@@ -94,7 +94,10 @@ class NekoWidget(QWidget):
         self.setFixedSize(160, 200)
 
     def load_assets(self):
-        base_path = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
         
         idle_path = os.path.join(base_path, 'assets', 'neko_idle.png')
         sleep_path = os.path.join(base_path, 'assets', 'neko_sleep.png')
@@ -371,19 +374,25 @@ class NekoWidget(QWidget):
                 shell = Dispatch('WScript.Shell')
                 shortcut = shell.CreateShortCut(shortcut_path)
                 
-                # Use pythonw.exe to run silently without a console window
-                pythonw_path = sys.executable.replace("python.exe", "pythonw.exe")
-                shortcut.Targetpath = pythonw_path if os.path.exists(pythonw_path) else sys.executable
-                
-                script_path = os.path.abspath(__file__)
-                shortcut.Arguments = f'"{script_path}"'
-                shortcut.WorkingDirectory = os.path.dirname(script_path)
+                if getattr(sys, 'frozen', False):
+                    # If running as PyInstaller executable
+                    shortcut.Targetpath = sys.executable
+                    shortcut.Arguments = ""
+                    shortcut.WorkingDirectory = os.path.dirname(sys.executable)
+                else:
+                    # If running as Python script
+                    pythonw_path = sys.executable.replace("python.exe", "pythonw.exe")
+                    shortcut.Targetpath = pythonw_path if os.path.exists(pythonw_path) else sys.executable
+                    
+                    script_path = os.path.abspath(__file__)
+                    shortcut.Arguments = f'"{script_path}"'
+                    shortcut.WorkingDirectory = os.path.dirname(script_path)
                 
                 # Use python icon or just default
                 shortcut.IconLocation = sys.executable
                 shortcut.save()
         except Exception as e:
-            print(f"Failed to set up autostart: {e}")
+            pass # Ignore print in noconsole mode
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
