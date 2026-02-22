@@ -100,11 +100,15 @@ class NekoWidget(QWidget):
         sleep_path = os.path.join(base_path, 'assets', 'neko_sleep.png')
         happy_path = os.path.join(base_path, 'assets', 'neko_happy.png')
         peek_path = os.path.join(base_path, 'assets', 'neko_peek.png')
+        curious_path = os.path.join(base_path, 'assets', 'neko_curious.png')
+        agitated_path = os.path.join(base_path, 'assets', 'neko_agitated.png')
         
         self.idle_pixmap = QPixmap(idle_path)
         self.sleep_pixmap = QPixmap(sleep_path)
         self.happy_pixmap = QPixmap(happy_path)
         self.peek_pixmap = QPixmap(peek_path)
+        self.curious_pixmap = QPixmap(curious_path)
+        self.agitated_pixmap = QPixmap(agitated_path)
         
         # Scale if necessary
         if not self.idle_pixmap.isNull():
@@ -115,6 +119,10 @@ class NekoWidget(QWidget):
             self.happy_pixmap = self.happy_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         if not self.peek_pixmap.isNull():
             self.peek_pixmap = self.peek_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        if not self.curious_pixmap.isNull():
+            self.curious_pixmap = self.curious_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        if not self.agitated_pixmap.isNull():
+            self.agitated_pixmap = self.agitated_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
         self.set_image(self.idle_pixmap)
 
@@ -146,10 +154,10 @@ class NekoWidget(QWidget):
         self.window_tracker_timer.timeout.connect(self.check_active_window)
         self.window_tracker_timer.start(1000)
         
-        # 10 second window change reset timer
+        # Window change reset timer
         self.window_change_reset_timer = QTimer(self)
+        self.window_change_reset_timer.setSingleShot(True)
         self.window_change_reset_timer.timeout.connect(self.reset_window_change_count)
-        self.window_change_reset_timer.start(10000)
         
         # Peek back-to-sleep timer
         self.peek_timer = QTimer(self)
@@ -168,23 +176,58 @@ class NekoWidget(QWidget):
             self.wake_up()
 
     def check_active_window(self):
-        # If we aren't sleeping or peeking, active window changes don't matter to our waking logic
-        if self.state not in [NekoState.SLEEPING, NekoState.PEEKING]:
+        # We track window changes in IDLE and TALKING
+        if self.state not in [NekoState.SLEEPING, NekoState.PEEKING, NekoState.IDLE, NekoState.TALKING]:
             return
             
         current_window = win32gui.GetForegroundWindow()
         
         if current_window and self.last_active_window and current_window != self.last_active_window:
-            self.window_change_count += 1
             
-            if self.window_change_count >= 3:
-                # Wake up fully if frantic typing/switching is happening
-                self.wake_up()
-                self.say(random.choice(["woah, so much blinking", "slow down!", "what's going on?", "you're moving fast!"]))
-                self.window_change_count = 0
-            elif self.window_change_count >= 1 and self.state == NekoState.SLEEPING:
-                # Just peek if it's a minor change
-                self.start_peek()
+            # Action if IDLE or TALKING
+            if self.state in [NekoState.IDLE, NekoState.TALKING]:
+                self.window_change_count += 1
+                self.reset_sleep_timer()  # Keep it awake like an interaction
+                
+                if self.window_change_count == 2:
+                    # Speak on 2nd window switch
+                    self.set_image(self.curious_pixmap)
+                    lines = [
+                        "Are you working?", "ooh, new app", "whatcha lookin at?", 
+                        "switchy switchy", "working hard?", "so many windows!"
+                    ]
+                    self.say(random.choice(lines))
+                    # Wait 5 seconds to turn back to idle (or get dizzy if 3 more changes)
+                    self.window_change_reset_timer.start(5000)
+                    
+                elif self.window_change_count >= 5:
+                    # Agitated state! Fast switching within the 5 seconds
+                    self.set_image(self.agitated_pixmap)
+                    lines = [
+                        "wat r u doin?!", "my head's spinnin!", "slow down >_<", 
+                        "too many screens!", "stahp switchin!", "ahhhhhhh!"
+                    ]
+                    self.say(random.choice(lines))
+                    self.window_change_count = 0  # Reset after scolding
+                    self.window_change_reset_timer.stop()
+            
+            # Action if SLEEPING or PEEKING
+            else:
+                self.window_change_count += 1
+                
+                # Start timer for full wake reset
+                if self.window_change_count == 1:
+                    self.window_change_reset_timer.start(10000)
+                    
+                if self.window_change_count >= 3:
+                    # Wake up fully if frantic typing/switching is happening
+                    self.wake_up()
+                    self.say(random.choice(["woah, meow 0w0", "slow down!", "what's going on?", "you woke me -w-"]))
+                    self.window_change_count = 0
+                    self.window_change_reset_timer.stop()
+                elif self.window_change_count >= 1 and self.state == NekoState.SLEEPING:
+                    # Just peek if it's a minor change
+                    self.start_peek()
                 
         self.last_active_window = current_window
 
