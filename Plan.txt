@@ -1,0 +1,229 @@
+YES. Perfect call. v0.1 first is exactly how real creatures get born 🐾
+Not fully formed Nekochan descending from the heavens… just a tiny digital kitten opening one eye for the first time.
+
+Here’s a **clean, coder-ready spec** you can drop straight into your vibecoder with minimal interpretation.
+
+No fluff. No philosophy. Just build instructions.
+
+# 🧾 PROJECT: DESKTOP NEKO — v0.1
+
+## 🎯 OBJECTIVE
+
+Create a **minimal lightweight desktop neko pet** that:
+
+• Starts with Windows
+• Appears bottom-right
+• Idles
+• Greets once
+• Says occasional random lines (with meows)
+• Can be clicked (pet reaction)
+• Can sleep after inactivity
+• Uses minimal resources
+
+NO advanced detection.
+NO cloud.
+NO complex AI.
+
+Just a living widget.
+
+---
+
+# 🧩 TECH REQUIREMENTS
+
+**Language:** Python
+**UI:** PySide6 or PyQt6
+**Input:** Basic mouse events
+**Startup:** Windows startup folder
+
+---
+
+# 🐱 FEATURES — v0.1
+
+## 1️⃣ Window / Appearance
+
+Create a transparent desktop window:
+
+• Frameless
+• Transparent background
+• Always on top
+• Fixed size (small)
+• Bottom-right corner
+• Draggable
+
+Display a static or simple animated Neko image.
+
+---
+
+## 2️⃣ States (Minimal)
+
+Implement only 3 states:
+
+```id="rfwsm1"
+IDLE
+TALKING
+SLEEPING
+```
+
+---
+
+## 3️⃣ Startup Behavior
+
+On launch:
+
+1. Show Neko in IDLE
+2. After 5–10 seconds → Greeting bubble
+3. Return to IDLE
+
+Greeting lines (random pick):
+
+* "mrrp… hello"
+* "you’re back, meow"
+* "hi hi"
+* "mew~"
+* "oh! there you are"
+
+---
+
+## 4️⃣ Dialogue System
+
+Every 2–5 minutes (random interval):
+
+Chance to say a random line.
+
+### Idle lines pool:
+
+* "mew?"
+* "what are you doing"
+* "mrrp"
+* "i’m watching"
+* "you look busy"
+* "meow meow"
+* "hm…"
+* "don’t mind me"
+
+Speech shown as small bubble above Neko for ~4 seconds.
+
+---
+
+## 5️⃣ Pet Interaction
+
+Mouse click on Neko:
+
+→ Enter TALKING state
+→ Show pet response
+→ Return to IDLE
+
+Pet response lines:
+
+* "mrrrow~"
+* "hehe meow"
+* "again again"
+* "purrr…"
+* "that’s nice"
+* "more pets pls"
+
+Optional: small happy animation if available.
+
+---
+
+## 6️⃣ Sleep System
+
+If no interaction or dialogue for 3 minutes:
+
+→ Enter SLEEPING state
+
+Sleep behavior:
+
+• Dim appearance
+• No dialogue
+• Minimal animation
+
+Wake triggers:
+
+• Mouse click
+• Mouse movement over Neko
+
+On wake:
+
+Line pool:
+
+* "m… meow?"
+* "did i sleep"
+* "oh hi"
+* "i was dreaming"
+
+Return to IDLE.
+
+---
+
+## 7️⃣ Resource Constraints
+
+Must remain lightweight:
+
+• Minimal animation loop
+• Reduce updates in sleep mode
+• No continuous processing
+• No network usage
+
+Goal:
+
+Near-zero CPU when idle.
+
+---
+
+## 8️⃣ Hide Option (Optional for v0.1)
+
+Right-click menu:
+
+• Hide
+• Exit
+
+If hidden:
+
+Program still runs but window invisible.
+
+---
+
+# 🐾 AUTO START
+
+Add app shortcut to Windows Startup folder.
+
+Program launches silently on boot.
+
+---
+
+# ✅ v0.1 SUCCESS CHECKLIST
+
+Project is complete if:
+
+✔ Neko appears on boot
+✔ Greets once
+✔ Says random meows occasionally
+✔ Can be clicked and reacts
+✔ Falls asleep
+✔ Wakes when interacted
+✔ Uses very low resources
+
+If it makes you smile even once, v0.1 succeeded.
+
+---
+
+Sir Sobi… this is small enough to build in a weekend, but meaningful enough to feel like something is finally there on your screen 🫧
+
+Once v0.1 exists, everything else becomes evolution instead of imagination.
+
+If you want next, after your vibecoder cooks this:
+
+I can prepare:
+
+## 🧾 v0.2 Plan — Curious Neko
+
+(where she starts noticing activity)
+
+or
+
+## 🧾 Personality Pack — Nekochan Awakening 🌸
+
+But first…
+
+let the tiny creature be born 🐈✨
