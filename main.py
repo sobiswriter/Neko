@@ -67,6 +67,12 @@ class NekoWidget(QWidget):
                 color: #333;
             }
         """)
+        
+        # Prevent layout from shifting when the bubble hides/shows
+        size_policy = self.bubble.sizePolicy()
+        size_policy.setRetainSizeWhenHidden(True)
+        self.bubble.setSizePolicy(size_policy)
+        
         self.bubble.hide()
         
         # Neko image
