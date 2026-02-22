@@ -2,6 +2,7 @@ import sys
 import random
 import os
 import winshell
+import win32gui
 from win32com.client import Dispatch
 from enum import Enum, auto
 from PySide6.QtWidgets import (
@@ -15,6 +16,7 @@ class NekoState(Enum):
     IDLE = auto()
     TALKING = auto()
     SLEEPING = auto()
+    PEEKING = auto()
 
 class NekoWidget(QWidget):
     def __init__(self):
@@ -22,6 +24,9 @@ class NekoWidget(QWidget):
         
         self.state = NekoState.IDLE
         self.drag_position = QPoint()
+        
+        self.last_active_window = 0
+        self.window_change_count = 0
         
         self.init_ui()
         self.load_assets()
@@ -94,10 +99,12 @@ class NekoWidget(QWidget):
         idle_path = os.path.join(base_path, 'assets', 'neko_idle.png')
         sleep_path = os.path.join(base_path, 'assets', 'neko_sleep.png')
         happy_path = os.path.join(base_path, 'assets', 'neko_happy.png')
+        peek_path = os.path.join(base_path, 'assets', 'neko_peek.png')
         
         self.idle_pixmap = QPixmap(idle_path)
         self.sleep_pixmap = QPixmap(sleep_path)
         self.happy_pixmap = QPixmap(happy_path)
+        self.peek_pixmap = QPixmap(peek_path)
         
         # Scale if necessary
         if not self.idle_pixmap.isNull():
@@ -106,6 +113,8 @@ class NekoWidget(QWidget):
             self.sleep_pixmap = self.sleep_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         if not self.happy_pixmap.isNull():
             self.happy_pixmap = self.happy_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        if not self.peek_pixmap.isNull():
+            self.peek_pixmap = self.peek_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
         self.set_image(self.idle_pixmap)
 
@@ -131,17 +140,66 @@ class NekoWidget(QWidget):
         self.sleep_timer = QTimer(self)
         self.sleep_timer.setSingleShot(True)
         self.sleep_timer.timeout.connect(self.go_to_sleep)
+        
+        # Active window tracker (polls every 1 second)
+        self.window_tracker_timer = QTimer(self)
+        self.window_tracker_timer.timeout.connect(self.check_active_window)
+        self.window_tracker_timer.start(1000)
+        
+        # 10 second window change reset timer
+        self.window_change_reset_timer = QTimer(self)
+        self.window_change_reset_timer.timeout.connect(self.reset_window_change_count)
+        self.window_change_reset_timer.start(10000)
+        
+        # Peek back-to-sleep timer
+        self.peek_timer = QTimer(self)
+        self.peek_timer.setSingleShot(True)
+        self.peek_timer.timeout.connect(self.end_peek)
 
     def set_next_dialogue_timer(self):
-        # 1 to 3 minutes
-        ms = random.randint(60000, 180000)
+        # 3 to 5 minutes
+        ms = random.randint(180000, 300000)
         self.dialogue_timer.start(ms)
 
     def reset_sleep_timer(self):
         # 30 seconds = 30000 ms
         self.sleep_timer.start(30000)
-        if self.state == NekoState.SLEEPING:
+        if self.state in [NekoState.SLEEPING, NekoState.PEEKING]:
             self.wake_up()
+
+    def check_active_window(self):
+        # If we aren't sleeping or peeking, active window changes don't matter to our waking logic
+        if self.state not in [NekoState.SLEEPING, NekoState.PEEKING]:
+            return
+            
+        current_window = win32gui.GetForegroundWindow()
+        
+        if current_window and self.last_active_window and current_window != self.last_active_window:
+            self.window_change_count += 1
+            
+            if self.window_change_count >= 3:
+                # Wake up fully if frantic typing/switching is happening
+                self.wake_up()
+                self.say(random.choice(["woah, so much blinking", "slow down!", "what's going on?", "you're moving fast!"]))
+                self.window_change_count = 0
+            elif self.window_change_count >= 1 and self.state == NekoState.SLEEPING:
+                # Just peek if it's a minor change
+                self.start_peek()
+                
+        self.last_active_window = current_window
+
+    def reset_window_change_count(self):
+        self.window_change_count = 0
+
+    def start_peek(self):
+        self.state = NekoState.PEEKING
+        self.set_image(self.peek_pixmap)
+        self.setWindowOpacity(0.9)
+        self.peek_timer.start(3000)  # Peek for 3 seconds then go back to sleep
+
+    def end_peek(self):
+        if self.state == NekoState.PEEKING:
+            self.go_to_sleep()
 
     def do_greeting(self):
         greetings = ["mrrp… hello", "you’re back, meow", "hi hi", "mew~", "oh! there you are"]
