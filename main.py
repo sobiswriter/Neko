@@ -133,12 +133,12 @@ class NekoWidget(QWidget):
         self.sleep_timer.timeout.connect(self.go_to_sleep)
 
     def set_next_dialogue_timer(self):
-        # 2 to 5 minutes
-        ms = random.randint(120000, 300000)
+        # 1 to 3 minutes
+        ms = random.randint(60000, 180000)
         self.dialogue_timer.start(ms)
 
     def reset_sleep_timer(self):
-        # 0.5 minute = 30000 ms
+        # 30 seconds = 30000 ms
         self.sleep_timer.start(30000)
         if self.state == NekoState.SLEEPING:
             self.wake_up()
@@ -148,14 +148,19 @@ class NekoWidget(QWidget):
         self.say(random.choice(greetings))
 
     def random_dialogue(self):
+        # If sleeping, there's a chance it wakes up just to talk
         if self.state == NekoState.SLEEPING:
-            self.set_next_dialogue_timer()
-            return
+            self.wake_up()
+            lines = [
+                "m... mrrp?", "i'm awake now", "where am i...", 
+                "just checking in", "is it time for treats?"
+            ]
+        else:
+            lines = [
+                "mew?", "what are you doing", "mrrp", "i’m watching", 
+                "you look busy", "meow meow", "hm…", "don’t mind me"
+            ]
             
-        lines = [
-            "mew?", "what are you doing", "mrrp", "i’m watching", 
-            "you look busy", "meow meow", "hm…", "don’t mind me"
-        ]
         self.say(random.choice(lines))
         self.set_next_dialogue_timer()
 
