@@ -93,14 +93,19 @@ class NekoWidget(QWidget):
         
         idle_path = os.path.join(base_path, 'assets', 'neko_idle.png')
         sleep_path = os.path.join(base_path, 'assets', 'neko_sleep.png')
+        happy_path = os.path.join(base_path, 'assets', 'neko_happy.png')
+        
         self.idle_pixmap = QPixmap(idle_path)
         self.sleep_pixmap = QPixmap(sleep_path)
+        self.happy_pixmap = QPixmap(happy_path)
         
         # Scale if necessary
         if not self.idle_pixmap.isNull():
             self.idle_pixmap = self.idle_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         if not self.sleep_pixmap.isNull():
             self.sleep_pixmap = self.sleep_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        if not self.happy_pixmap.isNull():
+            self.happy_pixmap = self.happy_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
         self.set_image(self.idle_pixmap)
 
@@ -156,6 +161,7 @@ class NekoWidget(QWidget):
 
     def pet_reaction(self):
         lines = ["mrrrow~", "hehe meow", "again again", "purrr…", "that’s nice", "more pets pls"]
+        self.set_image(self.happy_pixmap)
         self.say(random.choice(lines))
 
     def wake_up(self):
@@ -183,6 +189,7 @@ class NekoWidget(QWidget):
         self.bubble.hide()
         if self.state == NekoState.TALKING:
             self.state = NekoState.IDLE
+            self.set_image(self.idle_pixmap)
 
     # Window Movement & Interaction
     def mousePressEvent(self, event):
