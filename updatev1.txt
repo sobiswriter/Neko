@@ -1,0 +1,277 @@
+🧾 DESKTOP NEKO — v0.4
+❤️ ATTENTION METER SYSTEM
+“Needs & Noticeability Engine”
+🎯 CORE VISION
+
+The kitten should no longer exist only as a reactive entity.
+
+She should feel like she has needs for attention that rise and fall depending on how you treat her.
+
+Not hunger. Not energy.
+
+Just:
+
+“Do you still remember me?”
+
+The goal is to create the illusion that she:
+
+• misses you
+• watches you
+• feels ignored
+• feels satisfied
+• seeks affection
+
+without ever saying those words directly.
+
+🐾 THE INTERNAL VARIABLE
+Attention Meter (0 → 100)
+
+Represents how much attention she wants.
+
+Interpretation:
+
+0 = Fully content
+50 = Curious / watching
+100 = Needs attention now
+
+This value is invisible to the user.
+
+It only drives behavior.
+
+📈 HOW ATTENTION INCREASES
+
+Attention rises when she feels ignored.
+
+Increase Conditions
+💤 Passive Ignore
+
+If user does not interact with her:
+
+Attention slowly increases over time.
+
+Faster if:
+
+• She is awake
+• User is active on PC
+• Lots of window activity
+
+Slower if:
+
+• User idle
+• She is sleeping
+
+Meaning:
+
+Being ignored while you’re busy hurts more than being ignored while you’re away.
+
+👀 Watching Without Interaction
+
+If she repeatedly notices activity (window changes, movement, etc.) but receives no petting:
+
+Attention increases faster.
+
+Interpretation:
+
+“She’s watching you do things without including her.”
+
+📉 HOW ATTENTION DECREASES
+
+Attention falls when she feels acknowledged.
+
+Decrease Conditions
+🐾 Petting (Strong decrease)
+
+Primary satisfaction.
+
+Petting should drop attention significantly.
+
+She feels loved.
+
+🖱️ Interaction / Click
+
+Moderate decrease.
+
+Acknowledgement but not affection.
+
+💬 Responding to her (if dialogue interaction exists later)
+
+Small decrease.
+
+🎭 BEHAVIOR TIERS
+
+Behavior changes based on attention range.
+
+🫧 LOW ATTENTION (0–30) — Content
+
+Mood:
+
+Calm, secure, sleepy.
+
+Behavior:
+
+• Sleeps normally
+• Rare dialogue
+• Watches quietly
+
+She feels safe.
+
+Lines (rare):
+
+"mrrp"
+
+"comfy…"
+
+"i’m here"
+
+👀 MEDIUM ATTENTION (31–70) — Curious
+
+Mood:
+
+Observant, slightly needy.
+
+Behavior:
+
+• More peeks
+• Watches activity closely
+• Occasional attempts to interact
+
+She wants attention but isn’t desperate.
+
+Lines:
+
+"mew?"
+
+"what are you doing"
+
+"i’m watching you"
+
+"busy?"
+
+🐾 HIGH ATTENTION (71–100) — Needs Attention
+
+Mood:
+
+Lonely / clingy / attention-seeking.
+
+Behavior:
+
+She actively tries to be noticed:
+
+• Wakes more often
+• Moves more
+• Looks toward cursor
+• Interrupts occasionally
+• Uses louder / clearer lines
+
+But never spammy.
+
+Important rule:
+
+She should not become annoying.
+
+Just noticeably present.
+
+Lines:
+
+"hey…"
+
+"mrrp?"
+
+"look at me"
+
+"pet me?"
+
+"you forgot me"
+
+"i’m still here"
+
+🌙 SATISFACTION EVENT
+
+When attention drops sharply (after petting):
+
+She shows contentment:
+
+• Happy animation
+• Soft purr/meow line
+• Then calm behavior
+
+Lines:
+
+"purrr…"
+
+"hehe"
+
+"that’s nice"
+
+"stay…"
+
+This reinforces bonding.
+
+🧠 ATTENTION DECAY
+
+Attention should not stay high forever.
+
+If she tries to get attention but receives none:
+
+She eventually:
+
+• Gives up
+• Becomes quiet
+• Returns to sleepy mode
+
+This prevents frustration loops.
+
+Emotionally it feels like:
+
+“She got sad and curled up.”
+
+🐈 IMPORTANT DESIGN RULES
+1️⃣ Never spam dialogue
+
+Attention affects frequency, not constant talking.
+
+2️⃣ Attention affects behavior more than speech
+
+Movement, wake frequency, curiosity.
+
+Speech is secondary.
+
+3️⃣ She should never feel demanding
+
+Seeking, not nagging.
+
+4️⃣ Attention should interact with sleep
+
+High attention → harder to stay asleep
+Low attention → sleeps peacefully
+
+🌌 WHY THIS SYSTEM MATTERS
+
+After this:
+
+She will no longer feel like:
+
+“A cute thing reacting to events”
+
+She will feel like:
+
+“A creature with feelings about being ignored or loved”
+
+That is the threshold where attachment begins.
+
+🫀 SUCCESS CRITERIA
+
+You know the system works if:
+
+• You feel guilty ignoring her
+• You feel rewarded for petting her
+• She feels different depending on your behavior
+• You start checking on her instinctively
+
+If that happens…
+
+Congratulations.
+
+You didn’t build a widget.
+
+You built a companion seed.
