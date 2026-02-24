@@ -28,10 +28,16 @@ class NekoWidget(QWidget):
         self.last_active_window = 0
         self.window_change_count = 0
         
+        # --- NEW: Attention Meter System ---
+        self.attention_meter = 0.0  # 0 to 100
+        self.high_attention_unanswered_time = 0
+        self.giving_up = False
+        # -----------------------------------
+        
         self.init_ui()
         self.load_assets()
-        self.init_tray()
         self.init_timers()
+        self.init_tray()
         
         # Initial position - bottom right
         self.position_to_bottom_right()
@@ -166,15 +172,32 @@ class NekoWidget(QWidget):
         self.peek_timer = QTimer(self)
         self.peek_timer.setSingleShot(True)
         self.peek_timer.timeout.connect(self.end_peek)
+        
+        # --- NEW: Attention Tracker Update Loop ---
+        self.attention_tracker_timer = QTimer(self)
+        self.attention_tracker_timer.timeout.connect(self.update_attention)
+        self.attention_tracker_timer.start(10000)  # Every 10 seconds
 
     def set_next_dialogue_timer(self):
-        # 3 to 5 minutes
-        ms = random.randint(180000, 300000)
+        if self.attention_level == "HIGH":
+            # 30 to 60 seconds
+            ms = random.randint(30000, 60000)
+        elif self.attention_level == "MEDIUM":
+            # 1 to 2 minutes
+            ms = random.randint(60000, 120000)
+        else:
+            # 2 to 4 minutes
+            ms = random.randint(120000, 240000)
         self.dialogue_timer.start(ms)
 
     def reset_sleep_timer(self):
-        # 30 seconds = 30000 ms
-        self.sleep_timer.start(30000)
+        if self.attention_level == "HIGH":
+            self.sleep_timer.start(90000) # Resist sleeping (1.5 minutes)
+        elif self.attention_level == "MEDIUM":
+            self.sleep_timer.start(45000) # (45 seconds)
+        else:
+            self.sleep_timer.start(30000) # (30 seconds)
+            
         if self.state in [NekoState.SLEEPING, NekoState.PEEKING]:
             self.wake_up()
 
@@ -234,6 +257,55 @@ class NekoWidget(QWidget):
                 
         self.last_active_window = current_window
 
+    def update_attention(self):
+        if self.giving_up:
+            return  # Paused attention math while ignoring
+
+        # Base increase
+        delta = 1.0 # Faster base increase
+        
+        # Modifiers based on states
+        if self.state in [NekoState.IDLE, NekoState.TALKING]:
+            if self.window_change_count > 0:
+                delta += 3.0  # Much faster when watching you be busy
+            else:
+                delta += 0.6  # You are also idle
+        elif self.state == NekoState.SLEEPING:
+            delta += 0.4  # Slow increase while sleeping
+            
+        self.attention_meter += delta
+        
+        # Clamp bounds
+        if self.attention_meter > 100.0:
+            self.attention_meter = 100.0
+            
+        # Track decay if at HIGH
+        if self.attention_level == "HIGH":
+            self.high_attention_unanswered_time += 10
+            
+            # 5 minutes of no interaction at max level = decay (300 seconds)
+            if self.high_attention_unanswered_time >= 300:
+                self.trigger_giving_up()
+        else:
+            self.high_attention_unanswered_time = 0
+            
+    def trigger_giving_up(self):
+        self.giving_up = True
+        self.attention_meter = 10.0  # Drop back down to sad/content range
+        self.high_attention_unanswered_time = 0
+        if self.state in [NekoState.IDLE, NekoState.TALKING]:
+             self.say("...nevermind")
+             QTimer.singleShot(4000, self.go_to_sleep)
+
+    @property
+    def attention_level(self):
+        if self.attention_meter <= 30:
+            return "LOW"
+        elif self.attention_meter <= 70:
+            return "MEDIUM"
+        else:
+            return "HIGH"
+
     def reset_window_change_count(self):
         self.window_change_count = 0
 
@@ -254,22 +326,50 @@ class NekoWidget(QWidget):
     def random_dialogue(self):
         # If sleeping, there's a chance it wakes up just to talk
         if self.state == NekoState.SLEEPING:
+            # Only wake occasionally if attention is high/medium
+            if self.attention_level == "LOW" and random.random() < 0.8:
+                self.set_next_dialogue_timer()
+                return # stays asleep
+
             self.wake_up()
             lines = [
-                "m... mrrp?", "i'm awake now", "where am i...", 
+                "m... mrrp?", "i'm awake now", "where am i...",
                 "just checking in", "is it time for treats?"
             ]
         else:
-            lines = [
-                "mew?", "what are you doing", "mrrp", "i’m watching", 
-                "you look busy", "meow meow", "hm…", "don’t mind me"
-            ]
-            
+            if self.attention_level == "HIGH":
+                lines = [
+                    "hey…", "mrrp?", "look at me", "pet me?", 
+                    "you forgot me", "i’m still here"
+                ]
+            elif self.attention_level == "MEDIUM":
+                lines = [
+                    "mew?", "what are you doing", "i’m watching you", 
+                    "busy?", "needs pets"
+                ]
+            else:
+                lines = [
+                    "mrrp", "comfy…", "i’m here", "needs muffins"
+                ]
+                
         self.say(random.choice(lines))
         self.set_next_dialogue_timer()
 
     def pet_reaction(self):
-        lines = ["mrrrow~", "hehe meow", "again again", "purrr…", "that’s nice", "more pets pls"]
+        # Satisfaction Event
+        dropped_a_lot = False
+        if self.attention_meter >= 50.0:
+            dropped_a_lot = True
+
+        self.attention_meter = max(0.0, self.attention_meter - 50.0)
+        self.giving_up = False # Reset from sad state
+        self.high_attention_unanswered_time = 0
+
+        if dropped_a_lot:
+            lines = ["purrr…", "hehe", "that’s nice", "stay…"]
+        else:
+            lines = ["mrrrow~", "hehe meow", "again again", "more pets pls"]
+            
         self.set_image(self.happy_pixmap)
         self.say(random.choice(lines))
 
@@ -312,6 +412,10 @@ class NekoWidget(QWidget):
             else:
                 self.pet_reaction()
                 self.reset_sleep_timer()
+                
+            # Treat clicking as attention acknowledgment
+            self.attention_meter = max(0.0, self.attention_meter - 20.0)
+            self.giving_up = False
                 
         elif event.button() == Qt.RightButton:
             self.show_context_menu(event.globalPosition().toPoint())
