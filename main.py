@@ -7,7 +7,7 @@ from win32com.client import Dispatch
 from enum import Enum, auto
 from PySide6.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, 
-    QMenu, QSystemTrayIcon, QStyle
+    QMenu, QSystemTrayIcon, QStyle, QGridLayout
 )
 from PySide6.QtCore import Qt, QTimer, QPoint
 from PySide6.QtGui import QPixmap, QIcon
@@ -17,6 +17,73 @@ class NekoState(Enum):
     TALKING = auto()
     SLEEPING = auto()
     PEEKING = auto()
+
+class StatsWindow(QWidget):
+    def __init__(self, neko_ref):
+        super().__init__()
+        self.neko = neko_ref
+        self.init_ui()
+        
+        # Timer to refresh stats periodically
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.timeout.connect(self.update_stats)
+        self.refresh_timer.start(1000) # Every 1 second
+        
+    def init_ui(self):
+        self.setWindowTitle("Neko Stats")
+        self.setFixedSize(250, 180)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.Tool)
+        
+        layout = QGridLayout()
+        
+        self.lbl_attention = QLabel("Attention Meter:")
+        self.val_attention = QLabel("0.0")
+        
+        self.lbl_level = QLabel("Attention Level:")
+        self.val_level = QLabel("LOW")
+        
+        self.lbl_pets = QLabel("Pets Received:")
+        self.val_pets = QLabel("0")
+        
+        self.lbl_sleeps = QLabel("Times Slept:")
+        self.val_sleeps = QLabel("0")
+        
+        self.lbl_lines = QLabel("Lines Spoken:")
+        self.val_lines = QLabel("0")
+        
+        # Styling
+        font = self.lbl_attention.font()
+        font.setPointSize(10)
+        
+        for lbl in [self.lbl_attention, self.val_attention, self.lbl_level, self.val_level,
+                    self.lbl_pets, self.val_pets, self.lbl_sleeps, self.val_sleeps,
+                    self.lbl_lines, self.val_lines]:
+            lbl.setFont(font)
+            
+        layout.addWidget(self.lbl_attention, 0, 0)
+        layout.addWidget(self.val_attention, 0, 1)
+        
+        layout.addWidget(self.lbl_level, 1, 0)
+        layout.addWidget(self.val_level, 1, 1)
+        
+        layout.addWidget(self.lbl_pets, 2, 0)
+        layout.addWidget(self.val_pets, 2, 1)
+        
+        layout.addWidget(self.lbl_sleeps, 3, 0)
+        layout.addWidget(self.val_sleeps, 3, 1)
+        
+        layout.addWidget(self.lbl_lines, 4, 0)
+        layout.addWidget(self.val_lines, 4, 1)
+        
+        self.setLayout(layout)
+        self.update_stats()
+        
+    def update_stats(self):
+        self.val_attention.setText(f"{self.neko.attention_meter:.1f} / 100")
+        self.val_level.setText(self.neko.attention_level)
+        self.val_pets.setText(str(self.neko.stats_pets_received))
+        self.val_sleeps.setText(str(self.neko.stats_times_slept))
+        self.val_lines.setText(str(self.neko.stats_lines_spoken))
 
 class NekoWidget(QWidget):
     def __init__(self):
@@ -32,6 +99,13 @@ class NekoWidget(QWidget):
         self.attention_meter = 0.0  # 0 to 100
         self.high_attention_unanswered_time = 0
         self.giving_up = False
+        self.is_manually_hidden = False
+        self.temp_unhidden_for_dialogue = False
+        
+        self.stats_pets_received = 0
+        self.stats_times_slept = 0
+        self.stats_lines_spoken = 0
+        self.stats_window = None
         # -----------------------------------
         
         self.init_ui()
@@ -158,10 +232,10 @@ class NekoWidget(QWidget):
         self.sleep_timer.setSingleShot(True)
         self.sleep_timer.timeout.connect(self.go_to_sleep)
         
-        # Active window tracker (polls every 1 second)
+        # Active window tracker (polls every 2 seconds to reduce noise)
         self.window_tracker_timer = QTimer(self)
         self.window_tracker_timer.timeout.connect(self.check_active_window)
-        self.window_tracker_timer.start(1000)
+        self.window_tracker_timer.start(2000)
         
         # Window change reset timer
         self.window_change_reset_timer = QTimer(self)
@@ -180,14 +254,14 @@ class NekoWidget(QWidget):
 
     def set_next_dialogue_timer(self):
         if self.attention_level == "HIGH":
+            # 15 to 30 seconds
+            ms = random.randint(15000, 30000)
+        elif self.attention_level == "MEDIUM":
             # 30 to 60 seconds
             ms = random.randint(30000, 60000)
-        elif self.attention_level == "MEDIUM":
+        else:
             # 1 to 2 minutes
             ms = random.randint(60000, 120000)
-        else:
-            # 2 to 4 minutes
-            ms = random.randint(120000, 240000)
         self.dialogue_timer.start(ms)
 
     def reset_sleep_timer(self):
@@ -215,19 +289,19 @@ class NekoWidget(QWidget):
                 self.window_change_count += 1
                 self.reset_sleep_timer()  # Keep it awake like an interaction
                 
-                if self.window_change_count == 2:
-                    # Speak on 2nd window switch
+                if self.window_change_count == 3:
+                    # Speak on 3rd window switch (more stable than 2)
                     self.set_image(self.curious_pixmap)
                     lines = [
                         "Are you working?", "ooh, new app", "whatcha lookin at?", 
                         "switchy switchy", "working hard?", "so many windows!"
                     ]
                     self.say(random.choice(lines))
-                    # Wait 5 seconds to turn back to idle (or get dizzy if 3 more changes)
-                    self.window_change_reset_timer.start(5000)
+                    # Wait 8 seconds to turn back to idle (or get dizzy if 3 more changes)
+                    self.window_change_reset_timer.start(8000)
                     
-                elif self.window_change_count >= 5:
-                    # Agitated state! Fast switching within the 5 seconds
+                elif self.window_change_count >= 6:
+                    # Agitated state! Fast switching within the 8 seconds
                     self.set_image(self.agitated_pixmap)
                     lines = [
                         "wat r u doin?!", "my head's spinnin!", "slow down >_<", 
@@ -243,7 +317,7 @@ class NekoWidget(QWidget):
                 
                 # Start timer for full wake reset
                 if self.window_change_count == 1:
-                    self.window_change_reset_timer.start(10000)
+                    self.window_change_reset_timer.start(12000)
                     
                 if self.window_change_count >= 3:
                     # Wake up fully if frantic typing/switching is happening
@@ -262,16 +336,16 @@ class NekoWidget(QWidget):
             return  # Paused attention math while ignoring
 
         # Base increase
-        delta = 1.0 # Faster base increase
+        delta = 2.0 # Way faster base increase
         
         # Modifiers based on states
         if self.state in [NekoState.IDLE, NekoState.TALKING]:
             if self.window_change_count > 0:
-                delta += 3.0  # Much faster when watching you be busy
+                delta += 4.0  # Watching you be busy rapidly scales it
             else:
-                delta += 0.6  # You are also idle
+                delta += 1.0  # You are also idle
         elif self.state == NekoState.SLEEPING:
-            delta += 0.4  # Slow increase while sleeping
+            delta += 0.8  # Slow increase while sleeping
             
         self.attention_meter += delta
         
@@ -340,28 +414,36 @@ class NekoWidget(QWidget):
             if self.attention_level == "HIGH":
                 lines = [
                     "hey…", "mrrp?", "look at me", "pet me?", 
-                    "you forgot me", "i’m still here"
+                    "you forgot me", "i’m still here", "pay attention to me!",
+                    "notice me...", "don't ignore me", "i want pets!", 
+                    "play with me?", "meow meow meow!!"
                 ]
             elif self.attention_level == "MEDIUM":
                 lines = [
                     "mew?", "what are you doing", "i’m watching you", 
-                    "busy?", "needs pets"
+                    "busy?", "needs pets", "whatcha doing there", 
+                    "interesting...", "i'm bored", "is that work?", 
+                    "can I help?", "hmmm"
                 ]
             else:
                 lines = [
-                    "mrrp", "comfy…", "i’m here", "needs muffins"
+                    "mrrp", "comfy…", "i’m here", "needs muffins",
+                    "so cozy", "warm...", "zzz...", "peaceful", 
+                    "good human", "purr"
                 ]
                 
         self.say(random.choice(lines))
         self.set_next_dialogue_timer()
 
     def pet_reaction(self):
+        self.stats_pets_received += 1
+        
         # Satisfaction Event
         dropped_a_lot = False
-        if self.attention_meter >= 50.0:
+        if self.attention_meter >= 25.0:
             dropped_a_lot = True
 
-        self.attention_meter = max(0.0, self.attention_meter - 50.0)
+        self.attention_meter = max(0.0, self.attention_meter - 25.0)
         self.giving_up = False # Reset from sad state
         self.high_attention_unanswered_time = 0
 
@@ -382,12 +464,19 @@ class NekoWidget(QWidget):
         self.say(random.choice(wake_lines))
 
     def go_to_sleep(self):
+        self.stats_times_slept += 1
         self.state = NekoState.SLEEPING
         self.set_image(self.sleep_pixmap)
         self.setWindowOpacity(0.7)
         self.hide_bubble()
 
     def say(self, text):
+        self.stats_lines_spoken += 1
+        
+        if self.is_manually_hidden:
+            self.show()
+            self.temp_unhidden_for_dialogue = True
+
         self.bubble.setText(text)
         self.bubble.show()
         self.state = NekoState.TALKING
@@ -399,6 +488,10 @@ class NekoWidget(QWidget):
         if self.state == NekoState.TALKING:
             self.state = NekoState.IDLE
             self.set_image(self.idle_pixmap)
+            
+        if self.temp_unhidden_for_dialogue:
+            self.hide()
+            self.temp_unhidden_for_dialogue = False
 
     # Window Movement & Interaction
     def mousePressEvent(self, event):
@@ -406,16 +499,18 @@ class NekoWidget(QWidget):
             self.drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
             event.accept()
             
+            # If she's temporarily unhidden for dialogue and user clicks her, unhide her completely.
+            if self.temp_unhidden_for_dialogue:
+                self.is_manually_hidden = False
+                self.temp_unhidden_for_dialogue = False
+            
             # Interaction Logic
             if self.state == NekoState.SLEEPING:
                 self.reset_sleep_timer()
+                self.giving_up = False
             else:
                 self.pet_reaction()
                 self.reset_sleep_timer()
-                
-            # Treat clicking as attention acknowledgment
-            self.attention_meter = max(0.0, self.attention_meter - 20.0)
-            self.giving_up = False
                 
         elif event.button() == Qt.RightButton:
             self.show_context_menu(event.globalPosition().toPoint())
@@ -437,14 +532,39 @@ class NekoWidget(QWidget):
         y = screen.height() - self.height() - 50
         self.move(x, y)
 
+    def hide_neko(self):
+        self.is_manually_hidden = True
+        self.hide()
+
+    def show_neko(self):
+        self.is_manually_hidden = False
+        self.temp_unhidden_for_dialogue = False
+        self.show()
+
+    def open_stats_window(self):
+        if not self.stats_window:
+            self.stats_window = StatsWindow(self)
+        self.stats_window.show()
+        self.stats_window.raise_()
+
     def show_context_menu(self, pos):
         menu = QMenu(self)
-        hide_action = menu.addAction("Hide")
+        if self.is_manually_hidden:
+            toggle_action = menu.addAction("Unhide")
+        else:
+            toggle_action = menu.addAction("Hide")
+            
+        stats_action = menu.addAction("Stats")
         exit_action = menu.addAction("Exit")
         
         action = menu.exec(pos)
-        if action == hide_action:
-            self.hide()
+        if action == toggle_action:
+            if self.is_manually_hidden:
+                self.show_neko()
+            else:
+                self.hide_neko()
+        elif action == stats_action:
+            self.open_stats_window()
         elif action == exit_action:
             QApplication.quit()
 
@@ -460,10 +580,12 @@ class NekoWidget(QWidget):
         tray_menu = QMenu()
         show_action = tray_menu.addAction("Show Neko")
         hide_action = tray_menu.addAction("Hide Neko")
+        stats_action = tray_menu.addAction("Stats")
         exit_action = tray_menu.addAction("Exit")
         
-        show_action.triggered.connect(self.show)
-        hide_action.triggered.connect(self.hide)
+        show_action.triggered.connect(self.show_neko)
+        hide_action.triggered.connect(self.hide_neko)
+        stats_action.triggered.connect(self.open_stats_window)
         exit_action.triggered.connect(QApplication.quit)
         
         self.tray_icon.setContextMenu(tray_menu)
