@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer, QPoint
 from PySide6.QtGui import QPixmap, QIcon
+from llm_brain import AIBrainWorker
 
 class NekoState(Enum):
     IDLE = auto()
@@ -106,6 +107,8 @@ class NekoWidget(QWidget):
         self.stats_times_slept = 0
         self.stats_lines_spoken = 0
         self.stats_window = None
+        self.ai_brain_enabled = False
+        self.brain_worker = None
         # -----------------------------------
         
         self.init_ui()
@@ -158,6 +161,10 @@ class NekoWidget(QWidget):
         size_policy.setRetainSizeWhenHidden(True)
         self.bubble.setSizePolicy(size_policy)
         
+        self.bubble.setWordWrap(True)
+        self.bubble.setMinimumWidth(100)
+        self.bubble.setMaximumWidth(250)
+        
         self.bubble.hide()
         
         # Neko image
@@ -171,47 +178,63 @@ class NekoWidget(QWidget):
         
         self.setLayout(self.layout)
         
-        self.setFixedSize(160, 200)
+        self.setMinimumSize(160, 200)
+        
+        # Remove setFixedSize to allow the window to grow when the bubble expands
+        # self.setFixedSize(160, 200)
 
     def load_assets(self):
         if getattr(sys, 'frozen', False):
             base_path = sys._MEIPASS
         else:
             base_path = os.path.dirname(os.path.abspath(__file__))
-        
-        idle_path = os.path.join(base_path, 'assets', 'neko_idle.png')
-        sleep_path = os.path.join(base_path, 'assets', 'neko_sleep.png')
-        happy_path = os.path.join(base_path, 'assets', 'neko_happy.png')
-        peek_path = os.path.join(base_path, 'assets', 'neko_peek.png')
-        curious_path = os.path.join(base_path, 'assets', 'neko_curious.png')
-        agitated_path = os.path.join(base_path, 'assets', 'neko_agitated.png')
-        
-        self.idle_pixmap = QPixmap(idle_path)
-        self.sleep_pixmap = QPixmap(sleep_path)
-        self.happy_pixmap = QPixmap(happy_path)
-        self.peek_pixmap = QPixmap(peek_path)
-        self.curious_pixmap = QPixmap(curious_path)
-        self.agitated_pixmap = QPixmap(agitated_path)
-        
-        # Scale if necessary
-        if not self.idle_pixmap.isNull():
-            self.idle_pixmap = self.idle_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        if not self.sleep_pixmap.isNull():
-            self.sleep_pixmap = self.sleep_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        if not self.happy_pixmap.isNull():
-            self.happy_pixmap = self.happy_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        if not self.peek_pixmap.isNull():
-            self.peek_pixmap = self.peek_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        if not self.curious_pixmap.isNull():
-            self.curious_pixmap = self.curious_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        if not self.agitated_pixmap.isNull():
-            self.agitated_pixmap = self.agitated_pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            
+        def load_asset(base_name):
+            # Try loading .gif first
+            gif_path = os.path.join(base_path, 'assets', f'{base_name}.gif')
+            
+            # If gif exists, load as QMovie
+            if os.path.exists(gif_path):
+                from PySide6.QtCore import QSize
+                from PySide6.QtGui import QMovie
+                movie = QMovie(gif_path)
+                if movie.isValid():
+                    movie.setScaledSize(QSize(64, 64))
+                    return movie
+                    
+            # Fallback to .png
+            png_path = os.path.join(base_path, 'assets', f'{base_name}.png')
+            pixmap = QPixmap(png_path)
+            if not pixmap.isNull():
+                return pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                
+            return None
 
-        self.set_image(self.idle_pixmap)
+        # Load assets (can be either QMovie or QPixmap, or None)
+        self.idle_asset = load_asset('neko_idle')
+        self.sleep_asset = load_asset('neko_sleep')
+        self.happy_asset = load_asset('neko_happy')
+        self.peek_asset = load_asset('neko_peek')
+        self.curious_asset = load_asset('neko_curious')
+        self.agitated_asset = load_asset('neko_agitated')
 
-    def set_image(self, pixmap):
-        if not pixmap.isNull():
-            self.neko_image.setPixmap(pixmap)
+        self.current_movie = None
+        self.set_image(self.idle_asset)
+
+    def set_image(self, asset):
+        from PySide6.QtGui import QMovie, QPixmap
+        
+        # Stop any currently playing movie
+        if self.current_movie is not None:
+            self.current_movie.stop()
+            self.current_movie = None
+            
+        if isinstance(asset, QMovie):
+            self.neko_image.setMovie(asset)
+            asset.start()
+            self.current_movie = asset
+        elif isinstance(asset, QPixmap) and not asset.isNull():
+            self.neko_image.setPixmap(asset)
         else:
             self.neko_image.setText("[NEKO]")
             self.neko_image.setStyleSheet("color: white; background-color: black; padding: 10px;")
@@ -232,10 +255,10 @@ class NekoWidget(QWidget):
         self.sleep_timer.setSingleShot(True)
         self.sleep_timer.timeout.connect(self.go_to_sleep)
         
-        # Active window tracker (polls every 2 seconds to reduce noise)
+        # Active window tracker (polls every 3 seconds to reduce noise)
         self.window_tracker_timer = QTimer(self)
         self.window_tracker_timer.timeout.connect(self.check_active_window)
-        self.window_tracker_timer.start(2000)
+        self.window_tracker_timer.start(3000)
         
         # Window change reset timer
         self.window_change_reset_timer = QTimer(self)
@@ -290,19 +313,24 @@ class NekoWidget(QWidget):
                 self.reset_sleep_timer()  # Keep it awake like an interaction
                 
                 if self.window_change_count == 3:
-                    # Speak on 3rd window switch (more stable than 2)
-                    self.set_image(self.curious_pixmap)
-                    lines = [
-                        "Are you working?", "ooh, new app", "whatcha lookin at?", 
-                        "switchy switchy", "working hard?", "so many windows!"
-                    ]
-                    self.say(random.choice(lines))
-                    # Wait 8 seconds to turn back to idle (or get dizzy if 3 more changes)
-                    self.window_change_reset_timer.start(8000)
+                    if getattr(self, "ai_brain_enabled", False):
+                        self.trigger_ai_brain(event_type="window_switch", take_screenshot=True)
+                        self.window_change_count = 0 
+                        self.window_change_reset_timer.stop()
+                    else:
+                        # Speak on 3rd window switch (more stable than 2)
+                        self.set_image(self.curious_asset)
+                        lines = [
+                            "Are you working?", "ooh, new app", "whatcha lookin at?", 
+                            "switchy switchy", "working hard?", "so many windows!"
+                        ]
+                        self.say(random.choice(lines))
+                        # Wait 8 seconds to turn back to idle (or get dizzy if 3 more changes)
+                        self.window_change_reset_timer.start(8000)
                     
                 elif self.window_change_count >= 6:
                     # Agitated state! Fast switching within the 8 seconds
-                    self.set_image(self.agitated_pixmap)
+                    self.set_image(self.agitated_asset)
                     lines = [
                         "wat r u doin?!", "my head's spinnin!", "slow down >_<", 
                         "too many screens!", "stahp switchin!", "ahhhhhhh!"
@@ -335,17 +363,17 @@ class NekoWidget(QWidget):
         if self.giving_up:
             return  # Paused attention math while ignoring
 
-        # Base increase
-        delta = 2.0 # Way faster base increase
+        # Base increase (Decreased substantially as requested)
+        delta = 0.5 
         
         # Modifiers based on states
         if self.state in [NekoState.IDLE, NekoState.TALKING]:
             if self.window_change_count > 0:
-                delta += 4.0  # Watching you be busy rapidly scales it
+                delta += 1.0  # Watching you be busy scales it
             else:
-                delta += 1.0  # You are also idle
+                delta += 0.2  # You are also idle
         elif self.state == NekoState.SLEEPING:
-            delta += 0.8  # Slow increase while sleeping
+            delta += 0.1  # Slow increase while sleeping
             
         self.attention_meter += delta
         
@@ -367,9 +395,14 @@ class NekoWidget(QWidget):
         self.giving_up = True
         self.attention_meter = 10.0  # Drop back down to sad/content range
         self.high_attention_unanswered_time = 0
+        
         if self.state in [NekoState.IDLE, NekoState.TALKING]:
-             self.say("...nevermind")
-             QTimer.singleShot(4000, self.go_to_sleep)
+            if getattr(self, "ai_brain_enabled", False):
+                 self.trigger_ai_brain(event_type="ignored", take_screenshot=True)
+                 QTimer.singleShot(8000, self.go_to_sleep)
+            else:
+                 self.say("...nevermind")
+                 QTimer.singleShot(4000, self.go_to_sleep)
 
     @property
     def attention_level(self):
@@ -385,7 +418,7 @@ class NekoWidget(QWidget):
 
     def start_peek(self):
         self.state = NekoState.PEEKING
-        self.set_image(self.peek_pixmap)
+        self.set_image(self.peek_asset)
         self.setWindowOpacity(0.9)
         self.peek_timer.start(3000)  # Peek for 3 seconds then go back to sleep
 
@@ -397,7 +430,33 @@ class NekoWidget(QWidget):
         greetings = ["mrrp… hello", "you’re back, meow", "hi hi", "mew~", "oh! there you are"]
         self.say(random.choice(greetings))
 
+    def trigger_ai_brain(self, event_type="random", take_screenshot=False):
+        self.say("...(thinking)")
+        title = ""
+        try:
+            current_window = win32gui.GetForegroundWindow()
+            if current_window:
+                title = win32gui.GetWindowText(current_window)
+        except Exception:
+            pass
+        
+        self.brain_worker = AIBrainWorker(title, event_type=event_type, take_screenshot=take_screenshot)
+        self.brain_worker.finished_thinking.connect(self.on_brain_finished)
+        self.brain_worker.start()
+
     def random_dialogue(self):
+        # AI Brain Override
+        if getattr(self, "ai_brain_enabled", False):
+            if self.state == NekoState.SLEEPING and self.attention_level == "LOW" and random.random() < 0.8:
+                self.set_next_dialogue_timer()
+                return
+            
+            if self.state == NekoState.SLEEPING:
+                self.wake_up()
+                
+            self.trigger_ai_brain(event_type="random", take_screenshot=False)
+            return
+
         # If sleeping, there's a chance it wakes up just to talk
         if self.state == NekoState.SLEEPING:
             # Only wake occasionally if attention is high/medium
@@ -435,6 +494,11 @@ class NekoWidget(QWidget):
         self.say(random.choice(lines))
         self.set_next_dialogue_timer()
 
+    def on_brain_finished(self, text, success):
+        self.say(text)
+        self.set_next_dialogue_timer()
+        self.brain_worker = None
+
     def pet_reaction(self):
         self.stats_pets_received += 1
         
@@ -452,21 +516,33 @@ class NekoWidget(QWidget):
         else:
             lines = ["mrrrow~", "hehe meow", "again again", "more pets pls"]
             
-        self.set_image(self.happy_pixmap)
+        self.set_image(self.happy_asset)
         self.say(random.choice(lines))
 
     def wake_up(self):
         self.state = NekoState.IDLE
         self.setWindowOpacity(1.0)
-        self.set_image(self.idle_pixmap)
+        self.set_image(self.idle_asset)
         
         wake_lines = ["m… meow?", "did i sleep", "oh hi", "i was dreaming"]
-        self.say(random.choice(wake_lines))
+        
+        if getattr(self, "ai_brain_enabled", False):
+            # Only trigger reading screen automatically 50% of the time on wake to avoid spam
+            if random.random() < 0.5:
+                self.trigger_ai_brain(event_type="wake", take_screenshot=True)
+            else:
+                self.say(random.choice(wake_lines))
+        else:
+            self.say(random.choice(wake_lines))
 
     def go_to_sleep(self):
         self.stats_times_slept += 1
+        
+        if getattr(self, "ai_brain_enabled", False) and self.state != NekoState.SLEEPING:
+            self.trigger_ai_brain(event_type="sleep", take_screenshot=True)
+            
         self.state = NekoState.SLEEPING
-        self.set_image(self.sleep_pixmap)
+        self.set_image(self.sleep_asset)
         self.setWindowOpacity(0.7)
         self.hide_bubble()
 
@@ -487,7 +563,7 @@ class NekoWidget(QWidget):
         self.bubble.hide()
         if self.state == NekoState.TALKING:
             self.state = NekoState.IDLE
-            self.set_image(self.idle_pixmap)
+            self.set_image(self.idle_asset)
             
         if self.temp_unhidden_for_dialogue:
             self.hide()
@@ -555,6 +631,8 @@ class NekoWidget(QWidget):
             toggle_action = menu.addAction("Hide")
             
         stats_action = menu.addAction("Stats")
+        ai_action_text = "Disable AI Brain" if getattr(self, "ai_brain_enabled", False) else "Enable AI Brain (Exp)"
+        ai_action = menu.addAction(ai_action_text)
         exit_action = menu.addAction("Exit")
         
         action = menu.exec(pos)
@@ -565,15 +643,32 @@ class NekoWidget(QWidget):
                 self.hide_neko()
         elif action == stats_action:
             self.open_stats_window()
+        elif action == ai_action:
+            self.toggle_ai_brain()
         elif action == exit_action:
             QApplication.quit()
+
+    def toggle_ai_brain(self):
+        self.ai_brain_enabled = not getattr(self, "ai_brain_enabled", False)
+        # Update tray action state if possible
+        if hasattr(self, "tray_ai_action"):
+            self.tray_ai_action.setChecked(self.ai_brain_enabled)
+
+        if self.ai_brain_enabled:
+            self.say("my brain cells are connecting!")
+        else:
+            self.say("brain disconnected. meow.")
 
     def init_tray(self):
         self.tray_icon = QSystemTrayIcon(self)
         
         icon = QApplication.style().standardIcon(QStyle.SP_ComputerIcon)
-        if not self.idle_pixmap.isNull():
-            icon = QIcon(self.idle_pixmap)
+        from PySide6.QtGui import QMovie, QPixmap
+        if isinstance(self.idle_asset, QPixmap) and not self.idle_asset.isNull():
+            icon = QIcon(self.idle_asset)
+        elif isinstance(self.idle_asset, QMovie):
+            self.idle_asset.jumpToFrame(0)
+            icon = QIcon(self.idle_asset.currentPixmap())
         
         self.tray_icon.setIcon(icon)
         
@@ -581,11 +676,17 @@ class NekoWidget(QWidget):
         show_action = tray_menu.addAction("Show Neko")
         hide_action = tray_menu.addAction("Hide Neko")
         stats_action = tray_menu.addAction("Stats")
+        
+        self.tray_ai_action = tray_menu.addAction("Toggle AI Brain")
+        self.tray_ai_action.setCheckable(True)
+        self.tray_ai_action.setChecked(self.ai_brain_enabled)
+        
         exit_action = tray_menu.addAction("Exit")
         
         show_action.triggered.connect(self.show_neko)
         hide_action.triggered.connect(self.hide_neko)
         stats_action.triggered.connect(self.open_stats_window)
+        self.tray_ai_action.triggered.connect(self.toggle_ai_brain)
         exit_action.triggered.connect(QApplication.quit)
         
         self.tray_icon.setContextMenu(tray_menu)

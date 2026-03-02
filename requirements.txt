@@ -1,3 +1,5 @@
 PySide6
 winshell
 pywin32
+google-genai
+pillow

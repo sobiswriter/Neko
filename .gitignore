@@ -31,6 +31,7 @@ cover/
 # Environments
 .env
 .venv
+.config.json
 env/
 venv/
 ENV/
