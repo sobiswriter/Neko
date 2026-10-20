@@ -13,9 +13,9 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_80_drawings_including_sleep_transitions(self):
+    def test_atlas_has_96_drawings_including_extra_pet_responses(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 80)
+        self.assertEqual(len(atlas.frames), 96)
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
         self.assertNotEqual(atlas.frames["idle", 1, 0].toImage(), atlas.frames["idle", 1, 1].toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
@@ -23,7 +23,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_affection_and_look_frames_never_shrink_the_seated_cat(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        for bank, rows in (("idle", range(4)), ("pets", range(4)),
+        for bank, rows in (("idle", range(4)), ("pets", range(4)), ("affection", range(4)),
                            ("activity", range(3)), ("movement", (1, 2))):
             for row in rows:
                 for col in range(4):
@@ -32,7 +32,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_idle_gestures_finish_once_and_rest_instead_of_repeating_frantically(self):
         for name in ("ears", "sniff", "happy", "nuzzle", "wave", "groom", "stretch",
-                     "look_left", "look_right", "peek"):
+                     "look_left", "look_right", "peek", "chin_scritch", "blep", "paw_offer", "ear_rub"):
             clip = CLIPS[name]
             self.assertFalse(clip.loop, name)
             self.assertEqual(clip.frame_index(5), clip.order[-1], name)

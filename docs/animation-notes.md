@@ -12,8 +12,8 @@ consistent. No API key or art service is needed to run the companion.
 | neko-activity-v3.png | typing, grooming, yawn, sleep |
 | neko-movement-v3.png | walk, seated stretch, look around, loaf |
 
-The four base sheets contain 64 drawings in sixteen action sequences. The new
-transition sheet described below brings the total to 80. The frame player adds
+The four base sheets contain 64 drawings in sixteen action sequences. The
+transition and extra affection sheets described below bring the total to 96. The frame player adds
 directional looks and a blink variant. Timing holds and loops live in animations.py.
 Walking mirrors the same drawings when heading right. The loader samples each
 sheet at 512 x 512 and finds the main connected silhouette. The frame player now
@@ -67,3 +67,19 @@ a pet between sleep and waking; runtime sleep has no automatic wake deadline.
 ### Transition generation prompt
 
 Use case: stylized-concept. Asset type: production pixel-art sprite sheet for an existing tiny Windows desktop kitten. Input image 1 is the exact white kitten character/style reference; image 2 supplies its curled sleeping posture. Create ONE transparent sprite sheet, EXACTLY FOUR equal columns and FOUR equal rows (16 fully separate sprites), no labels, grid lines, shadows, props or symbols. Read cells left-to-right, top-to-bottom. Rows 1+2 are a continuous EIGHT-FRAME FALLING-ASLEEP animation: frame1 sitting upright eyes open; 2 eyelids droop and head nods; 3 elbows gently bend lowering chest; 4 forepaws extend and chest lowers halfway; 5 belly rests down, hindquarters settle; 6 tail wraps around body and nose lowers toward forepaws; 7 head rests on paws with eyes shut, tail tucked; 8 same compact fully curled asleep posture. Rows 3+4 are a continuous EIGHT-FRAME WAKING animation: frame9 exactly the same curled sleeping pose as frame8; 10 eyes half-open with head still down; 11 head lifts a little; 12 forelegs begin unfolding; 13 chest slowly rises from ground; 14 seated haunches with forelegs extending; 15 seated with a small head/shoulder stretch; 16 neutral upright sitting eyes open matching frame1. CRITICAL CHARACTER CONSISTENCY: same head size and volume in ALL sixteen frames, no enlarging the head as body curls. Match the existing simple white pixel kitten, charcoal outline, pale gray shadows, pink nose and inner ears, shiny dark eyes, one attached tail. Keep common feet/ground baseline and centered body in each equal cell, 20% clear padding on all sides, complete sprites never touch neighboring cells. Keep camera and scale FIXED; the curled cat should naturally be shorter but NOT a differently sized animal. ANATOMY: only FOUR limbs TOTAL, exactly TWO forelegs. As forepaws lift or tuck, remove their previous positions; do NOT draw duplicate paws or extra arms. Rear legs tuck behind the body and are not additional front feet. No ghost trails, disconnected pieces, red edge specks or duplicated tails. Favor very simple readable intermediate poses with gentle movement over elaborate contortions. Clean crisp low-resolution pixel art matching the reference, not a new art style. Actual transparent background.
+
+## Extra petting reactions
+
+Generated with the built-in ImageGen tool using assets/neko-pets-v3.png as the
+character reference. Saved in the project as assets/neko-affection-v1.png.
+Four rows add chin scritches, a tiny blep, a paw offer, and relaxed ear rubs.
+Each row is four drawings; this brings the collection to 96 drawings total.
+These are one-shot gestures with a relaxed rest within the existing 5.8-second
+petting slot, at 10 FPS rendering. They use the existing 112 x 100 canvas,
+82-pixel seated size and common baseline. No frame pixels were repaired by code.
+The eight pet responses use a shuffled bag, avoiding a repeat across bag boundaries.
+docs/neko-affection-preview.gif renders the actual player with the four new clips.
+
+### Extra petting generation prompt
+
+Use case: stylized-concept. Asset type: production transparent PIXEL-ART animation sprite sheet for the existing white desktop kitten. Reference image supplies EXACT character identity, palette, head size and simple anatomy. Create EXACTLY FOUR EQUAL COLUMNS by FOUR EQUAL ROWS, 16 separate complete kitten sprites, no labels, lines, ground, shadows, symbols, hands or props. Each row is a FOUR-FRAME petting response read left to right. Same seated body size, fixed camera, fixed head volume, common feet baseline and center per cell, at least 18 percent clear padding on all sides. Crisp charcoal pixel outline, white coat, pale gray shadows, pink ear interiors and nose, big shiny dark eyes, ONE attached tail. Row1 CHIN SCRITCH: neutral seated / lifts chin a little, eyes soften / chin happily tipped upward, eyes closed / returns to neutral. Row2 TINY BLEP: neutral seated / happy half-closed eyes and a tiny pink tongue peeks from mouth / eyes smiling closed with tiny tongue still visible / tongue disappears and neutral returns. Tongue must be just a tiny pink pixel mark, no huge mouth or teeth. Row3 OFFERING ONE PAW: neutral seated with exactly two planted forepaws / lifts front-left paw slightly forward toward viewer / gently offers that same paw at chest level, soft happy eyes / returns that paw to ground. CRITICAL: the lifted paw REPLACES its original ground position. Never leave a duplicate paw below it. Other front paw stays grounded, hind legs remain tucked, no extra arm. Row4 EAR RUB: neutral seated / both ears relax a little outward while eyes half-close / ears comfortably splay sideways, eyes smiling closed / ears return upright with eyes open. Keep the head upright and both front paws planted; no whole-body spinning or excessive head rotation. All poses anatomically simple: FOUR LIMBS TOTAL, TWO front paws only, ONE tail attached to rump. No extra paws, arms, dangling legs, duplicated tails, ghosts, red speckles or disconnected parts. Every row ends in a neutral posture matching its starting posture. Match the reference's cute minimalist pixel kitten, not a new style. Genuine transparent background.

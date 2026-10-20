@@ -16,7 +16,8 @@ Interaction rules
   Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
   Eight frames lower her into sleep; only a deliberate pet plays the eight-frame wake.
   Typing, window changes, dragging and elapsed time do not wake her. No timed wake-up.
-  Four pet responses alternate; nine idle moods avoid consecutive repeats.
+  Eight pet responses rotate through a shuffled bag before repeating.
+  Nine idle moods avoid consecutive repeats.
   298 offline lines use context shuffle bags, with personal questions and app rituals.
   Local foreground app names and media title hints select lines and matching gestures.
   Shared speech cooldown prevents spam. No recording or actual playback detection.
@@ -37,7 +38,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  Eighty drawings including sleep/wake transitions, timed holds and directional variants.
+  Ninety-six drawings including eight pet reactions and sleep/wake transitions.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

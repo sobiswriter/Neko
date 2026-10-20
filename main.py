@@ -272,6 +272,10 @@ class StatsWindow(QDialog):
             NekoState.FALLING_ASLEEP: "curling up for a little dream.",
             NekoState.HAPPY: "yes. right there. purrr.",
             NekoState.PEEKING: "just checking you're still there.",
+            NekoState.CHIN_SCRITCH: "oh. just under the little chin. purrr.",
+            NekoState.BLEPPING: "a tiny blep, just for you.",
+            NekoState.PAW_OFFER: "one little paw. for your company.",
+            NekoState.EAR_RUB: "these very small ears approve.",
         }.get(n.companion.state, "a little cat, doing little cat things."))
 
     def change_startup(self, enabled):
@@ -683,6 +687,8 @@ class NekoWidget(QWidget):
             NekoState.SNIFFING: "sniff", NekoState.LOAFING: "loaf",
             NekoState.CHEEK_RUB: "nuzzle", NekoState.WAVING: "wave",
             NekoState.KNEADING: "knead", NekoState.FOLLOWING: "walk",
+            NekoState.CHIN_SCRITCH: "chin_scritch", NekoState.BLEPPING: "blep",
+            NekoState.PAW_OFFER: "paw_offer", NekoState.EAR_RUB: "ear_rub",
         }.get(self.companion.state, "idle")
         self.current_asset = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",

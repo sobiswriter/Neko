@@ -8,8 +8,9 @@ Soft sounds are optional and off until you enable them.
 
 ## Living with Neko
 
-- **Click to pet.** Head pats, cheek nuzzles, paw greetings, and kneading alternate,
-  with little written purrs. No consecutive repeat of the same pet response.
+- **Click to pet.** Eight reactions: head pats, cheek nuzzles, paw greetings,
+  kneading, chin scritches, a tiny blep, offering a paw, and relaxed ear rubs.
+  Each plays gently and settles; all eight appear before the rotation repeats.
   If she's asleep, a pet plays her waking sequence instead.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
@@ -17,7 +18,7 @@ Soft sounds are optional and off until you enable them.
   toward it. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 80 drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 96 drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes, kneading and paw taps use slower continuous cycles. Rendering runs at
@@ -160,7 +161,8 @@ processes they launch.
 
 The four `assets/neko-*-v3.png` sheets each contain four sequences of four drawings.
 `assets/neko-transitions-v1.png` adds sixteen sleep/wake drawings with a constant
-character scale through the change in posture. Frame
+character scale through the change in posture. `assets/neko-affection-v1.png`
+adds sixteen drawings for four extra petting reactions. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
 neighboring cells is excluded when locating each silhouette.

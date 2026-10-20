@@ -60,6 +60,10 @@ CLIPS = {
     "nuzzle": Clip("pets", 1, (400, 550, 650, 1000)),
     "wave": Clip("pets", 2, (400, 550, 500, 950)),
     "knead": Clip("pets", 3, (450, 450, 450, 450), loop=True),
+    "chin_scritch": Clip("affection", 0, (450, 650, 950, 850)),
+    "blep": Clip("affection", 1, (500, 450, 750, 1100)),
+    "paw_offer": Clip("affection", 2, (450, 650, 850, 950)),
+    "ear_rub": Clip("affection", 3, (450, 600, 850, 1000)),
     "typing": Clip("activity", 0, (330, 330, 330, 330), loop=True),
     "groom": Clip("activity", 1, (600, 550, 700, 850)),
     "yawn": Clip("activity", 2, (600, 220, 650, 500)),
@@ -79,8 +83,8 @@ class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
         cells = {}
-        for bank in ("idle", "pets", "activity", "movement", "transitions"):
-            filename = "neko-transitions-v1.png" if bank == "transitions" else f"neko-{bank}-v3.png"
+        for bank in ("idle", "pets", "activity", "movement", "transitions", "affection"):
+            filename = f"neko-{bank}-v1.png" if bank in ("transitions", "affection") else f"neko-{bank}-v3.png"
             image = QImage(str(Path(path) / filename))
             if image.isNull():
                 return

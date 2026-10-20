@@ -121,6 +121,14 @@ class CompanionTests(unittest.TestCase):
                 seen.add(self.pet.state)
         self.assertEqual(seen, set(IDLE_STATES))
 
+    def test_pet_rotation_shows_every_response_before_repeating(self):
+        for cycle in range(4):
+            seen = set()
+            for index in range(len(PET_STATES)):
+                self.pet.pet((cycle * len(PET_STATES) + index) * 10)
+                seen.add(self.pet.state)
+            self.assertEqual(seen, set(PET_STATES))
+
     def test_cursor_curiosity_is_throttled(self):
         self.assertEqual(self.pet.tick(50, 0, cursor_near=True), "curious")
         self.pet.tick(54, 0)
