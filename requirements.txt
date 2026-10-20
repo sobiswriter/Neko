@@ -1,5 +1,3 @@
-PySide6
-winshell
-pywin32
-google-genai
-pillow
+PySide6-Essentials>=6.8,<7
+pywin32>=308
+google-genai>=2.31,<3
