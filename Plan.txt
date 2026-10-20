@@ -22,7 +22,7 @@ Interaction rules
   Local foreground app names and media title hints select lines and matching gestures.
   Shared speech cooldown prevents spam. No recording or actual playback detection.
   Ambient thoughts default to 75 seconds; configurable from 15 to 600. Quiet removes them.
-  Cursor walks keep a gap, last at most 6.5 seconds and travel about 220 pixels maximum.
+  Cursor walks move only left/right at the same height, keep a gap, last at most 6.5 seconds and travel about 220 pixels maximum.
   Eligible moving cursors invite another walk after 25 seconds.
   Keep 5–6 second gesture slots: one natural gesture followed by a relaxed rest.
   No repeated grooming, stretching, waving or head-bobbing within one gesture slot.

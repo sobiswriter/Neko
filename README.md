@@ -15,7 +15,7 @@ Soft sounds are optional and off until you enable them.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
 - **Come close.** She sniffs at a moving cursor and sometimes takes a small walk
-  toward it. Each walk can last 6.5 seconds, travels at most about 220 pixels,
+  left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
   yawns and sleepy peeks use 96 drawings, including eight-frame transitions into

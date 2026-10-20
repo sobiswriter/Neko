@@ -325,6 +325,38 @@ class DesktopTests(unittest.TestCase):
         self.neko.set_follow_mouse(False)
         self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
 
+    def test_walks_stay_horizontal_with_cursor_above_or_below(self):
+        area = self.neko.screen().availableGeometry()
+        origin = area.center() - self.neko.rect().center()
+        for offset in (QPoint(-220, -160), QPoint(220, 160)):
+            with self.subTest(offset=offset):
+                self.neko.move(origin)
+                self.neko.follow_origin = origin
+                self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic(), 6.5)
+                cursor = self.neko.geometry().center() + offset
+                with patch("main.QCursor.pos", return_value=cursor):
+                    for _ in range(100):
+                        self.neko.animate()
+                direction = -1 if offset.x() < 0 else 1
+                self.assertEqual(self.neko.y(), origin.y())
+                self.assertEqual(self.neko.x(), origin.x() + direction * 130)
+                self.assertEqual(self.neko.look_direction, direction)
+                self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+
+    def test_cursor_directly_above_does_not_start_or_continue_walking(self):
+        self.neko.last_follow = -99999
+        origin = self.neko.pos()
+        cursor = self.neko.geometry().center() - QPoint(0, 250)
+        self.neko.last_cursor = cursor - QPoint(30, 0)
+        with patch("main.QCursor.pos", return_value=cursor):
+            self.neko.tick()
+            self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
+            self.neko.follow_origin = origin
+            self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic(), 6.5)
+            self.neko.animate()
+        self.assertEqual(self.neko.pos(), origin)
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+
     def test_typing_stops_a_mouse_expedition(self):
         self.neko.follow_origin = self.neko.pos()
         self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic(), 3.2)

@@ -511,12 +511,12 @@ class NekoWidget(QWidget):
             if (self.drag_origin is not None or self.fullscreen or distance > 650
                     or not self.follow_mouse or not self.motion):
                 self.stop_following()
-            elif distance <= 90 or excursion >= 220 or time.monotonic() >= self.companion.pose_until:
+            elif abs(delta.x()) <= 90 or excursion >= 220 or time.monotonic() >= self.companion.pose_until:
                 self.stop_following()
                 self.offline_line("follow")
             else:
                 self.look_direction = -1 if delta.x() < 0 else 1
-                self.move(self.pos() + QPoint(round(delta.x() / distance), round(delta.y() / distance)) * 2)
+                self.move(self.x() + self.look_direction * 2, self.y())
                 self.clamp_position()
         self.update()
 
@@ -638,7 +638,7 @@ class NekoWidget(QWidget):
                 and not self.menu.isVisible()
                 and not (self.stats_window is not None and self.stats_window.isVisible())
                 and not changed and not window_event and not self.bubble.isVisible()
-                and self.companion.state == NekoState.IDLE and moved and 200 < distance < 520
+                and self.companion.state == NekoState.IDLE and moved and abs(delta.x()) > 200 and distance < 520
                 and now - self.last_follow >= 25):
             self.last_follow = now
             self.follow_origin = self.pos()
