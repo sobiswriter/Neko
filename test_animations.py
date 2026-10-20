@@ -30,13 +30,18 @@ class AnimationTests(unittest.TestCase):
                     bounds = sprite_bounds(atlas.frames[bank, row, col].toImage())
                     self.assertAlmostEqual(bounds.height(), 84, delta=2)
 
-    def test_motion_cycles_are_quicker_and_repeat_inside_longer_behavior_slots(self):
-        for name in ("typing", "walk", "knead"):
+    def test_idle_gestures_finish_once_and_rest_instead_of_repeating_frantically(self):
+        for name in ("ears", "sniff", "happy", "nuzzle", "wave", "groom", "stretch",
+                     "look_left", "look_right", "peek"):
+            clip = CLIPS[name]
+            self.assertFalse(clip.loop, name)
+            self.assertEqual(clip.frame_index(5), clip.order[-1], name)
+            self.assertEqual(clip.frame_index(6), clip.order[-1], name)
+
+    def test_continuous_motions_use_a_gentle_cycle_speed(self):
+        for name, minimum in (("tail", 2400), ("knead", 1600), ("typing", 1200), ("walk", 900)):
             self.assertTrue(CLIPS[name].loop)
-            self.assertLess(sum(CLIPS[name].durations), 1000)
-        for name in ("ears", "sniff", "happy", "nuzzle", "groom", "look_left"):
-            self.assertTrue(CLIPS[name].loop)
-            self.assertLess(sum(CLIPS[name].durations), 2500)
+            self.assertGreaterEqual(sum(CLIPS[name].durations), minimum, name)
 
     def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")

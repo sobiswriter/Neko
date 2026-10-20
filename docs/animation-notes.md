@@ -21,7 +21,7 @@ normalizes seated drawings to 82 pixels tall, with an aspect-preserving width ca
 This fixes smaller pet drawings shrinking during a click. Low sleeping/loaf poses
 share a 92-pixel width; walking keeps its natural proportions within 104 x 82.
 Every frame uses a 112 x 100 transparent canvas with the same ground anchor.
-Most gestures retain 5–6 second slots, with brisk repeating motion cycles.
+Most gestures retain 5–6 second slots, with one gentle action and a relaxed rest.
 No limbs or image pixels were repaired programmatically.
 
 The sheets were inspected at desktop size and the old atlas was removed from
@@ -58,7 +58,8 @@ starts the sleep loop. The transition bank uses one constant scale based on its
 first seated drawing, preserving head size while its body lowers. All frames
 retain the common 112 x 100 canvas and feet baseline.
 
-Existing motion cycles now repeat briskly inside their 5–6 second behavior slots;
+Existing gestures play once and rest inside their 5–6 second behavior slots;
+tail swishes, kneading, walking and paw taps use slower continuous cycles.
 rendering runs at 10 FPS, with action lengths preserved and slower holds for blinks and sleep.
 docs/neko-sleep-preview.gif shows the actual frame player. The preview simulates
 a pet between sleep and waking; runtime sleep has no automatic wake deadline.

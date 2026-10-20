@@ -18,8 +18,9 @@ Soft sounds are optional and off until you enable them.
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
   yawns and sleepy peeks use 80 drawings, including eight-frame transitions into
-  sleep and back to sitting. Most gestures still have 5–6 seconds on screen, but
-  their moving phases are quicker and suitable cycles repeat. Rendering runs at
+  sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
+  motion followed by a relaxed rest, without repeated head-bobbing or stretching.
+  Tail swishes, kneading and paw taps use slower continuous cycles. Rendering runs at
   10 FPS, keeping the same action lengths and walking speed.
   Every frame has a 112 × 100 transparent canvas;
   seated poses share an 82-pixel height so petting no longer makes her shrink.
