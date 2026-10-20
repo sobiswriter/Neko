@@ -8,21 +8,27 @@ class CompanionTests(unittest.TestCase):
     def setUp(self):
         self.pet = Companion(0, random.Random(4))
 
-    def test_a_nap_finishes_and_cannot_immediately_restart_from_old_inactivity(self):
+    def test_sleep_starts_with_a_transition_and_never_wakes_on_a_timer(self):
         self.assertEqual(self.pet.tick(180, 180), "sleep")
-        self.assertEqual(self.pet.tick(270, 270), "wake")
-        self.pet.tick(276, 276)
-        self.assertNotEqual(self.pet.tick(277, 277), "sleep")
+        self.assertEqual(self.pet.state, NekoState.FALLING_ASLEEP)
+        self.assertEqual(self.pet.tick(183, 0), "settled")
+        self.assertIsNone(self.pet.tick(10000, 0, keyboard_events=20, window_changed=True))
+        self.assertEqual(self.pet.state, NekoState.SLEEPING)
         self.assertEqual(self.pet.naps, 1)
 
-    def test_activity_and_petting_do_not_cut_short_a_nap(self):
+    def test_only_petting_wakes_her_and_repeated_pets_finish_the_wake_transition(self):
         self.pet.tick(200, idle_seconds=200)
         self.assertIsNone(self.pet.tick(201, 0, keyboard_events=20, window_event="open"))
-        self.pet.pet(202)
+        self.pet.tick(203, 0)
         self.assertEqual(self.pet.state, NekoState.SLEEPING)
-        self.assertIsNone(self.pet.tick(289, 0))
-        self.assertEqual(self.pet.tick(290, 0), "wake")
+        self.pet.pet(204)
         self.assertEqual(self.pet.state, NekoState.WAKING)
+        until = self.pet.pose_until
+        self.pet.pet(204.5)
+        self.assertEqual(self.pet.pose_until, until)
+        self.pet.tick(205, 1000)
+        self.assertEqual(self.pet.state, NekoState.WAKING)
+        self.assertEqual(self.pet.tick(until, 0), "idle")
 
     def test_sleep_deadline_can_interrupt_another_animation(self):
         self.pet.pose(NekoState.GROOMING, 179, 6)
@@ -55,8 +61,9 @@ class CompanionTests(unittest.TestCase):
 
     def test_returning_after_a_long_nap_does_not_release_overdue_chatter(self):
         self.pet.tick(200, 200)
+        self.pet.tick(203, 203)
         self.pet.next_comment = 100
-        self.pet.tick(1000, 0)
+        self.pet.pet(1000)
         self.assertGreaterEqual(self.pet.next_comment, 1015)
 
     def test_focus_mode_has_no_unsolicited_comments(self):
@@ -124,6 +131,7 @@ class CompanionTests(unittest.TestCase):
         self.assertIsNone(self.pet.tick(51, 0, window_changed=True))
         self.pet.tick(200, 200)
         self.assertIsNone(self.pet.tick(201, 201, window_changed=True))
+        self.pet.tick(203, 203)
         self.assertEqual(self.pet.state, NekoState.SLEEPING)
 
 

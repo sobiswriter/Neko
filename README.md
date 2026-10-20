@@ -10,14 +10,18 @@ Soft sounds are optional and off until you enable them.
 
 - **Click to pet.** Head pats, cheek nuzzles, paw greetings, and kneading alternate,
   with little written purrs. No consecutive repeat of the same pet response.
+  If she's asleep, a pet plays her waking sequence instead.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
 - **Come close.** She sniffs at a moving cursor and sometimes takes a small walk
   toward it. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 64 newly drawn frames across sixteen action sequences.
-  Most gestures play for 5–6 seconds. Every frame has a 112 × 100 transparent canvas;
+  yawns and sleepy peeks use 80 drawings, including eight-frame transitions into
+  sleep and back to sitting. Most gestures still have 5–6 seconds on screen, but
+  their moving phases are quicker and suitable cycles repeat. Rendering runs at
+  20 FPS; walking and paw actions advance roughly every 140–220 milliseconds.
+  Every frame has a 112 × 100 transparent canvas;
   seated poses share an 82-pixel height so petting no longer makes her shrink.
   Walking, loafing and sleep preserve their natural posture and proportions.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
@@ -28,9 +32,9 @@ Soft sounds are optional and off until you enable them.
   ongoing animation instead of disappearing immediately.
 - **Step away.** She yawns and naps after a configurable period without input.
   The default is three minutes; choose 1–3600 seconds. Type a number and press Enter
-  or leave the field to save it. Each nap lasts 90 seconds
-  through typing, app switches and petting, then she wakes herself with a stretch.
-  She stays awake for at least another sleep interval before the next nap.
+  or leave the field to save it. She curls down before sleeping and stays asleep
+  through typing, app switches and elapsed time. Only a deliberate pet wakes her;
+  dragging moves her without waking her. The old 90-second automatic wake is gone.
   Ignoring her never creates chores or penalties.
 - **Offline personality.** 298 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
@@ -43,13 +47,14 @@ Soft sounds are optional and off until you enable them.
   their own lines and matching gestures. These are app hints, not content analysis.
 - **Soft mews & purrs.** Enable them in the nook's Settings tab; Listen previews a
   small mew. These original synthesized cues are up to a second long, with low
-  volume encoded into the WAV files. A deliberate pet can purr or mew; waking can
-  chirp. Automatic cues have a 45-second pause and are suppressed during media apps,
+  volume encoded into the WAV files. A deliberate pet can purr or mew; she can
+  chirp on arrival. Automatic cues have a 45-second pause and are suppressed during media apps,
   quiet company and fullscreen. Turning sounds off or hiding stops playback.
 - **Right-click for her nook.** Quiet company, reduced motion, startup, optional
   AI, mouse following, sleep delay, chatter and idle gesture frequency, and lifetime
   pet/nap counts live in one small window. Double-click the tray
   icon to find her again.
+  Menus and the nook open beside her, with no periodic re-pinning over the controls.
 
 Quiet company stops unprompted words and sounds while keeping deliberate pet reactions.
 Hide really hides her: no surprise appearances, bubbles, or animation. Native
@@ -153,7 +158,8 @@ processes they launch.
 ## Character assets
 
 The four `assets/neko-*-v3.png` sheets each contain four sequences of four drawings.
-They replace the old atlas and add dedicated tail, ear, affection and walk cycles. Frame
+`assets/neko-transitions-v1.png` adds sixteen sleep/wake drawings with a constant
+character scale through the change in posture. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
 neighboring cells is excluded when locating each silhouette.

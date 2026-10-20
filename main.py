@@ -14,7 +14,7 @@ import winsound
 
 import win32gui
 import win32con
-from PySide6.QtCore import QLockFile, QPoint, QRectF, QSettings, QStandardPaths, Qt, QTimer
+from PySide6.QtCore import QLockFile, QPoint, QRect, QRectF, QSettings, QStandardPaths, Qt, QTimer
 from PySide6.QtGui import QColor, QCursor, QFont, QIcon, QMovie, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QDialog, QHBoxLayout, QLabel, QMenu, QMessageBox,
@@ -32,6 +32,20 @@ ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 TIMING_LIMITS = {"sleep_seconds": (180, 1, 3600),
                  "chatter_seconds": (75, 15, 600), "idle_seconds": (14, 5, 120)}
+
+
+def adjacent_position(anchor, size, area):
+    def clamp(x, y):
+        return QPoint(max(area.left(), min(x, area.right() - size.width() + 1)),
+                      max(area.top(), min(y, area.bottom() - size.height() + 1)))
+    for x, y in ((anchor.right() + 13, anchor.top()),
+                 (anchor.left() - size.width() - 12, anchor.top()),
+                 (anchor.left(), anchor.top() - size.height() - 12),
+                 (anchor.left(), anchor.bottom() + 13)):
+        point = clamp(x, y)
+        if not QRect(point, size).intersects(anchor):
+            return point
+    return clamp(anchor.left(), anchor.top() - size.height() - 12)
 
 
 def legacy_shortcut():
@@ -187,7 +201,7 @@ class StatsWindow(QDialog):
             self.timing[key] = spin
             timing.addRow(label, spin)
         company_layout.addLayout(timing)
-        note = QLabel("Naps last 90 seconds, even while you work.\nQuiet company still welcomes a deliberate pet.")
+        note = QLabel("She sleeps until you pet her awake.\nQuiet company still welcomes a deliberate pet.")
         note.setWordWrap(True)
         company_layout.addWidget(note)
         company_layout.addStretch()
@@ -255,6 +269,7 @@ class StatsWindow(QDialog):
             NekoState.YAWNING: "just resting my eyes...",
             NekoState.WAKING: "back from a little dream.",
             NekoState.SLEEPING: "somewhere soft, in a dream.",
+            NekoState.FALLING_ASLEEP: "curling up for a little dream.",
             NekoState.HAPPY: "yes. right there. purrr.",
             NekoState.PEEKING: "just checking you're still there.",
         }.get(n.companion.state, "a little cat, doing little cat things."))
@@ -383,6 +398,11 @@ class NekoWidget(QWidget):
         self.tray_icon = QSystemTrayIcon(QIcon(icon if not icon.isNull() else self.assets["idle"]), self)
         self.tray_icon.setToolTip("Neko · a little company")
         self.menu = QMenu()
+        self.overlay_timer = QTimer(self)
+        self.overlay_timer.setSingleShot(True)
+        self.overlay_timer.timeout.connect(self.place_menu)
+        self.menu.aboutToShow.connect(self.prepare_menu)
+        self.menu.aboutToHide.connect(self.overlay_timer.stop)
         self.menu.addAction("Neko's nook…", self.open_stats_window)
         self.quiet_action = self.menu.addAction("Quiet company")
         self.quiet_action.setCheckable(True)
@@ -394,6 +414,16 @@ class NekoWidget(QWidget):
         self.tray_icon.setContextMenu(self.menu)
         self.tray_icon.activated.connect(self.tray_activated)
         self.tray_icon.show()
+
+    def prepare_menu(self):
+        self.stop_following()
+        self.dismiss_bubble()
+        self.overlay_timer.start(0)
+
+    def place_menu(self):
+        if self.menu.isVisible() and self.menu.geometry().intersects(self.frameGeometry()):
+            screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
+            self.menu.move(adjacent_position(self.frameGeometry(), self.menu.size(), screen.availableGeometry()))
 
     def tray_activated(self, reason):
         if reason == QSystemTrayIcon.DoubleClick:
@@ -482,7 +512,7 @@ class NekoWidget(QWidget):
                 self.offline_line("follow")
             else:
                 self.look_direction = -1 if delta.x() < 0 else 1
-                self.move(self.pos() + QPoint(round(delta.x() / distance * 2), round(delta.y() / distance * 2)))
+                self.move(self.pos() + QPoint(round(delta.x() / distance), round(delta.y() / distance)))
                 self.clamp_position()
         self.update()
 
@@ -505,6 +535,9 @@ class NekoWidget(QWidget):
     def pin_to_top(self, force=False):
         now = time.monotonic()
         if (QApplication.platformName() != "windows" or not self.isVisible()
+                or self.menu.isVisible()
+                or QApplication.activePopupWidget() is not None
+                or (self.stats_window is not None and self.stats_window.isVisible())
                 or self.is_manually_hidden or self.closing or (not force and now - self.last_pin < 5)):
             return
         try:
@@ -526,7 +559,7 @@ class NekoWidget(QWidget):
     def sync_animation(self):
         active = self.isVisible() and not self.is_manually_hidden and not self.closing
         if active and self.motion:
-            self.animation_timer.start(80)
+            self.animation_timer.start(50)
         else:
             self.animation_timer.stop()
         for name, movie in self.movies.items():
@@ -598,6 +631,8 @@ class NekoWidget(QWidget):
         if was_following and keyboard_events >= 6:
             self.stop_following()
         if (self.follow_mouse and self.motion and not fullscreen and not keyboard_events
+                and not self.menu.isVisible()
+                and not (self.stats_window is not None and self.stats_window.isVisible())
                 and not changed and not window_event and not self.bubble.isVisible()
                 and self.companion.state == NekoState.IDLE and moved and 200 < distance < 520
                 and now - self.last_follow >= 25):
@@ -627,9 +662,6 @@ class NekoWidget(QWidget):
                 self.offline_line("typing")
             elif action == "curious":
                 self.offline_line(self.companion.reaction_kind)
-            elif action == "wake":
-                self.offline_line("wake")
-                self.play_sound("chirp")
             elif action == "idle" and was_following:
                 self.follow_origin = None
                 self.offline_line("follow")
@@ -642,10 +674,11 @@ class NekoWidget(QWidget):
     def refresh_asset(self):
         self.current_clip = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",
+            NekoState.FALLING_ASLEEP: "fall_asleep",
             NekoState.CURIOUS: "look_left" if self.look_direction < 0 else "look_right",
             NekoState.HAPPY: "happy", NekoState.GROOMING: "groom",
             NekoState.STRETCHING: "stretch", NekoState.TYPING: "typing",
-            NekoState.YAWNING: "yawn", NekoState.WAKING: "stretch",
+            NekoState.YAWNING: "yawn", NekoState.WAKING: "wake",
             NekoState.TAIL_SWISH: "tail", NekoState.EAR_FLICK: "ears",
             NekoState.SNIFFING: "sniff", NekoState.LOAFING: "loaf",
             NekoState.CHEEK_RUB: "nuzzle", NekoState.WAVING: "wave",
@@ -692,7 +725,7 @@ class NekoWidget(QWidget):
     def say(self, text, prompted=False):
         if (self.closing or self.is_manually_hidden or self.fullscreen
                 or not self.isVisible() or (self.quiet and not prompted)
-                or self.companion.state == NekoState.SLEEPING):
+                or self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)):
             return False
         text = " ".join(str(text).split())[:140]
         if not text:
@@ -730,15 +763,17 @@ class NekoWidget(QWidget):
 
     def pet_reaction(self):
         now = time.monotonic()
+        was_sleeping = self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+        was_waking = self.companion.state == NekoState.WAKING
         self.ai_generation += 1
         self.companion.pet(now)
         self.play_sound(random.choice(("mew", "purr")), prompted=True)
-        if self.companion.state == NekoState.SLEEPING:
+        if was_waking:
             return
         self.pose_started = now
         self.refresh_asset()
         if now - self.last_pet_words >= 6:
-            self.offline_line("pet", prompted=True)
+            self.offline_line("wake" if was_sleeping else "pet", prompted=True)
             self.last_pet_words = now
 
     def trigger_ai_brain(self):
@@ -790,7 +825,8 @@ class NekoWidget(QWidget):
             self.dragged = False
             event.accept()
         elif event.button() == Qt.RightButton:
-            self.menu.exec(event.globalPosition().toPoint())
+            screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
+            self.menu.exec(adjacent_position(self.frameGeometry(), self.menu.sizeHint(), screen.availableGeometry()))
 
     def mouseMoveEvent(self, event):
         if event.buttons() & Qt.LeftButton and self.drag_origin is not None:
@@ -799,7 +835,8 @@ class NekoWidget(QWidget):
                 self.dragged = True
             if self.dragged:
                 self.dismiss_bubble()
-                if self.companion.state not in (NekoState.CURIOUS, NekoState.SLEEPING):
+                if self.companion.state not in (NekoState.CURIOUS, NekoState.SLEEPING,
+                                                NekoState.FALLING_ASLEEP, NekoState.WAKING):
                     now = time.monotonic()
                     self.companion.pose(NekoState.CURIOUS, now, 3)
                     self.pose_started = now
@@ -811,7 +848,7 @@ class NekoWidget(QWidget):
             if self.dragged:
                 self.ai_generation += 1
                 now = time.monotonic()
-                if self.companion.state != NekoState.SLEEPING:
+                if self.companion.state not in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING):
                     self.companion.pose(NekoState.PEEKING, now, 5)
                     self.pose_started = now
                 self.companion.last_interaction = now
@@ -862,9 +899,14 @@ class NekoWidget(QWidget):
         self.pin_to_top(force=True)
 
     def open_stats_window(self):
+        self.stop_following()
+        self.dismiss_bubble()
         if self.stats_window is None:
             self.stats_window = StatsWindow(self)
         self.stats_window.show()
+        screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
+        self.stats_window.move(adjacent_position(self.frameGeometry(), self.stats_window.frameGeometry().size(),
+                                                screen.availableGeometry()))
         self.stats_window.raise_()
         self.stats_window.activateWindow()
 

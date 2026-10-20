@@ -12,7 +12,8 @@ consistent. No API key or art service is needed to run the companion.
 | neko-activity-v3.png | typing, grooming, yawn, sleep |
 | neko-movement-v3.png | walk, seated stretch, look around, loaf |
 
-There are 64 new drawings in sixteen action sequences. The frame player adds
+The four base sheets contain 64 drawings in sixteen action sequences. The new
+transition sheet described below brings the total to 80. The frame player adds
 directional looks and a blink variant. Timing holds and loops live in animations.py.
 Walking mirrors the same drawings when heading right. The loader samples each
 sheet at 512 x 512 and finds the main connected silhouette. The frame player now
@@ -20,7 +21,7 @@ normalizes seated drawings to 82 pixels tall, with an aspect-preserving width ca
 This fixes smaller pet drawings shrinking during a click. Low sleeping/loaf poses
 share a 92-pixel width; walking keeps its natural proportions within 104 x 82.
 Every frame uses a 112 x 100 transparent canvas with the same ground anchor.
-Most actions now take 5–6 seconds, including full left/right look sequences.
+Most gestures retain 5–6 second slots, with brisk repeating motion cycles.
 No limbs or image pixels were repaired programmatically.
 
 The sheets were inspected at desktop size and the old atlas was removed from
@@ -46,3 +47,22 @@ Production pixel-art kitten animation sheet matching the reference's identity: t
 ### movement
 
 Production pixel-art kitten animation sheet matching the reference's identity: tiny white kitten, charcoal pixel outline, pale gray shadows, pink ears/nose, big shiny dark eyes, ONE curled tail. Genuinely transparent background. EXACT equal 4 columns x 4 rows = 16 sprites, NO labels, props, ground, shadow, or neighboring overlap. Every cell has generous 20% empty padding. Same character size, identical head proportions, same center and feet baseline across each row. Each row is one four-frame sequence. ANATOMY: four legs TOTAL, never more. Exactly TWO front paws, never leave a front paw planted if that same paw is lifted. Hind legs are tucked into haunches in seated poses, without extra hanging feet. No duplicate limbs, no disconnected legs, no duplicated tails, no ghost outlines/red edge artifacts. Clean legible low-resolution pixel art, simple gentle movements; anatomy and consistency are more important than complexity. ROW1 walking toward LEFT: gentle four-frame side-view walk cycle, feline quadruped, small head turn so same face visible. Exactly four legs; near foreleg, far foreleg, near hindleg, far hindleg, alternate contacts without any fifth foot. Tail follows softly. Keep cat body at constant elevation and size. ROW2 SEATED stretch: kitten remains sitting on its haunches in every frame, its TWO front legs stretch forward together a little / extend / relax / return planted; rear legs remain tucked, no third front paw. No standing or complex contortions. ROW3 looking around: seated paws stationary, head turned a little left / front / a little right / front; ears follow, same head volume. ROW4 loaf: all frames are the same compact cat-loaf posture with ALL four paws tucked underneath and not visible, head upright, gentle eyes-open / half-blink / closed-blink / eyes-open; ONE tail wraps at the side. No detached parts, no extra paws.
+
+## Sleep and wake transition sheet
+
+Created with the built-in ImageGen tool from the existing idle and activity sheets.
+Project asset: assets/neko-transitions-v1.png. No external art paths are used at runtime.
+It adds sixteen drawings: rows 1–2 curl down into sleep, rows 3–4 unfold and wake.
+Sleep uses the final two curled drawings, so settling ends in the same pose that
+starts the sleep loop. The transition bank uses one constant scale based on its
+first seated drawing, preserving head size while its body lowers. All frames
+retain the common 112 x 100 canvas and feet baseline.
+
+Existing motion cycles now repeat briskly inside their 5–6 second behavior slots;
+rendering runs at 20 FPS, with deliberate slower holds for blinks and sleep.
+docs/neko-sleep-preview.gif shows the actual frame player. The preview simulates
+a pet between sleep and waking; runtime sleep has no automatic wake deadline.
+
+### Transition generation prompt
+
+Use case: stylized-concept. Asset type: production pixel-art sprite sheet for an existing tiny Windows desktop kitten. Input image 1 is the exact white kitten character/style reference; image 2 supplies its curled sleeping posture. Create ONE transparent sprite sheet, EXACTLY FOUR equal columns and FOUR equal rows (16 fully separate sprites), no labels, grid lines, shadows, props or symbols. Read cells left-to-right, top-to-bottom. Rows 1+2 are a continuous EIGHT-FRAME FALLING-ASLEEP animation: frame1 sitting upright eyes open; 2 eyelids droop and head nods; 3 elbows gently bend lowering chest; 4 forepaws extend and chest lowers halfway; 5 belly rests down, hindquarters settle; 6 tail wraps around body and nose lowers toward forepaws; 7 head rests on paws with eyes shut, tail tucked; 8 same compact fully curled asleep posture. Rows 3+4 are a continuous EIGHT-FRAME WAKING animation: frame9 exactly the same curled sleeping pose as frame8; 10 eyes half-open with head still down; 11 head lifts a little; 12 forelegs begin unfolding; 13 chest slowly rises from ground; 14 seated haunches with forelegs extending; 15 seated with a small head/shoulder stretch; 16 neutral upright sitting eyes open matching frame1. CRITICAL CHARACTER CONSISTENCY: same head size and volume in ALL sixteen frames, no enlarging the head as body curls. Match the existing simple white pixel kitten, charcoal outline, pale gray shadows, pink nose and inner ears, shiny dark eyes, one attached tail. Keep common feet/ground baseline and centered body in each equal cell, 20% clear padding on all sides, complete sprites never touch neighboring cells. Keep camera and scale FIXED; the curled cat should naturally be shorter but NOT a differently sized animal. ANATOMY: only FOUR limbs TOTAL, exactly TWO forelegs. As forepaws lift or tuck, remove their previous positions; do NOT draw duplicate paws or extra arms. Rear legs tuck behind the body and are not additional front feet. No ghost trails, disconnected pieces, red edge specks or duplicated tails. Favor very simple readable intermediate poses with gentle movement over elaborate contortions. Clean crisp low-resolution pixel art matching the reference, not a new art style. Actual transparent background.

@@ -53,23 +53,25 @@ class Clip:
 
 CLIPS = {
     "idle": Clip("idle", 0, (2500, 120, 160, 2400), loop=True),
-    "tail": Clip("idle", 1, (350, 300, 350, 450), loop=True),
-    "ears": Clip("idle", 2, (1200, 600, 700, 1700)),
-    "sniff": Clip("idle", 3, (900, 900, 1100, 1500)),
-    "happy": Clip("pets", 0, (800, 1200, 1600, 1400)),
-    "nuzzle": Clip("pets", 1, (900, 1200, 1600, 1300)),
-    "wave": Clip("pets", 2, (850, 1600, 1000, 1550)),
-    "knead": Clip("pets", 3, (550, 550, 550, 550), loop=True),
-    "typing": Clip("activity", 0, (400, 400, 400, 400), loop=True),
-    "groom": Clip("activity", 1, (1100, 1200, 1600, 1300)),
-    "yawn": Clip("activity", 2, (1100, 1100, 1700, 1300)),
-    "sleep": Clip("activity", 3, (1100, 900, 1100, 900), loop=True),
-    "walk": Clip("movement", 0, (240, 240, 240, 240), loop=True),
-    "stretch": Clip("movement", 1, (1100, 1600, 1200, 1500)),
-    "look_left": Clip("movement", 2, (700, 1500, 700, 1500, 600), (1, 0, 1, 2, 3)),
-    "look_right": Clip("movement", 2, (700, 1500, 700, 1500, 600), (1, 2, 3, 0, 1)),
+    "tail": Clip("idle", 1, (180, 150, 180, 300), loop=True),
+    "ears": Clip("idle", 2, (700, 150, 200, 750), loop=True),
+    "sniff": Clip("idle", 3, (450, 200, 240, 450), loop=True),
+    "happy": Clip("pets", 0, (350, 240, 320, 650), loop=True),
+    "nuzzle": Clip("pets", 1, (350, 220, 340, 650), loop=True),
+    "wave": Clip("pets", 2, (250, 200, 250, 800), loop=True),
+    "knead": Clip("pets", 3, (220, 220, 220, 220), loop=True),
+    "typing": Clip("activity", 0, (180, 180, 180, 180), loop=True),
+    "groom": Clip("activity", 1, (350, 240, 350, 700), loop=True),
+    "yawn": Clip("activity", 2, (600, 220, 650, 500)),
+    "fall_asleep": Clip("transitions", 0, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
+    "wake": Clip("transitions", 2, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
+    "sleep": Clip("transitions", 1, (1400, 1400), (2, 3), loop=True),
+    "walk": Clip("movement", 0, (140, 140, 140, 140), loop=True),
+    "stretch": Clip("movement", 1, (250, 400, 320, 600), loop=True),
+    "look_left": Clip("movement", 2, (200, 650, 220, 650, 600), (1, 0, 1, 2, 3), loop=True),
+    "look_right": Clip("movement", 2, (200, 650, 220, 650, 600), (1, 2, 3, 0, 1), loop=True),
     "loaf": Clip("movement", 3, (2200, 160, 180, 1800), loop=True),
-    "peek": Clip("idle", 0, (800, 500, 900, 800, 500, 900), (0, 1, 2, 3, 1, 0)),
+    "peek": Clip("idle", 0, (300, 100, 160, 400, 100, 500), (0, 1, 2, 3, 1, 0), loop=True),
 }
 
 
@@ -77,8 +79,9 @@ class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
         cells = {}
-        for bank in ("idle", "pets", "activity", "movement"):
-            image = QImage(str(Path(path) / f"neko-{bank}-v3.png"))
+        for bank in ("idle", "pets", "activity", "movement", "transitions"):
+            filename = "neko-transitions-v1.png" if bank == "transitions" else f"neko-{bank}-v3.png"
+            image = QImage(str(Path(path) / filename))
             if image.isNull():
                 return
             image = image.scaled(512, 512, Qt.IgnoreAspectRatio, Qt.FastTransformation)
@@ -91,7 +94,12 @@ class SpriteAtlas:
                     cells[bank, row, col] = cell.copy(bounds)
         for key, cell in cells.items():
             # Seated drawings share a height; low poses keep their natural proportions.
-            if key[:2] in (("activity", 3), ("movement", 3)):
+            if key[0] == "transitions":
+                scale = 82 / cells["transitions", 0, 0].height()
+                sprite = QPixmap.fromImage(cell).scaled(
+                    round(cell.width() * scale), round(cell.height() * scale),
+                    Qt.IgnoreAspectRatio, Qt.FastTransformation)
+            elif key[:2] in (("activity", 3), ("movement", 3)):
                 sprite = QPixmap.fromImage(cell).scaledToWidth(92, Qt.FastTransformation)
             else:
                 sprite = QPixmap.fromImage(cell).scaled(104, 82, Qt.KeepAspectRatio, Qt.FastTransformation)
@@ -104,4 +112,5 @@ class SpriteAtlas:
 
     def frame(self, name, elapsed, motion=True):
         clip = CLIPS[name]
-        return self.frames.get((clip.bank, clip.row, clip.frame_index(elapsed if motion else 0)), QPixmap())
+        index = clip.frame_index(elapsed if motion else 0)
+        return self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())

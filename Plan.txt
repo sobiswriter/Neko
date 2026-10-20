@@ -14,8 +14,8 @@ Interaction rules
   Idle gestures default to about 14 seconds; configurable from five to 120 seconds.
   Sleep delay defaults to three minutes; configurable from one to 3600 seconds.
   Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
-  Each nap lasts 90 seconds despite input or petting, then she wakes herself.
-  Old inactivity cannot immediately start another nap; give her a full awake interval.
+  Eight frames lower her into sleep; only a deliberate pet plays the eight-frame wake.
+  Typing, window changes, dragging and elapsed time do not wake her. No timed wake-up.
   Four pet responses alternate; nine idle moods avoid consecutive repeats.
   298 offline lines use context shuffle bags, with personal questions and app rituals.
   Local foreground app names and media title hints select lines and matching gestures.
@@ -23,7 +23,9 @@ Interaction rules
   Ambient thoughts default to 75 seconds; configurable from 15 to 600. Quiet removes them.
   Cursor walks keep a gap, last at most 6.5 seconds and travel about 220 pixels maximum.
   Eligible moving cursors invite another walk after 25 seconds.
-  Most gestures have 5–6 seconds to read; standing drawings keep a consistent size.
+  Keep 5–6 second gesture slots but repeat brisk motion cycles, not slow whole actions.
+  Rendering runs at 20 FPS; paw and walk drawings advance roughly every 140–220 ms.
+  Standing drawings keep a consistent size; transitions use one fixed character scale.
   Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
   Automatic sound has a 45-second pause; quiet/fullscreen/media suppress it.
   Hiding is absolute. Fullscreen hiding is optional; native pinning never steals focus.
@@ -33,7 +35,8 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  Sixteen drawn sequences, 64 new frames, with timed holds and directional variants.
+  Eighty drawings including sleep/wake transitions, timed holds and directional variants.
+  Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 
 Optional AI

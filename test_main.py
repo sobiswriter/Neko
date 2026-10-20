@@ -7,14 +7,14 @@ import time
 import unittest
 from unittest.mock import MagicMock, patch
 
-from PySide6.QtCore import QEvent, QPoint, QPointF, QSettings, Qt
+from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, QSize, QSettings, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
 from behavior import NekoState
 from dialogue import LINES
-from main import NekoWidget, set_autostart
+from main import NekoWidget, set_autostart, adjacent_position
 
 
 APP = QApplication.instance() or QApplication([])
@@ -39,6 +39,7 @@ class DesktopTests(unittest.TestCase):
         APP.processEvents()
 
     def tearDown(self):
+        self.neko.menu.hide()
         self.neko.tick_timer.stop()
         self.neko.animation_timer.stop()
         self.neko.save_timer.stop()
@@ -122,23 +123,21 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.current_clip, "loaf")
         self.assertIn(self.neko.bubble.text(), LINES["video"])
 
-    def test_napping_pets_keep_the_animation_and_automatic_wake_deadline(self):
+    def test_sleep_transitions_then_waits_for_a_pet_to_play_the_wake_frames(self):
         now = time.monotonic()
         with patch("main.desktop_activity", return_value=(180, 100, False)), \
                 patch("main.time.monotonic", return_value=now):
             self.neko.tick()
-        self.assertEqual(self.neko.current_clip, "sleep")
-        started = self.neko.pose_started
-        self.neko.pet_reaction()
-        self.assertEqual(self.neko.current_clip, "sleep")
-        self.assertEqual(self.neko.pose_started, started)
-        with patch("main.time.monotonic", return_value=now + 89):
+        self.assertEqual(self.neko.current_clip, "fall_asleep")
+        with patch("main.time.monotonic", return_value=now + 3):
             self.neko.tick()
         self.assertEqual(self.neko.current_clip, "sleep")
-        with patch("main.time.monotonic", return_value=now + 90):
+        with patch("main.time.monotonic", return_value=now + 1000):
             self.neko.tick()
+            self.assertEqual(self.neko.current_clip, "sleep")
+            self.neko.pet_reaction()
         self.assertEqual(self.neko.companion.state, NekoState.WAKING)
-        self.assertEqual(self.neko.current_clip, "stretch")
+        self.assertEqual(self.neko.current_clip, "wake")
 
     def test_sounds_are_opt_in_nonblocking_and_rate_limited(self):
         import winsound
@@ -218,7 +217,43 @@ class DesktopTests(unittest.TestCase):
         self.assertFalse(self.settings.value("follow_mouse", type=bool))
         with patch("main.desktop_activity", return_value=(45, 100, False)):
             self.neko.tick()
-        self.assertEqual(self.neko.companion.state, NekoState.SLEEPING)
+        self.assertEqual(self.neko.companion.state, NekoState.FALLING_ASLEEP)
+
+    def test_popup_placement_avoids_neko_at_screen_corners_and_center(self):
+        area = QRect(-1920, 0, 1920, 1080)
+        for anchor in (QRect(-1920, 0, 112, 112), QRect(-112, 0, 112, 112),
+                       QRect(-1920, 968, 112, 112), QRect(-112, 968, 112, 112),
+                       QRect(-1000, 500, 112, 112)):
+            for size in (QSize(220, 160), QSize(340, 640)):
+                rect = QRect(adjacent_position(anchor, size, area), size)
+                self.assertTrue(area.contains(rect))
+                self.assertFalse(rect.intersects(anchor))
+
+    def test_nook_and_popup_do_not_cover_neko(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        APP.processEvents()
+        self.assertFalse(self.neko.stats_window.frameGeometry().intersects(self.neko.frameGeometry()))
+        self.neko.stats_window.hide()
+        APP.processEvents()
+        self.neko.menu.popup(self.neko.pos())
+        APP.processEvents()
+        self.assertTrue(self.neko.menu.isVisible())
+        self.assertFalse(self.neko.menu.geometry().intersects(self.neko.frameGeometry()))
+        with patch("main.QApplication.platformName", return_value="windows"), \
+                patch("main.win32gui.SetWindowPos") as pin:
+            self.neko.pin_to_top(force=True)
+        pin.assert_not_called()
+
+    def test_following_cannot_walk_under_an_open_nook(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        self.neko.last_follow = -99999
+        cursor = self.neko.geometry().center() - QPoint(220, 0)
+        self.neko.last_cursor = cursor - QPoint(30, 0)
+        with patch("main.QCursor.pos", return_value=cursor):
+            self.neko.tick()
+        self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
 
     def test_timers_accept_typed_values_and_commit_on_enter(self):
         with patch("main.autostart_enabled", return_value=False):

@@ -7,6 +7,7 @@ import random
 class NekoState(Enum):
     IDLE = auto()
     SLEEPING = auto()
+    FALLING_ASLEEP = auto()
     PEEKING = auto()
     CURIOUS = auto()
     STRETCHING = auto()
@@ -44,7 +45,6 @@ class Companion:
         self.idle_seconds = idle_seconds
         self.state = NekoState.IDLE
         self.pose_until = 0
-        self.sleep_until = 0
         self.next_nap = 0
         self.next_idle = now + self.idle_seconds
         self.next_comment = now + self.chatter_seconds
@@ -68,7 +68,14 @@ class Companion:
     def pet(self, now):
         self.pets += 1
         self.last_interaction = now
-        if self.state == NekoState.SLEEPING:
+        if self.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
+            self.pending_window = None
+            self.next_nap = now + self.sleep_seconds
+            self.next_comment = max(self.next_comment, now + 15)
+            self.last_curiosity = now
+            self.pose(NekoState.WAKING, now, 2.6)
+            return
+        if self.state == NekoState.WAKING:
             return
         self.next_comment = max(self.next_comment, now + 15)
         self.last_pet = self.rng.choice([s for s in PET_STATES if s != self.last_pet])
@@ -83,21 +90,19 @@ class Companion:
         if self.pending_window and now - self.pending_window[1] > 7:
             self.pending_window = None
 
-        if self.state == NekoState.SLEEPING:
+        if self.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING):
             self.pending_window = None
-            if now < self.sleep_until:
-                return None
-            self.pose(NekoState.WAKING, now, 6)
-            self.next_nap = now + self.sleep_seconds
-            self.next_idle = now + self.idle_seconds
-            self.next_comment = max(self.next_comment, now + 15)
-            self.last_curiosity = now
-            return "wake"
+            if self.state == NekoState.FALLING_ASLEEP and now >= self.pose_until:
+                self.state = NekoState.SLEEPING
+                return "settled"
+            if self.state == NekoState.WAKING and now >= self.pose_until:
+                self.state = NekoState.IDLE
+                return "idle"
+            return None
 
         if idle_seconds >= self.sleep_seconds and now >= self.next_nap:
             self.pending_window = None
-            self.state = NekoState.SLEEPING
-            self.sleep_until = now + 90
+            self.pose(NekoState.FALLING_ASLEEP, now, 2.6)
             self.naps += 1
             return "sleep"
 

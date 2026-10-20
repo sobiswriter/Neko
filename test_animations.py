@@ -13,9 +13,9 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_64_distinct_drawings(self):
+    def test_atlas_has_80_drawings_including_sleep_transitions(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 64)
+        self.assertEqual(len(atlas.frames), 80)
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
         self.assertNotEqual(atlas.frames["idle", 1, 0].toImage(), atlas.frames["idle", 1, 1].toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
@@ -30,10 +30,21 @@ class AnimationTests(unittest.TestCase):
                     bounds = sprite_bounds(atlas.frames[bank, row, col].toImage())
                     self.assertAlmostEqual(bounds.height(), 84, delta=2)
 
-    def test_gestures_use_a_complete_noticeable_sequence(self):
-        for name, clip in CLIPS.items():
-            if name not in ("idle", "sleep", "walk", "typing", "tail", "knead", "loaf"):
-                self.assertGreaterEqual(sum(clip.durations), 4000, name)
+    def test_motion_cycles_are_quicker_and_repeat_inside_longer_behavior_slots(self):
+        for name in ("typing", "walk", "knead"):
+            self.assertTrue(CLIPS[name].loop)
+            self.assertLess(sum(CLIPS[name].durations), 1000)
+        for name in ("ears", "sniff", "happy", "nuzzle", "groom", "look_left"):
+            self.assertTrue(CLIPS[name].loop)
+            self.assertLess(sum(CLIPS[name].durations), 2500)
+
+    def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for name in ("fall_asleep", "wake"):
+            self.assertEqual(len(CLIPS[name].order), 8)
+            self.assertFalse(CLIPS[name].loop)
+            self.assertFalse(atlas.frame(name, 999).isNull())
+        self.assertEqual(atlas.frame("fall_asleep", 999).toImage(), atlas.frame("sleep", 1.5).toImage())
 
     def test_idle_holds_then_blinks_and_loops(self):
         idle = CLIPS["idle"]
@@ -42,8 +53,8 @@ class AnimationTests(unittest.TestCase):
         self.assertEqual(idle.frame_index(sum(idle.durations) / 1000), 0)
 
     def test_one_shot_actions_end_without_looping(self):
-        self.assertEqual(CLIPS["stretch"].frame_index(999), 3)
-        self.assertEqual(CLIPS["stretch"].frame_index(-1), 0)
+        self.assertEqual(CLIPS["fall_asleep"].frame_index(999), 7)
+        self.assertEqual(CLIPS["fall_asleep"].frame_index(-1), 0)
 
     def test_reduced_motion_holds_a_real_frame(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
