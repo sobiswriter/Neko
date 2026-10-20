@@ -51,6 +51,7 @@ class Companion:
         if self.state == NekoState.SLEEPING:
             self.state = NekoState.IDLE
             self.next_idle = now + self.rng.uniform(20, 40)
+            self.next_comment = max(self.next_comment, now + 240)
             self.last_curiosity = now
             return "wake"
 

@@ -13,7 +13,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
 from behavior import NekoState
-from main import NekoWidget
+from main import NekoWidget, set_autostart
 
 
 APP = QApplication.instance() or QApplication([])
@@ -72,6 +72,7 @@ class DesktopTests(unittest.TestCase):
         self.assertTrue(self.neko.bubble.isVisible())
 
     def test_fullscreen_hides_and_restores_without_chatter(self):
+        self.neko.companion.next_comment = 0
         with patch("main.desktop_activity", return_value=(0, 200, True)):
             self.neko.tick()
         self.assertFalse(self.neko.isVisible())
@@ -79,6 +80,13 @@ class DesktopTests(unittest.TestCase):
         self.neko.tick()
         self.assertTrue(self.neko.isVisible())
         self.assertFalse(self.neko.bubble.isVisible())
+        self.assertGreater(self.neko.companion.next_comment, time.monotonic() + 700)
+
+    def test_leaving_quiet_mode_does_not_release_overdue_chatter(self):
+        self.neko.set_quiet(True)
+        self.neko.companion.next_comment = 0
+        self.neko.set_quiet(False)
+        self.assertGreater(self.neko.companion.next_comment, time.monotonic() + 700)
 
     def test_counts_and_preferences_are_saved_without_double_counting(self):
         self.neko.pet_reaction()
@@ -139,6 +147,31 @@ class DesktopTests(unittest.TestCase):
             self.neko.companion.state = state
             self.neko.refresh_asset()
             self.assertFalse(self.neko.grab().isNull())
+
+    def test_bubbles_do_not_capture_desktop_input(self):
+        self.assertTrue(self.neko.bubble.windowFlags() & Qt.WindowTransparentForInput)
+        self.assertTrue(self.neko.bubble.windowFlags() & Qt.WindowDoesNotAcceptFocus)
+
+    def test_startup_is_opt_in_and_migrates_the_old_shortcut(self):
+        shortcut = Path(self.folder.name) / "DesktopNeko.lnk"
+        shortcut.touch()
+        with patch("main.legacy_shortcut", return_value=shortcut), \
+                patch("main.winreg.CreateKey"), patch("main.winreg.SetValueEx") as write:
+            set_autostart(True)
+        command = write.call_args.args[-1]
+        self.assertIn("pythonw.exe", command)
+        self.assertIn('"', command)
+        self.assertIn("main.py", command)
+        self.assertFalse(shortcut.exists())
+
+    def test_startup_failure_preserves_the_old_shortcut(self):
+        shortcut = Path(self.folder.name) / "DesktopNeko.lnk"
+        shortcut.touch()
+        with patch("main.legacy_shortcut", return_value=shortcut), \
+                patch("main.winreg.CreateKey", side_effect=PermissionError):
+            with self.assertRaises(PermissionError):
+                set_autostart(True)
+        self.assertTrue(shortcut.exists())
 
 
 if __name__ == "__main__":

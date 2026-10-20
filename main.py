@@ -212,10 +212,10 @@ class NekoWidget(QWidget):
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.setFixedSize(112, 112)
         self.setAccessibleName("Neko, your desktop companion")
-        self.setToolTip("a little company · pet me, drag me, or right-click for my nook")
+        self.setAccessibleDescription("Click to pet, drag to move, or right-click for Neko's nook.")
         self.assets = {}
         self.movies = {}
-        for name in ("idle", "sleep", "happy", "peek", "curious", "agitated"):
+        for name in ("idle", "sleep", "happy", "peek", "curious"):
             self.assets[name] = QPixmap(str(ASSET_ROOT / f"neko_{name}.png"))
             movie = QMovie(str(ASSET_ROOT / f"neko_{name}.gif"))
             if movie.isValid():
@@ -223,8 +223,10 @@ class NekoWidget(QWidget):
                 self.movies[name] = movie
         self.current_asset = "idle"
         self.bubble = QLabel(None, Qt.ToolTip | Qt.FramelessWindowHint
-                             | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus)
+                             | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
+                             | Qt.WindowTransparentForInput)
         self.bubble.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.bubble.setAttribute(Qt.WA_TranslucentBackground)
         self.bubble.setAttribute(Qt.WA_TransparentForMouseEvents)
         self.bubble.setTextFormat(Qt.PlainText)
         self.bubble.setWordWrap(True)
@@ -278,6 +280,7 @@ class NekoWidget(QWidget):
         self.quiet = enabled
         self.quiet_action.setChecked(enabled)
         self.ai_generation += 1
+        self.companion.next_comment = time.monotonic() + random.uniform(720, 1200)
         if enabled:
             self.dismiss_bubble()
         self.save_preferences()
@@ -324,6 +327,8 @@ class NekoWidget(QWidget):
         if fullscreen != self.fullscreen:
             self.fullscreen = fullscreen
             self.ai_generation += 1
+            self.companion.next_comment = now + random.uniform(720, 1200)
+            self.companion.next_idle = now + random.uniform(20, 40)
             self.dismiss_bubble()
             self.setVisible(not fullscreen)
             self.sync_animation()
@@ -506,7 +511,6 @@ class NekoWidget(QWidget):
         area = QApplication.primaryScreen().availableGeometry()
         self.move(area.right() - self.width() - 24, area.bottom() - self.height() - 12)
         self.dismiss_bubble()
-        self.save_preferences()
 
     def clamp_position(self, *args):
         screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()

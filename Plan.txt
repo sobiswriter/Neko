@@ -1,0 +1,35 @@
+DESKTOP NEKO — QUIET COMPANY
+
+Intent
+  A curious little presence at the edge of your work. Pleasant to notice,
+  perfectly happy to be ignored. Keep the original pixel cat and a tiny footprint.
+
+Interaction rules
+  Visual reactions before words. No attention debt, chores, streaks, or guilt.
+  Breathing and small poses; no roaming, chasing, sound, or focus stealing.
+  Petting is deliberate: a click, not a drag or an accidental hover.
+  Curiosity responds to nearby cursors/window changes, throttled to 45 seconds.
+  Idle poses vary every 25–55 seconds and do not repeat consecutively.
+  Three minutes without input means a nap. Returning wakes her silently.
+  Ambient words are spaced 12–20 minutes apart. Quiet mode removes them.
+  Hiding is absolute. Fullscreen apps tuck her away automatically.
+  Motion can be disabled without losing interaction.
+
+Small home
+  One nook for preferences, startup, AI, lifetime pets and naps.
+  Remember position and clamp it into an available monitor.
+  Startup is opt-in; a single-instance lock prevents duplicate pets.
+
+Optional AI
+  Off by default. Current window title only; no screenshots or history.
+  One request at a time, bounded timeout, no visible thinking/error chatter.
+  Discard stale replies after interaction, hiding, focus mode or fullscreen.
+  The offline pet remains complete when the service is unavailable.
+
+Deliberately excluded
+  Voice/chat UI, hunger systems, notifications, task reminders, cloud memory,
+  roaming across windows, new accounts, plugin systems, and new art dependencies.
+
+Validation
+  Deterministic behavior tests, Qt interaction tests with temporary settings,
+  mocked AI requests, native Windows rendering, and a packaged-executable smoke test.

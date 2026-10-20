@@ -19,6 +19,12 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(self.pet.tick(201, idle_seconds=0), "wake")
         self.assertEqual(self.pet.state, NekoState.IDLE)
 
+    def test_returning_after_a_long_nap_does_not_release_overdue_chatter(self):
+        self.pet.tick(200, 200)
+        self.pet.next_comment = 100
+        self.pet.tick(1000, 0)
+        self.assertGreaterEqual(self.pet.next_comment, 1240)
+
     def test_focus_mode_has_no_unsolicited_comments(self):
         self.pet.next_comment = 0
         actions = [self.pet.tick(t, 0, quiet=True) for t in range(1, 2000)]
