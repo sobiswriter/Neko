@@ -1,7 +1,8 @@
 # Desktop Neko 🐾
 
 A little company for your Windows desktop. Neko stretches, settles down, notices
-your cursor, and naps when you step away. No chores, guilt, sounds, or attention meter.
+your cursor, and naps when you step away. No chores, guilt, or attention meter.
+Soft sounds are optional and off until you enable them.
 
 ![Neko's new drawn animations](docs/neko-preview.gif)
 
@@ -12,10 +13,13 @@ your cursor, and naps when you step away. No chores, guilt, sounds, or attention
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
 - **Come close.** She sniffs at a moving cursor and sometimes takes a small walk
-  toward it. Each walk lasts at most 3.2 seconds, travels at most about 160 pixels,
-  and keeps a gap from the arrow. Mouse following is optional, with a minute's rest.
+  toward it. Each walk can last 6.5 seconds, travels at most about 220 pixels,
+  and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
   yawns and sleepy peeks use 64 newly drawn frames across sixteen action sequences.
+  Most gestures play for 5–6 seconds. Every frame has a 112 × 100 transparent canvas;
+  seated poses share an 82-pixel height so petting no longer makes her shrink.
+  Walking, loafing and sleep preserve their natural posture and proportions.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual
@@ -23,18 +27,30 @@ your cursor, and naps when you step away. No chores, guilt, sounds, or attention
   changes also hint at internal tab/document changes. Events wait briefly for an
   ongoing animation instead of disappearing immediately.
 - **Step away.** She yawns and naps after a configurable period without input.
-  The default is three minutes; choose 30–3600 seconds. Returning earns a stretch
-  and sometimes a little greeting. Ignoring her never creates chores or penalties.
-- **Offline personality.** Over 200 short lines, shuffled separately for typing,
+  The default is three minutes; choose 30–3600 seconds. Each nap lasts 90 seconds
+  through typing, app switches and petting, then she wakes herself with a stretch.
+  She stays awake for at least another sleep interval before the next nap.
+  Ignoring her never creates chores or penalties.
+- **Offline personality.** 298 short lines, including more personal questions and
+  company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
   All automatic words share an 8–30 second pause and never replace a visible bubble.
+- **Little app rituals.** VLC gets a watch-buddy loaf and questions about what
+  you're watching; audio file titles and Spotify get listening questions and tail
+  swishes. Coding, drawing, writing, chat, games, folders and terminals each have
+  their own lines and matching gestures. These are app hints, not content analysis.
+- **Soft mews & purrs.** Enable them in the nook's Settings tab; Listen previews a
+  small mew. These original synthesized cues are up to a second long, with low
+  volume encoded into the WAV files. A deliberate pet can purr or mew; waking can
+  chirp. Automatic cues have a 45-second pause and are suppressed during media apps,
+  quiet company and fullscreen. Turning sounds off or hiding stops playback.
 - **Right-click for her nook.** Quiet company, reduced motion, startup, optional
   AI, mouse following, sleep delay, chatter and idle gesture frequency, and lifetime
   pet/nap counts live in one small window. Double-click the tray
   icon to find her again.
 
-Quiet company stops unprompted words while keeping deliberate pet reactions.
+Quiet company stops unprompted words and sounds while keeping deliberate pet reactions.
 Hide really hides her: no surprise appearances, bubbles, or animation. Native
 topmost positioning keeps her above normal windows without stealing focus.
 **Tuck away during fullscreen apps** is a separate, opt-in choice in the nook.
@@ -46,7 +62,9 @@ Typing and window reactions work locally and can be switched off. Keyboard
 detection requests only raw-input headers: key identities, text and passwords are
 never read, reconstructed, saved, or sent anywhere. Window reactions use native
 events plus a local, temporary hash of the foreground window title to notice
-changes; the title is not stored or transmitted in offline mode. Optional AI has
+changes, plus the foreground executable's name for app-specific reactions. Titles
+are used briefly for local media hints, then discarded; neither titles nor app
+history are stored or transmitted in offline mode. Optional AI has
 its own title-sharing toggle below. Apps expose different accessibility events:
 internal tabs are hints, not universal exact tracking. Background tabs are not
 tracked. See [Microsoft's event reference](https://learn.microsoft.com/en-us/windows/win32/winauto/event-constants).
@@ -152,8 +170,10 @@ generates a bouncing ball, so it isn't part of the app or build.
 - `behavior.py`: timing, temporary poses, naps, and pet reactions; no Qt or network.
 - `main.py`: desktop integration, rendering, preferences, nook, and tray.
 - `animations.py`: sprite atlas loading, frame timing and directional clips.
-- `activity.py`: local keyboard-activity headers and Windows lifecycle events.
+- `activity.py`: local keyboard headers, Windows events and foreground executable name.
+- `app_context.py`: local app categories and media title hints.
 - `dialogue.py`: offline lines and per-context shuffle bags.
+- `tools/make_sounds.py`: reproducible, original synthesized WAV cues; standard library only.
 - `llm_brain.py`: optional title-only Gemini worker.
 - `test_*.py`: standard-library unittest suite, with Qt's event helpers.
 - `Plan.txt`: interaction rules for keeping future changes quiet and minimal.

@@ -15,8 +15,12 @@ consistent. No API key or art service is needed to run the companion.
 There are 64 new drawings in sixteen action sequences. The frame player adds
 directional looks and a blink variant. Timing holds and loops live in animations.py.
 Walking mirrors the same drawings when heading right. The loader samples each
-sheet at 512 x 512, finds the main connected silhouette, and applies one shared
-scale and ground anchor. Every frame fits the 112 x 112 desktop widget.
+sheet at 512 x 512 and finds the main connected silhouette. The frame player now
+normalizes seated drawings to 82 pixels tall, with an aspect-preserving width cap.
+This fixes smaller pet drawings shrinking during a click. Low sleeping/loaf poses
+share a 92-pixel width; walking keeps its natural proportions within 104 x 82.
+Every frame uses a 112 x 100 transparent canvas with the same ground anchor.
+Most actions now take 5–6 seconds, including full left/right look sequences.
 No limbs or image pixels were repaired programmatically.
 
 The sheets were inspected at desktop size and the old atlas was removed from

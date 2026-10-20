@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import winreg
+import winsound
 
 import win32gui
 import win32con
@@ -20,8 +21,9 @@ from PySide6.QtWidgets import (
     QPushButton, QSpinBox, QFormLayout, QTabWidget, QSystemTrayIcon, QVBoxLayout, QWidget,
 )
 
-from behavior import Companion, NekoState
-from activity import ActivityMonitor
+from behavior import Companion, NekoState, PET_STATES
+from activity import ActivityMonitor, foreground_executable
+from app_context import app_kind
 from animations import SpriteAtlas
 from dialogue import OfflineDialogue
 
@@ -114,6 +116,7 @@ class StatsWindow(QDialog):
             QPushButton { background: #eee5df; color: #504b48; border: 0;
                           border-radius: 8px; padding: 9px 16px; }
             QPushButton:hover { background: #e7d8d1; }
+            QPushButton:disabled { color: #9c9088; background: #f2ece6; }
         """)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(26, 24, 26, 24)
@@ -144,6 +147,18 @@ class StatsWindow(QDialog):
         self.motion.setChecked(neko.motion)
         self.motion.toggled.connect(neko.set_motion)
         settings_layout.addWidget(self.motion)
+        sound_row = QHBoxLayout()
+        self.sounds = QCheckBox("Soft mews and purrs")
+        self.sounds.setChecked(neko.sounds_enabled)
+        self.sounds.toggled.connect(neko.set_sounds)
+        sound_row.addWidget(self.sounds)
+        self.sound_test = QPushButton("Listen")
+        self.sound_test.setEnabled(neko.sounds_enabled)
+        self.sound_test.setAccessibleName("Preview a soft mew")
+        self.sound_test.clicked.connect(lambda: neko.play_sound("mew", prompted=True))
+        self.sounds.toggled.connect(self.sound_test.setEnabled)
+        sound_row.addWidget(self.sound_test)
+        settings_layout.addLayout(sound_row)
         self.reactivity = QCheckBox("Notice typing and window activity")
         self.reactivity.setChecked(neko.reactive)
         self.reactivity.toggled.connect(neko.set_reactivity)
@@ -167,7 +182,7 @@ class StatsWindow(QDialog):
             self.timing[key] = spin
             timing.addRow(label, spin)
         company_layout.addLayout(timing)
-        note = QLabel("Reactions share a pause between words.\nQuiet company still welcomes a deliberate pet.")
+        note = QLabel("Naps last 90 seconds, even while you work.\nQuiet company still welcomes a deliberate pet.")
         note.setWordWrap(True)
         company_layout.addWidget(note)
         company_layout.addStretch()
@@ -183,7 +198,8 @@ class StatsWindow(QDialog):
         self.ai.setChecked(neko.ai_enabled)
         self.ai.toggled.connect(neko.set_ai)
         settings_layout.addWidget(self.ai)
-        privacy = QLabel("Offline notices title changes locally, never what you type.\n"
+        privacy = QLabel("Offline uses app names and title hints locally.\n"
+                         "Never reads what you type.\n"
                          "AI sends the current window title to Google Gemini.\n"
                          "No screenshots. No conversation history.\n"
                          "Uses GEMINI_API_KEY from your environment or config.json.")
@@ -275,6 +291,8 @@ class NekoWidget(QWidget):
         self.last_title_stamp = None
         self.quiet = self.settings.value("quiet", False, type=bool)
         self.motion = self.settings.value("motion", True, type=bool)
+        self.sounds_enabled = self.settings.value("sounds_enabled", False, type=bool)
+        self.last_sound = -math.inf
         self.reactive = self.settings.value("reactive", True, type=bool)
         self.hide_fullscreen = self.settings.value("hide_fullscreen", False, type=bool)
         self.ai_enabled = self.settings.value("ai_enabled", False, type=bool)
@@ -283,6 +301,8 @@ class NekoWidget(QWidget):
         self.is_manually_hidden = False
         self.fullscreen = False
         self.last_window = 0
+        self.current_executable = ""
+        self.app_context = None
         self.brain_worker = None
         self.ai_generation = 0
         self.ai_status = "Offline company is always available."
@@ -384,6 +404,7 @@ class NekoWidget(QWidget):
         self.companion.next_comment = time.monotonic() + self.companion.chatter_seconds
         if enabled:
             self.dismiss_bubble()
+            self.stop_sound()
         self.save_preferences()
 
     def set_motion(self, enabled):
@@ -392,6 +413,34 @@ class NekoWidget(QWidget):
             self.stop_following()
         self.sync_animation()
         self.save_preferences()
+
+    def set_sounds(self, enabled):
+        self.sounds_enabled = enabled
+        if not enabled:
+            self.stop_sound()
+        self.save_preferences()
+
+    def stop_sound(self):
+        try:
+            winsound.PlaySound(None, 0)
+        except (RuntimeError, OSError):
+            pass
+
+    def play_sound(self, kind, prompted=False):
+        now = time.monotonic()
+        if (kind not in ("mew", "chirp", "purr") or not self.sounds_enabled
+                or self.closing or self.is_manually_hidden or not self.isVisible() or self.fullscreen
+                or (not prompted and (self.quiet or self.app_context in ("music", "video")))
+                or now - self.last_sound < (6 if prompted else 45)):
+            return False
+        try:
+            winsound.PlaySound(str(ASSET_ROOT / "sounds" / f"{kind}.wav"),
+                               winsound.SND_FILENAME | winsound.SND_ASYNC
+                               | winsound.SND_NODEFAULT | winsound.SND_NOSTOP)
+        except (RuntimeError, OSError):
+            return False
+        self.last_sound = now
+        return True
 
     def set_timing(self, key, value):
         limits = {"sleep_seconds": (30, 3600), "chatter_seconds": (15, 600), "idle_seconds": (5, 120)}
@@ -420,15 +469,15 @@ class NekoWidget(QWidget):
             delta = cursor - self.geometry().center()
             distance = math.hypot(delta.x(), delta.y())
             excursion = (self.pos() - self.follow_origin).manhattanLength() if self.follow_origin else 0
-            if (self.drag_origin is not None or self.fullscreen or distance > 400
+            if (self.drag_origin is not None or self.fullscreen or distance > 650
                     or not self.follow_mouse or not self.motion):
                 self.stop_following()
-            elif distance <= 100 or excursion >= 160 or time.monotonic() >= self.companion.pose_until:
+            elif distance <= 90 or excursion >= 220 or time.monotonic() >= self.companion.pose_until:
                 self.stop_following()
                 self.offline_line("follow")
             else:
                 self.look_direction = -1 if delta.x() < 0 else 1
-                self.move(self.pos() + QPoint(round(delta.x() / distance * 4), round(delta.y() / distance * 4)))
+                self.move(self.pos() + QPoint(round(delta.x() / distance * 2), round(delta.y() / distance * 2)))
                 self.clamp_position()
         self.update()
 
@@ -501,14 +550,22 @@ class NekoWidget(QWidget):
         fullscreen_changed = fullscreen != self.fullscreen
         if self.reactive and not fullscreen and window:
             try:
-                stamp = (window, hash(win32gui.GetWindowText(window)))
+                title = win32gui.GetWindowText(window)
+                stamp = (window, hash(title))
+                if not self.last_title_stamp or window != self.last_title_stamp[0]:
+                    self.current_executable = foreground_executable(window)
+                self.app_context = app_kind(self.current_executable, title)
                 if self.last_title_stamp and stamp[0] == self.last_title_stamp[0] and stamp != self.last_title_stamp:
                     window_event = window_event or "tab"
                 self.last_title_stamp = stamp
             except win32gui.error:
                 self.last_title_stamp = None
+                self.current_executable = ""
+                self.app_context = None
         else:
             self.last_title_stamp = None
+            self.current_executable = ""
+            self.app_context = None
         if fullscreen_changed:
             self.fullscreen = fullscreen
             self.ai_generation += 1
@@ -516,6 +573,7 @@ class NekoWidget(QWidget):
             self.companion.next_comment = now + self.companion.chatter_seconds
             self.companion.next_idle = now + self.companion.idle_seconds
             self.dismiss_bubble()
+            self.stop_sound()
             self.companion.pending_window = None
             self.last_words = now
             keyboard_events, window_event = 0, None
@@ -527,7 +585,8 @@ class NekoWidget(QWidget):
         changed = bool(self.last_window and window != self.last_window)
         self.pin_to_top(force=changed)
         cursor = QCursor.pos()
-        distance = (cursor - self.geometry().center()).manhattanLength()
+        delta = cursor - self.geometry().center()
+        distance = math.hypot(delta.x(), delta.y())
         moved = (cursor - self.last_cursor).manhattanLength() >= 20
         self.last_cursor = cursor
         was_following = self.companion.state == NekoState.FOLLOWING
@@ -535,17 +594,18 @@ class NekoWidget(QWidget):
             self.stop_following()
         if (self.follow_mouse and self.motion and not fullscreen and not keyboard_events
                 and not changed and not window_event and not self.bubble.isVisible()
-                and self.companion.state == NekoState.IDLE and moved and 120 < distance < 350
-                and now - self.last_follow >= 60):
+                and self.companion.state == NekoState.IDLE and moved and 200 < distance < 520
+                and now - self.last_follow >= 25):
             self.last_follow = now
             self.follow_origin = self.pos()
-            self.companion.pose(NekoState.FOLLOWING, now, 3.2)
+            self.companion.pose(NekoState.FOLLOWING, now, 6.5)
             self.pose_started = now
             self.refresh_asset()
         action = self.companion.tick(now, idle, self.quiet or fullscreen,
                                      cursor_near=moved and distance < 150 and not fullscreen,
                                      window_changed=changed and self.reactive and not fullscreen and not fullscreen_changed,
-                                     keyboard_events=keyboard_events, window_event=window_event)
+                                     keyboard_events=keyboard_events, window_event=window_event,
+                                     app_kind=self.app_context)
         self.last_window = window
         if action == "comment":
             if not (self.ai_enabled and self.trigger_ai_brain()):
@@ -564,6 +624,7 @@ class NekoWidget(QWidget):
                 self.offline_line(self.companion.reaction_kind)
             elif action == "wake":
                 self.offline_line("wake")
+                self.play_sound("chirp")
             elif action == "idle" and was_following:
                 self.follow_origin = None
                 self.offline_line("follow")
@@ -618,7 +679,7 @@ class NekoWidget(QWidget):
                 painter.scale(-1, 1)
             painter.drawPixmap(-pixmap.width() // 2, -pixmap.height(), pixmap)
         painter.restore()
-        if state == NekoState.HAPPY and elapsed < 3.2:
+        if state in PET_STATES and elapsed < 5.8:
             painter.setPen(QColor("#cf9699"))
             painter.setFont(QFont("Segoe UI Symbol", 12))
             painter.drawText(QRectF(78, 12 - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
@@ -654,6 +715,8 @@ class NekoWidget(QWidget):
             return False
         if self.say(self.dialogue.pick(kind), prompted=prompted):
             self.ai_generation += 1
+            if kind == "hello":
+                self.play_sound("chirp")
             return True
         return False
 
@@ -664,6 +727,9 @@ class NekoWidget(QWidget):
         now = time.monotonic()
         self.ai_generation += 1
         self.companion.pet(now)
+        self.play_sound(random.choice(("mew", "purr")), prompted=True)
+        if self.companion.state == NekoState.SLEEPING:
+            return
         self.pose_started = now
         self.refresh_asset()
         if now - self.last_pet_words >= 6:
@@ -728,7 +794,7 @@ class NekoWidget(QWidget):
                 self.dragged = True
             if self.dragged:
                 self.dismiss_bubble()
-                if self.companion.state != NekoState.CURIOUS:
+                if self.companion.state not in (NekoState.CURIOUS, NekoState.SLEEPING):
                     now = time.monotonic()
                     self.companion.pose(NekoState.CURIOUS, now, 3)
                     self.pose_started = now
@@ -740,9 +806,10 @@ class NekoWidget(QWidget):
             if self.dragged:
                 self.ai_generation += 1
                 now = time.monotonic()
-                self.companion.pose(NekoState.PEEKING, now, 1.8)
+                if self.companion.state != NekoState.SLEEPING:
+                    self.companion.pose(NekoState.PEEKING, now, 5)
+                    self.pose_started = now
                 self.companion.last_interaction = now
-                self.pose_started = now
                 self.refresh_asset()
                 self.clamp_position()
                 self.save_preferences()
@@ -769,6 +836,7 @@ class NekoWidget(QWidget):
 
     def hide_neko(self):
         self.stop_following()
+        self.stop_sound()
         self.is_manually_hidden = True
         self.activity.enabled = False
         self.activity.consume(time.monotonic())
@@ -797,6 +865,7 @@ class NekoWidget(QWidget):
 
     def save_preferences(self):
         for key, value in {"quiet": self.quiet, "motion": self.motion,
+                           "sounds_enabled": self.sounds_enabled,
                            "follow_mouse": self.follow_mouse,
                            "sleep_seconds": self.companion.sleep_seconds,
                            "chatter_seconds": self.companion.chatter_seconds,
@@ -810,6 +879,7 @@ class NekoWidget(QWidget):
 
     def quit_neko(self):
         self.closing = True
+        self.stop_sound()
         self.activity.close()
         self.tick_timer.stop()
         self.animation_timer.stop()

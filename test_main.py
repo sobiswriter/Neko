@@ -29,6 +29,10 @@ class DesktopTests(unittest.TestCase):
         self.activity.start()
         self.native_monitor = patch("main.ActivityMonitor.start", return_value=None)
         self.native_monitor.start()
+        self.app_lookup = patch("main.foreground_executable", return_value="")
+        self.app_lookup.start()
+        self.sound_backend = patch("main.winsound.PlaySound")
+        self.sound_backend.start()
         self.neko = NekoWidget(self.settings)
         self.neko.tick_timer.stop()
         self.neko.show_neko()
@@ -50,6 +54,8 @@ class DesktopTests(unittest.TestCase):
         APP.processEvents()
         self.activity.stop()
         self.native_monitor.stop()
+        self.app_lookup.stop()
+        self.sound_backend.stop()
         self.folder.cleanup()
 
     def test_hidden_pet_never_reappears_to_talk(self):
@@ -107,6 +113,80 @@ class DesktopTests(unittest.TestCase):
         self.neko.last_window = 99
         self.neko.tick()
         self.assertIn(self.neko.bubble.text(), LINES["switch"])
+
+    def test_vlc_gets_a_watch_buddy_pose_and_local_question(self):
+        self.neko.last_window = 99
+        with patch("main.foreground_executable", return_value="vlc.exe"), \
+                patch("main.win32gui.GetWindowText", return_value="a film.mkv - VLC media player"):
+            self.neko.tick()
+        self.assertEqual(self.neko.current_clip, "loaf")
+        self.assertIn(self.neko.bubble.text(), LINES["video"])
+
+    def test_napping_pets_keep_the_animation_and_automatic_wake_deadline(self):
+        now = time.monotonic()
+        with patch("main.desktop_activity", return_value=(180, 100, False)), \
+                patch("main.time.monotonic", return_value=now):
+            self.neko.tick()
+        self.assertEqual(self.neko.current_clip, "sleep")
+        started = self.neko.pose_started
+        self.neko.pet_reaction()
+        self.assertEqual(self.neko.current_clip, "sleep")
+        self.assertEqual(self.neko.pose_started, started)
+        with patch("main.time.monotonic", return_value=now + 89):
+            self.neko.tick()
+        self.assertEqual(self.neko.current_clip, "sleep")
+        with patch("main.time.monotonic", return_value=now + 90):
+            self.neko.tick()
+        self.assertEqual(self.neko.companion.state, NekoState.WAKING)
+        self.assertEqual(self.neko.current_clip, "stretch")
+
+    def test_sounds_are_opt_in_nonblocking_and_rate_limited(self):
+        import winsound
+        with patch("main.winsound.PlaySound") as play:
+            self.assertFalse(self.neko.play_sound("mew", prompted=True))
+            play.assert_not_called()
+            self.neko.set_sounds(True)
+            self.assertTrue(self.settings.value("sounds_enabled", type=bool))
+            self.assertTrue(self.neko.play_sound("mew", prompted=True))
+            flags = play.call_args.args[1]
+            self.assertTrue(flags & winsound.SND_ASYNC)
+            self.assertTrue(flags & winsound.SND_NODEFAULT)
+            self.assertFalse(self.neko.play_sound("mew", prompted=True))
+            self.neko.set_sounds(False)
+            play.assert_called_with(None, 0)
+
+    def test_quiet_hidden_fullscreen_and_media_guard_sound(self):
+        self.neko.sounds_enabled = True
+        self.neko.set_quiet(True)
+        self.assertFalse(self.neko.play_sound("chirp"))
+        self.assertTrue(self.neko.play_sound("purr", prompted=True))
+        self.neko.last_sound = -999999
+        self.neko.set_quiet(False)
+        self.neko.app_context = "music"
+        self.assertFalse(self.neko.play_sound("chirp"))
+        self.neko.fullscreen = True
+        self.assertFalse(self.neko.play_sound("mew", prompted=True))
+        self.neko.fullscreen = False
+        self.neko.hide_neko()
+        self.assertFalse(self.neko.play_sound("mew", prompted=True))
+
+    def test_audio_device_failure_does_not_break_the_pet(self):
+        self.neko.sounds_enabled = True
+        with patch("main.winsound.PlaySound", side_effect=RuntimeError("no device")):
+            self.assertFalse(self.neko.play_sound("mew", prompted=True))
+            self.neko.set_sounds(False)
+
+    def test_nook_sound_toggle_and_preview_work_without_enabling_ai(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        nook = self.neko.stats_window
+        self.assertFalse(nook.sound_test.isEnabled())
+        nook.sounds.setChecked(True)
+        self.assertTrue(nook.sound_test.isEnabled())
+        with patch("main.winsound.PlaySound") as play:
+            nook.sound_test.click()
+        self.assertTrue(play.call_args.args[0].endswith("mew.wav"))
+        self.assertFalse(self.neko.ai_enabled)
 
     def test_title_fingerprint_catches_a_tab_change_in_the_same_app(self):
         self.neko.last_window = 100

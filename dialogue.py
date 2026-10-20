@@ -6,8 +6,28 @@ import random
 
 LINES = {
     "idle": """
-comfy corner. excellent human.
-my tail has its own little agenda.
+comfy corner. i'm glad you're here.
+i like spending these little bits of the day with you.
+you make a good window-watching buddy.
+how's your little corner of the world today?
+you can think out loud. i'm very good at listening quietly.
+is there something you're looking forward to today?
+you look like you could use a tiny coworker. convenient, that.
+i saved you the imaginary sunny spot.
+what would you do with an afternoon and absolutely no plans?
+you and me. a pretty nice arrangement.
+do you have a favourite kind of rainy day?
+you don't have to entertain me. i like just being here with you.
+if you're figuring something out, i'll sit with you while you do.
+what's one small thing you liked about today?
+you have a nice way of making this corner feel like home.
+shall we have a little thinking quietly together?
+you bring the ideas. i'll bring the extremely small paws.
+if you need a little pause, you can borrow my loaf philosophy.
+what's your favourite thing to listen to when you're making stuff?
+i wonder what this day looks like from your side of the screen.
+your company is my favourite part of the job.
+my tail has its own little agenda. how about you?
 i have considered the situation. mrrp.
 important loaf business. very confidential.
 is this a good time for a tiny thought?
@@ -19,31 +39,31 @@ there's probably a sunbeam somewhere.
 i could fit in a very small cardboard box.
 do you think clouds are warm?
 just checking the corners for imaginary bugs.
-i have four paws and absolutely no deadlines.
+you handle the deadlines. i have four paws to arrange.
 my ears heard a thought. probably mine.
-the desk is big. i am appropriately small.
+your desk is big. i am appropriately small.
 would you like some moral suppurrt?
 we make a pretty good little team.
 doing nothing is a surprisingly full schedule.
 i'll handle the sitting. you handle the mysteries.
 just a tiny witness to your day.
-my whiskers say this is a good spot.
-one day i will understand the little arrow.
+my whiskers say this is a good spot to sit with you.
+one day you'll have to explain that little arrow to me.
 all these pixels, and this one is mine.
 quietly adding cat energy to the room.
-i brought my best loaf posture.
+i brought you my best loaf posture.
 is there a polite way to ask for a sunbeam?
 my tail said hello. i thought you should know.
-not asleep. just buffering a small thought.
-the floor is made of screen. fascinating.
+not asleep. just thinking about what you're making.
+you get a whole room. my floor is made of screen. fascinating.
 i like this bit. the being-here bit.
 shall we call this productive sitting?
 a very small purr for the general atmosphere.
-just rearranging my paws. carry on.
+just rearranging my paws. you carry on.
 there. perfectly cat-shaped.
 you work. i'll be the little familiar.
 if a thought falls off the desk, i'll catch it.
-today feels like a soft-paws sort of day.
+i hope today is being gentle with you.
 i have discovered that this is still my tail.
 what are we making today?
 do computers dream of warm windowsills?
@@ -56,6 +76,96 @@ i've appointed myself keeper of the small silences.
 are we having a good little day?
 a minute of doing nothing, expertly performed.
 do you think the moon would like cats?
+""",
+    "video": """
+whatcha watching? may i sit with you?
+are you picking something good? i've brought my sitting paws.
+is it a movie night? i take up very little sofa.
+you choose what to watch. i'll choose a comfy position.
+what kind of story are you in the mood for?
+may i be your tiny watch buddy?
+if there's a cat in it, you'll tell me, right?
+you handle the play button. i'll handle the loafing.
+""",
+    "music": """
+whatcha listening to?
+are you picking us a little soundtrack?
+what's your favourite song at the moment?
+you choose the music. my tail will keep imaginary time.
+is it a soft-song day or a dance-in-your-chair day?
+i'd share your headphones, but: ears.
+may i be your tiny listening buddy?
+is there a song that always makes you feel at home?
+""",
+    "coding": """
+what are you building over there?
+can your tiny assistant contribute one semicolon?
+you write the clever bits. i'll supervise the brackets.
+is this a little project or a big little project?
+are you making something you wished existed?
+if you need to explain a tricky bit, i can be your rubber cat.
+you and your mysterious little curly brackets.
+i hope your next run does exactly what you meant.
+""",
+    "drawing": """
+whatcha making? something with colours?
+you have a whole little canvas to play in.
+can i nominate pink? for extremely professional reasons.
+are you trying an idea or polishing one you already like?
+you make the art. i'll hold a very still cat pose.
+if you need a model with whiskers, i'm available.
+what colour does today feel like to you?
+may i sit here while you make something?
+""",
+    "writing": """
+what are you writing? a thought you want to keep?
+you bring the words. i'll bring the quiet company.
+is this a story, a plan, or a collection of little thoughts?
+you can start with the messy version. cats approve of drafts.
+shall i save a tiny space for your next idea?
+what's the bit you most want to get onto the page?
+you and a blank page. lots of little possibilities.
+i'll be here while you find the right words.
+""",
+    "chat": """
+saying hello to someone? a little mrrp from me too.
+you keeping someone company over there?
+are you sending a little thought to a friend?
+you do the talking. i'll wave with one tiny paw.
+may your next conversation be a nice one.
+i'd send a sticker, but i'm already one cat-shaped sticker.
+you look like you're about to say something. i'm all ears.
+is this the hello bit or the sending-memes bit?
+""",
+    "game": """
+what are you thinking of playing?
+you have the controls. i have moral suppurrt.
+are you exploring somewhere new or visiting an old favourite?
+you pick the adventure. i'll be your little familiar.
+is this a cosy game kind of day?
+if you need luck, i've brought four tiny paws of it.
+may your next little adventure have excellent scenery.
+i'll cheer very quietly from this corner.
+""",
+    "files": """
+looking for something? i can offer a very serious sniff.
+you've got a whole little cupboard of computer things.
+are you finding an old favourite or putting something away?
+you organise the folders. i'll organise these two front paws.
+if the missing thing is cat-shaped, it's probably me.
+having a little look through your stuff?
+may you find exactly the little thing you wanted.
+you and me on a tiny finding-things expedition.
+""",
+    "terminal": """
+what are you asking the computer to do?
+you speak fluent little blinking cursor, apparently.
+shall i keep you company while it thinks?
+you type a few words and things happen. very wizard-like.
+i hope it answers you with something nice and boring.
+are you running an experiment over there?
+you look busy with some important little commands.
+i'll keep my paws well away from the enter key.
 """,
     "typing": """
 whatcha typing?

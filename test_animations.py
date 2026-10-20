@@ -19,7 +19,21 @@ class AnimationTests(unittest.TestCase):
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
         self.assertNotEqual(atlas.frames["idle", 1, 0].toImage(), atlas.frames["idle", 1, 1].toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
-        self.assertTrue(all(frame.width() <= 112 and frame.height() <= 99 for frame in atlas.frames.values()))
+        self.assertTrue(all(frame.width() == 112 and frame.height() == 100 for frame in atlas.frames.values()))
+
+    def test_affection_and_look_frames_never_shrink_the_seated_cat(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for bank, rows in (("idle", range(4)), ("pets", range(4)),
+                           ("activity", range(3)), ("movement", (1, 2))):
+            for row in rows:
+                for col in range(4):
+                    bounds = sprite_bounds(atlas.frames[bank, row, col].toImage())
+                    self.assertAlmostEqual(bounds.height(), 84, delta=2)
+
+    def test_gestures_use_a_complete_noticeable_sequence(self):
+        for name, clip in CLIPS.items():
+            if name not in ("idle", "sleep", "walk", "typing", "tail", "knead", "loaf"):
+                self.assertGreaterEqual(sum(clip.durations), 4000, name)
 
     def test_idle_holds_then_blinks_and_loops(self):
         idle = CLIPS["idle"]

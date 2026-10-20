@@ -21,6 +21,9 @@ class PackagingTests(unittest.TestCase):
         for bank in ("idle", "pets", "activity", "movement"):
             self.assertIn(f"assets/neko-{bank}-v3.png", names)
         self.assertNotIn("assets/neko-atlas.png", names)
+        for kind in ("mew", "chirp", "purr"):
+            self.assertIn(f"assets/sounds/{kind}.wav", names)
+        self.assertTrue(any(name.endswith("winsound.pyd") for name in names))
         self.assertNotIn("config.json", names)
         self.assertNotIn("icuuc.dll", names)
         modules = archive.open_embedded_archive("PYZ.pyz").toc
@@ -29,6 +32,7 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("activity", modules)
         self.assertIn("animations", modules)
         self.assertIn("dialogue", modules)
+        self.assertIn("app_context", modules)
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui

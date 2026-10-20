@@ -1,11 +1,10 @@
 """Drawn sprite sequences with per-frame timing and a shared ground anchor."""
 
 from dataclasses import dataclass
-from statistics import median
 from pathlib import Path
 
 from PySide6.QtCore import QRect, Qt
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtGui import QImage, QPixmap, QPainter
 
 
 def sprite_bounds(cell):
@@ -55,22 +54,22 @@ class Clip:
 CLIPS = {
     "idle": Clip("idle", 0, (2500, 120, 160, 2400), loop=True),
     "tail": Clip("idle", 1, (350, 300, 350, 450), loop=True),
-    "ears": Clip("idle", 2, (500, 180, 250, 900)),
-    "sniff": Clip("idle", 3, (500, 250, 350, 900)),
-    "happy": Clip("pets", 0, (350, 450, 650, 800)),
-    "nuzzle": Clip("pets", 1, (350, 450, 650, 800)),
-    "wave": Clip("pets", 2, (350, 600, 350, 700)),
-    "knead": Clip("pets", 3, (350, 350, 350, 350), loop=True),
-    "typing": Clip("activity", 0, (240, 220, 240, 220), loop=True),
-    "groom": Clip("activity", 1, (500, 450, 650, 700)),
-    "yawn": Clip("activity", 2, (500, 450, 650, 800)),
+    "ears": Clip("idle", 2, (1200, 600, 700, 1700)),
+    "sniff": Clip("idle", 3, (900, 900, 1100, 1500)),
+    "happy": Clip("pets", 0, (800, 1200, 1600, 1400)),
+    "nuzzle": Clip("pets", 1, (900, 1200, 1600, 1300)),
+    "wave": Clip("pets", 2, (850, 1600, 1000, 1550)),
+    "knead": Clip("pets", 3, (550, 550, 550, 550), loop=True),
+    "typing": Clip("activity", 0, (400, 400, 400, 400), loop=True),
+    "groom": Clip("activity", 1, (1100, 1200, 1600, 1300)),
+    "yawn": Clip("activity", 2, (1100, 1100, 1700, 1300)),
     "sleep": Clip("activity", 3, (1100, 900, 1100, 900), loop=True),
-    "walk": Clip("movement", 0, (160, 160, 160, 160), loop=True),
-    "stretch": Clip("movement", 1, (450, 650, 500, 800)),
-    "look_left": Clip("movement", 2, (250, 1100, 550), (1, 0, 1)),
-    "look_right": Clip("movement", 2, (250, 1100, 550), (1, 2, 3)),
+    "walk": Clip("movement", 0, (240, 240, 240, 240), loop=True),
+    "stretch": Clip("movement", 1, (1100, 1600, 1200, 1500)),
+    "look_left": Clip("movement", 2, (700, 1500, 700, 1500, 600), (1, 0, 1, 2, 3)),
+    "look_right": Clip("movement", 2, (700, 1500, 700, 1500, 600), (1, 2, 3, 0, 1)),
     "loaf": Clip("movement", 3, (2200, 160, 180, 1800), loop=True),
-    "peek": Clip("idle", 0, (250, 350, 900), (1, 2, 3)),
+    "peek": Clip("idle", 0, (800, 500, 900, 800, 500, 900), (0, 1, 2, 3, 1, 0)),
 }
 
 
@@ -90,12 +89,18 @@ class SpriteAtlas:
                     if bounds.isEmpty():
                         return
                     cells[bank, row, col] = cell.copy(bounds)
-        # One scale for every drawing: stretching never shrinks her head to fit.
-        scale = 82 / median(cells["idle", 0, col].height() for col in range(4))
         for key, cell in cells.items():
-            self.frames[key] = QPixmap.fromImage(cell).scaled(
-                max(1, round(cell.width() * scale)), max(1, round(cell.height() * scale)),
-                Qt.IgnoreAspectRatio, Qt.FastTransformation)
+            # Seated drawings share a height; low poses keep their natural proportions.
+            if key[:2] in (("activity", 3), ("movement", 3)):
+                sprite = QPixmap.fromImage(cell).scaledToWidth(92, Qt.FastTransformation)
+            else:
+                sprite = QPixmap.fromImage(cell).scaled(104, 82, Qt.KeepAspectRatio, Qt.FastTransformation)
+            frame = QPixmap(112, 100)
+            frame.fill(Qt.transparent)
+            painter = QPainter(frame)
+            painter.drawPixmap((112 - sprite.width()) // 2, 98 - sprite.height(), sprite)
+            painter.end()
+            self.frames[key] = frame
 
     def frame(self, name, elapsed, motion=True):
         clip = CLIPS[name]

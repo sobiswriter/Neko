@@ -6,6 +6,8 @@ from ctypes import wintypes
 import time
 
 import win32gui
+import win32api
+import win32process
 from PySide6.QtCore import QAbstractNativeEventFilter
 from PySide6.QtWidgets import QApplication
 
@@ -33,6 +35,26 @@ USER32.SetWinEventHook.argtypes = [wintypes.DWORD, wintypes.DWORD, wintypes.HMOD
 USER32.SetWinEventHook.restype = wintypes.HANDLE
 USER32.UnhookWinEvent.argtypes = [wintypes.HANDLE]
 USER32.UnhookWinEvent.restype = wintypes.BOOL
+KERNEL32 = ctypes.WinDLL("kernel32", use_last_error=True)
+KERNEL32.QueryFullProcessImageNameW.argtypes = [wintypes.HANDLE, wintypes.DWORD,
+                                              wintypes.LPWSTR, ctypes.POINTER(wintypes.DWORD)]
+KERNEL32.QueryFullProcessImageNameW.restype = wintypes.BOOL
+
+
+def foreground_executable(hwnd):
+    try:
+        pid = win32process.GetWindowThreadProcessId(hwnd)[1]
+        handle = win32api.OpenProcess(0x1000, False, pid)
+        try:
+            buffer = ctypes.create_unicode_buffer(32768)
+            size = wintypes.DWORD(len(buffer))
+            if KERNEL32.QueryFullProcessImageNameW(int(handle), 0, buffer, ctypes.byref(size)):
+                return buffer.value.rsplit("\\", 1)[-1].casefold()
+        finally:
+            handle.Close()
+    except win32api.error:
+        pass
+    return ""
 
 
 class ActivityMonitor(QAbstractNativeEventFilter):

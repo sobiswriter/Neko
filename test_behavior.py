@@ -8,16 +8,30 @@ class CompanionTests(unittest.TestCase):
     def setUp(self):
         self.pet = Companion(0, random.Random(4))
 
-    def test_leaving_her_alone_never_creates_a_need_for_attention(self):
-        for now in range(0, 3600, 5):
-            self.pet.tick(now, idle_seconds=now)
-        self.assertEqual(self.pet.state, NekoState.SLEEPING)
+    def test_a_nap_finishes_and_cannot_immediately_restart_from_old_inactivity(self):
+        self.assertEqual(self.pet.tick(180, 180), "sleep")
+        self.assertEqual(self.pet.tick(270, 270), "wake")
+        self.pet.tick(276, 276)
+        self.assertNotEqual(self.pet.tick(277, 277), "sleep")
         self.assertEqual(self.pet.naps, 1)
 
-    def test_activity_wakes_her_silently(self):
+    def test_activity_and_petting_do_not_cut_short_a_nap(self):
         self.pet.tick(200, idle_seconds=200)
-        self.assertEqual(self.pet.tick(201, idle_seconds=0), "wake")
+        self.assertIsNone(self.pet.tick(201, 0, keyboard_events=20, window_event="open"))
+        self.pet.pet(202)
+        self.assertEqual(self.pet.state, NekoState.SLEEPING)
+        self.assertIsNone(self.pet.tick(289, 0))
+        self.assertEqual(self.pet.tick(290, 0), "wake")
         self.assertEqual(self.pet.state, NekoState.WAKING)
+
+    def test_sleep_deadline_can_interrupt_another_animation(self):
+        self.pet.pose(NekoState.GROOMING, 179, 6)
+        self.assertEqual(self.pet.tick(180, 180), "sleep")
+
+    def test_app_context_selects_a_matching_animation_and_line_kind(self):
+        self.assertEqual(self.pet.tick(10, 0, window_event="open", app_kind="music"), "curious")
+        self.assertEqual(self.pet.reaction_kind, "music")
+        self.assertEqual(self.pet.state, NekoState.TAIL_SWISH)
 
     def test_typing_gets_a_brief_response_then_a_cooldown(self):
         self.assertEqual(self.pet.tick(10, 0, keyboard_events=8), "typing")
@@ -61,7 +75,7 @@ class CompanionTests(unittest.TestCase):
         self.pet.pet(50)
         self.assertEqual(self.pet.pets, 1)
         self.assertIn(self.pet.state, PET_STATES)
-        self.pet.tick(54, 0)
+        self.pet.tick(56, 0)
         self.assertEqual(self.pet.state, NekoState.IDLE)
         self.assertGreaterEqual(self.pet.next_comment, 65)
 
