@@ -56,4 +56,27 @@ class ActivityTests(unittest.TestCase):
                 patch("activity.win32gui.GetForegroundWindow", return_value=123), \
                 patch("activity.win32gui.GetWindowText", side_effect=AssertionError("must not read text")):
             monitor.on_window_event(None, 0x800C, 123, 0, 0, 0, 0)
-        self.assertEqual(monitor.consume(time.monotonic())[1], "change")
+        self.assertEqual(monitor.consume(time.monotonic())[1], "tab")
+
+    def test_app_internal_selection_is_not_rejected_as_a_child_object(self):
+        monitor = ActivityMonitor()
+        with patch("activity.win32gui.GetAncestor", return_value=123), \
+                patch("activity.win32gui.GetForegroundWindow", return_value=123):
+            monitor.on_window_event(None, 0x8006, 456, -4, 2, 0, 0)
+        self.assertEqual(monitor.consume(time.monotonic())[1], "tab")
+
+    def test_background_selections_do_not_trigger_reactions(self):
+        monitor = ActivityMonitor()
+        with patch("activity.win32gui.GetAncestor", return_value=456), \
+                patch("activity.win32gui.GetForegroundWindow", return_value=123):
+            monitor.on_window_event(None, 0x8006, 456, -4, 2, 0, 0)
+        self.assertIsNone(monitor.consume(time.monotonic())[1])
+
+    def test_close_event_survives_a_following_selection_change(self):
+        monitor = ActivityMonitor()
+        monitor.windows.add(456)
+        monitor.on_window_event(None, 0x8001, 456, 0, 0, 0, 0)
+        with patch("activity.win32gui.GetAncestor", return_value=123), \
+                patch("activity.win32gui.GetForegroundWindow", return_value=123):
+            monitor.on_window_event(None, 0x8006, 123, -4, 2, 0, 0)
+        self.assertEqual(monitor.consume(time.monotonic())[1], "close")

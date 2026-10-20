@@ -7,24 +7,31 @@ your cursor, and naps when you step away. No chores, guilt, sounds, or attention
 
 ## Living with Neko
 
-- **Click to pet.** Closed-eye kneading, a tiny heart, and an occasional written purr.
+- **Click to pet.** Head pats, cheek nuzzles, paw greetings, and kneading alternate,
+  with little written purrs. No consecutive repeat of the same pet response.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
-- **Come close.** She occasionally looks toward your cursor. She never chases it.
-- **Keep working.** Blinks, paw washing, stretches, yawns, and sleepy peeks use
-  64 drawn frames with individual timing, rather than rotating or stretching a still.
-- **Type together.** A typing burst occasionally gets a few little paw taps,
-  at most once every 45 seconds. She then goes back to her own business.
-- **Open, close, or move windows.** Native events earn a curious look or blink,
-  at most once every 18 seconds. A current-window title change can also trigger a
-  glance when the app exposes that event, including some browser tab changes.
-- **Step away.** After three minutes without keyboard or mouse input, she naps.
-  She yawns first; returning wakes her with a silent stretch. There is no penalty
-  for ignoring her. Actions finish naturally instead of interrupting one another.
-- **Very occasional words.** Unprompted bubbles are spaced 12–20 minutes apart.
-  Petting postpones them; no back-to-back identical idle lines.
+- **Come close.** She sniffs at a moving cursor and sometimes takes a small walk
+  toward it. Each walk lasts at most 3.2 seconds, travels at most about 160 pixels,
+  and keeps a gap from the arrow. Mouse following is optional, with a minute's rest.
+- **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
+  yawns and sleepy peeks use 64 newly drawn frames across sixteen action sequences.
+- **Type together.** A typing burst gets a few little paw taps and a local thought
+  such as “whatcha typing?”, at most once every 30 seconds.
+- **Open, close, or move windows.** Native events earn a look, blink and contextual
+  line, with an eight-second visual cooldown. Foreground app selections and title
+  changes also hint at internal tab/document changes. Events wait briefly for an
+  ongoing animation instead of disappearing immediately.
+- **Step away.** She yawns and naps after a configurable period without input.
+  The default is three minutes; choose 30–3600 seconds. Returning earns a stretch
+  and sometimes a little greeting. Ignoring her never creates chores or penalties.
+- **Offline personality.** Over 200 short lines, shuffled separately for typing,
+  windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
+  context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
+  All automatic words share an 8–30 second pause and never replace a visible bubble.
 - **Right-click for her nook.** Quiet company, reduced motion, startup, optional
-  AI, and lifetime pet/nap counts live in one small window. Double-click the tray
+  AI, mouse following, sleep delay, chatter and idle gesture frequency, and lifetime
+  pet/nap counts live in one small window. Double-click the tray
   icon to find her again.
 
 Quiet company stops unprompted words while keeping deliberate pet reactions.
@@ -37,10 +44,12 @@ can still cover desktop windows. Only one copy runs at a time.
 
 Typing and window reactions work locally and can be switched off. Keyboard
 detection requests only raw-input headers: key identities, text and passwords are
-never read, reconstructed, saved, or sent anywhere. Window reactions use events and
-handles, without reading titles. Optional AI has its own title-sharing toggle below.
-Exact browser tab creation/closure, especially in background tabs, needs a browser
-extension; this version deliberately ships without one.
+never read, reconstructed, saved, or sent anywhere. Window reactions use native
+events plus a local, temporary hash of the foreground window title to notice
+changes; the title is not stored or transmitted in offline mode. Optional AI has
+its own title-sharing toggle below. Apps expose different accessibility events:
+internal tabs are hints, not universal exact tracking. Background tabs are not
+tracked. See [Microsoft's event reference](https://learn.microsoft.com/en-us/windows/win32/winauto/event-constants).
 
 ## Run from source
 
@@ -71,7 +80,8 @@ never included in a build. If a key was committed in an older revision, rotate i
 ignoring the file now does not remove it from Git history.
 
 When an unprompted comment is due, AI sends the **current window title** to Google
-Gemini. Window titles may contain private names or document titles. No screenshots,
+Gemini, at most once every ten minutes. Other comments remain offline. Window
+titles may contain private names or document titles. No screenshots,
 microphone, files, or conversation history are collected. Quiet mode and hiding
 prevent new requests. An already-sent request cannot be retracted, but its reply
 is discarded after hiding, petting, entering fullscreen, or changing AI/quiet mode.
@@ -123,8 +133,8 @@ processes they launch.
 
 ## Character assets
 
-`assets/neko-atlas.png` contains eight sequences of eight drawings: blink/idle,
-looking around, typing, grooming, stretching, yawning, affection and sleep. Frame
+The four `assets/neko-*-v3.png` sheets each contain four sequences of four drawings.
+They replace the old atlas and add dedicated tail, ear, affection and walk cycles. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
 neighboring cells is excluded when locating each silhouette.
@@ -143,6 +153,7 @@ generates a bouncing ball, so it isn't part of the app or build.
 - `main.py`: desktop integration, rendering, preferences, nook, and tray.
 - `animations.py`: sprite atlas loading, frame timing and directional clips.
 - `activity.py`: local keyboard-activity headers and Windows lifecycle events.
+- `dialogue.py`: offline lines and per-context shuffle bags.
 - `llm_brain.py`: optional title-only Gemini worker.
 - `test_*.py`: standard-library unittest suite, with Qt's event helpers.
 - `Plan.txt`: interaction rules for keeping future changes quiet and minimal.

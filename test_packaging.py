@@ -18,7 +18,9 @@ class PackagingTests(unittest.TestCase):
         archive = CArchiveReader(str(self.exe))
         names = {name.replace("\\", "/") for name in archive.toc}
         self.assertIn("assets/neko_idle.png", names)
-        self.assertIn("assets/neko-atlas.png", names)
+        for bank in ("idle", "pets", "activity", "movement"):
+            self.assertIn(f"assets/neko-{bank}-v3.png", names)
+        self.assertNotIn("assets/neko-atlas.png", names)
         self.assertNotIn("config.json", names)
         self.assertNotIn("icuuc.dll", names)
         modules = archive.open_embedded_archive("PYZ.pyz").toc
@@ -26,6 +28,7 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("google.genai", modules)
         self.assertIn("activity", modules)
         self.assertIn("animations", modules)
+        self.assertIn("dialogue", modules)
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui

@@ -72,7 +72,17 @@ class ActivityMonitor(QAbstractNativeEventFilter):
         return False, 0
 
     def on_window_event(self, hook, event, hwnd, object_id, child_id, thread, timestamp):
-        if not self.enabled or not hwnd or object_id != 0 or child_id != 0:
+        if not self.enabled or not hwnd:
+            return
+        if event in (0x8006, 0x8007, 0x8009):
+            try:
+                if (win32gui.GetAncestor(hwnd, 2) == win32gui.GetForegroundWindow()
+                        and self.window_event not in ("open", "close")):
+                    self.window_event = "tab"
+            except win32gui.error:
+                pass
+            return
+        if object_id != 0 or child_id != 0:
             return
         if event == 0x8001:
             if hwnd in self.windows:
@@ -91,9 +101,9 @@ class ActivityMonitor(QAbstractNativeEventFilter):
             self.windows.add(hwnd)
             if event == 0x8002:
                 self.window_event = "open"
-            elif hwnd == win32gui.GetForegroundWindow():
+            elif hwnd == win32gui.GetForegroundWindow() and self.window_event not in ("open", "close"):
                 # shortcut: title changes hint at tabs; use an extension for exact tab lifecycle events.
-                self.window_event = "move" if event == 0x000B else "change"
+                self.window_event = "move" if event == 0x000B else ("tab" if event == 0x800C else "switch")
         except win32gui.error:
             pass  # A window can disappear between the event and these queries.
 

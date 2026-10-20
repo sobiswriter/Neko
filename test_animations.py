@@ -14,11 +14,12 @@ APP = QApplication.instance() or QApplication([])
 
 class AnimationTests(unittest.TestCase):
     def test_atlas_has_64_distinct_drawings(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets/neko-atlas.png")
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
         self.assertEqual(len(atlas.frames), 64)
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
-        self.assertNotEqual(atlas.frames[2, 0].toImage(), atlas.frames[2, 1].toImage())
-        self.assertNotEqual(atlas.frames[3, 0].toImage(), atlas.frames[3, 4].toImage())
+        self.assertNotEqual(atlas.frames["idle", 1, 0].toImage(), atlas.frames["idle", 1, 1].toImage())
+        self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
+        self.assertTrue(all(frame.width() <= 112 and frame.height() <= 99 for frame in atlas.frames.values()))
 
     def test_idle_holds_then_blinks_and_loops(self):
         idle = CLIPS["idle"]
@@ -27,11 +28,11 @@ class AnimationTests(unittest.TestCase):
         self.assertEqual(idle.frame_index(sum(idle.durations) / 1000), 0)
 
     def test_one_shot_actions_end_without_looping(self):
-        self.assertEqual(CLIPS["stretch"].frame_index(999), 7)
+        self.assertEqual(CLIPS["stretch"].frame_index(999), 3)
         self.assertEqual(CLIPS["stretch"].frame_index(-1), 0)
 
     def test_reduced_motion_holds_a_real_frame(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets/neko-atlas.png")
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
         self.assertEqual(atlas.frame("typing", 0).toImage(),
                          atlas.frame("typing", 10, motion=False).toImage())
 

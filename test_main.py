@@ -13,6 +13,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
 from behavior import NekoState
+from dialogue import LINES
 from main import NekoWidget, set_autostart
 
 
@@ -85,7 +86,7 @@ class DesktopTests(unittest.TestCase):
         self.neko.tick()
         self.assertTrue(self.neko.isVisible())
         self.assertFalse(self.neko.bubble.isVisible())
-        self.assertGreater(self.neko.companion.next_comment, time.monotonic() + 700)
+        self.assertGreater(self.neko.companion.next_comment, time.monotonic() + 70)
 
     def test_fullscreen_visibility_is_a_choice_and_stays_silent(self):
         self.assertFalse(self.neko.hide_fullscreen)
@@ -100,6 +101,89 @@ class DesktopTests(unittest.TestCase):
         self.neko.tick()
         self.assertEqual(self.neko.companion.state, NekoState.TYPING)
         self.assertEqual(self.neko.current_clip, "typing")
+        self.assertIn(self.neko.bubble.text(), LINES["typing"])
+
+    def test_app_switch_speaks_offline(self):
+        self.neko.last_window = 99
+        self.neko.tick()
+        self.assertIn(self.neko.bubble.text(), LINES["switch"])
+
+    def test_title_fingerprint_catches_a_tab_change_in_the_same_app(self):
+        self.neko.last_window = 100
+        with patch("main.win32gui.GetWindowText", return_value="first document"):
+            self.neko.tick()
+        with patch("main.win32gui.GetWindowText", return_value="another document"):
+            self.neko.tick()
+        self.assertIn(self.neko.bubble.text(), LINES["tab"])
+        self.assertEqual(self.neko.last_title_stamp, (100, hash("another document")))
+
+    def test_reactive_words_share_a_pause_and_never_replace_a_visible_bubble(self):
+        self.assertTrue(self.neko.offline_line("typing"))
+        words = self.neko.bubble.text()
+        self.assertFalse(self.neko.offline_line("switch"))
+        self.assertEqual(self.neko.bubble.text(), words)
+        self.neko.dismiss_bubble()
+        self.assertFalse(self.neko.offline_line("cursor"))
+
+    def test_nook_timing_controls_apply_and_persist(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        for key, value in (("sleep_seconds", 45), ("chatter_seconds", 30), ("idle_seconds", 8)):
+            spin = self.neko.stats_window.timing[key]
+            self.assertGreater(spin.lineEdit().width(), 35)
+            spin.setValue(value)
+            self.assertEqual(getattr(self.neko.companion, key), value)
+            self.assertEqual(self.settings.value(key, type=int), value)
+        self.neko.stats_window.follow.setChecked(False)
+        self.assertFalse(self.settings.value("follow_mouse", type=bool))
+        with patch("main.desktop_activity", return_value=(45, 100, False)):
+            self.neko.tick()
+        self.assertEqual(self.neko.companion.state, NekoState.SLEEPING)
+
+    def test_bad_saved_timing_is_recovered_and_clamped(self):
+        self.settings.setValue("sleep_seconds", "broken")
+        self.settings.setValue("chatter_seconds", -100)
+        self.settings.setValue("idle_seconds", 99999)
+        other = NekoWidget(self.settings)
+        try:
+            self.assertEqual(other.companion.sleep_seconds, 180)
+            self.assertEqual(other.companion.chatter_seconds, 15)
+            self.assertEqual(other.companion.idle_seconds, 120)
+        finally:
+            other.tray_icon.hide()
+            other.bubble.deleteLater()
+            other.deleteLater()
+
+    def test_mouse_following_is_bounded_and_optional(self):
+        self.neko.last_follow = -99999
+        origin = self.neko.pos()
+        cursor = self.neko.geometry().center() - QPoint(220, 0)
+        self.neko.last_cursor = cursor - QPoint(30, 0)
+        with patch("main.QCursor.pos", return_value=cursor):
+            self.neko.tick()
+            self.assertEqual(self.neko.current_clip, "walk")
+            for _ in range(100):
+                self.neko.animate()
+        self.assertGreater((self.neko.pos() - origin).manhattanLength(), 0)
+        self.assertLessEqual((self.neko.pos() - origin).manhattanLength(), 165)
+        self.neko.set_follow_mouse(False)
+        self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
+
+    def test_typing_stops_a_mouse_expedition(self):
+        self.neko.follow_origin = self.neko.pos()
+        self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic(), 3.2)
+        self.neko.activity.keyboard.extend([time.monotonic()] * 8)
+        self.neko.tick()
+        self.assertEqual(self.neko.companion.state, NekoState.TYPING)
+
+    def test_following_stops_at_the_deadline_even_before_next_behavior_tick(self):
+        self.neko.follow_origin = self.neko.pos()
+        self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic() - 4, 3.2)
+        original = self.neko.pos()
+        with patch("main.QCursor.pos", return_value=self.neko.geometry().center() - QPoint(220, 0)):
+            self.neko.animate()
+        self.assertEqual(self.neko.pos(), original)
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
 
     def test_pinning_uses_no_activation_and_no_move_flags(self):
         with patch("main.QApplication.platformName", return_value="windows"), \
@@ -112,7 +196,7 @@ class DesktopTests(unittest.TestCase):
         self.neko.set_quiet(True)
         self.neko.companion.next_comment = 0
         self.neko.set_quiet(False)
-        self.assertGreater(self.neko.companion.next_comment, time.monotonic() + 700)
+        self.assertGreater(self.neko.companion.next_comment, time.monotonic() + 70)
 
     def test_counts_and_preferences_are_saved_without_double_counting(self):
         self.neko.pet_reaction()
