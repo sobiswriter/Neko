@@ -17,7 +17,27 @@ class CompanionTests(unittest.TestCase):
     def test_activity_wakes_her_silently(self):
         self.pet.tick(200, idle_seconds=200)
         self.assertEqual(self.pet.tick(201, idle_seconds=0), "wake")
-        self.assertEqual(self.pet.state, NekoState.IDLE)
+        self.assertEqual(self.pet.state, NekoState.WAKING)
+
+    def test_typing_gets_a_brief_response_then_a_cooldown(self):
+        self.assertEqual(self.pet.tick(10, 0, keyboard_events=8), "typing")
+        self.assertEqual(self.pet.state, NekoState.TYPING)
+        self.pet.tick(14, 0, keyboard_events=8)
+        self.assertNotEqual(self.pet.tick(15, 0, keyboard_events=8), "typing")
+
+    def test_window_events_do_not_interrupt_grooming(self):
+        self.pet.pose(NekoState.GROOMING, 10, 3)
+        self.assertIsNone(self.pet.tick(11, 0, window_event="open"))
+        self.assertEqual(self.pet.state, NekoState.GROOMING)
+
+    def test_closed_window_gets_a_little_blink(self):
+        self.assertEqual(self.pet.tick(20, 0, window_event="close"), "curious")
+        self.assertEqual(self.pet.state, NekoState.PEEKING)
+
+    def test_she_yawns_before_a_nap(self):
+        self.pet.next_idle = 10000
+        self.pet.tick(100, 100)
+        self.assertEqual(self.pet.state, NekoState.YAWNING)
 
     def test_returning_after_a_long_nap_does_not_release_overdue_chatter(self):
         self.pet.tick(200, 200)

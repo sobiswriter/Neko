@@ -26,6 +26,8 @@ class DesktopTests(unittest.TestCase):
         self.settings = QSettings(str(Path(self.folder.name) / "prefs.ini"), QSettings.IniFormat)
         self.activity = patch("main.desktop_activity", return_value=(0, 100, False))
         self.activity.start()
+        self.native_monitor = patch("main.ActivityMonitor.start", return_value=None)
+        self.native_monitor.start()
         self.neko = NekoWidget(self.settings)
         self.neko.tick_timer.stop()
         self.neko.show_neko()
@@ -46,6 +48,7 @@ class DesktopTests(unittest.TestCase):
         APP.sendPostedEvents(None, QEvent.DeferredDelete)
         APP.processEvents()
         self.activity.stop()
+        self.native_monitor.stop()
         self.folder.cleanup()
 
     def test_hidden_pet_never_reappears_to_talk(self):
@@ -73,6 +76,7 @@ class DesktopTests(unittest.TestCase):
         self.assertTrue(self.neko.bubble.isVisible())
 
     def test_fullscreen_hides_and_restores_without_chatter(self):
+        self.neko.hide_fullscreen = True
         self.neko.companion.next_comment = 0
         with patch("main.desktop_activity", return_value=(0, 200, True)):
             self.neko.tick()
@@ -82,6 +86,27 @@ class DesktopTests(unittest.TestCase):
         self.assertTrue(self.neko.isVisible())
         self.assertFalse(self.neko.bubble.isVisible())
         self.assertGreater(self.neko.companion.next_comment, time.monotonic() + 700)
+
+    def test_fullscreen_visibility_is_a_choice_and_stays_silent(self):
+        self.assertFalse(self.neko.hide_fullscreen)
+        with patch("main.desktop_activity", return_value=(0, 200, True)):
+            self.neko.tick()
+        self.assertTrue(self.neko.isVisible())
+        self.assertFalse(self.neko.say("unprompted"))
+        self.assertFalse(self.neko.activity.enabled)
+
+    def test_typing_signal_selects_a_real_paw_animation(self):
+        self.neko.activity.keyboard.extend([time.monotonic()] * 8)
+        self.neko.tick()
+        self.assertEqual(self.neko.companion.state, NekoState.TYPING)
+        self.assertEqual(self.neko.current_clip, "typing")
+
+    def test_pinning_uses_no_activation_and_no_move_flags(self):
+        with patch("main.QApplication.platformName", return_value="windows"), \
+                patch("main.win32gui.SetWindowPos") as pin:
+            self.neko.pin_to_top(force=True)
+        self.assertEqual(pin.call_args.args[1], -1)
+        self.assertEqual(pin.call_args.args[-1] & 0x13, 0x13)
 
     def test_leaving_quiet_mode_does_not_release_overdue_chatter(self):
         self.neko.set_quiet(True)

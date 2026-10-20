@@ -6,18 +6,22 @@ Intent
 
 Interaction rules
   Visual reactions before words. No attention debt, chores, streaks, or guilt.
-  Breathing and small poses; no roaming, chasing, sound, or focus stealing.
+  Drawn frame sequences and connected reactions; no roaming, chasing or sound.
   Petting is deliberate: a click, not a drag or an accidental hover.
-  Curiosity responds to nearby cursors/window changes, throttled to 45 seconds.
+  Curiosity responds to cursors and native window events, throttled to 18 seconds.
+  Typing bursts occasionally earn paw taps, throttled to 45 seconds.
+  No key values, typed text or window titles are needed for these local reactions.
   Idle poses vary every 25–55 seconds and do not repeat consecutively.
-  Three minutes without input means a nap. Returning wakes her silently.
+  A yawn leads toward a nap after three idle minutes. Returning earns a silent stretch.
   Ambient words are spaced 12–20 minutes apart. Quiet mode removes them.
-  Hiding is absolute. Fullscreen apps tuck her away automatically.
+  Hiding is absolute. Fullscreen hiding is optional; native pinning never steals focus.
+  Fullscreen activity always suppresses unsolicited speech and activity reactions.
   Motion can be disabled without losing interaction.
 
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
+  Eight drawn sequences, 64 frames, with timed holds and directional variants.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 
 Optional AI
@@ -29,6 +33,7 @@ Optional AI
 Deliberately excluded
   Voice/chat UI, hunger systems, notifications, task reminders, cloud memory,
   roaming across windows, new accounts, plugin systems, and new art dependencies.
+  Browser extensions and exact background-tab tracking stay out of this pass.
 
 Validation
   Deterministic behavior tests, Qt interaction tests with temporary settings,

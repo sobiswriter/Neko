@@ -12,6 +12,7 @@ import time
 import winreg
 
 import win32gui
+import win32con
 from PySide6.QtCore import QLockFile, QPoint, QRectF, QSettings, QStandardPaths, Qt, QTimer
 from PySide6.QtGui import QColor, QCursor, QFont, QIcon, QMovie, QPainter, QPixmap
 from PySide6.QtWidgets import (
@@ -20,6 +21,8 @@ from PySide6.QtWidgets import (
 )
 
 from behavior import Companion, NekoState
+from activity import ActivityMonitor
+from animations import SpriteAtlas
 
 
 ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "assets"
@@ -75,7 +78,8 @@ def desktop_activity():
         try:
             bounds = win32gui.GetWindowRect(window)
             screen = QApplication.screenAt(QPoint(bounds[0], bounds[1]))
-            if screen and win32gui.GetClassName(window) not in ("Progman", "WorkerW"):
+            if (screen and not ctypes.windll.user32.IsZoomed(wintypes.HWND(window))
+                    and win32gui.GetClassName(window) not in ("Progman", "WorkerW")):
                 area = screen.geometry()
                 fullscreen = (bounds[0] <= area.left() and bounds[1] <= area.top()
                               and bounds[2] >= area.right() + 1
@@ -114,6 +118,9 @@ class StatsWindow(QDialog):
         self.keepsakes = QLabel()
         self.keepsakes.setStyleSheet("color: #80675e; padding: 12px 0;")
         layout.addWidget(self.keepsakes)
+        self.mood = QLabel()
+        self.mood.setStyleSheet("color: #746b65; font-size: 12px;")
+        layout.addWidget(self.mood)
         self.focus = QCheckBox("Quiet company · no unprompted words")
         self.focus.setChecked(neko.quiet)
         self.focus.toggled.connect(neko.set_quiet)
@@ -122,6 +129,14 @@ class StatsWindow(QDialog):
         self.motion.setChecked(neko.motion)
         self.motion.toggled.connect(neko.set_motion)
         layout.addWidget(self.motion)
+        self.reactivity = QCheckBox("Notice typing and window activity")
+        self.reactivity.setChecked(neko.reactive)
+        self.reactivity.toggled.connect(neko.set_reactivity)
+        layout.addWidget(self.reactivity)
+        self.fullscreen = QCheckBox("Tuck away during fullscreen apps")
+        self.fullscreen.setChecked(neko.hide_fullscreen)
+        self.fullscreen.toggled.connect(neko.set_hide_fullscreen)
+        layout.addWidget(self.fullscreen)
         self.startup = QCheckBox("Join me when Windows starts")
         self.startup.setChecked(autostart_enabled())
         self.startup.toggled.connect(self.change_startup)
@@ -155,6 +170,8 @@ class StatsWindow(QDialog):
     def showEvent(self, event):
         self.focus.setChecked(self.neko.quiet)
         self.ai.setChecked(self.neko.ai_enabled)
+        self.reactivity.setChecked(self.neko.reactive)
+        self.fullscreen.setChecked(self.neko.hide_fullscreen)
         self.update_stats()
         self.timer.start(1000)
         super().showEvent(event)
@@ -168,6 +185,18 @@ class StatsWindow(QDialog):
         self.keepsakes.setText(f"{n.total_pets + n.companion.pets} little pets   ·   "
                                f"{n.total_naps + n.companion.naps} cozy naps")
         self.status.setText(self.startup_error or n.ai_status)
+        self.mood.setText({
+            NekoState.IDLE: "happy to keep you company.",
+            NekoState.TYPING: "helping with the important paw-work.",
+            NekoState.CURIOUS: "oh? something happening over there?",
+            NekoState.GROOMING: "washing these very important little paws.",
+            NekoState.STRETCHING: "a biiig little stretch.",
+            NekoState.YAWNING: "just resting my eyes...",
+            NekoState.WAKING: "back from a little dream.",
+            NekoState.SLEEPING: "somewhere soft, in a dream.",
+            NekoState.HAPPY: "yes. right there. purrr.",
+            NekoState.PEEKING: "just checking you're still there.",
+        }[n.companion.state])
 
     def change_startup(self, enabled):
         try:
@@ -188,6 +217,8 @@ class NekoWidget(QWidget):
         self.companion = Companion(time.monotonic())
         self.quiet = self.settings.value("quiet", False, type=bool)
         self.motion = self.settings.value("motion", True, type=bool)
+        self.reactive = self.settings.value("reactive", True, type=bool)
+        self.hide_fullscreen = self.settings.value("hide_fullscreen", False, type=bool)
         self.ai_enabled = self.settings.value("ai_enabled", False, type=bool)
         self.total_pets = max(0, self.settings.value("pets", 0, type=int))
         self.total_naps = max(0, self.settings.value("naps", 0, type=int))
@@ -204,6 +235,8 @@ class NekoWidget(QWidget):
         self.closing = False
         self.started = time.monotonic()
         self.pose_started = self.started
+        self.look_direction = -1
+        self.last_pin = 0
         self.stats_window = None
         self.setWindowTitle("Desktop Neko")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
@@ -215,6 +248,7 @@ class NekoWidget(QWidget):
         self.setAccessibleDescription("Click to pet, drag to move, or right-click for Neko's nook.")
         self.assets = {}
         self.movies = {}
+        self.atlas = SpriteAtlas(ASSET_ROOT / "neko-atlas.png")
         for name in ("idle", "sleep", "happy", "peek", "curious"):
             self.assets[name] = QPixmap(str(ASSET_ROOT / f"neko_{name}.png"))
             movie = QMovie(str(ASSET_ROOT / f"neko_{name}.gif"))
@@ -222,6 +256,7 @@ class NekoWidget(QWidget):
                 movie.frameChanged.connect(self.update)
                 self.movies[name] = movie
         self.current_asset = "idle"
+        self.current_clip = "idle"
         self.bubble = QLabel(None, Qt.ToolTip | Qt.FramelessWindowHint
                              | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
                              | Qt.WindowTransparentForInput)
@@ -238,7 +273,7 @@ class NekoWidget(QWidget):
         self.bubble_timer.timeout.connect(self.bubble.hide)
         self.tick_timer = QTimer(self)
         self.tick_timer.timeout.connect(self.tick)
-        self.tick_timer.start(1000)
+        self.tick_timer.start(500)
         self.animation_timer = QTimer(self)
         self.animation_timer.timeout.connect(self.update)
         self.save_timer = QTimer(self)
@@ -253,10 +288,15 @@ class NekoWidget(QWidget):
         app = QApplication.instance()
         app.primaryScreenChanged.connect(self.clamp_position)
         app.screenRemoved.connect(self.clamp_position)
+        self.activity = ActivityMonitor()
+        self.activity.enabled = self.reactive
+        self.activity.start(int(self.winId()))
+        self.destroyed.connect(self.activity.close)
         self.sync_animation()
 
     def init_tray(self):
-        self.tray_icon = QSystemTrayIcon(QIcon(self.assets["idle"]), self)
+        icon = self.atlas.frame("idle", 0)
+        self.tray_icon = QSystemTrayIcon(QIcon(icon if not icon.isNull() else self.assets["idle"]), self)
         self.tray_icon.setToolTip("Neko · a little company")
         self.menu = QMenu()
         self.menu.addAction("Neko's nook…", self.open_stats_window)
@@ -290,6 +330,35 @@ class NekoWidget(QWidget):
         self.sync_animation()
         self.save_preferences()
 
+    def set_reactivity(self, enabled):
+        self.reactive = enabled
+        self.activity.enabled = enabled and not self.fullscreen and not self.is_manually_hidden
+        self.activity.consume(time.monotonic())
+        self.save_preferences()
+
+    def set_hide_fullscreen(self, enabled):
+        self.hide_fullscreen = enabled
+        self.dismiss_bubble()
+        self.setVisible(not self.is_manually_hidden and not self.closing
+                        and not (enabled and self.fullscreen))
+        self.sync_animation()
+        self.pin_to_top(force=True)
+        self.save_preferences()
+
+    def pin_to_top(self, force=False):
+        now = time.monotonic()
+        if (QApplication.platformName() != "windows" or not self.isVisible()
+                or self.is_manually_hidden or self.closing or (not force and now - self.last_pin < 5)):
+            return
+        try:
+            # Reassert the native z-order without taking the user's keyboard focus.
+            win32gui.SetWindowPos(int(self.winId()), win32con.HWND_TOPMOST, 0, 0, 0, 0,
+                                 win32con.SWP_NOACTIVATE | win32con.SWP_NOSIZE
+                                 | win32con.SWP_NOMOVE | win32con.SWP_NOOWNERZORDER)
+            self.last_pin = now
+        except win32gui.error:
+            pass
+
     def set_ai(self, enabled):
         self.ai_enabled = enabled
         self.ai_generation += 1
@@ -298,7 +367,7 @@ class NekoWidget(QWidget):
         self.save_preferences()
 
     def sync_animation(self):
-        active = self.isVisible() and not self.is_manually_hidden and not self.fullscreen
+        active = self.isVisible() and not self.is_manually_hidden and not self.closing
         if active and self.motion:
             self.animation_timer.start(80)
         else:
@@ -324,21 +393,26 @@ class NekoWidget(QWidget):
             return
         now = time.monotonic()
         idle, window, fullscreen = desktop_activity()
+        self.activity.enabled = self.reactive and not fullscreen
+        keyboard_events, window_event = self.activity.consume(now)
         if fullscreen != self.fullscreen:
             self.fullscreen = fullscreen
             self.ai_generation += 1
             self.companion.next_comment = now + random.uniform(720, 1200)
             self.companion.next_idle = now + random.uniform(20, 40)
             self.dismiss_bubble()
-            self.setVisible(not fullscreen)
+            self.setVisible(not (fullscreen and self.hide_fullscreen))
             self.sync_animation()
-        if fullscreen:
+        if fullscreen and self.hide_fullscreen:
             self.last_window = window
             return
+        changed = bool(self.last_window and window != self.last_window)
+        self.pin_to_top(force=changed)
         near = (QCursor.pos() - self.geometry().center()).manhattanLength() < 150
-        action = self.companion.tick(now, idle, self.quiet,
+        action = self.companion.tick(now, idle, self.quiet or fullscreen,
                                      cursor_near=near,
-                                     window_changed=bool(self.last_window and window != self.last_window))
+                                     window_changed=changed and self.reactive and not fullscreen,
+                                     keyboard_events=keyboard_events, window_event=window_event)
         self.last_window = window
         if action == "comment":
             if self.ai_enabled:
@@ -347,12 +421,21 @@ class NekoWidget(QWidget):
                 self.random_dialogue()
         elif action:
             self.pose_started = now
+            if action == "curious":
+                self.look_direction = -1 if QCursor.pos().x() < self.geometry().center().x() else 1
             self.refresh_asset()
             if action == "sleep":
                 self.ai_generation += 1
                 self.dismiss_bubble()
 
     def refresh_asset(self):
+        self.current_clip = {
+            NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",
+            NekoState.CURIOUS: "look_left" if self.look_direction < 0 else "look_right",
+            NekoState.HAPPY: "happy", NekoState.GROOMING: "groom",
+            NekoState.STRETCHING: "stretch", NekoState.TYPING: "typing",
+            NekoState.YAWNING: "yawn", NekoState.WAKING: "stretch",
+        }.get(self.companion.state, "idle")
         self.current_asset = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",
             NekoState.CURIOUS: "curious", NekoState.HAPPY: "happy",
@@ -367,32 +450,21 @@ class NekoWidget(QWidget):
         now = time.monotonic()
         elapsed = now - self.pose_started
         state = self.companion.state
-        breathing = math.sin((now - self.started) * 1.7) if self.motion else 0
-        y, sx, sy, rotation = -0.7 * breathing, 1, 1 + 0.012 * breathing, 0
-        if self.motion:
-            if state == NekoState.STRETCHING:
-                stretch = math.sin(min(elapsed / 3.5, 1) * math.pi)
-                sx, sy = 1 - 0.07 * stretch, 1 + 0.12 * stretch
-            elif state == NekoState.GROOMING:
-                rotation = math.sin(elapsed * 5) * 4
-            elif state == NekoState.CURIOUS:
-                rotation = 4 if QCursor.pos().x() >= self.geometry().center().x() else -4
-            elif state == NekoState.HAPPY:
-                y -= abs(math.sin(elapsed * 3)) * 2
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(75, 55, 48, 18))
         painter.drawEllipse(QRectF(28, 99, 56, 5))
         painter.save()
-        painter.translate(56, 99 + y)
-        painter.rotate(rotation)
-        painter.scale(sx, sy)
+        painter.translate(56, 99)
         movie = self.movies.get(self.current_asset)
-        pixmap = movie.currentPixmap() if movie and not movie.currentPixmap().isNull() else self.assets[self.current_asset]
+        pixmap = self.atlas.frame(self.current_clip, elapsed, self.motion)
+        if movie and not movie.currentPixmap().isNull():
+            pixmap = movie.currentPixmap().scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
+        elif pixmap.isNull():
+            pixmap = self.assets[self.current_asset].scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
         if pixmap.isNull():
             painter.setPen(QColor("#a67671"))
             painter.drawText(QRectF(-45, -85, 90, 85), Qt.AlignCenter, "=^·ω·^=")
         else:
-            pixmap = pixmap.scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
             painter.drawPixmap(-pixmap.width() // 2, -pixmap.height(), pixmap)
         painter.restore()
         if state == NekoState.HAPPY and elapsed < 3.2:
@@ -443,7 +515,8 @@ class NekoWidget(QWidget):
             self.last_pet_words = now
 
     def trigger_ai_brain(self):
-        if self.brain_worker is not None or not self.ai_enabled or self.quiet:
+        if (self.brain_worker is not None or not self.ai_enabled or self.quiet
+                or self.fullscreen or self.is_manually_hidden):
             return
         from llm_brain import AIBrainWorker
         try:
@@ -495,12 +568,22 @@ class NekoWidget(QWidget):
                 self.dragged = True
             if self.dragged:
                 self.dismiss_bubble()
+                if self.companion.state != NekoState.CURIOUS:
+                    now = time.monotonic()
+                    self.companion.pose(NekoState.CURIOUS, now, 3)
+                    self.pose_started = now
+                    self.refresh_asset()
                 self.move(point - self.drag_offset)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton and self.drag_origin is not None:
             if self.dragged:
                 self.ai_generation += 1
+                now = time.monotonic()
+                self.companion.pose(NekoState.PEEKING, now, 1.8)
+                self.companion.last_interaction = now
+                self.pose_started = now
+                self.refresh_asset()
                 self.clamp_position()
                 self.save_preferences()
             else:
@@ -526,6 +609,8 @@ class NekoWidget(QWidget):
 
     def hide_neko(self):
         self.is_manually_hidden = True
+        self.activity.enabled = False
+        self.activity.consume(time.monotonic())
         self.ai_generation += 1
         self.dismiss_bubble()
         self.hide()
@@ -537,8 +622,10 @@ class NekoWidget(QWidget):
         self.hide_action.setText("Hide Neko")
         self.companion.next_comment = time.monotonic() + random.uniform(720, 1200)
         self.fullscreen = desktop_activity()[2]
-        self.setVisible(not self.fullscreen)
+        self.activity.enabled = self.reactive and not self.fullscreen
+        self.setVisible(not (self.fullscreen and self.hide_fullscreen))
         self.sync_animation()
+        self.pin_to_top(force=True)
 
     def open_stats_window(self):
         if self.stats_window is None:
@@ -549,6 +636,7 @@ class NekoWidget(QWidget):
 
     def save_preferences(self):
         for key, value in {"quiet": self.quiet, "motion": self.motion,
+                           "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
                            "ai_enabled": self.ai_enabled, "position": self.pos(),
                            "pets": self.total_pets + self.companion.pets,
                            "naps": self.total_naps + self.companion.naps}.items():
@@ -557,6 +645,7 @@ class NekoWidget(QWidget):
 
     def quit_neko(self):
         self.closing = True
+        self.activity.close()
         self.tick_timer.stop()
         self.animation_timer.stop()
         self.dismiss_bubble()

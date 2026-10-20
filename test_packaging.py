@@ -18,11 +18,14 @@ class PackagingTests(unittest.TestCase):
         archive = CArchiveReader(str(self.exe))
         names = {name.replace("\\", "/") for name in archive.toc}
         self.assertIn("assets/neko_idle.png", names)
+        self.assertIn("assets/neko-atlas.png", names)
         self.assertNotIn("config.json", names)
         self.assertNotIn("icuuc.dll", names)
         modules = archive.open_embedded_archive("PYZ.pyz").toc
         self.assertIn("llm_brain", modules)
         self.assertIn("google.genai", modules)
+        self.assertIn("activity", modules)
+        self.assertIn("animations", modules)
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui
@@ -35,11 +38,11 @@ class PackagingTests(unittest.TestCase):
             children = wmi.ExecQuery(
                 "SELECT ProcessId FROM Win32_Process WHERE ParentProcessId=%d" % process.pid)
             pids = {process.pid} | {int(child.ProcessId) for child in children}
-            windows = []
+            windows = {}
 
             def visit(hwnd, _):
                 if win32process.GetWindowThreadProcessId(hwnd)[1] in pids:
-                    windows.append(win32gui.GetWindowText(hwnd))
+                    windows[win32gui.GetWindowText(hwnd)] = hwnd
 
             win32gui.EnumWindows(visit, None)
             return windows
@@ -63,7 +66,12 @@ class PackagingTests(unittest.TestCase):
             processes.append(second)
             self.assertEqual(second.wait(timeout=15), 0)
             self.assertIsNone(first.poll())
-            self.assertNotIn("Unhandled exception in script", owned_windows(first))
+            windows = owned_windows(first)
+            self.assertNotIn("Unhandled exception in script", windows)
+            self.assertIn("Desktop Neko", windows)
+            pet = windows["Desktop Neko"]
+            if win32gui.IsWindowVisible(pet):
+                self.assertTrue(win32gui.GetWindowLong(pet, -20) & 8, "Visible pet must be topmost")
         finally:
             for process in reversed(processes):
                 if process.poll() is None:

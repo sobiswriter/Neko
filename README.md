@@ -3,17 +3,24 @@
 A little company for your Windows desktop. Neko stretches, settles down, notices
 your cursor, and naps when you step away. No chores, guilt, sounds, or attention meter.
 
-![Neko](assets/neko_idle.png)
+![Neko's new drawn animations](docs/neko-preview.gif)
 
 ## Living with Neko
 
-- **Click to pet.** A happy pose, a tiny heart, and an occasional purr.
-- **Drag to move.** Position is remembered, including on another monitor.
-- **Come close.** She occasionally tilts toward your cursor. She never chases it.
-- **Keep working.** Little stretches and sleepy peeks happen every 25–55 seconds.
-  Window changes can earn a silent curious look, at most once every 45 seconds.
+- **Click to pet.** Closed-eye kneading, a tiny heart, and an occasional written purr.
+- **Drag to move.** She looks around while held and blinks when set down. Dragging
+  never counts as petting. Position is remembered, including on another monitor.
+- **Come close.** She occasionally looks toward your cursor. She never chases it.
+- **Keep working.** Blinks, paw washing, stretches, yawns, and sleepy peeks use
+  64 drawn frames with individual timing, rather than rotating or stretching a still.
+- **Type together.** A typing burst occasionally gets a few little paw taps,
+  at most once every 45 seconds. She then goes back to her own business.
+- **Open, close, or move windows.** Native events earn a curious look or blink,
+  at most once every 18 seconds. A current-window title change can also trigger a
+  glance when the app exposes that event, including some browser tab changes.
 - **Step away.** After three minutes without keyboard or mouse input, she naps.
-  Returning wakes her silently. There is no penalty for ignoring her.
+  She yawns first; returning wakes her with a silent stretch. There is no penalty
+  for ignoring her. Actions finish naturally instead of interrupting one another.
 - **Very occasional words.** Unprompted bubbles are spaced 12–20 minutes apart.
   Petting postpones them; no back-to-back identical idle lines.
 - **Right-click for her nook.** Quiet company, reduced motion, startup, optional
@@ -21,9 +28,19 @@ your cursor, and naps when you step away. No chores, guilt, sounds, or attention
   icon to find her again.
 
 Quiet company stops unprompted words while keeping deliberate pet reactions.
-Hide really hides her: no surprise appearances, bubbles, or animation. Fullscreen
-apps automatically tuck her away until you return. Neither the pet nor her
-bubbles take keyboard focus. Only one copy runs at a time.
+Hide really hides her: no surprise appearances, bubbles, or animation. Native
+topmost positioning keeps her above normal windows without stealing focus.
+**Tuck away during fullscreen apps** is a separate, opt-in choice in the nook.
+Fullscreen activity always suppresses automatic words and typing/window reactions,
+even when she remains visible. Exclusive-fullscreen games and other topmost overlays
+can still cover desktop windows. Only one copy runs at a time.
+
+Typing and window reactions work locally and can be switched off. Keyboard
+detection requests only raw-input headers: key identities, text and passwords are
+never read, reconstructed, saved, or sent anywhere. Window reactions use events and
+handles, without reading titles. Optional AI has its own title-sharing toggle below.
+Exact browser tab creation/closure, especially in background tabs, needs a browser
+extension; this version deliberately ships without one.
 
 ## Run from source
 
@@ -85,9 +102,10 @@ so unrelated tools cannot supply conflicting Windows libraries.
 .venv\Scripts\python.exe -m unittest discover -v
 ```
 
-Tests cover quiet timing, naps, curiosity, clicks versus dragging, fullscreen and
-hide behavior, persistence, stale AI replies, single-flight requests, and API
-failure handling. Qt tests default to offscreen rendering with temporary settings.
+Tests cover animation timing, frame importing, header-only keyboard detection,
+window events, quiet timing, naps, curiosity, clicks versus dragging, fullscreen
+preferences, pinning flags, persistence, stale AI replies and API failure handling.
+Qt tests default to offscreen rendering with temporary settings.
 For native Windows widgets, set `$env:QT_QPA_PLATFORM = 'windows'` before running.
 Tests do not change Windows startup or use your API key.
 
@@ -105,9 +123,17 @@ processes they launch.
 
 ## Character assets
 
-The original six transparent PNGs are retained. You can replace them in `assets/`
-or provide matching GIFs, which take precedence. Motion can be disabled in the
-nook; GIFs then display a still frame. Missing art has a small text-cat fallback.
+`assets/neko-atlas.png` contains eight sequences of eight drawings: blink/idle,
+looking around, typing, grooming, stretching, yawning, affection and sleep. Frame
+durations and directional variants live in `animations.py`. Frames are imported
+once at a consistent scale and anchored at their feet. Generated-sheet bleed from
+neighboring cells is excluded when locating each silhouette.
+
+The [generation prompts and art notes](docs/animation-notes.md) document the built-in
+ImageGen workflow. The original six transparent PNGs remain as fallbacks. Matching
+GIFs in `assets/` still take precedence over the atlas for customization. Motion can
+be disabled in the nook, holding a still frame without losing direct interaction.
+Missing art has a small text-cat fallback.
 `gen_gif.py` is the original optional animation experiment; it needs Pillow and
 generates a bouncing ball, so it isn't part of the app or build.
 
@@ -115,6 +141,8 @@ generates a bouncing ball, so it isn't part of the app or build.
 
 - `behavior.py`: timing, temporary poses, naps, and pet reactions; no Qt or network.
 - `main.py`: desktop integration, rendering, preferences, nook, and tray.
+- `animations.py`: sprite atlas loading, frame timing and directional clips.
+- `activity.py`: local keyboard-activity headers and Windows lifecycle events.
 - `llm_brain.py`: optional title-only Gemini worker.
 - `test_*.py`: standard-library unittest suite, with Qt's event helpers.
 - `Plan.txt`: interaction rules for keeping future changes quiet and minimal.
