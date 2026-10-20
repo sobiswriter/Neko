@@ -27,7 +27,8 @@ Soft sounds are optional and off until you enable them.
   changes also hint at internal tab/document changes. Events wait briefly for an
   ongoing animation instead of disappearing immediately.
 - **Step away.** She yawns and naps after a configurable period without input.
-  The default is three minutes; choose 30–3600 seconds. Each nap lasts 90 seconds
+  The default is three minutes; choose 1–3600 seconds. Type a number and press Enter
+  or leave the field to save it. Each nap lasts 90 seconds
   through typing, app switches and petting, then she wakes herself with a stretch.
   She stays awake for at least another sleep interval before the next nap.
   Ignoring her never creates chores or penalties.

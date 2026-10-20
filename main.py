@@ -30,6 +30,8 @@ from dialogue import OfflineDialogue
 
 ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "assets"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+TIMING_LIMITS = {"sleep_seconds": (180, 1, 3600),
+                 "chatter_seconds": (75, 15, 600), "idle_seconds": (14, 5, 120)}
 
 
 def legacy_shortcut():
@@ -169,12 +171,15 @@ class StatsWindow(QDialog):
         company_layout.addWidget(self.follow)
         timing = QFormLayout()
         self.timing = {}
-        for key, label, minimum, maximum in (
-                ("sleep_seconds", "Sleep after inactivity", 30, 3600),
-                ("chatter_seconds", "Little thoughts about every", 15, 600),
-                ("idle_seconds", "Idle gestures about every", 5, 120)):
+        for key, label in (("sleep_seconds", "Sleep after inactivity"),
+                           ("chatter_seconds", "Little thoughts about every"),
+                           ("idle_seconds", "Idle gestures about every")):
+            _, minimum, maximum = TIMING_LIMITS[key]
             spin = QSpinBox()
             spin.setRange(minimum, maximum)
+            spin.setKeyboardTracking(False)
+            spin.setToolTip(f"{minimum}–{maximum} seconds. Type a number, then press Enter or click elsewhere.")
+            spin.setMinimumWidth(100)
             spin.setSuffix(" sec")
             spin.setValue(getattr(neko.companion, key))
             spin.setAccessibleName(label)
@@ -271,9 +276,7 @@ class NekoWidget(QWidget):
         super().__init__()
         self.settings = settings if settings is not None else QSettings("DesktopNeko", "Neko")
         self.companion = Companion(time.monotonic())
-        for key, default, minimum, maximum in (("sleep_seconds", 180, 30, 3600),
-                                              ("chatter_seconds", 75, 15, 600),
-                                              ("idle_seconds", 14, 5, 120)):
+        for key, (default, minimum, maximum) in TIMING_LIMITS.items():
             try:
                 value = int(self.settings.value(key, default))
             except (ValueError, TypeError, OverflowError):
@@ -443,11 +446,13 @@ class NekoWidget(QWidget):
         return True
 
     def set_timing(self, key, value):
-        limits = {"sleep_seconds": (30, 3600), "chatter_seconds": (15, 600), "idle_seconds": (5, 120)}
-        minimum, maximum = limits[key]
+        _, minimum, maximum = TIMING_LIMITS[key]
         setattr(self.companion, key, max(minimum, min(maximum, value)))
-        self.companion.next_comment = time.monotonic() + self.companion.chatter_seconds
-        self.companion.next_idle = time.monotonic() + self.companion.idle_seconds
+        now = time.monotonic()
+        if key == "sleep_seconds" and self.companion.next_nap > now:
+            self.companion.next_nap = now + self.companion.sleep_seconds
+        self.companion.next_comment = now + self.companion.chatter_seconds
+        self.companion.next_idle = now + self.companion.idle_seconds
         self.save_preferences()
 
     def set_follow_mouse(self, enabled):

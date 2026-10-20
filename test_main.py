@@ -220,6 +220,47 @@ class DesktopTests(unittest.TestCase):
             self.neko.tick()
         self.assertEqual(self.neko.companion.state, NekoState.SLEEPING)
 
+    def test_timers_accept_typed_values_and_commit_on_enter(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        for key, value in (("sleep_seconds", 10), ("chatter_seconds", 45), ("idle_seconds", 9)):
+            spin = self.neko.stats_window.timing[key]
+            previous = getattr(self.neko.companion, key)
+            QTest.mouseClick(spin, Qt.LeftButton, pos=QPoint(25, spin.height() // 2))
+            QTest.keyClick(spin, Qt.Key_A, Qt.ControlModifier)
+            QTest.keyClicks(spin, str(value))
+            self.assertEqual(getattr(self.neko.companion, key), previous)
+            QTest.keyClick(spin, Qt.Key_Return)
+            self.assertEqual(getattr(self.neko.companion, key), value)
+            self.assertEqual(self.settings.value(key, type=int), value)
+
+    def test_changed_sleep_delay_replaces_the_old_awake_deadline(self):
+        now = time.monotonic()
+        self.neko.companion.next_nap = now + 180
+        with patch("main.time.monotonic", return_value=now):
+            self.neko.set_timing("sleep_seconds", 10)
+        self.assertEqual(self.neko.companion.next_nap, now + 10)
+
+    def test_sleep_edit_saves_when_leaving_the_field_and_survives_reload(self):
+        from PySide6.QtWidgets import QPushButton
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        nook = self.neko.stats_window
+        spin = nook.timing["sleep_seconds"]
+        QTest.mouseClick(spin, Qt.LeftButton, pos=QPoint(25, spin.height() // 2))
+        QTest.keyClick(spin, Qt.Key_A, Qt.ControlModifier)
+        QTest.keyClicks(spin, "7")
+        done = next(button for button in nook.findChildren(QPushButton) if button.text() == "Comfy.")
+        QTest.mouseClick(done, Qt.LeftButton)
+        self.assertEqual(self.settings.value("sleep_seconds", type=int), 7)
+        other = NekoWidget(self.settings)
+        try:
+            self.assertEqual(other.companion.sleep_seconds, 7)
+        finally:
+            other.tray_icon.hide()
+            other.bubble.deleteLater()
+            other.deleteLater()
+
     def test_bad_saved_timing_is_recovered_and_clamped(self):
         self.settings.setValue("sleep_seconds", "broken")
         self.settings.setValue("chatter_seconds", -100)

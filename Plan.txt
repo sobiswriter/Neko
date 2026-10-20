@@ -12,7 +12,8 @@ Interaction rules
   Typing bursts earn paw taps and local questions, throttled to 30 seconds.
   Never read key values or typed text. Local title hashes help notice app tab changes.
   Idle gestures default to about 14 seconds; configurable from five to 120 seconds.
-  Sleep delay defaults to three minutes; configurable from 30 to 3600 seconds.
+  Sleep delay defaults to three minutes; configurable from one to 3600 seconds.
+  Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
   Each nap lasts 90 seconds despite input or petting, then she wakes herself.
   Old inactivity cannot immediately start another nap; give her a full awake interval.
   Four pet responses alternate; nine idle moods avoid consecutive repeats.
