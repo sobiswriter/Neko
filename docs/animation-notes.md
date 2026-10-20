@@ -59,7 +59,7 @@ first seated drawing, preserving head size while its body lowers. All frames
 retain the common 112 x 100 canvas and feet baseline.
 
 Existing motion cycles now repeat briskly inside their 5–6 second behavior slots;
-rendering runs at 20 FPS, with deliberate slower holds for blinks and sleep.
+rendering runs at 10 FPS, with action lengths preserved and slower holds for blinks and sleep.
 docs/neko-sleep-preview.gif shows the actual frame player. The preview simulates
 a pet between sleep and waking; runtime sleep has no automatic wake deadline.
 

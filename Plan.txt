@@ -24,7 +24,7 @@ Interaction rules
   Cursor walks keep a gap, last at most 6.5 seconds and travel about 220 pixels maximum.
   Eligible moving cursors invite another walk after 25 seconds.
   Keep 5–6 second gesture slots but repeat brisk motion cycles, not slow whole actions.
-  Rendering runs at 20 FPS; paw and walk drawings advance roughly every 140–220 ms.
+  Rendering runs at 10 FPS, preserving action lengths and cursor-walk speed.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
   Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
   Automatic sound has a 45-second pause; quiet/fullscreen/media suppress it.

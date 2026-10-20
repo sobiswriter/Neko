@@ -20,7 +20,7 @@ Soft sounds are optional and off until you enable them.
   yawns and sleepy peeks use 80 drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures still have 5–6 seconds on screen, but
   their moving phases are quicker and suitable cycles repeat. Rendering runs at
-  20 FPS; walking and paw actions advance roughly every 140–220 milliseconds.
+  10 FPS, keeping the same action lengths and walking speed.
   Every frame has a 112 × 100 transparent canvas;
   seated poses share an 82-pixel height so petting no longer makes her shrink.
   Walking, loafing and sleep preserve their natural posture and proportions.

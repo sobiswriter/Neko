@@ -512,7 +512,7 @@ class NekoWidget(QWidget):
                 self.offline_line("follow")
             else:
                 self.look_direction = -1 if delta.x() < 0 else 1
-                self.move(self.pos() + QPoint(round(delta.x() / distance), round(delta.y() / distance)))
+                self.move(self.pos() + QPoint(round(delta.x() / distance), round(delta.y() / distance)) * 2)
                 self.clamp_position()
         self.update()
 
@@ -559,7 +559,7 @@ class NekoWidget(QWidget):
     def sync_animation(self):
         active = self.isVisible() and not self.is_manually_hidden and not self.closing
         if active and self.motion:
-            self.animation_timer.start(50)
+            self.animation_timer.start(100)
         else:
             self.animation_timer.stop()
         for name, movie in self.movies.items():
