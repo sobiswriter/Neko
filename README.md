@@ -76,7 +76,8 @@ Model availability is listed in [Google's model lifecycle documentation](https:/
 
 The result is `dist\DesktopNeko.exe`. Assets are bundled; local configuration is
 deliberately excluded. Build on Windows. A source launch and the executable use
-the same preferences and instance lock.
+the same preferences and instance lock. The build isolates its DLL search path
+so unrelated tools cannot supply conflicting Windows libraries.
 
 ## Check the behavior
 
@@ -89,6 +90,18 @@ hide behavior, persistence, stale AI replies, single-flight requests, and API
 failure handling. Qt tests default to offscreen rendering with temporary settings.
 For native Windows widgets, set `$env:QT_QPA_PLATFORM = 'windows'` before running.
 Tests do not change Windows startup or use your API key.
+
+After building, quit any running Neko and check the actual executable as well:
+
+```powershell
+$env:NEKO_TEST_EXE = 'dist\DesktopNeko.exe'
+.venv\Scripts\python.exe -m unittest test_packaging -v
+Remove-Item Env:NEKO_TEST_EXE
+```
+
+These opt-in checks verify bundle contents, native Qt startup, and rejection of
+a second instance. They respect foreground fullscreen apps and stop only the
+processes they launch.
 
 ## Character assets
 

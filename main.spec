@@ -1,5 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
+from pathlib import Path
+import sys
+
+# Keep unrelated tools' ICU and runtime DLLs out of the Windows bundle.
+os.environ['PATH'] = os.pathsep.join([
+    str(Path(sys.executable).parent),
+    str(Path(os.environ['SystemRoot']) / 'System32'),
+    os.environ['SystemRoot'],
+])
 
 a = Analysis(
     ['main.py'],

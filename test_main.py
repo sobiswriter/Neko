@@ -7,7 +7,7 @@ import time
 import unittest
 from unittest.mock import MagicMock, patch
 
-from PySide6.QtCore import QPoint, QPointF, QSettings, Qt
+from PySide6.QtCore import QEvent, QPoint, QPointF, QSettings, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
@@ -43,6 +43,7 @@ class DesktopTests(unittest.TestCase):
             self.neko.stats_window.deleteLater()
         self.neko.hide()
         self.neko.deleteLater()
+        APP.sendPostedEvents(None, QEvent.DeferredDelete)
         APP.processEvents()
         self.activity.stop()
         self.folder.cleanup()
