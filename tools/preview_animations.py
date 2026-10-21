@@ -13,6 +13,7 @@ from PySide6.QtWidgets import QApplication
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from animations import CLIPS, SpriteAtlas
+from cursors import petting_cursors
 
 
 IDLES = [("idle", "Sitting / blink"), ("tail", "Tail swish"), ("ears", "Ear flick"),
@@ -24,6 +25,10 @@ ACTIVITIES = [("typing", "Typing"), ("walk", "Walking"), ("fall_asleep", "Settli
               ("sleep", "Sleeping"), ("wake", "Waking"),
               ("arrive", "Drop in / hello"), ("depart", "Hop down / goodbye")]
 REWORK = [ACTIVITIES[-2], ACTIVITIES[-1], IDLES[1], IDLES[-2], IDLES[-1]]
+PETS = [("happy", "Head pats"), ("nuzzle", "Cheek nuzzle"), ("knead", "Kneading"),
+        ("chin_scritch", "Chin scritches"), ("blep", "Tiny blep"), ("paw_offer", "Paw offer"),
+        ("ear_rub", "Ear rubs"), ("pet_stretch", "Front stretch"), ("back_arch", "Back arch"),
+        ("happy_hop", "Tiny hop"), ("side_flop", "Side flop"), ("shoulder_peek", "Shoulder peek")]
 BACKGROUND = (248, 246, 241)
 
 
@@ -34,6 +39,13 @@ def pixels(pixmap):
 
 
 def displayed(atlas, name, elapsed):
+    if name in {item[0] for item in PETS}:
+        if elapsed < 0.8:
+            name = "idle"
+        elif elapsed >= 6.6:
+            name, elapsed = "idle", elapsed - 6.6
+        else:
+            elapsed -= 0.8
     slot = 8 if name == "loaf" else 6
     if name in {item[0] for item in IDLES} and elapsed >= slot:
         name, elapsed = "idle", elapsed - slot
@@ -43,10 +55,10 @@ def displayed(atlas, name, elapsed):
 
 
 def frame_sheet(atlas, entries, destination, source=False):
-    sheet = Image.new("RGB", (180 + 8 * 180, len(entries) * 210), BACKGROUND)
+    sheet = Image.new("RGB", (180 + 8 * 180, len(entries) * 225), BACKGROUND)
     draw = ImageDraw.Draw(sheet)
     for row, (name, label) in enumerate(entries):
-        draw.text((8, row * 210 + 12), label, fill="#514a43")
+        draw.text((8, row * 225 + 12), label, fill="#514a43")
         clip = CLIPS[name]
         indices = sorted(set(clip.order))
         for col, index in enumerate(indices):
@@ -56,29 +68,29 @@ def frame_sheet(atlas, entries, destination, source=False):
                 first = clip.order.index(index)
                 elapsed = (sum(clip.durations[:first]) + clip.durations[first] / 2) / 1000
                 frame = pixels(atlas.frame(name, elapsed))
-            sheet.paste(frame.resize((168, 150), Image.Resampling.NEAREST),
-                        (180 + col * 180, row * 210 + 35), frame.resize((168, 150), Image.Resampling.NEAREST))
-            draw.text((184 + col * 180, row * 210 + 190), str(index + 1), fill="#514a43")
+            frame = frame.resize((168, 168), Image.Resampling.NEAREST)
+            sheet.paste(frame, (180 + col * 180, row * 225 + 35), frame)
+            draw.text((184 + col * 180, row * 225 + 210), str(index + 1), fill="#514a43")
     sheet.save(destination)
 
 
 def flight_sheet(atlas, destination):
-    sheet = Image.new("RGB", (160 + 10 * 112, 4 * 130), BACKGROUND)
+    sheet = Image.new("RGB", (160 + 10 * 112, 4 * 144), BACKGROUND)
     draw = ImageDraw.Draw(sheet)
     for row in range(4):
         name = "arrive" if row < 2 else "depart"
-        draw.text((8, row * 130 + 8), name, fill="#514a43")
+        draw.text((8, row * 144 + 8), name, fill="#514a43")
         for col in range(10):
             elapsed = (row % 2 * 10 + col) / 10
             frame = pixels(atlas.frame(name, elapsed))
-            left, top = 160 + col * 112, row * 130
+            left, top = 160 + col * 112, row * 144
             sheet.paste(frame, (left, top), frame)
-            draw.text((left + 6, top + 108), f"{elapsed:.1f}s", fill="#514a43")
+            draw.text((left + 6, top + 124), f"{elapsed:.1f}s", fill="#514a43")
     sheet.save(destination)
 
 
 def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
-    width, height = columns * 160, ((len(entries) + columns - 1) // columns) * 140
+    width, height = columns * 160, ((len(entries) + columns - 1) // columns) * 152
     frames = []
     # GIF uses centiseconds; 30/30/40ms yields exactly 30 frames per second.
     durations = [30, 30, 40] * (seconds * 10)
@@ -87,7 +99,7 @@ def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
         canvas = Image.new("RGB", (width, height), BACKGROUND)
         draw = ImageDraw.Draw(canvas)
         for index, (name, label) in enumerate(entries):
-            left, top = index % columns * 160, index // columns * 140
+            left, top = index % columns * 160, index // columns * 152
             draw.text((left + 8, top + 8), label, fill="#514a43")
             frame = displayed(atlas, name, elapsed_ms / 1000)
             canvas.paste(frame, (left + 24, top + 30), frame)
@@ -102,6 +114,24 @@ def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
     assert len(frames) == seconds * 30
 
 
+def cursor_preview(atlas, destination):
+    hands = petting_cursors()
+    assert all(cursor.hotSpot() == hands[0].hotSpot() for cursor in hands)
+    frames = []
+    for index in range(48):
+        elapsed = index / 20 - 0.6
+        canvas = Image.new("RGB", (160, 152), BACKGROUND)
+        frame = pixels(atlas.frame("idle" if elapsed < 0 else "happy", max(0, elapsed)))
+        canvas.paste(frame, (24, 30), frame)
+        if 0 <= elapsed < len(hands) * 0.07:
+            hand = hands[min(len(hands) - 1, int(elapsed / 0.07))]
+            frame = pixels(hand.pixmap())
+            canvas.paste(frame, (80 - hand.hotSpot().x(), 60 - hand.hotSpot().y()), frame)
+        frames.append(canvas.resize((480, 456), Image.Resampling.NEAREST))
+    frames[0].save(destination, save_all=True, append_images=frames[1:], duration=50,
+                   loop=0, disposal=2)
+
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
@@ -110,6 +140,9 @@ if __name__ == "__main__":
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)
         frame_sheet(atlas, entries, folder / (stem + "-frames.png"))
+    catalog(atlas, PETS, folder / "neko-pet-catalog")
+    frame_sheet(atlas, PETS, folder / "neko-pet-frames.png", source=True)
+    cursor_preview(atlas, folder / "neko-palm-preview.gif")
     frame_sheet(atlas, REWORK, folder / "neko-tail-life-frames.png")
     frame_sheet(atlas, REWORK, folder / "neko-tail-life-source-frames.png", source=True)
     flight_sheet(atlas, folder / "neko-lifecycle-flight.png")

@@ -14,16 +14,18 @@ character sheets inspired pose ideas without being copied or used as edit target
 
 No anatomy pixels were painted or repaired programmatically. The loader isolates
 each connected silhouette, allowing vertical overscan for drawings that extend
-across a nominal row boundary. Native cell aspect ratios are preserved rather
-than stretching rectangular cells into squares. Each new row uses a single
-scale across all four poses, preventing the lowered body from enlarging the head.
-All output frames retain the 112×100 transparent canvas and common ground anchor;
-the airborne hop has a 10-pixel lift inside that canvas, without moving the window.
+across a nominal row boundary. Native source cells are imported without stretching
+rectangular cells into squares. The later [head calibration](pet-scale-and-cursor.md)
+matches all twelve reactions to idle's 62x50-pixel head and starting height,
+using the same two scale factors through each row's poses. All frames now use
+a 112x112 transparent canvas; the airborne hop retains its 10-pixel lift without
+moving the desktop window. Posture changes are preserved rather than normalizing
+every crouch, raised tail or lying pose to the same whole-body height.
 
 The old wave row in `neko-pets-v3.png` and malformed paw row in
 `neko-affection-v1.png` are never loaded into the atlas. Those source sheets remain
 because they also contain retained art. The rejected six-frame sheet was deleted.
-The atlas now loads 144 drawings including the later tail/lifecycle banks;
+The atlas now loads 148 entries including the later tail/lifecycle banks;
 48 still belong to these twelve pet reactions.
 
 The new gestures play once, then rest inside the existing 5.8-second slot.

@@ -23,9 +23,15 @@ Seated hello, shy head dip, nose wiggle, tail curl, and old paw wave have been
 removed from the active set. The old malformed paw offer is also excluded.
 The obsolete six-frame sheet and its previews have been deleted.
 
-The GIF uses the app's SpriteAtlas and Clip timing at 10 FPS, including rest at
+The GIF starts with 0.8 seconds of the actual idle drawing, then uses the app's
+SpriteAtlas and Clip timing at 10 FPS, including rest at
 the end of each 5.8-second petting slot. Kneading loops as it does in the app;
 the other gestures play once and return to rest. Side flop retraces its
 intermediate drawings to rise gently. No extra petting loaf was added.
+
+All twelve reactions are calibrated to idle's head size and starting height.
+The preview returns to idle after each 5.8-second reaction to expose size jumps.
+Postures still change naturally: a flop lowers her head and a stretch extends her body.
+See [size matching and palm interaction](pet-scale-and-cursor.md).
 
 [Inspect every source drawing](neko-pet-frames.png).

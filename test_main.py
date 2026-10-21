@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, QSize, QSettings, Qt
-from PySide6.QtGui import QMouseEvent
+from PySide6.QtGui import QCursor, QMouseEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
@@ -541,12 +541,42 @@ class DesktopTests(unittest.TestCase):
         QTest.mouseClick(self.neko, Qt.LeftButton, pos=QPoint(56, 60))
         self.assertEqual(self.neko.companion.pets, 1)
         QTest.mousePress(self.neko, Qt.LeftButton, pos=QPoint(56, 60))
+        self.assertEqual(self.neko.cursor().shape(), Qt.ClosedHandCursor)
         move = QMouseEvent(QMouseEvent.MouseMove, QPointF(80, 60),
                            QPointF(self.neko.mapToGlobal(QPoint(80, 60))),
                            Qt.NoButton, Qt.LeftButton, Qt.NoModifier)
         APP.sendEvent(self.neko, move)
         QTest.mouseRelease(self.neko, Qt.LeftButton, pos=QPoint(80, 60))
         self.assertEqual(self.neko.companion.pets, 1)
+        self.assertFalse(self.neko.pet_cursor_timer.isActive())
+        self.assertEqual(self.neko.cursor().shape(), Qt.OpenHandCursor)
+
+    def test_hover_hand_and_pet_stroke_are_local_and_cancel_on_leave(self):
+        self.assertEqual(self.neko.cursor().shape(), Qt.OpenHandCursor)
+        position = QCursor.pos()
+        QTest.mouseClick(self.neko, Qt.LeftButton, pos=QPoint(56, 60))
+        self.assertTrue(self.neko.pet_cursor_timer.isActive())
+        first = self.neko.cursor().pixmap().toImage()
+        self.neko.advance_pet_cursor()
+        self.assertNotEqual(first, self.neko.cursor().pixmap().toImage())
+        self.assertEqual(QCursor.pos(), position)
+        APP.sendEvent(self.neko, QEvent(QEvent.Leave))
+        self.assertFalse(self.neko.pet_cursor_timer.isActive())
+        self.assertEqual(self.neko.cursor().shape(), Qt.OpenHandCursor)
+
+    def test_hand_stroke_finishes_and_respects_reduced_motion_and_hiding(self):
+        QTest.mouseClick(self.neko, Qt.LeftButton, pos=QPoint(56, 60))
+        for _ in range(12):
+            self.neko.advance_pet_cursor()
+        self.assertFalse(self.neko.pet_cursor_timer.isActive())
+        self.assertEqual(self.neko.cursor().shape(), Qt.OpenHandCursor)
+        self.neko.set_motion(False)
+        QTest.mouseClick(self.neko, Qt.LeftButton, pos=QPoint(56, 60))
+        self.assertFalse(self.neko.pet_cursor_timer.isActive())
+        self.neko.set_motion(True)
+        QTest.mouseClick(self.neko, Qt.LeftButton, pos=QPoint(56, 60))
+        self.neko.hide_neko()
+        self.assertFalse(self.neko.pet_cursor_timer.isActive())
 
     def test_nook_opens_and_all_poses_render(self):
         with patch("main.autostart_enabled", return_value=False):

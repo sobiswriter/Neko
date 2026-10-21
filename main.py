@@ -26,6 +26,7 @@ from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
 from animations import SpriteAtlas, CLIPS
 from dialogue import OfflineDialogue
+from cursors import petting_cursors
 
 
 ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "assets"
@@ -381,6 +382,11 @@ class NekoWidget(QWidget):
         self.tick_timer.start(500)
         self.animation_timer = QTimer(self)
         self.animation_timer.timeout.connect(self.animate)
+        self.pet_cursors = petting_cursors()
+        self.pet_cursor_step = 0
+        self.pet_cursor_timer = QTimer(self)
+        self.pet_cursor_timer.timeout.connect(self.advance_pet_cursor)
+        self.setCursor(Qt.OpenHandCursor)
         self.save_timer = QTimer(self)
         self.save_timer.timeout.connect(self.save_preferences)
         self.save_timer.start(60000)
@@ -452,6 +458,7 @@ class NekoWidget(QWidget):
     def set_motion(self, enabled):
         self.motion = enabled
         if not enabled:
+            self.reset_pet_cursor()
             self.stop_following()
             if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
                 self.finish_transition()
@@ -617,6 +624,7 @@ class NekoWidget(QWidget):
             self.current_executable = ""
             self.app_context = None
         if fullscreen_changed:
+            self.reset_pet_cursor()
             self.fullscreen = fullscreen
             self.ai_generation += 1
             self.stop_following()
@@ -725,17 +733,21 @@ class NekoWidget(QWidget):
         painter.translate(56, 99)
         movie = None if state in (NekoState.ARRIVING, NekoState.LEAVING) else self.movies.get(self.current_asset)
         pixmap = self.atlas.frame(self.current_clip, elapsed, self.motion)
+        # Keep the original atlas origin; extra canvas space extends below it.
+        top = -100
         if movie and not movie.currentPixmap().isNull():
             pixmap = movie.currentPixmap().scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
+            top = -pixmap.height()
         elif pixmap.isNull():
             pixmap = self.assets[self.current_asset].scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
+            top = -pixmap.height()
         if pixmap.isNull():
             painter.setPen(QColor("#a67671"))
             painter.drawText(QRectF(-45, -85, 90, 85), Qt.AlignCenter, "=^·ω·^=")
         else:
             if state == NekoState.FOLLOWING and self.look_direction > 0:
                 painter.scale(-1, 1)
-            painter.drawPixmap(-pixmap.width() // 2, -pixmap.height(), pixmap)
+            painter.drawPixmap(-pixmap.width() // 2, top, pixmap)
         painter.restore()
         if state in PET_STATES and elapsed < 5.8:
             painter.setPen(QColor("#cf9699"))
@@ -840,11 +852,30 @@ class NekoWidget(QWidget):
         if self.closing:
             QApplication.quit()
 
+    def reset_pet_cursor(self):
+        self.pet_cursor_timer.stop()
+        self.setCursor(Qt.OpenHandCursor)
+
+    def advance_pet_cursor(self):
+        if self.pet_cursor_step >= len(self.pet_cursors):
+            self.reset_pet_cursor()
+            return
+        self.setCursor(self.pet_cursors[self.pet_cursor_step])
+        self.pet_cursor_step += 1
+
+    def leaveEvent(self, event):
+        self.reset_pet_cursor()
+        if self.drag_origin is not None:
+            self.setCursor(Qt.ClosedHandCursor)
+        super().leaveEvent(event)
+
     def mousePressEvent(self, event):
         if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
             event.ignore()
             return
         if event.button() == Qt.LeftButton:
+            self.reset_pet_cursor()
+            self.setCursor(Qt.ClosedHandCursor)
             self.stop_following()
             self.drag_origin = event.globalPosition().toPoint()
             self.drag_offset = self.drag_origin - self.pos()
@@ -883,6 +914,11 @@ class NekoWidget(QWidget):
                 self.save_preferences()
             else:
                 self.pet_reaction()
+            self.reset_pet_cursor()
+            if not self.dragged and self.motion:
+                self.pet_cursor_step = 0
+                self.advance_pet_cursor()
+                self.pet_cursor_timer.start(70)
             self.drag_origin = None
 
     def position_to_bottom_right(self):
@@ -903,6 +939,7 @@ class NekoWidget(QWidget):
             self.hide_neko()
 
     def hide_neko(self):
+        self.reset_pet_cursor()
         if self.companion.state == NekoState.LEAVING:
             self.finish_quit()
             return
@@ -985,6 +1022,7 @@ class NekoWidget(QWidget):
             self.finish_quit()
 
     def start_transition(self, state, clip):
+        self.reset_pet_cursor()
         now = time.monotonic()
         duration = sum(CLIPS[clip].durations)
         self.companion.pose(state, now, duration / 1000)
@@ -1009,6 +1047,7 @@ class NekoWidget(QWidget):
             self.offline_line("hello")
 
     def finish_quit(self):
+        self.reset_pet_cursor()
         self.transition_timer.stop()
         self.closing = True
         self.stop_sound()

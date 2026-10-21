@@ -17,6 +17,9 @@ Soft sounds are optional and off until you enable them.
   If she's asleep, a pet plays her waking sequence instead.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
+- **A little helping hand.** Hovering shows an open palm; holding uses a closed hand
+  for dragging. A pet click plays a short palm stroke without moving the actual pointer.
+  Leaving, hiding, entering fullscreen or reduced motion stops the stroke.
 - **Come close.** She sniffs at a moving cursor and sometimes takes a small walk
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
@@ -27,9 +30,10 @@ Soft sounds are optional and off until you enable them.
   Tail swishes make one lazy sweep and rest; kneading and paw taps use slower continuous cycles.
   Normal rendering runs at 10 FPS; arrival/departure briefly use 30 FPS for smooth travel,
   keeping walking speed unchanged.
-  Every frame has a 112 × 100 transparent canvas;
-  retained seated poses share an 82-pixel height. New body movements keep one
-  scale across each sequence so crouching and lying down do not enlarge her head.
+  Every frame has a 112 × 112 transparent canvas. Idle is about 82 pixels tall;
+  all twelve pet reactions use idle's 62 × 50-pixel head reference and starting
+  head position. Each reaction retains the same calibration throughout its poses,
+  so crouching and lying down do not cause the old whole-body fitting size jump.
   Walking, loafing and sleep preserve their natural posture and proportions.
 - **A little tail trouble.** Two eight-drawing idle games: she turns in a compact
   circle chasing her tail, or stays seated and pins its tip with one forepaw before
@@ -208,6 +212,7 @@ generates a bouncing ball, so it isn't part of the app or build.
 - `behavior.py`: timing, temporary poses, naps, and pet reactions; no Qt or network.
 - `main.py`: desktop integration, rendering, preferences, nook, and tray.
 - `animations.py`: sprite atlas loading, frame timing and directional clips.
+- `cursors.py`: small palm-stroke cursor frames with a stationary hotspot.
 - `activity.py`: local keyboard headers, Windows events and foreground executable name.
 - `app_context.py`: local app categories and media title hints.
 - `dialogue.py`: offline lines and per-context shuffle bags.

@@ -43,6 +43,7 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("animations", modules)
         self.assertIn("dialogue", modules)
         self.assertIn("app_context", modules)
+        self.assertIn("cursors", modules)
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui

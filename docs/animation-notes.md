@@ -1,5 +1,9 @@
 # Neko animation art
 
+The import details below record the original art passes. Current runtime frames
+use a 112x112 canvas; pet reactions use the later [idle-matched head calibration](pet-scale-and-cursor.md)
+in place of the original whole-body height fitting described below.
+
 Current petting art and final prompts are documented in [petting-notes.md](petting-notes.md).
 The notes below record earlier sheets. Their wave and paw-offer rows are retired,
 and historical preview GIFs containing those reactions have been removed.

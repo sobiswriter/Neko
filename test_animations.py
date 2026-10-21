@@ -23,12 +23,37 @@ class AnimationTests(unittest.TestCase):
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
         self.assertNotEqual(atlas.frames["tailswish", 0, 1].toImage(), atlas.frames["tailswish", 0, 2].toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
-        self.assertTrue(all(frame.width() == 112 and frame.height() == 100 for frame in atlas.frames.values()))
+        self.assertTrue(all(frame.width() == 112 and frame.height() == 112 for frame in atlas.frames.values()))
 
-    def test_affection_and_look_frames_never_shrink_the_seated_cat(self):
+    def test_petting_reference_heads_match_idle_width_and_vertical_anchor(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        for bank, rows in (("idle", (0, 2, 3)), ("pets", (0, 1, 3)), ("affection", (0, 1, 3)),
-                           ("activity", range(3)), ("movement", (1, 2))):
+        for name in ("idle", "happy", "nuzzle", "knead", "chin_scritch", "blep", "ear_rub",
+                     "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
+            image = atlas.frame(name, 0).toImage()
+            widest = 0
+            for y in range(20, 50):
+                run = 0
+                for x in range(image.width()):
+                    run = run + 1 if image.pixelColor(x, y).alpha() >= 128 else 0
+                    widest = max(widest, run)
+            self.assertAlmostEqual(widest, 62, delta=2, msg=name)
+            self.assertAlmostEqual(sprite_bounds(image).top(), 16, delta=2, msg=name)
+
+    def test_calibrated_pet_poses_are_not_clipped_by_the_canvas(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for name in ("happy", "nuzzle", "knead", "chin_scritch", "blep", "ear_rub",
+                     "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
+            clip = CLIPS[name]
+            for index in range(4):
+                image = atlas.frames[clip.bank, clip.row, index].toImage()
+                self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
+                                    for x in range(112) for y in (0, 111)), (name, index))
+                self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
+                                    for x in (0, 111) for y in range(112)), (name, index))
+
+    def test_idle_and_activity_frames_keep_their_seated_scale(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for bank, rows in (("idle", (0, 2, 3)), ("activity", range(3)), ("movement", (1, 2))):
             for row in rows:
                 for col in range(4):
                     bounds = sprite_bounds(atlas.frames[bank, row, col].toImage())
@@ -58,7 +83,7 @@ class AnimationTests(unittest.TestCase):
                 frame = atlas.frame(name, (elapsed + duration / 2) / 1000)
                 self.assertFalse(frame.isNull())
                 self.assertEqual(frame.toImage(), atlas.frames[clip.bank, clip.row, col].toImage())
-                self.assertLessEqual(sprite_bounds(frame.toImage()).bottom(), 99)
+                self.assertLessEqual(sprite_bounds(frame.toImage()).bottom(), 110)
                 elapsed += duration
             self.assertEqual(clip.frame_index(5.8), 0)
 

@@ -8,6 +8,9 @@ Interaction rules
   Visual reactions before words. No attention debt, chores, streaks, or guilt.
   Drawn sequences and connected reactions; optional short cursor walks and soft sounds.
   Petting is deliberate: a click, not a drag or an accidental hover.
+  Hover uses an open palm; holding uses a closed hand; a click adds a 630ms palm stroke.
+  The cursor image moves, never the actual pointer; reduced motion skips the stroke.
+  Pet sheets calibrate to idle's 62x50 head and starting height, rather than whole-body fit.
   Window curiosity has an eight-second cooldown; cursor curiosity uses 18 seconds.
   Typing bursts earn paw taps and local questions, throttled to 30 seconds.
   Never read key values or typed text. Local title hashes help notice app tab changes.

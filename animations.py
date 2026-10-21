@@ -87,6 +87,15 @@ CLIPS = {
 }
 
 
+# Head width/height measured in the imported 128px source cells, ears through chin.
+# Calibrate to idle's 62x50px head instead of fitting each whole-body silhouette.
+# Remeasure these landmarks when replacing the versioned pet sheets.
+PET_HEADS = {("pets", 0): (75, 64), ("pets", 1): (76, 64), ("pets", 3): (76, 64),
+             ("affection", 0): (79, 67), ("affection", 1): (78, 65), ("affection", 3): (78, 65),
+             ("petting-a", 0): (48, 46), ("petting-a", 1): (39, 38), ("petting-a", 2): (47, 43),
+             ("petting-b", 0): (60, 51), ("petting-b", 1): (50, 45), ("petting-b", 2): (65, 57)}
+
+
 class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
@@ -118,11 +127,15 @@ class SpriteAtlas:
                         return
                     cells[bank, row, col] = cell.copy(bounds)
         for key, cell in cells.items():
-            # Seated drawings share a height; low poses keep their natural proportions.
-            if key[0] in ("petting-a", "petting-b", "tailplay", "lifecycle", "tailswish"):
-                two_rows = key[0] in ("tailplay", "lifecycle", "tailswish")
-                start_row = key[1] // 2 * 2 if two_rows else key[1]
-                rows = range(start_row, start_row + (2 if two_rows else 1))
+            pet_head = PET_HEADS.get(key[:2])
+            if pet_head:
+                scale_x, scale_y = 62 / pet_head[0], 50 / pet_head[1]
+                sprite = QPixmap.fromImage(cell).scaled(
+                    round(cell.width() * scale_x), round(cell.height() * scale_y),
+                    Qt.IgnoreAspectRatio, Qt.FastTransformation)
+            elif key[0] in ("tailplay", "lifecycle", "tailswish"):
+                start_row = key[1] // 2 * 2
+                rows = range(start_row, start_row + 2)
                 row_cells = [cells[key[0], row, col] for row in rows for col in range(4)]
                 reference = cells["lifecycle", 1, 3] if key[0] == "lifecycle" and start_row == 0 else row_cells[0]
                 scale = min(82 / reference.height(),
@@ -140,10 +153,12 @@ class SpriteAtlas:
                 sprite = QPixmap.fromImage(cell).scaledToWidth(92, Qt.FastTransformation)
             else:
                 sprite = QPixmap.fromImage(cell).scaled(104, 82, Qt.KeepAspectRatio, Qt.FastTransformation)
-            frame = QPixmap(112, 100)
+            frame = QPixmap(112, 112)
             frame.fill(Qt.transparent)
             painter = QPainter(frame)
-            ground = 88 if key == ("petting-a", 2, 2) else 98
+            ground = 16 + round(cells[key[0], key[1], 0].height() * scale_y) if pet_head else 98
+            if key == ("petting-a", 2, 2):
+                ground -= 10
             left = (112 - sprite.width()) // 2
             if key[0] == "tailswish":
                 # Anchor the seated body, not the changing width of its tail.
@@ -174,7 +189,7 @@ class SpriteAtlas:
         else:
             progress = max(0, min(1, (elapsed - 0.85) / 0.75))
             offset = round(-96 * progress + 208 * progress * progress)
-        frame = QPixmap(112, 100)
+        frame = QPixmap(112, 112)
         frame.fill(Qt.transparent)
         painter = QPainter(frame)
         painter.drawPixmap(0, offset, source)
