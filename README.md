@@ -185,8 +185,9 @@ The startup/thought correction build is `dist\updated\DesktopNeko.exe` while the
 previous executable is running. Quit the existing Neko from her tray menu before
 launching it; the single-instance lock prevents two kittens running together.
 
-The newer twelve-reaction petting build is `dist\petting-qol\DesktopNeko.exe`.
-Use that build for the new petting animations; quit the existing Neko first.
+The current expressive twelve-reaction build is `dist\expressive-petting\DesktopNeko.exe`.
+It supersedes the earlier `dist\petting-qol\DesktopNeko.exe`; quit the existing Neko first.
+See the [release verification](docs/petting-revision-validation.md) for its artwork and native checks.
 
 ## Check the behavior
 
@@ -218,9 +219,9 @@ processes they launch.
 The base idle, pets, activity and movement v3 sheets each contain four sequences of four drawings.
 `assets/neko-transitions-v1.png` adds sixteen sleep/wake drawings with a constant
 character scale through the change in posture. `assets/neko-affection-v1.png`
-supplies the retained chin scritches, blep and ear rubs.
+contains historical chin scritches, blep and ear rubs; those pet rows are no longer imported.
 `assets/neko-petting-a-v1.png` and `assets/neko-petting-b-v1.png` each contain
-three rows of four drawings, for five new reactions and the remade paw offer.
+three rows of four drawings from an earlier petting pass; they too are historical.
 `assets/neko-tailplay-v4.png` supplies the eleven-pose running cycle and five preparation/payoff poses.
 `assets/neko-tailsettle-v1.png` adds eight entry/recovery poses, calibrated separately
 and appended to the tail sequence without altering the accepted running artwork.
@@ -248,6 +249,9 @@ supersedes that bubble styling; see the [current text-only preview](docs/neko-th
 The [expressive petting revision and per-reaction verification](docs/petting-revision-validation.md)
 records current timings, expression choices, native rendering and safe repeated-click handoffs.
 See the [expression/gesture study](docs/petting-expression-study.md) for the acting references.
+Current petting uses twelve dedicated `assets/neko-pet-*-v1.png` sheets, with
+16–28 source slots each and a separate canonical-idle handoff. The playful roll
+replaces blep. Older pet sheets remain historical assets rather than active pet playback.
 The original six
 transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can
@@ -255,6 +259,24 @@ be disabled in the nook, holding a still frame without losing direct interaction
 Missing art has a small text-cat fallback.
 `gen_gif.py` is the original optional animation experiment; it needs Pillow and
 generates a bouncing ball, so it isn't part of the app or build.
+
+## Animation authoring
+
+Read [framemaster.md](framemaster.md) before planning or changing animations.
+It records the successful method: physical storyboards, subtle expressions,
+ImageGen prompt requirements, exact frame assembly, fixed scale and support
+registration, complete idle transitions, runtime integration and visual/native
+verification. It also records rejected approaches and known testing limits.
+
+[AGENTS.md](AGENTS.md) directs future animation work to that guide. Add verified
+discoveries to the relevant section and its dated findings log, with evidence and
+remaining limits; keep proposed techniques separate from tested practice.
+
+The [pickup and held-mood plan](docs/pickup-animation-plan.md) proposes an excited →
+calm → mildly unimpressed → sleepy hold, with release from any phase and a gentle
+return to the chosen resting location. It is a design for review; current dragging
+still uses the existing look-around/set-down behavior. Implementation tasks are in
+[tasks/todo.md](tasks/todo.md).
 
 ## Project map
 
@@ -269,5 +291,7 @@ generates a bouncing ball, so it isn't part of the app or build.
 - `llm_brain.py`: optional title-only Gemini worker.
 - `test_*.py`: standard-library unittest suite, with Qt's event helpers.
 - `Plan.txt`: interaction rules for keeping future changes quiet and minimal.
+- `framemaster.md`: animation philosophy, production method, verification and discoveries.
+- `AGENTS.md`: animation-specific instructions for future agents.
 
 Built by Sobi, who kinda likes Nekos.

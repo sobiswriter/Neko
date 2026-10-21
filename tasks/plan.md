@@ -1,5 +1,40 @@
 # Animation rebuild
 
+## Pickup animation — proposed, 2026-10-22
+
+Status: documentation and planning complete; pickup implementation awaits review of this proposal. The user requested a plan before making this next feature. Previous completed plans are preserved below.
+
+The full [pickup design](../docs/pickup-animation-plan.md) defines the storyboard, input/state rules, pose budgets, release/cancel behavior, dependency-ordered slices and acceptance matrix. [Frame Master](../framemaster.md) records the verified production method, and root `AGENTS.md` directs animation work to consult and maintain it.
+
+### Goal and decisions
+
+Turn existing click-hold dragging into a suspended kitten performance. Preserve quick-click petting and drag counts/nap rules. Crossing the normal drag distance starts pickup immediately; a stationary hold starts at a proposed 250ms. Awake mood targets are excited 0–3s, calm 3–10s, mildly unimpressed 10–20s and sleepy thereafter. These share compatible body phases, keep the pointer hotspot fixed and progress by elapsed time rather than mouse events. A pre-existing nap remains a nap during quiet carrying.
+
+Release interrupts every lift/loop/expression phase on the next nominal 50ms update and connects through drawn lowering/contact/recovery to canonical idle at the user's chosen location. Early release, mid-yawn and re-grab need explicit bridges. A real sleeping kitten returns to appropriate supported nap/wake transitions. No fixed long film may delay release.
+
+Measure the tall pose at canonical scale first. Increase fixed transparent vertical space only if necessary; preserve saved visible origins, tray crop, click-through padding and old positions. Separate logical resting placement from temporary drawn lift so saving during hold cannot store an airborne offset.
+
+### Ordered slices and checkpoints
+
+1. Prove held silhouette, opposite sway extremes, mid-lift and contact; document measured canvas/anchor decision.
+2. Author one complete calm entry/loop/release path, including all phase connections and full idle recovery.
+3. Import/calibrate it and update previews; implement any measured canvas compatibility separately.
+4. Add click/hold/drag ownership, arbitrary release and re-grab; prove awake starting posture-family bridges.
+5. **Checkpoint A:** native calm pickup → carry → set-down is complete, stable and interruptible before expanding artwork.
+6. Author excited, mildly unimpressed and sleepy variants plus drawn expression bridges, one mood per small slice.
+7. Connect monotonic mood progression without resetting body phase; release during every bridge/yawn.
+8. Finish real-nap/timed-wake rules and desktop cancellation/save paths in separate slices.
+9. **Checkpoint B:** full source regression and native interruption matrix pass.
+10. Render complete previews/contact sheets, update provenance/Frame Master/README and verify a fresh executable.
+
+Detailed acceptance, file scopes and dependencies are in the full design and [working checklist](todo.md). No new dependency, settings panel, background thought panel, sound library or physics system is proposed.
+
+### Risks and unresolved measurements
+
+Tall silhouette bounds, final frame budgets, timing thresholds and posture-family bridge count require prototype evidence. Highest risks are geometry drift between mood variants, release from mid-yawn or side-lying poses, temporary offsets leaking into saved positions and held drowsiness interfering with real naps. Native DPR 1.0 can be checked locally; physical mixed-DPI/multi-monitor behavior needs appropriate hardware and must otherwise remain an explicit limit.
+
+---
+
 ## Petting revision: readable acting, expressions and complete recovery
 
 Status: approved and implemented, 2026-10-22. The user reviewed the plan before authorizing artwork/runtime changes. See [final per-reaction verification](../docs/petting-revision-validation.md) and [native/release measurements](../docs/petting-revision-native.json). The delivered build is `dist/expressive-petting/DesktopNeko.exe`. Earlier implementation/validation records below describe preceding revisions.

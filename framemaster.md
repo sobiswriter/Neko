@@ -1,0 +1,255 @@
+# Frame Master: Neko animation authoring
+
+This is the working reference for every agent making or changing Neko animations. Read it before storyboarding, generating artwork, changing frame registration or altering animation playback. Update it when new evidence improves the method. Keep verified practice separate from proposed designs.
+
+Baseline: the expressive petting revision completed on **2026-10-22**, artwork/runtime commit `28c4620`. Its [verification report](docs/petting-revision-validation.md), [exact prompts and assembly record](docs/petting-revision-prompts.json), [expression study](docs/petting-expression-study.md) and [native measurements](docs/petting-revision-native.json) are the evidence behind this guide. Earlier reports describe earlier versions; their numbers are not automatically current.
+
+The [pickup design](docs/pickup-animation-plan.md) is proposed work. Holding stages and interruptible release described there do not exist in the current runtime.
+
+## 1. The design philosophy
+
+Neko is a small character performing an action, rather than a still image being moved around. A reaction needs a readable physical story:
+
+**Notice/anticipate → transfer weight → act/contact → let the expression read → release → recover → resume ordinary idle.**
+
+The accepted tail chase is our reference for connected pose composition and cadence. A quiet cheek rub should have its own slower rhythm, with equally careful connections. Do not change the accepted tail art or timing as an incidental consequence of another animation.
+
+- Give each gesture its own silhouette, supporting paws, rhythm and expression sequence. A new smile on the same head bob does not make another distinct reaction.
+- Keep physical volume and character identity stable. A stretch gets wider/lower because joints change position, not because the entire kitten shrinks to fit a box.
+- Make anticipation and recovery actual drawings. Appending idle cannot conceal an unfinished get-up, unplanted paw or turning head.
+- Let a meaningful action linger. Paw contact, sustained stretch pressure or a sleepy pause can hold; adding two seconds to every drawing makes movement sluggish without adding acting.
+- Use one main emphasis at a time. Constant simultaneous paw, head, ear and tail movement makes subtle gestures noisy.
+- Review native desktop size before approving enlarged art. An attractive source sheet can lose its expression or anatomy after import.
+- Use references for mechanics and silhouette. Preserve Neko's identity, palette and camera; reference backgrounds, hands, watermarks and text are not sprite content.
+
+### Expressions belong to gestures
+
+The [expression study](docs/petting-expression-study.md) separates reference-informed body-language observations from stylized acting choices. Glyphs such as `=_=`, `;)` and excited squeezed eyes are descriptions for artists, never text stamped over the face.
+
+| Acting | Drawn treatment | Timing/gesture |
+| --- | --- | --- |
+| Relaxed | Partial straight upper lids over the existing eyes, tiny quiet mouth, soft ears | Pressure eases into supporting paws; slow reopen after contact. |
+| Wink | One eye closes through intermediate lids while the other stays soft | Brief accent during cheek/paw contact, followed by a drawn reopen. |
+| Excited | Short inward eye squeeze, attentive ears and connected body effort | Reach or hop apex; open eyes around landing. Avoid angry brows. |
+| Sleepy | Heavy lids, small breath, slight supported head settling | Sleep precedes the peek; reopening precedes rising. |
+| Yawn/deadpan | Jaw opens and closes, then level half-lids with closed mouth | A complete yawn followed by a readable quiet hold, not one open-mouth sprite. |
+
+Keep eye/nose spacing, mouth placement, head volume and ear construction consistent. Eyes/ears can lead a head movement by a drawing; shoulders follow and the tail lags a larger movement. This is an acting guideline, not a reason to move every feature in every pose.
+
+## 2. Plan the complete action before making art
+
+Read the current code and relevant validation report, then write the storyboard in `tasks/plan.md` with tasks in `tasks/todo.md`. Preserve incomplete work already recorded there. Ask for review when the user requested a plan first; do not treat a proposed plan as implementation authorization.
+
+For each action, record:
+
+1. Trigger, starting state, finishing state, total timing target and whether it is finite or genuinely looping.
+2. Ordered story beats with approximate times, expression changes and what the viewer should notice.
+3. Support/occlusion map at difficult poses: which forepaw/hindpaw supports weight, which leg is hidden and where the attached tail travels.
+4. Entry, every repeated-cycle seam, recovery and connection to the actual idle drawing.
+5. Interruption rules: repeated pets, dragging, nap, hiding, reduced motion, fullscreen and quit. User-controlled holding additionally needs release from every phase.
+6. Source-pose budget, canonical calibration drawing, likely bounds and highest-risk prototype.
+7. Acceptance evidence: numerical checks, source/runtime visual review and real-window playback.
+
+Prototype the difficult geometry first: belly-up roll occlusion, low kneading support, deepest stretch and highest hop. For pickup, first prove the tall silhouette and release at arbitrary phases. Source slots are a planning budget, not a quota; repeated clean holds and neutral drawings may be selected intentionally. Source slots, unique drawings, clip order entries and screen repaints are different quantities.
+
+## 3. Canonical character and current production measurements
+
+Use `assets/neko_idle.png` as the generation identity reference and the actual atlas idle as the runtime comparison. Preserve white fur, gray chest/underchin shading, charcoal stepped outlines, pink nose/inner ears, large dark eyes with small square highlights, compact body and large head. Keep hard pixel clusters; use nearest-neighbor scaling for review/import.
+
+Current pet production values in [animations.py](animations.py):
+
+| Item | Verified baseline |
+| --- | --- |
+| Transparent runtime canvas | 192 × 112 px for every atlas frame |
+| Horizontal padding relative to old 112px footprint | 40 px on each side |
+| Seated reference body height | About 82 px |
+| Seated reference head width | 62 px; endpoint tests allow ±4 px |
+| Ground reference | `ground = 98` in import placement |
+| Near-idle final head center | Within 2 px of actual idle |
+| Final crown position | About y=16, ±2 px in the endpoint check |
+| Pet playback repaint interval | Precise Qt timer, 50 ms, nominal 20 FPS |
+| Total atlas entries | 427: 147 non-pet + 268 pet source slots + 12 appended idle entries |
+
+These are baseline measurements, not permission to force every posture into a seated shape. A lying kitten is lower and wider. Check continuity against appropriate anatomical landmarks throughout the action. If a new pose needs space, measure it at the retained character scale before changing the fixed canvas. Do not resize the desktop window on each pose.
+
+## 4. Generate the drawings, preserve the evidence
+
+Use built-in ImageGen for authored raster anatomy and expression changes, with `transparent_background: true` and the canonical reference. Extraction/render tools may crop, register, pack and resize existing drawings; they do not invent limbs or paint replacement facial acting.
+
+The exact successful and rejected prompts are in [petting-revision-prompts.json](docs/petting-revision-prompts.json). Reuse its structure, then specify the new action pose by pose. The common prompt contract included:
+
+> Fixed camera and physical head volume; exactly four anatomical legs (two forelegs, two hindlegs), one connected torso/neck, one head, two ears and one attached tail. Occluded legs stay hidden. A lifted paw replaces its grounded version. Four chronological columns, generous clear cell padding, every complete sprite inside its cell. True transparent alpha; no floor, shadow, haze, props, hands, hearts, motion marks, labels, numbers, grid or watermark.
+
+Also specify the particular eye/lid/mouth/ear acting, weight-bearing joints and complete seated recovery. “Cute kitten animation” alone leaves too much room for unrelated poses or decorative motion. Request small connected changes and ease into/out of contact. The last revision requested 16–28 source slots depending on the story; larger budgets require their own justification.
+
+Generated sheets can violate row count, equal spacing, size, anatomy and the requested expression. Inspect actual output rather than trusting the prompt. Reject/redraw unusable anatomy or expression. An adjacent complete drawing can replace a contaminated hold if the action remains coherent; record the substitution and recheck its timing. Never keep a bad frame merely to reach the planned count.
+
+Record exact prompt text, reference identities, generated output identity, rejected drafts, chosen source indices, batch calibration and final asset names. The generation cache is not a runtime asset directory. Final consumable PNGs belong in `assets/`; tracked prompt/assembly records must explain how they were made. The one-off extraction/native-probe scripts from this revision live under ignored `build/` and are not prerequisites future agents can assume are available.
+
+## 5. Extract and assemble complete silhouettes
+
+The revision's extraction procedure was:
+
+1. Inspect the sheet's actual layout. Search source columns with horizontal overscan for the expected major high-alpha connected kitten silhouettes.
+2. Sort silhouettes into their intended chronological row/column order; verify it visually against the storyboard.
+3. Crop each complete silhouette's bounding rectangle, retaining ears, paws and tail. Check for neighboring-cell bleed and detached fragments inside that rectangle.
+4. Pack the selected drawings in four columns of **384 × 384 px cells**, with a shared baseline 12 px above the cell bottom and adequate clear padding.
+5. Use a single documented calibration for a source batch. Combine separately generated batches only after comparing neutral head/body landmarks.
+6. Select the same generated neutral calibration drawing for source slot zero and the final source slot. Runtime substitutes actual idle at zero and appends actual idle after the final generated neutral; physical recovery must already be finished.
+
+Bounding-box extraction is not a transparency cleanup guarantee: an unrelated fragment inside the bounding rectangle survives. The final stretch review found exactly this failure. The regression checks imported drawings for 8-connected components at alpha ≥128, ignores isolated 1–2 px specks and requires a single larger component. This catches detached pieces, not attached extra limbs or incorrect anatomy. Light/dark visual review remains essential, including faint alpha below that threshold.
+
+### Actual assembly decisions worth preserving
+
+These are revision-specific recipes, with full output identities in the JSON; they are examples of measured corrections rather than universal constants.
+
+- **Roll:** from 28 generated slots, exclude zero-based `1, 3, 24, 26`, leaving 24. Inspect the turning/occluded legs and supported rise closely.
+- **Knead:** generate transition `T0..T11` and cycle `C0..C11` separately. Register the cycle uniformly by `head_width(T0) / head_width(C0)`. Entry is `T0,T1,T2,T3,C0,C0`; run `C0..C11` as four finite left/right pairs; recovery is `T3,T2,T8,T9,T10,T0`. Transition `T4..T7` caused a head dip/jump and were excluded. The cycle was redrawn with bent elbows and yielded shoulders because the upright draft did not read as kneading.
+- **Front stretch:** use the first 16 corrected main drawings and eight separately authored recovery drawings. That recovery batch used `scale_x = 153/229` from neutral head width and `scale_y = 214/355` from neutral seated height. These fixed batch values correct source mismatch; they are not per-pose fitting. Final neutral selects main `M0`.
+- **Stretch fragment:** source slot 14 contained a detached 16-pixel line. Reject it and select the clean complete slot-13 hold again; do not paint/delete anatomy to disguise a bad drawing.
+- **Nuzzle:** recovery order is `0..14,16,17,15,18,0`; decreasing head tilt removes an unwanted second lean after centering.
+- **Ear rub:** anticipation slot 1 selects near-neutral softened-lid source drawing 14, avoiding an oversized early tilted head.
+
+## 6. Import at one scale; anchor the physical support
+
+The current pet importer in `SpriteAtlas.load_pets` reads four columns and `PET_ROWS[name]` rows, overscans each cell vertically by one eighth, scales the cell to width 128 and finds its main sprite bounds. `pet_landmarks` measures the longest opaque head run in the upper three-fifths and extreme contact pixels in the bottom 14 rows. This heuristic suits the current drawings; validate it before applying it to a new hanging or turned pose.
+
+For the first neutral source drawing:
+
+```text
+sx = 62 / reference_head_width
+sy = 82 / reference_sprite_height
+center_target = idle_head_center + ((reference_left + reference_right)/2 - reference_head_center) * sx
+rear_target   = idle_head_center + (reference_right - reference_head_center) * sx
+```
+
+Apply those same `sx, sy` values throughout the sequence. Separate x/y calibration here is existing source normalization against measured canonical landmarks, not permission to squash individual poses. If a new batch needs extreme distortion to match, redraw it.
+
+Default placement aligns the mean support contacts with `center_target`. Stretch/arch align their rear support with `rear_target`. Hops align the head axis with the actual idle head axis; roll uses a silhouette-center track calibrated against the reference head. These are action-specific anchors, not arbitrary recentering of every bounding box. The head-relative target prevents a different tail/haunch width from shifting the resting kitten sideways.
+
+The hop's ground offsets are explicitly:
+
+```text
+0,0,0,0,3,8,11,6,0,0,0,4,10,13,7,0,0,0,2,6,8,4,0,0,0,0,0,0
+```
+
+There are three actual airborne passages separated by contact/compression. During petting the desktop window stays fixed; these arcs happen within its canvas. The importer currently clamps a sprite's left margin to 2 px where its full width fits. Do not rely on that clamp to conceal source drift or clipping.
+
+### Idle handoff and timing
+
+`Clip` stores bank, row, integer millisecond durations, pose order and loop flag. Finite actions clamp at their last entry; genuinely repeating states opt into loops. Match duration/order lengths and use the actual clip sum as the runtime deadline.
+
+Source pose zero becomes the actual canonical idle. Keep the final generated neutral after the complete recovery, then append the canonical idle at index `rows * 4`. The importer does not automatically insert an unrelated penultimate idle blink. The current clip setup splits the old final hold into `150 ms` drawn neutral plus `old_final_hold - 150 ms` canonical idle, preserving total duration. New clips must have enough final hold for that split or use an explicitly reviewed alternative.
+
+Connecting poses currently have at least 50 ms, commonly 100–250 ms; contact/expression holds can be 250–500 ms or longer where the story warrants it. These are observations and planning guidance. Judge rhythm in normal-speed playback, not by maximizing frame count.
+
+Current reaction totals/source slots: head pats 2.80s/16, nuzzle 3.70s/20, knead 5.80s/24, chin 3.00s/16, roll 5.80s/24, paw offer 3.60s/20, ear rub 2.95s/16, stretch 5.20s/24, arch 4.90s/24, three hops 5.00s/28, side flop 6.80s/28 and shoulder peek 6.40s/28. See the verification report for each story.
+
+### Retained tail and lifecycle recipes
+
+The [tail/lifecycle notes](docs/tail-lifecycle-notes.md) and [exact revision prompts](docs/playful-motion-prompts.md) preserve that earlier motion study; their old canvas/atlas totals are historical. The accepted construction is still relevant:
+
+- The supplied running GIF informed **eleven 50ms poses**, making a 550ms turn: low stretched body, squeezed eyes, alternating scrambling paws and a long tail trailing outside the turn. It replaced a rejected slow tucked-tail cycle. Chase repeats the turn five times; catch uses two turns before its pounce/two-paw payoff. Final totals are 4.69s chase and 3.68s catch.
+- `neko-tailplay-v4.png` contains the accepted run/payoff. `neko-tailsettle-v1.png` adds eight separately calibrated entry/recovery drawings, appended as indices 16–23 rather than modifying the accepted run. Eager tilt/crouch/run-ready prepares play; deceleration/half-sit/contented blink returns to actual idle. Catch connects its low pounce into half-sit. Inspect the run seam and these physical-height changes independently.
+- Arrival combines `neko-arrival-v1.png` landing art with real window travel from the target monitor's top edge to the saved resting position. The first three pose durations total 700ms; accelerating travel uses `drop_progress`. Complete airborne/contact/compression/rebound/sit drawings make the 1.9s story. A pose-only sheet cannot verify that desktop trajectory; use the monitor-scene preview and native window.
+- Departure introduces the first two `neko-farewell-v1.png` sad drawings for 650ms and 350ms, then the retained 200ms crouch and accepted `neko-lifecycle-v2.png` hop/arc. Its 2.15s total gives the emotion time to read without replacing the graceful motion.
+- A later startup correction starts arrival timing on the first Qt animation tick so loading cannot consume the fall before the window appears. See [startup verification](docs/startup-thought-validation.md). Preserve the landing target through hiding, reduced motion, monitor changes and quit.
+
+## 7. Carry artwork changes through the runtime
+
+Read callers before changing a shared function. An animation change can reach:
+
+| Surface | Current responsibility / what to check |
+| --- | --- |
+| `behavior.py` | State selection, deadlines, nap rules, twelve-reaction shuffle bag and bounded pending pet. |
+| `animations.py` | Imported banks/row counts, calibration, frame order, durations, loops and canonical endpoints. |
+| `main.py` | State-to-clip mapping, repaint cadence, real clip deadline, input, cursor, saving/clamping and lifecycle. |
+| `assets/`, `main.spec` | Final bundled artwork and resource presence. Retiring an action includes its selection/mapping and required assets. |
+| `test_behavior.py`, `test_animations.py`, `test_main.py`, `test_packaging.py` | Behavior, rendered pose invariants, native integration and actual bundle checks. |
+| `tools/preview_animations.py`, `docs/`, README | Accurate sampling, full playback, contact sheets, prompt provenance and current descriptions. |
+
+`Companion.pet()` counts clicks immediately and coalesces at most one pending reaction. `finish_pet()` starts that pending reaction at the completed action's safe end, without counting it twice. `main.refresh_asset()` replaces the provisional behavior duration with the actual clip sum at every pet start, including queued starts. A longer clip must not be truncated by an old generic duration. Nap waits for active pet completion; a tiny snooze inside flop stays a pet state rather than starting a real nap. Hide/reduced motion clear pending pets.
+
+Current timer classes differ intentionally: petting uses precise 50 ms; accepted tail motion uses 50 ms coarse; arrival/departure briefly use 33 ms; ordinary idle uses 100 ms. Source-pose timing and Qt repaint interval are separate. Custom GIF assets still override atlas playback where supported; inspect customization paths when changing behavior.
+
+### Desktop and presentation compatibility
+
+- The 192 × 112 widget is fixed during playback. Keep original visible placement through the saved-position convention: load `saved - QPoint(40,0)`, save `(arrival_target or current_position) + QPoint(40,0)`. The expanded canvas is clamped to available screen space; edges can therefore nudge a placement.
+- Keep the tray icon's central 112 × 112 crop (`x=40`) so transparent padding does not make her icon tiny. Check painted shadow/heart/text centers after canvas changes.
+- Transparent side padding must pass through to desktop clicks; the visible kitten remains interactive. Added space is not an invisible click-blocking panel.
+- Arrival travels from the actual monitor top and starts its clock on the first animation tick. Save its final landing target, not a temporary airborne window position. Departure retains its sad pause and accepted hop trajectory.
+- Thoughts remain background-free: cream semibold glyphs with a small dark glyph shadow, no panel/border. Cursor artwork retains a fixed hotspot; the pet stroke never moves the actual pointer.
+- Dragging does not count as petting and currently preserves real sleeping/waking states. A new hold feature must deliberately handle these existing rules rather than accidentally waking her.
+
+## 8. Verification: drawings, sampling, real playback, release
+
+### A. Establish failure and protect unrelated work
+
+For logic/calibration changes, first add the smallest meaningful regression demonstrating the defect. Do not write tests that merely restate an array. Example: count three separated airborne passages from rendered ground bounds, rather than only asserting that an offset tuple exists.
+
+Before shared atlas/canvas work, snapshot unrelated clip definitions and rendered frames. The last revision compared all 147 non-pet frames pixel-for-pixel after cropping the new padding (`40,0,112,112`) and verified unchanged clip definitions. This protected the accepted tail art/cadence. A reversed calibration-sign mutation was also rejected by head-alignment checks; mutation stayed in memory, not in production files.
+
+### B. Review every selected drawing and connection
+
+- One connected head/neck/torso; two forelegs and two hindlegs accounted for, allowing natural occlusion; no extra grounded paw beneath a lifted leg; one attached tail, two coherent ears.
+- Review entry, action, maximum reach/turn, each loop seam, complete release and actual-idle handoff. Compare adjacent frames and slow playback, not only attractive keyframes.
+- Check head volume, eye/nose/mouth drift, expressions at native size and scale/alignment at both endpoints.
+- Check clear boundaries, genuine alpha, faint haze, detached islands and neighboring sheet fragments on light and dark backgrounds. Numeric component tests cannot certify attached anatomy.
+- Check physical support and believable joint travel. Kneading alternates pressure with a quiet head; roll rises through planted support; hops have landing compression between arcs.
+
+### C. Preview the runtime output
+
+Use `SpriteAtlas` and actual `Clip` timing through [tools/preview_animations.py](tools/preview_animations.py), not a separately approximated timing list. Pillow is an optional preview dependency, not a new runtime dependency.
+
+```powershell
+.venv\Scripts\python.exe -m unittest test_behavior test_animations test_main -v
+.venv\Scripts\python.exe tools/preview_animations.py
+```
+
+The current pet catalog includes 0.8s ordinary idle first, the full longest reaction, then at least 0.8s ordinary idle. Duration is derived from the maximum clip length plus that allowance (currently 9s normal, 18s half speed). Verify decoded GIF durations and that every used pose is sampled. Round the elapsed time after subtracting the intro (`round(elapsed - 0.8, 3)`): floating-point subtraction previously skipped short poses. Native 192 × 112 images and contact sheets must retain aspect ratio; the old square-thumbnail resize would squash the expanded canvas.
+
+### D. Observe the actual Windows event loop
+
+An offscreen screenshot or generated GIF is not proof of native timing. Let a test-owned visible window warm up, start each action, record every expected pose entry and paint interval through the real Qt event loop, and capture light/dark native rendering. A synthetic polling loop can distort timing; starting before the window is visible can miss initial entries in the probe.
+
+Exercise repeated clicks through the longest clip, nap during a reaction, hide/show, reduced motion, actual drag versus pet, saved-origin roundtrip and corner clamping. Verify transparent-margin hit testing and tray framing after footprint changes. For interruptible actions add systematic release/cancel checks at every phase and timing boundary.
+
+### E. Build and inspect the actual deliverable
+
+After source/art checks pass, build to a distinct output folder and test that exact executable. Never overwrite a user's running build or kill unrelated app processes to make a test pass.
+
+```powershell
+.venv\Scripts\python.exe -m unittest discover -v
+.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --distpath dist\animation-review main.spec
+$env:NEKO_TEST_EXE = 'dist\animation-review\DesktopNeko.exe'
+.venv\Scripts\python.exe -m unittest test_packaging -v
+Remove-Item Env:NEKO_TEST_EXE
+```
+
+The native packaging smoke check needs the existing Neko closed because the shared single-instance lock is intentional. Tests stop only their own process trees. Check bundle resource presence and hashes against final PNGs, native startup/tray/topmost behavior, second-instance rejection and exclusion of credentials/unrelated DLLs. Record the executable hash and actual source/art commit; do not claim an older executable contains new art.
+
+### Evidence and honest limits
+
+The baseline native run observed all 280 pet entries; median paint intervals were 49.85–50.03ms at DPR 1.0. Full discovery ran 149 tests: 147 passed, two opt-in package checks skipped. After final fragment rejection, three focused render checks and the corrected stretch's 25-entry native playback passed; both final packaged checks passed. This is not a claim that the entire suite was rerun after that last selection edit.
+
+Physical mixed-DPI/multiple-monitor hardware and long-session resource behavior were not exercised. Automated geometry checks and our visual review cannot promise the absence of every possible anatomy defect. Report what was observed and what remains untested.
+
+## 9. Keep this guide alive
+
+Before finishing any animation change:
+
+1. Update the relevant method section when a verified discovery changes the process. Do not leave an obsolete recipe as the apparent current instruction.
+2. Add a dated finding below: symptom, cause, evidence, chosen correction, rejected approach, regression/visual check and remaining limit. Link tracked code/art/QA records.
+3. Record exact prompts and assembly selections in that revision's provenance file. Update current counts, timings, README and preview tools when affected; preserve old reports as historical evidence.
+4. Mark proposals as proposals. Promote a proposed technique to verified practice only after source/runtime review and recorded evidence.
+
+Do not relax an anatomy, scale, timing or clipping check merely to accept a new sheet. Investigate the source and the shared import/registration first. A future discovery can supersede a measured constant, but must carry the measurements and compatibility reasoning that justify it.
+
+### Findings log
+
+| Date | Finding and correction | Evidence / remaining limit |
+| --- | --- | --- |
+| 2026-10-22 | Tail/haunch-based registration shifted five pet endpoints, including a 6px arch shift. Reference support targets to the canonical head axis. | Endpoint checks now within 2px; reversed-sign mutation fails. See [revision report](docs/petting-revision-validation.md). |
+| 2026-10-22 | Uneven generated layout and separately drawn knead/stretch batches caused pose drift. Extract complete silhouettes, compare neutral landmarks, use fixed batch calibration and redraw unsuitable mechanics. | Exact selections/ratios in [assembly record](docs/petting-revision-prompts.json); heuristics still need checking for new postures. |
+| 2026-10-22 | A detached 16px line survived bounding-box cropping beside stretch pose 14. Reject the drawing, select a clean neighboring hold and add a connected-fragment regression. | Final light/dark review, focused checks and native stretch replay passed. Connected extra limbs still require visual review. |
+| 2026-10-22 | Short previews and floating intro subtraction could hide recovery or skip connecting poses. Derive preview length from longest clip, round intro-adjusted time and assert pose coverage/decoded duration. | Current catalogs cover every used entry and decode to 9s/18s. Preview sampling alone does not prove native playback. |
