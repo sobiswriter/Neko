@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
 from behavior import Companion, NekoState, PET_STATES
 from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
-from animations import SpriteAtlas, CLIPS, drop_progress
+from animations import SpriteAtlas, CLIPS, drop_progress, CANVAS_WIDTH, CANVAS_PADDING
 from dialogue import OfflineDialogue
 from cursors import petting_cursors
 
@@ -280,7 +280,7 @@ class StatsWindow(QDialog):
             NekoState.HAPPY: "yes. right there. purrr.",
             NekoState.PEEKING: "just checking you're still there.",
             NekoState.CHIN_SCRITCH: "oh. just under the little chin. purrr.",
-            NekoState.BLEPPING: "a tiny blep, just for you.",
+            NekoState.ROLLING: "a happy little roll, just for you.",
             NekoState.PAW_OFFER: "one little paw. for your company.",
             NekoState.EAR_RUB: "these very small ears approve.",
         }.get(n.companion.state, "a little cat, doing little cat things."))
@@ -351,7 +351,7 @@ class NekoWidget(QWidget):
                             | Qt.Tool | Qt.WindowDoesNotAcceptFocus)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
-        self.setFixedSize(112, 112)
+        self.setFixedSize(CANVAS_WIDTH, 112)
         self.setAccessibleName("Neko, your desktop companion")
         self.setAccessibleDescription("Click to pet, drag to move, or right-click for Neko's nook.")
         self.assets = {}
@@ -401,7 +401,7 @@ class NekoWidget(QWidget):
         saved = self.settings.value("position", None)
         self.position_to_bottom_right()
         if isinstance(saved, QPoint):
-            self.move(saved)
+            self.move(saved - QPoint(CANVAS_PADDING, 0))
             self.clamp_position()
         app = QApplication.instance()
         app.primaryScreenChanged.connect(self.clamp_position)
@@ -416,7 +416,7 @@ class NekoWidget(QWidget):
         self.transition_timer.timeout.connect(self.finish_transition)
 
     def init_tray(self):
-        icon = self.atlas.frame("idle", 0)
+        icon = self.atlas.frame("idle", 0).copy(CANVAS_PADDING, 0, 112, 112)
         self.tray_icon = QSystemTrayIcon(QIcon(icon if not icon.isNull() else self.assets["idle"]), self)
         self.tray_icon.setToolTip("Neko · a little company")
         self.menu = QMenu()
@@ -731,7 +731,7 @@ class NekoWidget(QWidget):
             NekoState.SNIFFING: "sniff", NekoState.LOAFING: "loaf",
             NekoState.CHEEK_RUB: "nuzzle",
             NekoState.KNEADING: "knead", NekoState.FOLLOWING: "walk",
-            NekoState.CHIN_SCRITCH: "chin_scritch", NekoState.BLEPPING: "blep",
+            NekoState.CHIN_SCRITCH: "chin_scritch", NekoState.ROLLING: "roll",
             NekoState.PAW_OFFER: "paw_offer", NekoState.EAR_RUB: "ear_rub",
             NekoState.PET_STRETCH: "pet_stretch", NekoState.BACK_ARCH: "back_arch",
             NekoState.HAPPY_HOP: "happy_hop", NekoState.SIDE_FLOP: "side_flop",
@@ -761,9 +761,9 @@ class NekoWidget(QWidget):
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(75, 55, 48, 18))
         if state not in (NekoState.ARRIVING, NekoState.LEAVING):
-            painter.drawEllipse(QRectF(28, 99, 56, 5))
+            painter.drawEllipse(QRectF(28 + CANVAS_PADDING, 99, 56, 5))
         painter.save()
-        painter.translate(56, 99)
+        painter.translate(self.width() // 2, 99)
         movie = None if state in (NekoState.ARRIVING, NekoState.LEAVING) else self.movies.get(self.current_asset)
         pixmap = self.atlas.frame(self.current_clip, elapsed, self.motion)
         # Keep the original atlas origin; extra canvas space extends below it.
@@ -785,7 +785,7 @@ class NekoWidget(QWidget):
         if state in PET_STATES:
             painter.setPen(QColor("#cf9699"))
             painter.setFont(QFont("Segoe UI Symbol", 12))
-            painter.drawText(QRectF(78, 12 - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
+            painter.drawText(QRectF(78 + CANVAS_PADDING, 12 - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
 
     def say(self, text, prompted=False):
         if (self.closing or self.is_manually_hidden or self.fullscreen
@@ -800,7 +800,7 @@ class NekoWidget(QWidget):
         self.bubble.adjustSize()
         screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
         area = screen.availableGeometry()
-        x = max(area.left() + 6, min(self.x() + 56 - self.bubble.width() // 2,
+        x = max(area.left() + 6, min(self.x() + self.width() // 2 - self.bubble.width() // 2,
                                     area.right() - self.bubble.width() - 6))
         y = self.y() - self.bubble.height() - 4
         if y < area.top():
@@ -1036,7 +1036,8 @@ class NekoWidget(QWidget):
                            "idle_seconds": self.companion.idle_seconds,
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
                            "ai_enabled": self.ai_enabled,
-                           "position": self.arrival_target if self.arrival_target is not None else self.pos(),
+                           "position": (self.arrival_target if self.arrival_target is not None else self.pos())
+                                       + QPoint(CANVAS_PADDING, 0),
                            "pets": self.total_pets + self.companion.pets,
                            "naps": self.total_naps + self.companion.naps}.items():
             self.settings.setValue(key, value)

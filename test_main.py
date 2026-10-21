@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QApplication
 
 from behavior import NekoState, IDLE_STATES
 from dialogue import LINES
+from animations import CANVAS_PADDING
 from main import NekoWidget, set_autostart, adjacent_position
 
 
@@ -22,6 +23,22 @@ APP.setQuitOnLastWindowClosed(False)
 
 
 class DesktopTests(unittest.TestCase):
+    def test_sleepy_flop_finishes_its_story_before_a_queued_pet_or_nap(self):
+        self.neko.companion.pet_bag = [NekoState.CHEEK_RUB, NekoState.SIDE_FLOP]
+        self.neko.pet_reaction()
+        started = self.neko.pose_started
+        with patch("main.time.monotonic", return_value=started + 0.2):
+            self.neko.pet_reaction()
+        with patch("main.time.monotonic", return_value=started + 6.0):
+            self.neko.animate()
+        self.assertIsNone(self.neko.companion.tick(started + 6.0, idle_seconds=1000))
+        self.assertEqual(self.neko.current_clip, "side_flop")
+        self.assertTrue(self.neko.companion.pet_pending)
+        with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+            self.neko.animate()
+        self.assertEqual(self.neko.current_clip, "nuzzle")
+        self.assertEqual(self.neko.companion.pets, 2)
+
     def test_pet_motion_uses_tail_cadence_and_returns_to_idle_when_the_clip_finishes(self):
         self.neko.companion.pet_bag = [NekoState.HAPPY_HOP]
         self.neko.pet_reaction()
@@ -139,7 +156,7 @@ class DesktopTests(unittest.TestCase):
             self.neko.animate()
         self.assertLess(self.neko.y(), target.y())
         self.neko.save_preferences()
-        self.assertEqual(self.settings.value("position", type=QPoint), target)
+        self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, 0))
         with patch("main.time.monotonic", return_value=start + 0.75):
             self.neko.animate()
         self.assertEqual(self.neko.pos(), target)
@@ -199,7 +216,7 @@ class DesktopTests(unittest.TestCase):
             interrupt()
             self.assertEqual(self.neko.pos(), target)
             self.neko.save_preferences()
-            self.assertEqual(self.settings.value("position", type=QPoint), target)
+            self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, 0))
 
     def test_screen_change_before_the_first_animation_tick_does_not_leave_arrival_stuck(self):
         target = self.neko.pos()
@@ -243,9 +260,9 @@ class DesktopTests(unittest.TestCase):
         hidden_rows = screen.geometry().top() - self.neko.y()
         self.assertGreater(hidden_rows, 0)
         self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
-                            for x in range(112) for y in range(hidden_rows)))
+                            for x in range(self.neko.width()) for y in range(hidden_rows)))
         self.assertTrue(any(image.pixelColor(x, y).alpha() > 0
-                            for x in range(112) for y in range(hidden_rows, 112)))
+                            for x in range(self.neko.width()) for y in range(hidden_rows, 112)))
 
     def test_quit_plays_goodbye_once_then_cleans_up_without_moving_saved_position(self):
         origin = self.neko.pos()
@@ -266,7 +283,7 @@ class DesktopTests(unittest.TestCase):
         self.assertFalse(self.neko.isVisible())
         self.assertFalse(self.neko.transition_timer.isActive())
         self.assertFalse(self.neko.animation_timer.isActive())
-        self.assertEqual(self.settings.value("position", type=QPoint), origin)
+        self.assertEqual(self.settings.value("position", type=QPoint), origin + QPoint(CANVAS_PADDING, 0))
 
     def test_reduced_motion_or_hidden_quit_skips_jump_and_hidden_arrival_never_greets(self):
         with patch.object(self.neko, "offline_line") as words:
@@ -535,6 +552,7 @@ class DesktopTests(unittest.TestCase):
     def test_popup_placement_avoids_neko_at_screen_corners_and_center(self):
         area = QRect(-1920, 0, 1920, 1080)
         for anchor in (QRect(-1920, 0, 112, 112), QRect(-112, 0, 112, 112),
+                       QRect(-1920, 968, 192, 112), QRect(-192, 0, 192, 112),
                        QRect(-1920, 968, 112, 112), QRect(-112, 968, 112, 112),
                        QRect(-1000, 500, 112, 112)):
             for size in (QSize(220, 160), QSize(340, 640)):
@@ -739,7 +757,9 @@ class DesktopTests(unittest.TestCase):
         self.settings.setValue("position", point)
         other = NekoWidget(self.settings)
         try:
-            self.assertEqual(other.pos(), point)
+            self.assertEqual(other.pos() + QPoint(CANVAS_PADDING, 0), point)
+            other.save_preferences()
+            self.assertEqual(self.settings.value("position", type=QPoint), point)
         finally:
             other.tray_icon.hide()
             other.bubble.deleteLater()

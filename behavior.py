@@ -24,7 +24,7 @@ class NekoState(Enum):
     LOAFING = auto()
     FOLLOWING = auto()
     CHIN_SCRITCH = auto()
-    BLEPPING = auto()
+    ROLLING = auto()
     PAW_OFFER = auto()
     EAR_RUB = auto()
     PET_STRETCH = auto()
@@ -39,7 +39,7 @@ class NekoState(Enum):
 
 
 PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
-              NekoState.CHIN_SCRITCH, NekoState.BLEPPING, NekoState.PAW_OFFER, NekoState.EAR_RUB,
+              NekoState.CHIN_SCRITCH, NekoState.ROLLING, NekoState.PAW_OFFER, NekoState.EAR_RUB,
               NekoState.PET_STRETCH, NekoState.BACK_ARCH, NekoState.HAPPY_HOP,
               NekoState.SIDE_FLOP, NekoState.SHOULDER_PEEK)
 IDLE_STATES = (NekoState.STRETCHING, NekoState.GROOMING, NekoState.PEEKING,

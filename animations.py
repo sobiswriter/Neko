@@ -6,6 +6,9 @@ from pathlib import Path
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtGui import QImage, QPixmap, QPainter
 
+CANVAS_WIDTH = 192
+CANVAS_PADDING = (CANVAS_WIDTH - 112) // 2
+
 
 def sprite_bounds(cell):
     """Anchor the main connected silhouette, excluding bleed from neighboring cells."""
@@ -62,19 +65,34 @@ CLIPS = {
                        (16, 17, 18, 19) + tuple(range(11)) * 2 + (13, 14, 13, 12, 21, 22, 23)),
     "arrive": Clip("arrival", 0, (200, 200, 300, 120, 180, 160, 220, 520), tuple(range(8))),
     "depart": Clip("lifecycle", 2, (650, 350, 200, 150, 200, 200, 200, 200), tuple(range(8))),
-    "happy": Clip("pet-happy", 0, (100, 90, 100, 100, 100, 240, 100, 100, 100, 120, 100, 280), tuple(range(12))),
-    "nuzzle": Clip("pet-nuzzle", 0, (100, 100, 100, 100, 150, 300, 150, 100, 100, 100, 120, 300), tuple(range(12))),
-    "pet_stretch": Clip("pet-pet_stretch", 0, (100, 100, 100, 100, 120, 120, 120, 150, 400, 200, 150, 150, 120, 120, 100, 300), tuple(range(16))),
-    "back_arch": Clip("pet-back_arch", 0, (100, 100, 100, 100, 120, 150, 200, 200, 300, 150, 150, 150, 120, 120, 100, 300), tuple(range(16))),
-    "happy_hop": Clip("pet-happy_hop", 0, (100, 80, 90, 100, 60, 60, 60, 80, 60, 60, 60, 90, 90, 100, 120, 300), tuple(range(16))),
-    "side_flop": Clip("pet-side_flop", 0, (100, 120, 120, 120, 150, 150, 180, 500, 300, 150, 150, 150, 140, 120, 120, 300), tuple(range(16))),
-    "shoulder_peek": Clip("pet-shoulder_peek", 0, (100, 100, 100, 120, 140, 180, 300, 120, 120, 120, 120, 300), tuple(range(12))),
-    "knead": Clip("pet-knead", 0, (100, 120) + (100, 120, 80, 100, 120, 100, 100) * 3 + (150, 150, 300),
-                  (0, 1) + tuple(range(2, 9)) * 3 + (9, 10, 11)),
-    "chin_scritch": Clip("pet-chin_scritch", 0, (100, 100, 100, 100, 120, 300, 160, 250, 120, 120, 100, 300), tuple(range(12))),
-    "blep": Clip("pet-blep", 0, (100, 100, 100, 120, 160, 250, 100, 120, 120, 100, 160, 300), tuple(range(12))),
-    "paw_offer": Clip("pet-paw_offer", 0, (100, 120, 100, 100, 150, 250, 180, 120, 100, 100, 100, 300), tuple(range(12))),
-    "ear_rub": Clip("pet-ear_rub", 0, (100, 100, 120, 120, 160, 300, 180, 120, 120, 120, 100, 300), tuple(range(12))),
+    "happy": Clip("pet-happy", 0, (100, 100, 100, 150, 150, 200, 250, 150,
+                                 200, 200, 150, 150, 200, 200, 150, 350), tuple(range(16))),
+    "nuzzle": Clip("pet-nuzzle", 0, (100, 100, 150, 150, 150, 200, 200, 200, 200, 200,
+                                   200, 200, 250, 150, 150, 150, 150, 200, 200, 400), tuple(range(20))),
+    "pet_stretch": Clip("pet-pet_stretch", 0, (100, 100, 150, 150, 200, 150, 150, 200, 150, 150, 250, 300,
+                                              250, 250, 500, 500, 200, 150, 150, 150, 150, 150, 200, 500), tuple(range(24))),
+    "back_arch": Clip("pet-back_arch", 0, (100, 100, 150, 150, 200, 150, 150, 150, 150, 250, 250, 250,
+                                          250, 450, 350, 200, 150, 150, 150, 150, 150, 150, 200, 500), tuple(range(24))),
+    "happy_hop": Clip("pet-happy_hop", 0, (100, 150, 150, 200, 100, 150, 150, 150, 150, 200,
+                                         150, 100, 150, 200, 150, 150, 200, 150, 100, 100,
+                                         150, 100, 100, 200, 250, 300, 350, 600), tuple(range(28))),
+    "side_flop": Clip("pet-side_flop", 0, (100, 100, 100, 100, 100, 100, 150, 150, 400, 400, 400, 400,
+                                         150, 250, 200, 150, 200, 250, 200, 250, 300, 300, 350,
+                                         250, 300, 250, 300, 600), tuple(range(28))),
+    "shoulder_peek": Clip("pet-shoulder_peek", 0, (100, 100, 100, 150, 200, 300, 350, 100, 100, 100, 100,
+                                                 150, 250, 600, 250, 250, 150, 200, 450, 250, 250,
+                                                 300, 300, 300, 150, 150, 200, 500), tuple(range(28))),
+    "knead": Clip("pet-knead", 0, (100,) * 6 + (100, 100, 50, 50, 100, 100, 100, 100, 50, 50, 100, 50) * 4
+                  + (150, 150, 150, 150, 300, 500),
+                  tuple(range(6)) + tuple(range(6, 18)) * 4 + tuple(range(18, 24))),
+    "chin_scritch": Clip("pet-chin_scritch", 0, (100, 100, 150, 150, 200, 200, 300, 200,
+                                               200, 200, 200, 150, 150, 150, 150, 400), tuple(range(16))),
+    "roll": Clip("pet-roll", 0, (100, 150, 150, 150, 200, 200, 150, 150, 200, 250, 300, 250,
+                                400, 350, 350, 250, 200, 200, 200, 200, 200, 350, 350, 500), tuple(range(24))),
+    "paw_offer": Clip("pet-paw_offer", 0, (100, 100, 100, 150, 150, 150, 150, 250, 200, 250,
+                                         300, 300, 150, 150, 150, 150, 150, 150, 200, 300), tuple(range(20))),
+    "ear_rub": Clip("pet-ear_rub", 0, (100, 100, 150, 150, 200, 200, 250, 200,
+                                     250, 200, 200, 150, 150, 150, 150, 350), tuple(range(16))),
     "typing": Clip("activity", 0, (330, 330, 330, 330), loop=True),
     "groom": Clip("idleplay-a", 0, (300, 250, 550, 650, 550, 300, 450, 600), tuple(range(8))),
     "yawn": Clip("idleplay-c", 0, (300, 350, 350, 650, 350, 350, 450, 650), tuple(range(8))),
@@ -90,9 +108,15 @@ CLIPS = {
 }
 
 
-PET_ROWS = {name: 4 if name in ("pet_stretch", "back_arch", "happy_hop", "side_flop") else 3
-            for name in ("happy", "nuzzle", "knead", "chin_scritch", "blep", "paw_offer", "ear_rub",
-                         "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek")}
+PET_ROWS = {"happy": 4, "nuzzle": 5, "knead": 6, "chin_scritch": 4, "roll": 6, "paw_offer": 5,
+            "ear_rub": 4, "pet_stretch": 6, "back_arch": 6, "happy_hop": 7, "side_flop": 7,
+            "shoulder_peek": 7}
+
+# Preserve the last drawn recovery before handing off to the actual seated idle.
+for name, rows in PET_ROWS.items():
+    clip = CLIPS[name]
+    CLIPS[name] = Clip(clip.bank, clip.row, clip.durations[:-1] + (150, clip.durations[-1] - 150),
+                       clip.order + (rows * 4,))
 
 # Seated head landmarks in each eight-pose idle story's imported source cells.
 IDLE_HEADS = {("idleplay-a", 0): (67, 56), ("idleplay-a", 2): (68, 54), ("idleplay-a", 4): (66, 51),
@@ -200,11 +224,11 @@ class SpriteAtlas:
                 sprite = QPixmap.fromImage(cell).scaledToWidth(92, Qt.FastTransformation)
             else:
                 sprite = QPixmap.fromImage(cell).scaled(104, 82, Qt.KeepAspectRatio, Qt.FastTransformation)
-            frame = QPixmap(112, 112)
+            frame = QPixmap(CANVAS_WIDTH, 112)
             frame.fill(Qt.transparent)
             painter = QPainter(frame)
             ground = 98
-            left = (112 - sprite.width()) // 2
+            left = (CANVAS_WIDTH - sprite.width()) // 2
             if key[0] == "tailswish":
                 # Anchor the seated body, not the changing width of its tail.
                 left += (0, 1, 3, 4, 1, 1, 0, 0)[key[1] * 4 + key[2]]
@@ -232,9 +256,8 @@ class SpriteAtlas:
 
     def load_pets(self, path, idle):
         idle_bounds = sprite_bounds(idle.toImage())
-        _, idle_head, idle_left, idle_right = pet_landmarks(idle.toImage().copy(idle_bounds))
-        center = idle_bounds.left() + (idle_left + idle_right) / 2
-        right = idle_bounds.left() + idle_right
+        _, idle_head, _, _ = pet_landmarks(idle.toImage().copy(idle_bounds))
+        idle_head += idle_bounds.left()
         for name, rows in PET_ROWS.items():
             image = QImage(str(Path(path) / f"neko-pet-{name}-v1.png"))
             if image.isNull():
@@ -250,31 +273,38 @@ class SpriteAtlas:
                 if bounds.isEmpty():
                     return
                 poses.append(cell.copy(bounds))
-            head_width, _, _, _ = pet_landmarks(poses[0])
+            head_width, reference_head, reference_left, reference_right = pet_landmarks(poses[0])
             scale_x, scale_y = 62 / head_width, 82 / poses[0].height()
+            # Calibrate support contacts against the head so a different tail/haunch width cannot shift rest.
+            center = idle_head + ((reference_left + reference_right) / 2 - reference_head) * scale_x
+            right = idle_head + (reference_right - reference_head) * scale_x
             for index, pose in enumerate(poses):
                 _, head_center, foot_left, foot_right = pet_landmarks(pose)
                 anchor, target = (foot_left + foot_right) / 2, center
                 if name in ("pet_stretch", "back_arch"):
                     anchor, target = foot_right, right
                 elif name == "happy_hop":
-                    anchor, target = head_center, idle_bounds.left() + idle_head
+                    anchor, target = head_center, idle_head
+                elif name == "roll":
+                    anchor = pose.width() / 2
+                    target = idle_head + (poses[0].width() / 2 - reference_head) * scale_x
                 sprite = QPixmap.fromImage(pose).scaled(round(pose.width() * scale_x),
                     round(pose.height() * scale_y), Qt.IgnoreAspectRatio, Qt.FastTransformation)
                 ground = 98
                 if name == "happy_hop":
-                    ground -= (0, 0, 0, 0, 2, 6, 11, 14, 11, 6, 2, 0, 0, 0, 0, 0)[index]
-                frame = QPixmap(112, 112)
+                    ground -= (0, 0, 0, 0, 3, 8, 11, 6, 0, 0, 0, 4, 10, 13,
+                               7, 0, 0, 0, 2, 6, 8, 4, 0, 0, 0, 0, 0, 0)[index]
+                frame = QPixmap(CANVAS_WIDTH, 112)
                 frame.fill(Qt.transparent)
                 painter = QPainter(frame)
                 left = round(target - anchor * scale_x)
-                if sprite.width() <= 108:
-                    left = max(2, min(left, 110 - sprite.width()))
+                if sprite.width() <= CANVAS_WIDTH - 4:
+                    left = max(2, min(left, CANVAS_WIDTH - 2 - sprite.width()))
                 painter.drawPixmap(left, ground - sprite.height(), sprite)
                 painter.end()
                 self.frames[f"pet-{name}", index // 4, index % 4] = (
-                    idle if index in (0, rows * 4 - 1) else
-                    self.frames["idle", 0, 2] if index == rows * 4 - 2 else frame)
+                    idle if index == 0 else frame)
+            self.frames[f"pet-{name}", rows, 0] = idle
 
     def frame(self, name, elapsed, motion=True):
         if not motion and name in ("arrive", "depart"):
@@ -288,7 +318,7 @@ class SpriteAtlas:
         launch = sum(clip.durations[:3]) / 1000
         progress = max(0, min(1, (elapsed - launch) / 0.75))
         offset = round(-96 * progress + 208 * progress * progress)
-        frame = QPixmap(112, 112)
+        frame = QPixmap(CANVAS_WIDTH, 112)
         frame.fill(Qt.transparent)
         painter = QPainter(frame)
         painter.drawPixmap(0, offset, source)
