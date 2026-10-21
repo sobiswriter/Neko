@@ -24,7 +24,7 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 148 loaded drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 150 loaded drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; kneading and paw taps use slower continuous cycles.
@@ -35,14 +35,15 @@ Soft sounds are optional and off until you enable them.
   head position. Each reaction retains the same calibration throughout its poses,
   so crouching and lying down do not cause the old whole-body fitting size jump.
   Walking, loafing and sleep preserve their natural posture and proportions.
-- **A little tail trouble.** Two eight-drawing idle games: she turns in a compact
-  circle chasing her tail, or stays seated and pins its tip with one forepaw before
-  it slips away. Each plays once, then returns to her normal sitting drawing.
+- **A little tail trouble.** She crouches and follows her tail through two compact
+  stepping turns. The catch game takes three turns, then a small pounce and a
+  two-paw catch before the tip slips away. Each finishes in her normal sitting drawing.
   These do not change the twelve pet reactions.
 - **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
-  sit-up before her greeting. **Let her go · quit** gives her a relaxed glance down,
-  a crouch and a small hop before she drops out of view. These rebuilt eight-drawing
-  transitions last 1.6 and 1.8 seconds, use continuous travel between poses,
+  sit-up before her greeting. She enters from her monitor's top edge and lands at
+  her saved position. **Let her go · quit** gives her a little sad look and lowered
+  ears, then the existing crouch and graceful hop. These eight-drawing
+  transitions last 1.9 and 2.15 seconds, use continuous travel between poses,
   keep her saved desktop position, and do not accept pets or
   window reactions midway through. Reduced motion skips the jumps; quitting
   while hidden or fullscreen is immediate. Hide/Show remains immediate.
@@ -182,14 +183,16 @@ processes they launch.
 
 ## Character assets
 
-The four `assets/neko-*-v3.png` sheets each contain four sequences of four drawings.
+The base idle, pets, activity and movement v3 sheets each contain four sequences of four drawings.
 `assets/neko-transitions-v1.png` adds sixteen sleep/wake drawings with a constant
 character scale through the change in posture. `assets/neko-affection-v1.png`
 supplies the retained chin scritches, blep and ear rubs.
 `assets/neko-petting-a-v1.png` and `assets/neko-petting-b-v1.png` each contain
 three rows of four drawings, for five new reactions and the remade paw offer.
-`assets/neko-tailplay-v2.png` rebuilds both tail games; `assets/neko-lifecycle-v2.png`
-rebuilds arrival/departure; `assets/neko-tailswish-v1.png` adds the eight-pose lazy swish.
+`assets/neko-tailplay-v3.png` supplies the eight-view turning cycle and eight preparation/payoff poses.
+`assets/neko-arrival-v1.png` supplies the graceful landing; the first two drawings in
+`assets/neko-farewell-v1.png` introduce sadness before the retained hop in
+`assets/neko-lifecycle-v2.png`. `assets/neko-tailswish-v1.png` supplies the lazy swish.
 The retired wave, old paw-offer and original tail-swish rows are never loaded into the atlas. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
@@ -197,7 +200,7 @@ neighboring cells is excluded when locating each silhouette.
 
 The [generation prompts and art notes](docs/animation-notes.md) document the built-in
 ImageGen workflow; [tail and lifecycle notes](docs/tail-lifecycle-notes.md) include
-the rebuilt motion, [exact prompts](docs/animation-rebuild-prompts.md), and frame-by-frame QA.
+the rebuilt motion, [revision prompts](docs/playful-motion-prompts.md), and frame-by-frame QA.
 Run `tools/preview_animations.py` with optional Pillow installed to regenerate the runtime catalogs.
 The original six
 transparent PNGs remain as fallbacks. Matching

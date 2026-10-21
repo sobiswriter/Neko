@@ -1,5 +1,21 @@
 # Animation rebuild
 
+## Playfulness revision requested after review
+
+The user supplied a crouched tail-chasing GIF and a graceful cat landing reference.
+The new acceptance criteria supersede the earlier seated tail trap and neutral departure:
+
+1. Tail chase uses two full compact turns; tail catch uses three, followed by a crouched pounce/catch and recovery. A shared eight-view stepping cycle must have one attached tail and four anatomical legs; no repeated sitting interruption between turns.
+2. Arrival actually travels from above the target monitor's top edge to the saved position. New airborne/contact/compression/rebound poses add kitten playfulness. Position saves, hide, reduced motion, fullscreen and quit must never persist an intermediate airborne position.
+3. Departure immediately shows a small sad expression and lowered ears before crouching. Preserve the existing accepted hop-down drawings and arc. No guilt text is added.
+4. Inspect source drawings, actual-size runtime playback, complete turns, and a monitor-scene drop preview. Keep the new pet-size calibration and palm behavior intact. Run regression/native rendering checks, rebuild and inspect the executable.
+
+Implementation order: generate three small sheets (tail game, arrival, sadness); test flight/persistence and spin counts; integrate; inspect and correct; update previews/notes; build and validate.
+
+Completed: [revision verification](../docs/playful-motion-validation.md). The packaged cold-start and second-instance checks now pass as well.
+
+## Earlier rebuild record
+
 Rebuild arrival, departure, tail chase, tail catch and tail swish while retaining Neko's identity and existing interaction rules. Authorized for planning and implementation together; checkpoints are reviewed during execution.
 
 Completed. See `docs/animation-rebuild-validation.md` for results and the fresh packaged-startup check that remains deferred while the user's existing Neko is running.

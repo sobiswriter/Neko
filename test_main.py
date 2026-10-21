@@ -89,6 +89,69 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.companion.pets, 0)
         self.assertEqual(self.neko.pos(), origin)
 
+    def test_arrival_falls_from_monitor_top_without_saving_airborne_position(self):
+        target = self.neko.pos()
+        self.neko.show_neko(greet=True)
+        screen = QApplication.screenAt(target + QPoint(56, 56)) or QApplication.primaryScreen()
+        self.assertLessEqual(self.neko.geometry().bottom(), screen.geometry().top())
+        start = self.neko.pose_started
+        with patch("main.time.monotonic", return_value=start + 0.35):
+            self.neko.animate()
+        self.assertLess(self.neko.y(), target.y())
+        self.neko.save_preferences()
+        self.assertEqual(self.settings.value("position", type=QPoint), target)
+        with patch("main.time.monotonic", return_value=start + 0.75):
+            self.neko.animate()
+        self.assertEqual(self.neko.pos(), target)
+        self.neko.finish_transition()
+        self.assertEqual(self.neko.pos(), target)
+
+    def test_interrupted_arrival_restores_the_saved_landing_position(self):
+        target = self.neko.pos()
+        for interrupt in (self.neko.hide_neko, lambda: self.neko.set_motion(False)):
+            self.neko.set_motion(True)
+            self.neko.show_neko(greet=True)
+            interrupt()
+            self.assertEqual(self.neko.pos(), target)
+            self.neko.save_preferences()
+            self.assertEqual(self.settings.value("position", type=QPoint), target)
+
+    def test_quitting_mid_arrival_starts_sad_goodbye_at_the_landing_position(self):
+        target = self.neko.pos()
+        self.neko.show_neko(greet=True)
+        self.neko.quit_neko()
+        self.assertEqual(self.neko.pos(), target)
+        self.assertIsNone(self.neko.arrival_target)
+        self.assertEqual(self.neko.current_clip, "depart")
+        self.assertEqual(self.neko.atlas.frame("depart", 0).toImage(),
+                         self.neko.atlas.frames["farewell", 0, 0].toImage())
+
+    def test_fullscreen_interrupts_arrival_without_greeting_or_losing_position(self):
+        target = self.neko.pos()
+        self.neko.show_neko(greet=True)
+        with patch("main.desktop_activity", return_value=(0, 100, True)), \
+                patch.object(self.neko, "offline_line") as words:
+            self.neko.tick()
+            words.assert_not_called()
+        self.assertEqual(self.neko.pos(), target)
+        self.assertIsNone(self.neko.arrival_target)
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+
+    def test_arrival_ink_stays_below_its_monitor_top(self):
+        screen = QApplication.primaryScreen()
+        self.neko.move(screen.geometry().left() + 80, screen.geometry().top() + 20)
+        self.neko.show_neko(greet=True)
+        start = self.neko.pose_started
+        with patch("main.time.monotonic", return_value=start + 0.35):
+            self.neko.animate()
+            image = self.neko.grab().toImage()
+        hidden_rows = screen.geometry().top() - self.neko.y()
+        self.assertGreater(hidden_rows, 0)
+        self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
+                            for x in range(112) for y in range(hidden_rows)))
+        self.assertTrue(any(image.pixelColor(x, y).alpha() > 0
+                            for x in range(112) for y in range(hidden_rows, 112)))
+
     def test_quit_plays_goodbye_once_then_cleans_up_without_moving_saved_position(self):
         origin = self.neko.pos()
         with patch("main.QApplication.quit") as quit_app:
@@ -143,18 +206,24 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.current_clip, "idle")
         self.assertFalse(self.neko.transition_timer.isActive())
 
-    def test_jump_playback_repaints_between_poses_without_moving_the_window(self):
+    def test_arrival_moves_the_window_and_departure_repaints_its_hop_in_place(self):
         origin = self.neko.pos()
         for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.20, 0.22)),
-                                     (NekoState.LEAVING, "depart", (1.42, 1.44))):
+                                     (NekoState.LEAVING, "depart", (1.77, 1.79))):
             self.neko.start_transition(state, clip)
             start = self.neko.pose_started
             frames = []
+            positions = []
             for elapsed in samples:
                 with patch("main.time.monotonic", return_value=start + elapsed):
+                    self.neko.animate()
                     frames.append(self.neko.grab().toImage())
-                self.assertEqual(self.neko.pos(), origin)
-            self.assertNotEqual(frames[0], frames[1], clip)
+                    positions.append(self.neko.pos())
+            if state == NekoState.ARRIVING:
+                self.assertNotEqual(positions[0], positions[1])
+            else:
+                self.assertEqual(positions, [origin, origin])
+                self.assertNotEqual(frames[0], frames[1], clip)
 
     def test_speech_does_not_change_sleep_or_geometry(self):
         original = self.neko.geometry()

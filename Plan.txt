@@ -27,7 +27,7 @@ Interaction rules
   Eleven idle moods avoid consecutive repeats, including two eight-frame tail games.
   Tail chase turns clockwise; tail catch pins the tip beneath one forepaw before it slips away.
   Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
-  finishes a relaxed downward glance and small hop before quitting. No window position changes.
+  shows mild sadness then the accepted small hop before quitting. Arrival travels from the monitor top; only the landing position is saved.
   Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
   298 offline lines use context shuffle bags, with personal questions and app rituals.
   Local foreground app names and media title hints select lines and matching gestures.
@@ -50,7 +50,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  148 loaded drawings including twelve pet reactions, tail play, arrival, departure and sleep.
+  150 loaded drawings including twelve pet reactions, two/three-turn tail games, arrival, departure and sleep.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

@@ -56,10 +56,12 @@ CLIPS = {
     "tail": Clip("tailswish", 0, (450, 220, 220, 350, 220, 220, 280, 900), tuple(range(8))),
     "ears": Clip("idle", 2, (700, 250, 350, 900)),
     "sniff": Clip("idle", 3, (450, 350, 450, 850)),
-    "tail_chase": Clip("tailplay", 0, (450, 400, 220, 220, 220, 220, 300, 800), tuple(range(8))),
-    "tail_catch": Clip("tailplay", 2, (450, 400, 320, 250, 550, 300, 350, 800), tuple(range(8))),
-    "arrive": Clip("lifecycle", 0, (140, 140, 140, 100, 180, 200, 200, 500), tuple(range(8))),
-    "depart": Clip("lifecycle", 2, (400, 250, 200, 150, 200, 200, 200, 200), tuple(range(8))),
+    "tail_chase": Clip("tailplay", 0, (350, 350) + (160,) * 16 + (250, 600),
+                       (8, 9) + tuple(range(8)) * 2 + (14, 15)),
+    "tail_catch": Clip("tailplay", 0, (350, 250) + (140,) * 24 + (160, 180, 300, 220, 200, 400),
+                       (8, 9) + tuple(range(8)) * 3 + (10, 11, 12, 13, 14, 15)),
+    "arrive": Clip("arrival", 0, (200, 200, 300, 120, 180, 160, 220, 520), tuple(range(8))),
+    "depart": Clip("lifecycle", 2, (650, 350, 200, 150, 200, 200, 200, 200), tuple(range(8))),
     "happy": Clip("pets", 0, (450, 600, 650, 900)),
     "nuzzle": Clip("pets", 1, (400, 550, 650, 1000)),
     "pet_stretch": Clip("petting-a", 0, (400, 550, 1100, 650, 800), (0, 1, 2, 3, 0)),
@@ -96,6 +98,11 @@ PET_HEADS = {("pets", 0): (75, 64), ("pets", 1): (76, 64), ("pets", 3): (76, 64)
              ("petting-b", 0): (60, 51), ("petting-b", 1): (50, 45), ("petting-b", 2): (65, 57)}
 
 
+def drop_progress(elapsed):
+    duration = sum(CLIPS["arrive"].durations[:3]) / 1000
+    return max(0, min(1, elapsed / duration)) ** 2
+
+
 class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
@@ -103,25 +110,32 @@ class SpriteAtlas:
         for bank, version, rows in (("idle", 3, 4), ("pets", 3, 4), ("activity", 3, 4),
                                     ("movement", 3, 4), ("transitions", 1, 4), ("affection", 1, 4),
                                     ("petting-a", 1, 3), ("petting-b", 1, 3),
-                                    ("tailplay", 2, 4), ("lifecycle", 2, 4), ("tailswish", 1, 2)):
+                                    ("tailplay", 3, 4), ("lifecycle", 2, 4), ("tailswish", 1, 2),
+                                    ("arrival", 1, 2), ("farewell", 1, 1)):
             filename = f"neko-{bank}-v{version}.png"
             image = QImage(str(Path(path) / filename))
             if image.isNull():
                 return
             for row in range(rows):
                 # Retired wave and malformed paw offer never enter the runtime atlas.
-                if (bank, row) in (("pets", 2), ("affection", 2), ("idle", 1)):
+                if (bank, row) in (("pets", 2), ("affection", 2), ("idle", 1),
+                                   ("lifecycle", 0), ("lifecycle", 1)):
                     continue
                 for col in range(4):
+                    if bank == "farewell" and col >= 2:
+                        continue
                     left, top = col * image.width() // 4, row * image.height() // rows
                     right, bottom = (col + 1) * image.width() // 4, (row + 1) * image.height() // rows
                     region = QRect(left, top, right - left, bottom - top)
-                    if bank in ("petting-a", "petting-b"):
+                    if bank in ("petting-a", "petting-b", "arrival", "tailplay"):
                         # Drawn baselines can cross a nominal row; isolate the center silhouette with padding.
                         margin = region.height() // 5
                         region = region.adjusted(0, -margin, 0, margin).intersected(image.rect())
-                    cell = image.copy(region).scaled(
-                        128, 128, Qt.KeepAspectRatio, Qt.FastTransformation)
+                    cell = image.copy(region)
+                    if bank in ("arrival", "tailplay"):
+                        cell = cell.scaledToWidth(128, Qt.FastTransformation)
+                    else:
+                        cell = cell.scaled(128, 128, Qt.KeepAspectRatio, Qt.FastTransformation)
                     bounds = sprite_bounds(cell)
                     if bounds.isEmpty():
                         return
@@ -133,14 +147,17 @@ class SpriteAtlas:
                 sprite = QPixmap.fromImage(cell).scaled(
                     round(cell.width() * scale_x), round(cell.height() * scale_y),
                     Qt.IgnoreAspectRatio, Qt.FastTransformation)
-            elif key[0] in ("tailplay", "lifecycle", "tailswish"):
-                start_row = key[1] // 2 * 2
-                rows = range(start_row, start_row + 2)
-                row_cells = [cells[key[0], row, col] for row in rows for col in range(4)]
-                reference = cells["lifecycle", 1, 3] if key[0] == "lifecycle" and start_row == 0 else row_cells[0]
+            elif key[0] in ("tailplay", "lifecycle", "tailswish", "arrival", "farewell"):
+                start_row = 0 if key[0] == "tailplay" else key[1] // 2 * 2
+                rows = range(4) if key[0] == "tailplay" else range(start_row, start_row + (1 if key[0] == "farewell" else 2))
+                row_cells = [cells[key[0], row, col] for row in rows
+                             for col in range(2 if key[0] == "farewell" else 4)]
+                reference = (cells["tailplay", 3, 3] if key[0] == "tailplay" else
+                             cells["arrival", 1, 3] if key[0] == "arrival" else row_cells[0])
                 scale = min(82 / reference.height(),
                             104 / max(cell.width() for cell in row_cells),
-                            82 / max(cell.height() for cell in row_cells))
+                            (98 if key[0] in ("tailplay", "arrival", "farewell") else 82)
+                            / max(cell.height() for cell in row_cells))
                 sprite = QPixmap.fromImage(cell).scaled(
                     round(cell.width() * scale), round(cell.height() * scale),
                     Qt.IgnoreAspectRatio, Qt.FastTransformation)
@@ -168,11 +185,11 @@ class SpriteAtlas:
             self.frames[key] = frame
         # The shared seated drawing prevents a different face popping in at rest.
         idle = self.frames["idle", 0, 0]
-        for key in (("lifecycle", 1, 3), ("lifecycle", 2, 0),
-                    ("tailplay", 0, 0), ("tailplay", 1, 3),
-                    ("tailplay", 2, 0), ("tailplay", 3, 3),
+        for key in (("arrival", 1, 3), ("tailplay", 2, 0), ("tailplay", 3, 3),
                     ("tailswish", 0, 0), ("tailswish", 1, 3)):
             self.frames[key] = idle
+        self.frames["lifecycle", 2, 0] = self.frames["farewell", 0, 0]
+        self.frames["lifecycle", 2, 1] = self.frames["farewell", 0, 1]
 
     def frame(self, name, elapsed, motion=True):
         if not motion and name in ("arrive", "depart"):
@@ -180,15 +197,12 @@ class SpriteAtlas:
         clip = CLIPS[name]
         index = clip.frame_index(elapsed if motion else 0)
         source = self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())
-        if source.isNull() or name not in ("arrive", "depart"):
+        if source.isNull() or name != "depart":
             return source
-        # Flight follows elapsed time, independently of the held drawing.
-        if name == "arrive":
-            progress = max(0, min(1, elapsed / 0.42))
-            offset = round(-112 * (1 - progress * progress))
-        else:
-            progress = max(0, min(1, (elapsed - 0.85) / 0.75))
-            offset = round(-96 * progress + 208 * progress * progress)
+        # Preserve the accepted hop arc after the longer sad pause and crouch.
+        launch = sum(clip.durations[:3]) / 1000
+        progress = max(0, min(1, (elapsed - launch) / 0.75))
+        offset = round(-96 * progress + 208 * progress * progress)
         frame = QPixmap(112, 112)
         frame.fill(Qt.transparent)
         painter = QPainter(frame)

@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
 from behavior import Companion, NekoState, PET_STATES
 from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
-from animations import SpriteAtlas, CLIPS
+from animations import SpriteAtlas, CLIPS, drop_progress
 from dialogue import OfflineDialogue
 from cursors import petting_cursors
 
@@ -316,6 +316,8 @@ class NekoWidget(QWidget):
         self.last_ai_attempt = -math.inf
         self.last_cursor = QCursor.pos()
         self.follow_origin = None
+        self.arrival_target = None
+        self.arrival_top = 0
         self.last_follow = time.monotonic() - 45
         self.last_title_stamp = None
         self.quiet = self.settings.value("quiet", False, type=bool)
@@ -517,7 +519,11 @@ class NekoWidget(QWidget):
         self.follow_origin = None
 
     def animate(self):
-        if self.companion.state == NekoState.FOLLOWING:
+        if self.arrival_target is not None:
+            progress = drop_progress(time.monotonic() - self.pose_started)
+            y = self.arrival_top + (self.arrival_target.y() - self.arrival_top) * progress
+            self.move(self.arrival_target.x(), round(y))
+        elif self.companion.state == NekoState.FOLLOWING:
             cursor = QCursor.pos()
             delta = cursor - self.geometry().center()
             distance = math.hypot(delta.x(), delta.y())
@@ -626,6 +632,8 @@ class NekoWidget(QWidget):
         if fullscreen_changed:
             self.reset_pet_cursor()
             self.fullscreen = fullscreen
+            if fullscreen and self.companion.state == NekoState.ARRIVING:
+                self.finish_transition()
             self.ai_generation += 1
             self.stop_following()
             self.companion.next_comment = now + self.companion.chatter_seconds
@@ -720,6 +728,9 @@ class NekoWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        if self.arrival_target is not None:
+            top = max(0, self.arrival_top + self.height() - self.y())
+            painter.setClipRect(0, top, self.width(), max(0, self.height() - top))
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform, False)
         now = time.monotonic()
@@ -927,6 +938,7 @@ class NekoWidget(QWidget):
         self.dismiss_bubble()
 
     def clamp_position(self, *args):
+        self.restore_arrival_position()
         screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
         area = screen.availableGeometry()
         self.move(max(area.left(), min(self.x(), area.right() - self.width() + 1)),
@@ -940,6 +952,7 @@ class NekoWidget(QWidget):
 
     def hide_neko(self):
         self.reset_pet_cursor()
+        self.restore_arrival_position()
         if self.companion.state == NekoState.LEAVING:
             self.finish_quit()
             return
@@ -998,7 +1011,8 @@ class NekoWidget(QWidget):
                            "chatter_seconds": self.companion.chatter_seconds,
                            "idle_seconds": self.companion.idle_seconds,
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
-                           "ai_enabled": self.ai_enabled, "position": self.pos(),
+                           "ai_enabled": self.ai_enabled,
+                           "position": self.arrival_target if self.arrival_target is not None else self.pos(),
                            "pets": self.total_pets + self.companion.pets,
                            "naps": self.total_naps + self.companion.naps}.items():
             self.settings.setValue(key, value)
@@ -1007,6 +1021,7 @@ class NekoWidget(QWidget):
     def quit_neko(self):
         if self.closing or self.companion.state == NekoState.LEAVING:
             return
+        self.restore_arrival_position()
         if (self.motion and self.isVisible() and not self.fullscreen and not self.is_manually_hidden
                 and not self.atlas.frame("depart", 0).isNull()):
             self.stop_following()
@@ -1021,12 +1036,23 @@ class NekoWidget(QWidget):
         else:
             self.finish_quit()
 
+    def restore_arrival_position(self):
+        if self.arrival_target is not None:
+            self.move(self.arrival_target)
+            self.arrival_target = None
+
     def start_transition(self, state, clip):
         self.reset_pet_cursor()
+        self.restore_arrival_position()
         now = time.monotonic()
         duration = sum(CLIPS[clip].durations)
         self.companion.pose(state, now, duration / 1000)
         self.pose_started = now
+        if state == NekoState.ARRIVING:
+            self.arrival_target = self.pos()
+            screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
+            self.arrival_top = screen.geometry().top() - self.height()
+            self.move(self.arrival_target.x(), self.arrival_top)
         self.refresh_asset()
         self.transition_timer.start(duration)
 
@@ -1035,6 +1061,7 @@ class NekoWidget(QWidget):
         if self.companion.state == NekoState.LEAVING:
             self.finish_quit()
         elif self.companion.state == NekoState.ARRIVING:
+            self.restore_arrival_position()
             now = time.monotonic()
             self.companion.state = NekoState.IDLE
             self.companion.next_nap = now + self.companion.sleep_seconds
@@ -1044,10 +1071,12 @@ class NekoWidget(QWidget):
             self.activity.consume(now)
             self.pose_started = now
             self.refresh_asset()
-            self.offline_line("hello")
+            if not self.fullscreen:
+                self.offline_line("hello")
 
     def finish_quit(self):
         self.reset_pet_cursor()
+        self.restore_arrival_position()
         self.transition_timer.stop()
         self.closing = True
         self.stop_sound()

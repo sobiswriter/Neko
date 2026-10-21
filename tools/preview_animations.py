@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, SpriteAtlas
+from animations import CLIPS, SpriteAtlas, drop_progress
 from cursors import petting_cursors
 
 
@@ -55,10 +55,12 @@ def displayed(atlas, name, elapsed):
 
 
 def frame_sheet(atlas, entries, destination, source=False):
-    sheet = Image.new("RGB", (180 + 8 * 180, len(entries) * 225), BACKGROUND)
+    bands = [((len(set(CLIPS[name].order)) + 7) // 8) for name, _ in entries]
+    sheet = Image.new("RGB", (180 + 8 * 180, sum(bands) * 225), BACKGROUND)
     draw = ImageDraw.Draw(sheet)
+    band = 0
     for row, (name, label) in enumerate(entries):
-        draw.text((8, row * 225 + 12), label, fill="#514a43")
+        draw.text((8, band * 225 + 12), label, fill="#514a43")
         clip = CLIPS[name]
         indices = sorted(set(clip.order))
         for col, index in enumerate(indices):
@@ -69,9 +71,37 @@ def frame_sheet(atlas, entries, destination, source=False):
                 elapsed = (sum(clip.durations[:first]) + clip.durations[first] / 2) / 1000
                 frame = pixels(atlas.frame(name, elapsed))
             frame = frame.resize((168, 168), Image.Resampling.NEAREST)
-            sheet.paste(frame, (180 + col * 180, row * 225 + 35), frame)
-            draw.text((184 + col * 180, row * 225 + 210), str(index + 1), fill="#514a43")
+            left, top = 180 + col % 8 * 180, (band + col // 8) * 225
+            sheet.paste(frame, (left, top + 35), frame)
+            draw.text((left + 4, top + 210), str(index + 1), fill="#514a43")
+        band += bands[row]
     sheet.save(destination)
+
+
+def lifecycle_scene(atlas, destination):
+    frames = []
+    durations = [30, 30, 40] * 60
+    elapsed_ms = 0
+    for duration in durations:
+        canvas = Image.new("RGB", (480, 360), BACKGROUND)
+        draw = ImageDraw.Draw(canvas)
+        draw.text((12, 10), "Monitor top", fill="#514a43")
+        draw.line((0, 30, 240, 30), fill="#bcb4a7")
+        draw.text((252, 10), "Sad pause, then hop", fill="#514a43")
+        draw.line((0, 299, 480, 299), fill="#bcb4a7")
+        elapsed = elapsed_ms / 1000
+        y = round(-82 + 270 * drop_progress(elapsed))
+        arrival = displayed(atlas, "arrive", elapsed)
+        # Same 112px window, top-edge clip and trajectory as NekoWidget.
+        canvas.paste(arrival, (64, y), arrival)
+        draw.rectangle((0, 0, 239, 29), fill=BACKGROUND)
+        draw.text((12, 10), "Monitor top", fill="#514a43")
+        departure = pixels(atlas.frame("depart", max(0, elapsed - 0.5)))
+        canvas.paste(departure, (304, 188), departure)
+        frames.append(canvas)
+        elapsed_ms += duration
+    frames[0].save(destination, save_all=True, append_images=frames[1:],
+                   duration=durations, loop=0, disposal=2)
 
 
 def flight_sheet(atlas, destination):
@@ -135,7 +165,7 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 148
+    assert len(atlas.frames) == 150
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)
@@ -146,6 +176,7 @@ if __name__ == "__main__":
     frame_sheet(atlas, REWORK, folder / "neko-tail-life-frames.png")
     frame_sheet(atlas, REWORK, folder / "neko-tail-life-source-frames.png", source=True)
     flight_sheet(atlas, folder / "neko-lifecycle-flight.png")
+    lifecycle_scene(atlas, folder / "neko-lifecycle-scene.gif")
     catalog(atlas, REWORK, folder / "neko-tail-life-native", columns=5, seconds=6)
     catalog(atlas, REWORK, folder / "neko-tail-life-preview", columns=5, scale=2, seconds=6)
     print("Rebuilt idle, activity and animation-rework previews from SpriteAtlas.")

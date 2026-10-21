@@ -13,9 +13,9 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_148_drawings_without_retired_or_malformed_frames(self):
+    def test_atlas_has_150_drawings_without_retired_or_malformed_frames(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 148)
+        self.assertEqual(len(atlas.frames), 150)
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
                              for key in atlas.frames))
         for retired in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
@@ -92,15 +92,16 @@ class AnimationTests(unittest.TestCase):
             self.assertTrue(CLIPS[name].loop)
             self.assertGreaterEqual(sum(CLIPS[name].durations), minimum, name)
 
-    def test_tail_play_and_lifecycle_have_eight_drawings_each(self):
+    def test_tail_play_and_lifecycle_load_all_their_drawings(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         for name in ("tail_chase", "tail_catch", "arrive", "depart"):
             clip = CLIPS[name]
-            self.assertEqual(set(clip.order), set(range(8)))
+            indices = set(clip.order)
+            self.assertTrue(set(range(8)) <= indices)
             self.assertFalse(clip.loop)
             self.assertLess(sum(clip.durations), 6000)
-            images = [atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage() for i in range(8)]
-            expected = 7 if name in ("tail_chase", "tail_catch") else 8
+            images = [atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage() for i in indices]
+            expected = len(indices) - (1 if name in ("tail_chase", "tail_catch") else 0)
             self.assertEqual(len({bytes(image.constBits()) for image in images}), expected, name)
         departed = atlas.frame("depart", 999).toImage()
         self.assertEqual(departed.pixelColor(56, 50).alpha(), 0)
@@ -116,6 +117,26 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(atlas.frame(name, 0).toImage(), idle, name)
             self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
 
+    def test_tail_chase_has_two_turns_and_catch_has_three_before_its_pounce(self):
+        for name, turns in (("tail_chase", 2), ("tail_catch", 3)):
+            clip = CLIPS[name]
+            cycle = tuple(range(8))
+            self.assertEqual(clip.order[2:2 + turns * 8], cycle * turns, name)
+            self.assertFalse(clip.loop)
+            self.assertLess(sum(clip.durations), 6000)
+        self.assertIn(12, CLIPS["tail_catch"].order[26:])
+
+    def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for key, frame in atlas.frames.items():
+            if key[0] not in ("arrival", "tailplay", "farewell"):
+                continue
+            image = frame.toImage()
+            self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
+                                for x in range(112) for y in (0, 111)), key)
+            self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
+                                for x in (0, 111) for y in range(112)), key)
+
     def test_tail_swishing_does_not_pull_the_head_sideways(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         centers = []
@@ -129,15 +150,15 @@ class AnimationTests(unittest.TestCase):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         idle = atlas.frame("idle", 0).toImage()
         self.assertEqual(atlas.frame("arrive", 999).toImage(), idle)
-        self.assertEqual(atlas.frame("depart", 0).toImage(), idle)
-        self.assertNotEqual(atlas.frame("arrive", 0.20).toImage(),
-                            atlas.frame("arrive", 0.22).toImage())
-        self.assertEqual(CLIPS["arrive"].frame_index(0.20), CLIPS["arrive"].frame_index(0.22))
+        self.assertNotEqual(atlas.frame("depart", 0).toImage(), idle)
+        self.assertNotEqual(atlas.frame("depart", 1.77).toImage(),
+                            atlas.frame("depart", 1.79).toImage())
+        self.assertEqual(CLIPS["depart"].frame_index(1.77), CLIPS["depart"].frame_index(1.79))
+        self.assertTrue(any(bytes(atlas.frame("arrive", 0).toImage().constBits())))
         for name in ("arrive", "depart"):
             self.assertEqual(atlas.frame(name, 0.2, motion=False).toImage(), idle)
-        for name, elapsed in (("arrive", 0), ("depart", 999)):
-            image = atlas.frame(name, elapsed).toImage()
-            self.assertFalse(any(bytes(image.constBits())))
+        image = atlas.frame("depart", 999).toImage()
+        self.assertFalse(any(bytes(image.constBits())))
 
     def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
