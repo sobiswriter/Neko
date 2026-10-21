@@ -370,12 +370,14 @@ class NekoWidget(QWidget):
                              | Qt.WindowTransparentForInput)
         self.bubble.setAttribute(Qt.WA_ShowWithoutActivating)
         self.bubble.setAttribute(Qt.WA_TranslucentBackground)
+        # Qt otherwise leaves this top-level label's styled background unpainted.
+        self.bubble.setAttribute(Qt.WA_NoSystemBackground, False)
         self.bubble.setAttribute(Qt.WA_TransparentForMouseEvents)
         self.bubble.setTextFormat(Qt.PlainText)
         self.bubble.setWordWrap(True)
-        self.bubble.setFixedWidth(215)
-        self.bubble.setStyleSheet("background: #faf7f2; color: #66564f; border: 1px solid #e7dcd3;"
-                                 "border-radius: 12px; padding: 10px 13px; font: 12px 'Segoe UI';")
+        self.bubble.setFixedWidth(270)
+        self.bubble.setStyleSheet("background: #fffaf0; color: #33261f; border: 1px solid #b49a80;"
+                                 "border-radius: 12px; padding: 11px 14px; font: 600 16px 'Segoe UI';")
         self.bubble_timer = QTimer(self)
         self.bubble_timer.setSingleShot(True)
         self.bubble_timer.timeout.connect(self.bubble.hide)
@@ -695,11 +697,8 @@ class NekoWidget(QWidget):
             elif action == "idle" and was_following:
                 self.follow_origin = None
                 self.offline_line("follow")
-            elif action == "fidget" and random.random() < 0.25:
-                kind = {NekoState.TAIL_SWISH: "tail", NekoState.GROOMING: "groom",
-                        NekoState.LOAFING: "loaf", NekoState.YAWNING: "yawn"}.get(self.companion.state)
-                if kind:
-                    self.offline_line(kind)
+            elif action == "fidget":
+                self.offline_line(self.current_clip)
 
     def refresh_asset(self):
         self.current_clip = {
@@ -788,7 +787,7 @@ class NekoWidget(QWidget):
         y = max(area.top(), min(y, area.bottom() - self.bubble.height()))
         self.bubble.move(x, y)
         self.bubble.show()
-        self.bubble_timer.start(max(3500, min(6500, len(text) * 65)))
+        self.bubble_timer.start(max(5500, min(10000, len(text) * 75)))
         self.companion.comments += 1
         self.last_words = time.monotonic()
         return True

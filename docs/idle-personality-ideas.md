@@ -1,8 +1,8 @@
 # Giving other idles a little story
 
-Ideas for a later art pass; these are not implemented by the tail-transition change.
+Implemented in the idle-personality update, with source and runtime review recorded in [verification](idle-personality-validation.md).
 
-- **Grooming:** lick one paw, wipe behind an ear, pause as if she noticed you watching, then give a soft blink. A small pause makes the payoff readable.
+- **Grooming:** lick one paw, wipe behind an ear, lower it and pause as if she noticed you watching, then give a soft blink. Lowering the paw before the pause avoids the rejected draft's duplicated arm.
 - **Stretch:** reach both front paws, lengthen her back, stretch one existing hindleg, then settle with a tiny paw shake. Keep four anatomical limbs through every drawing.
 - **Loaf:** tuck each front paw in turn, draw the tail close, relax the shoulders and finish with a slow blink. The final tucked silhouette should match the resting loaf.
 - **Sniffing:** lean toward the cursor, make two little nose twitches, then a curious head tilt before sitting back. Keep cursor following subject to its existing cooldown.

@@ -13,15 +13,27 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_158_drawings_without_retired_or_malformed_frames(self):
+    def test_reworked_idles_have_drawn_entry_action_and_return_to_idle(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 158)
+        idle = atlas.frame("idle", 0).toImage()
+        for name in ("groom", "stretch", "loaf", "sniff", "ears", "yawn", "peek", "look_left", "look_right"):
+            clip = CLIPS[name]
+            self.assertTrue(clip.bank.startswith("idleplay-"), name)
+            self.assertGreaterEqual(len(set(clip.order)), 5, name)
+            self.assertFalse(clip.loop, name)
+            self.assertLess(sum(clip.durations), 8000 if name == "loaf" else 6000, name)
+            self.assertEqual(atlas.frame(name, 0).toImage(), idle, name)
+            self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
+
+    def test_atlas_has_195_drawings_without_retired_or_malformed_frames(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        self.assertEqual(len(atlas.frames), 195)
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
                              for key in atlas.frames))
         for retired in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
             self.assertNotIn(retired, CLIPS)
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
-        self.assertNotEqual(atlas.frames["tailswish", 0, 1].toImage(), atlas.frames["tailswish", 0, 2].toImage())
+        self.assertNotEqual(atlas.frame("tail", 0.8).toImage(), atlas.frame("tail", 1.2).toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
         self.assertTrue(all(frame.width() == 112 and frame.height() == 112 for frame in atlas.frames.values()))
 
@@ -53,7 +65,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_idle_and_activity_frames_keep_their_seated_scale(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        for bank, rows in (("idle", (0, 2, 3)), ("activity", range(3)), ("movement", (1, 2))):
+        for bank, rows in (("idle", (0,)), ("activity", (0,))):
             for row in rows:
                 for col in range(4):
                     bounds = sprite_bounds(atlas.frames[bank, row, col].toImage())
@@ -133,7 +145,7 @@ class AnimationTests(unittest.TestCase):
     def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         for key, frame in atlas.frames.items():
-            if key[0] not in ("arrival", "tailplay", "farewell"):
+            if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith("idleplay-"):
                 continue
             image = frame.toImage()
             self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
@@ -145,10 +157,13 @@ class AnimationTests(unittest.TestCase):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         centers = []
         for index in range(8):
-            image = atlas.frames["tailswish", index // 4, index % 4].toImage()
+            clip = CLIPS["tail"]
+            image = atlas.frames[clip.bank, clip.row + index // 4, index % 4].toImage()
             opaque = [x for x in range(112) if image.pixelColor(x, 36).alpha() > 128]
             centers.append((min(opaque) + max(opaque)) / 2)
         self.assertLessEqual(max(centers) - min(centers), 1)
+        self.assertIn(8, CLIPS["tail"].order)
+        self.assertEqual(atlas.frames["tailswish", 2, 0].toImage(), atlas.frames["idle", 0, 2].toImage())
 
     def test_lifecycle_motion_continues_between_drawn_poses_and_has_clean_endpoints(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")

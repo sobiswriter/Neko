@@ -33,6 +33,8 @@ class PackagingTests(unittest.TestCase):
         self.assertNotIn("assets/neko-tailplay-v2.png", names)
         self.assertIn("assets/neko-lifecycle-v2.png", names)
         self.assertIn("assets/neko-tailswish-v1.png", names)
+        for bank in ("a", "b", "c"):
+            self.assertIn(f"assets/neko-idleplay-{bank}-v1.png", names)
         self.assertNotIn("assets/neko-tailplay-v1.png", names)
         self.assertNotIn("assets/neko-lifecycle-v1.png", names)
         self.assertNotIn("assets/neko-atlas.png", names)

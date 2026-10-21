@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Personality for all other idles and readable thoughts
+
+Rebuild grooming, stretch, loaf, sniff, ears, lazy swish, yawn, sleepy peek and directional looks as small stories with drawn entry/action/recovery. Three 4-column/6-row sheets supply eight drawings per action (directional looks share left/right alternatives). Keep the accepted tail games, pet reactions and lifecycle artwork. Retire replaced source rows from runtime import. Every spontaneous idle attempts an action-specific offline thought, subject to existing quiet/fullscreen/bubble/cooldown rules. Increase bubble font to 16px semibold, width to 270px, dark text/cream fill/clear border and reading time to 5.5–10s. Review each used pose and handoff, test state/line/visibility behavior, inspect actual bubble rendering, regenerate catalogs and rebuild.
+
 ## Longer chase and frequent special idles
 
 Make chase longer than catch while preserving the accepted 50ms running poses. Chase takes five turns and catch two; both gain a drawn eager lean/crouch entry and a relaxed half-sit/blink recovery. Target 4.69s versus 3.68s, inside existing six-second slots. Generate eight transition poses without redrawing the running cycle. Give each tail game three times the ordinary idle selection weight, preserving no consecutive repeats and all other idles. Review anatomy/scale/handoffs, exercise selection and timing, regenerate previews and rebuild. Other-idle ideas are suggestions for the user, not additional animation changes in this revision.

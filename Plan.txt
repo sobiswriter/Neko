@@ -24,7 +24,7 @@ Interaction rules
   Two 4-column by 3-row sheets add front stretch, back arch, hop, side flop,
   shoulder peek and a corrected paw offer. No six-frame petting reactions.
   Nap duration is independently configurable: 1–3600 seconds or 0 until petted (default).
-  Eleven idle moods avoid consecutive repeats, including two eight-frame tail games.
+  Eleven idle moods avoid consecutive repeats, including extended tail games and idle stories with drawn anticipation/recovery.
   Tail chase turns clockwise; tail catch pins the tip beneath one forepaw before it slips away.
   Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
   shows mild sadness then the accepted small hop before quitting. Arrival travels from the monitor top; only the landing position is saved.
@@ -37,7 +37,7 @@ Interaction rules
   Eligible moving cursors invite another walk after 25 seconds.
   Keep 5–6 second gesture slots: one natural gesture followed by a relaxed rest.
   No repeated grooming, stretching, waving or head-bobbing within one gesture slot.
-  Tail swishes, kneading and paw taps use gentle continuous cycles.
+  Kneading and paw taps use gentle continuous cycles; the lazy swish plays once and settles with a blink.
   Rendering runs at 10 FPS; tail running uses 20 FPS and arrival/departure use 30 FPS.
   Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
@@ -50,7 +50,8 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  158 loaded drawings including twelve pet reactions, five/two-turn tail games with drawn entry/recovery, arrival, departure and sleep. Tail games get triple idle selection weight.
+  195 loaded drawings including twelve pet reactions, new idle stories, five/two-turn tail games with drawn entry/recovery, arrival, departure and sleep. Tail games get triple idle selection weight.
+  Every idle attempts a matching local thought. Bubble text is 16px semibold, dark on painted cream, visible for 5.5-10 seconds.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

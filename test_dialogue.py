@@ -5,6 +5,14 @@ from dialogue import LINES, OfflineDialogue
 
 
 class DialogueTests(unittest.TestCase):
+    def test_every_idle_has_its_own_playful_line_bank(self):
+        for kind in ("tail", "groom", "loaf", "yawn", "stretch", "ears", "sniff", "peek",
+                     "look_left", "look_right", "tail_chase", "tail_catch"):
+            self.assertIn(kind, LINES)
+            self.assertGreaterEqual(len(LINES[kind]), 4)
+        self.assertIn("Look at meeee!", LINES["tail_chase"])
+        self.assertIn("Round.. around... around...", LINES["tail_chase"])
+
     def test_library_is_large_short_and_has_no_duplicate_lines(self):
         lines = [line for bank in LINES.values() for line in bank]
         self.assertGreaterEqual(len(lines), 200)

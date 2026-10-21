@@ -1,5 +1,13 @@
 # Animation rebuild checklist
 
+## Other-idle personality and readable thoughts
+
+- [x] Read art/idle selection, dialogue dispatch, bubbles and tests; define scope and failing regressions.
+- [x] Generate/review idle stories with entry/recovery; integrate and retire old runtime rows. Retain verified swish with a new blink; reject its proportion-drifting draft.
+- [x] Add matching playful thought banks and improve bubble font, contrast and reading time.
+- [x] Inspect every used pose, transitions and native thought bubbles; run checks.
+- [x] Update previews/notes, rebuild and verify packaged startup.
+
 ## Tail duration, transitions and frequency
 
 - [x] Set timing and selection acceptance criteria; write failing regressions.

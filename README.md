@@ -24,7 +24,7 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 158 loaded drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 195 loaded drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; kneading and paw taps use slower continuous cycles.
@@ -36,6 +36,10 @@ Soft sounds are optional and off until you enable them.
   head position. Each reaction retains the same calibration throughout its poses,
   so crouching and lying down do not cause the old whole-body fitting size jump.
   Walking, loafing and sleep preserve their natural posture and proportions.
+  Grooming, stretching, loafing, sniffing, ear flicks, yawning, sleepy peeks and
+  directional looks now have drawn anticipation and recovery: paw lick and ear wipe,
+  a stretch/paw shake, tuck into loaf, tiny nose twitches and contented blinks.
+  The accepted lazy swish gains a blink before sitting still again.
 - **A little tail trouble.** She runs low with closed eyes and a trailing tail through five quick
   turns, following the supplied GIF's eleven 50ms poses. The catch game takes two turns, then a small pounce and a
   two-paw catch before the tip slips away. An eager head tilt and crouch lead into play;
@@ -71,6 +75,11 @@ Soft sounds are optional and off until you enable them.
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
   All automatic words share an 8–30 second pause and never replace a visible bubble.
+  Every spontaneous idle attempts its own local thought, including “Look at meeee!”
+  and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
+  Thoughts use dark 16px semibold text on a painted cream background, a 270px-wide
+  bubble and 5.5–10 seconds of reading time. The previous transparent-background
+  painting bug is fixed, so words remain readable over dark apps.
 - **Little app rituals.** VLC gets a watch-buddy loaf and questions about what
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
@@ -199,6 +208,10 @@ and appended to the tail sequence without altering the accepted running artwork.
 `assets/neko-arrival-v1.png` supplies the graceful landing; the first two drawings in
 `assets/neko-farewell-v1.png` introduce sadness before the retained hop in
 `assets/neko-lifecycle-v2.png`. `assets/neko-tailswish-v1.png` supplies the lazy swish.
+`assets/neko-idleplay-a-v1.png`, `assets/neko-idleplay-b-v1.png` and
+`assets/neko-idleplay-c-v1.png` provide the new idle stories. Replaced idle/activity/
+movement rows and the rejected swish candidates are not imported. New idle stories
+share measured head calibration throughout each sequence and return to canonical idle.
 The retired wave, old paw-offer and original tail-swish rows are never loaded into the atlas. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
@@ -208,6 +221,9 @@ The [generation prompts and art notes](docs/animation-notes.md) document the bui
 ImageGen workflow; [tail and lifecycle notes](docs/tail-lifecycle-notes.md) include
 the rebuilt motion, [revision prompts](docs/playful-motion-prompts.md), and frame-by-frame QA.
 Run `tools/preview_animations.py` with optional Pillow installed to regenerate the runtime catalogs.
+See [idle personality and readability verification](docs/idle-personality-validation.md),
+the [generation prompts](docs/idle-personality-prompts.md) and the
+[native before/after bubble preview](docs/neko-thought-readability.png).
 The original six
 transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can

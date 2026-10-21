@@ -12,7 +12,7 @@ from PySide6.QtGui import QCursor, QMouseEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
-from behavior import NekoState
+from behavior import NekoState, IDLE_STATES
 from dialogue import LINES
 from main import NekoWidget, set_autostart, adjacent_position
 
@@ -241,6 +241,44 @@ class DesktopTests(unittest.TestCase):
         self.neko.companion.state = NekoState.SLEEPING
         self.assertFalse(self.neko.say("wake up"))
         self.assertEqual(self.neko.companion.state, NekoState.SLEEPING)
+
+    def test_every_idle_attempts_a_matching_thought_without_a_random_gate(self):
+        for state in IDLE_STATES:
+            self.neko.companion.state = state
+            with patch.object(self.neko.companion, "tick", return_value="fidget"), \
+                    patch("main.random.random", return_value=1), \
+                    patch.object(self.neko, "offline_line") as words:
+                self.neko.tick()
+                words.assert_called_once_with(self.neko.current_clip)
+
+    def test_idle_thoughts_still_respect_quiet_and_visible_bubble(self):
+        self.neko.companion.state = NekoState.TAIL_CHASE
+        self.neko.set_quiet(True)
+        with patch.object(self.neko.companion, "tick", return_value="fidget"):
+            self.neko.tick()
+        self.assertFalse(self.neko.bubble.isVisible())
+        self.neko.set_quiet(False)
+        self.assertTrue(self.neko.say("a thought already here."))
+        with patch.object(self.neko.companion, "tick", return_value="fidget"):
+            self.neko.tick()
+        self.assertEqual(self.neko.bubble.text(), "a thought already here.")
+
+    def test_thoughts_use_larger_dark_text_and_allow_time_to_read(self):
+        self.assertTrue(self.neko.say("Look at meeee!"))
+        APP.processEvents()
+        self.assertGreaterEqual(self.neko.bubble.font().pixelSize(), 16)
+        self.assertGreaterEqual(self.neko.bubble.font().weight(), 600)
+        self.assertGreaterEqual(self.neko.bubble.width(), 260)
+        self.assertGreaterEqual(self.neko.bubble_timer.interval(), 5500)
+        image = self.neko.bubble.grab().toImage()
+        background = image.pixelColor(6, image.height() // 2)
+        self.assertEqual(background.alpha(), 255)
+        self.assertGreaterEqual(background.red(), 240)
+        area = QApplication.primaryScreen().availableGeometry()
+        self.assertTrue(area.contains(self.neko.bubble.geometry()))
+        self.assertTrue(self.neko.say("a much longer little thought for you to read. " * 3))
+        self.assertLessEqual(self.neko.bubble_timer.interval(), 10000)
+
 
     def test_quiet_mode_still_accepts_a_deliberate_pet(self):
         self.neko.set_quiet(True)

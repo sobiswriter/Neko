@@ -167,7 +167,7 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 158
+    assert len(atlas.frames) == 195
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)

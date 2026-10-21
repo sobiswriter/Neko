@@ -14,7 +14,7 @@ Arrival lasts 1.9 seconds. Her actual 112px desktop window moves from just above
 
 Departure lasts 2.15 seconds. A sad look with lowered ears appears immediately for 650ms; a second downcast pose holds 350ms. The retained crouch follows for 200ms, then the previously accepted hop drawings and upward/downward arc. There is no new dialogue. Only the first two farewell candidates are imported.
 
-The atlas has 158 entries. neko-tailplay-v4.png, neko-tailsettle-v1.png, neko-arrival-v1.png and neko-farewell-v1.png provide the current art. neko-lifecycle-v2.png remains for its accepted departure poses; its old arrival rows are not loaded. Retired tailplay sheets are removed from the bundle. Shared idle endpoints prevent a face change at rest.
+The current atlas has 195 entries after the [idle-personality update](idle-personality-validation.md). neko-tailplay-v4.png, neko-tailsettle-v1.png, neko-arrival-v1.png and neko-farewell-v1.png provide the tail/lifecycle art. neko-lifecycle-v2.png remains for its accepted departure poses; its old arrival rows are not loaded. Retired tailplay sheets are removed from the bundle. Shared idle endpoints prevent a face change at rest.
 
 Generated poses slightly cross nominal row boundaries. Arrival and tail cells use padded sampling regions, connected-silhouette bounds and constant width-based source sampling, so paws are retained without changing scale between rows. Whole sequences share a scale and ground anchor; frames are never individually fitted to their bounding boxes. No anatomy pixels were painted or patched programmatically.
 
