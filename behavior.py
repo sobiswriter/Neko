@@ -32,6 +32,10 @@ class NekoState(Enum):
     HAPPY_HOP = auto()
     SIDE_FLOP = auto()
     SHOULDER_PEEK = auto()
+    TAIL_CHASE = auto()
+    TAIL_CATCH = auto()
+    ARRIVING = auto()
+    LEAVING = auto()
 
 
 PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
@@ -40,7 +44,8 @@ PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
               NekoState.SIDE_FLOP, NekoState.SHOULDER_PEEK)
 IDLE_STATES = (NekoState.STRETCHING, NekoState.GROOMING, NekoState.PEEKING,
                NekoState.YAWNING, NekoState.TAIL_SWISH, NekoState.EAR_FLICK,
-               NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS)
+               NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS,
+               NekoState.TAIL_CHASE, NekoState.TAIL_CATCH)
 APP_MOODS = {"music": NekoState.TAIL_SWISH, "video": NekoState.LOAFING,
              "coding": NekoState.TYPING, "drawing": NekoState.CURIOUS,
              "writing": NekoState.TYPING, "chat": NekoState.CHEEK_RUB,
@@ -81,6 +86,8 @@ class Companion:
         self.next_idle = max(self.next_idle, now + self.idle_seconds)
 
     def pet(self, now):
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
+            return
         self.pets += 1
         self.last_interaction = now
         if self.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
@@ -107,6 +114,9 @@ class Companion:
 
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
              window_changed=False, keyboard_events=0, window_event=None, app_kind=None):
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
+            self.pending_window = None
+            return None
         if idle_seconds < 10:
             self.drowsy = False
         if window_event or window_changed:

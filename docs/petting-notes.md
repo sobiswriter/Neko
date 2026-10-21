@@ -23,7 +23,8 @@ the airborne hop has a 10-pixel lift inside that canvas, without moving the wind
 The old wave row in `neko-pets-v3.png` and malformed paw row in
 `neko-affection-v1.png` are never loaded into the atlas. Those source sheets remain
 because they also contain retained art. The rejected six-frame sheet was deleted.
-The atlas loads 112 drawings total, of which 48 belong to the twelve pet reactions.
+The atlas now loads 144 drawings including the later tail/lifecycle banks;
+48 still belong to these twelve pet reactions.
 
 The new gestures play once, then rest inside the existing 5.8-second slot.
 Side flop reuses its intermediate poses in reverse to return upright smoothly.

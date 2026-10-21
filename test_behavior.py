@@ -92,6 +92,23 @@ class CompanionTests(unittest.TestCase):
         self.assertNotEqual(pet.state, NekoState.SLEEPING)
         self.assertEqual(pet.tick(45, 45), "sleep")
 
+    def test_arrival_and_departure_cannot_be_interrupted_by_sleep_or_activity(self):
+        for state in (NekoState.ARRIVING, NekoState.LEAVING):
+            self.pet.pose(state, 0, 3)
+            self.assertIsNone(self.pet.tick(9999, 9999, cursor_near=True,
+                                            keyboard_events=20, window_event="open"))
+            self.assertEqual(self.pet.state, state)
+            self.assertIsNone(self.pet.pending_window)
+            pets = self.pet.pets
+            self.pet.pet(10000)
+            self.assertEqual(self.pet.state, state)
+            self.assertEqual(self.pet.pets, pets)
+
+    def test_tail_games_are_idle_choices_without_expanding_pet_rotation(self):
+        self.assertIn(NekoState.TAIL_CHASE, IDLE_STATES)
+        self.assertIn(NekoState.TAIL_CATCH, IDLE_STATES)
+        self.assertEqual(len(PET_STATES), 12)
+
     def test_timed_nap_counts_from_settling_and_wakes_gently_without_immediate_resleep(self):
         pet = Companion(0, sleep_seconds=45, sleep_duration=60)
         pet.tick(45, 45)

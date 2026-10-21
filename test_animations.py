@@ -13,9 +13,9 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_112_drawings_without_retired_or_malformed_frames(self):
+    def test_atlas_has_144_drawings_without_retired_or_malformed_frames(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 112)
+        self.assertEqual(len(atlas.frames), 144)
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2))
                              for key in atlas.frames))
         for retired in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
@@ -66,6 +66,20 @@ class AnimationTests(unittest.TestCase):
         for name, minimum in (("tail", 2400), ("knead", 1600), ("typing", 1200), ("walk", 900)):
             self.assertTrue(CLIPS[name].loop)
             self.assertGreaterEqual(sum(CLIPS[name].durations), minimum, name)
+
+    def test_tail_play_and_lifecycle_have_eight_drawings_each(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for name in ("tail_chase", "tail_catch", "arrive", "depart"):
+            clip = CLIPS[name]
+            self.assertEqual(set(clip.order), set(range(8)))
+            self.assertFalse(clip.loop)
+            self.assertLess(sum(clip.durations), 6000)
+            images = [atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage() for i in range(8)]
+            self.assertEqual(len({bytes(image.constBits()) for image in images}), 8, name)
+        departed = atlas.frame("depart", 999).toImage()
+        self.assertEqual(departed.pixelColor(56, 50).alpha(), 0)
+        self.assertTrue(all(byte == 0 for byte in bytes(departed.constBits())))
+        self.assertNotEqual(atlas.frame("arrive", 0).toImage(), atlas.frame("arrive", 999).toImage())
 
     def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")

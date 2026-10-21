@@ -21,7 +21,7 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 112 loaded drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 144 loaded drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes, kneading and paw taps use slower continuous cycles. Rendering runs at
@@ -30,6 +30,15 @@ Soft sounds are optional and off until you enable them.
   retained seated poses share an 82-pixel height. New body movements keep one
   scale across each sequence so crouching and lying down do not enlarge her head.
   Walking, loafing and sleep preserve their natural posture and proportions.
+- **A little tail trouble.** Two eight-drawing idle games: she turns in a compact
+  circle chasing her tail, or stays seated and tries to trap its tip between her
+  forepaws. Each plays once, then rests. These do not change the twelve pet reactions.
+- **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
+  sit-up before her greeting. **Let her go · quit** gives her a wistful pause and
+  a hop down out of view before closing. These eight-drawing transitions last
+  about two seconds, keep her saved desktop position, and do not accept pets or
+  window reactions midway through. Reduced motion skips the jumps; quitting
+  while hidden or fullscreen is immediate. Hide/Show remains immediate.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual
@@ -178,7 +187,9 @@ once at a consistent scale and anchored at their feet. Generated-sheet bleed fro
 neighboring cells is excluded when locating each silhouette.
 
 The [generation prompts and art notes](docs/animation-notes.md) document the built-in
-ImageGen workflow. The original six transparent PNGs remain as fallbacks. Matching
+ImageGen workflow; [tail and lifecycle notes](docs/tail-lifecycle-notes.md) include
+the new motion references, prompts and eight-frame previews. The original six
+transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can
 be disabled in the nook, holding a still frame without losing direct interaction.
 Missing art has a small text-cat fallback.

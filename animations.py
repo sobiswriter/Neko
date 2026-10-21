@@ -56,6 +56,10 @@ CLIPS = {
     "tail": Clip("idle", 1, (650, 650, 650, 650), loop=True),
     "ears": Clip("idle", 2, (700, 250, 350, 900)),
     "sniff": Clip("idle", 3, (450, 350, 450, 850)),
+    "tail_chase": Clip("tailplay", 0, (500, 250, 250, 250, 250, 250, 250, 250, 900), tuple(range(8)) + (0,)),
+    "tail_catch": Clip("tailplay", 2, (400, 350, 350, 400, 650, 350, 350, 650), tuple(range(8))),
+    "arrive": Clip("lifecycle", 0, (200, 180, 180, 180, 280, 280, 300, 600), tuple(range(8))),
+    "depart": Clip("lifecycle", 2, (650, 300, 200, 180, 180, 180, 200, 210), tuple(range(8))),
     "happy": Clip("pets", 0, (450, 600, 650, 900)),
     "nuzzle": Clip("pets", 1, (400, 550, 650, 1000)),
     "pet_stretch": Clip("petting-a", 0, (400, 550, 1100, 650, 800), (0, 1, 2, 3, 0)),
@@ -89,7 +93,8 @@ class SpriteAtlas:
         cells = {}
         for bank, version, rows in (("idle", 3, 4), ("pets", 3, 4), ("activity", 3, 4),
                                     ("movement", 3, 4), ("transitions", 1, 4), ("affection", 1, 4),
-                                    ("petting-a", 1, 3), ("petting-b", 1, 3)):
+                                    ("petting-a", 1, 3), ("petting-b", 1, 3),
+                                    ("tailplay", 1, 4), ("lifecycle", 1, 4)):
             filename = f"neko-{bank}-v{version}.png"
             image = QImage(str(Path(path) / filename))
             if image.isNull():
@@ -102,7 +107,7 @@ class SpriteAtlas:
                     left, top = col * image.width() // 4, row * image.height() // rows
                     right, bottom = (col + 1) * image.width() // 4, (row + 1) * image.height() // rows
                     region = QRect(left, top, right - left, bottom - top)
-                    if bank in ("petting-a", "petting-b"):
+                    if bank in ("petting-a", "petting-b", "tailplay", "lifecycle"):
                         # Drawn baselines can cross a nominal row; isolate the center silhouette with padding.
                         margin = region.height() // 5
                         region = region.adjusted(0, -margin, 0, margin).intersected(image.rect())
@@ -114,8 +119,10 @@ class SpriteAtlas:
                     cells[bank, row, col] = cell.copy(bounds)
         for key, cell in cells.items():
             # Seated drawings share a height; low poses keep their natural proportions.
-            if key[0] in ("petting-a", "petting-b"):
-                row_cells = [cells[key[0], key[1], col] for col in range(4)]
+            if key[0] in ("petting-a", "petting-b", "tailplay", "lifecycle"):
+                start_row = key[1] // 2 * 2 if key[0] in ("tailplay", "lifecycle") else key[1]
+                rows = range(start_row, start_row + (2 if key[0] in ("tailplay", "lifecycle") else 1))
+                row_cells = [cells[key[0], row, col] for row in rows for col in range(4)]
                 scale = min(82 / row_cells[0].height(),
                             104 / max(cell.width() for cell in row_cells),
                             82 / max(cell.height() for cell in row_cells))
@@ -135,6 +142,10 @@ class SpriteAtlas:
             frame.fill(Qt.transparent)
             painter = QPainter(frame)
             ground = 88 if key == ("petting-a", 2, 2) else 98
+            if key[0] == "lifecycle":
+                index = key[1] % 2 * 4 + key[2]
+                offsets = (-95, -65, -35, -10, 0, 0, 0, 0) if key[1] < 2 else (0, 0, 0, -8, 12, 40, 75, 115)
+                ground += offsets[index]
             painter.drawPixmap((112 - sprite.width()) // 2, ground - sprite.height(), sprite)
             painter.end()
             self.frames[key] = frame

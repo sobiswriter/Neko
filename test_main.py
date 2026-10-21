@@ -39,6 +39,7 @@ class DesktopTests(unittest.TestCase):
         APP.processEvents()
 
     def tearDown(self):
+        self.neko.transition_timer.stop()
         self.neko.menu.hide()
         self.neko.tick_timer.stop()
         self.neko.animation_timer.stop()
@@ -67,6 +68,78 @@ class DesktopTests(unittest.TestCase):
         self.assertFalse(self.neko.isVisible())
         self.assertFalse(self.neko.bubble.isVisible())
         self.assertFalse(self.neko.animation_timer.isActive())
+
+    def test_startup_lands_before_greeting_and_ignores_pets_and_inactivity(self):
+        origin = self.neko.pos()
+        with patch.object(self.neko, "offline_line") as words:
+            self.neko.show_neko(greet=True)
+            self.assertEqual(self.neko.current_clip, "arrive")
+            self.assertTrue(self.neko.transition_timer.isActive())
+            self.neko.pet_reaction()
+            with patch("main.desktop_activity", return_value=(9999, 100, False)):
+                self.neko.tick()
+            self.assertEqual(self.neko.companion.state, NekoState.ARRIVING)
+            words.assert_not_called()
+            self.neko.finish_transition()
+            words.assert_called_once_with("hello")
+        self.assertEqual(self.neko.current_clip, "idle")
+        self.assertGreater(self.neko.companion.next_nap, time.monotonic())
+        self.assertEqual(self.neko.companion.pets, 0)
+        self.assertEqual(self.neko.pos(), origin)
+
+    def test_quit_plays_goodbye_once_then_cleans_up_without_moving_saved_position(self):
+        origin = self.neko.pos()
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertFalse(self.neko.closing)
+            self.assertEqual(self.neko.current_clip, "depart")
+            deadline = self.neko.companion.pose_until
+            self.neko.quit_neko()
+            self.neko.pet_reaction()
+            self.neko.tick()
+            self.neko.show_neko()
+            self.assertEqual(self.neko.companion.pose_until, deadline)
+            quit_app.assert_not_called()
+            self.neko.finish_transition()
+            quit_app.assert_called_once()
+        self.assertTrue(self.neko.closing)
+        self.assertFalse(self.neko.isVisible())
+        self.assertFalse(self.neko.transition_timer.isActive())
+        self.assertFalse(self.neko.animation_timer.isActive())
+        self.assertEqual(self.settings.value("position", type=QPoint), origin)
+
+    def test_reduced_motion_or_hidden_quit_skips_jump_and_hidden_arrival_never_greets(self):
+        with patch.object(self.neko, "offline_line") as words:
+            self.neko.show_neko(greet=True)
+            self.neko.hide_neko()
+            self.neko.finish_transition()
+            words.assert_not_called()
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            quit_app.assert_called_once()
+        self.assertTrue(self.neko.closing)
+
+    def test_turning_motion_off_finishes_an_active_departure(self):
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.neko.set_motion(False)
+            quit_app.assert_called_once()
+        self.assertTrue(self.neko.closing)
+
+    def test_departure_timer_completes_cleanup_without_a_behavior_tick(self):
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            QTest.qWait(2350)
+            quit_app.assert_called_once()
+        self.assertTrue(self.neko.closing)
+
+    def test_reduced_motion_startup_greets_without_a_jump(self):
+        self.neko.set_motion(False)
+        with patch.object(self.neko, "offline_line") as words:
+            self.neko.show_neko(greet=True)
+            words.assert_called_once_with("hello")
+        self.assertEqual(self.neko.current_clip, "idle")
+        self.assertFalse(self.neko.transition_timer.isActive())
 
     def test_speech_does_not_change_sleep_or_geometry(self):
         original = self.neko.geometry()

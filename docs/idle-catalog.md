@@ -2,8 +2,8 @@
 
 ![Current idle animations](neko-idle-catalog.gif)
 
-The main catalog includes the default sitting loop and all nine ambient moods.
-Looking around has two directional variants, producing eleven numbered entries.
+The main catalog includes the default sitting loop and all eleven ambient moods.
+Looking around has two directional variants, producing thirteen numbered entries.
 
 1. Sitting / slow blink — default resting loop
 2. Tail swish
@@ -16,6 +16,8 @@ Looking around has two directional variants, producing eleven numbered entries.
 9. Sleepy peek — uses the sitting/blink drawings with different timing
 10. Looking around, left-leading
 11. Looking around, right-leading — same four drawings, different playback order
+12. Chasing her own tail — eight drawings, a compact clockwise turn
+13. Catching her tail — eight drawings, a seated attempt to trap the tip
 
 All use the actual runtime SpriteAtlas and Clip timing at 10 FPS. Ambient moods
 are shown for their six-second slot, then return to the default sitting loop;
@@ -28,11 +30,13 @@ the random wait between gestures so they can be compared side by side.
 
 ![Related activity and sleep animations](neko-activity-catalog.gif)
 
-12. Typing paw taps — typing, writing and coding reactions
-13. Cursor walk — left-facing art; the app mirrors it to walk right
-14. Falling asleep — eight transition drawings
-15. Sleeping — two-drawing breathing loop
-16. Waking up — eight transition drawings
+14. Typing paw taps — typing, writing and coding reactions
+15. Cursor walk — left-facing art; the app mirrors it to walk right
+16. Falling asleep — eight transition drawings
+17. Sleeping — two-drawing breathing loop
+18. Waking up — eight transition drawings
+19. Dropping in / hello — eight startup drawings
+20. Hopping down / goodbye — eight quit drawings
 
 These are displayed separately because their triggers differ from ambient idle
 moods. Loops are shown continuously for inspection; transition clips finish and
@@ -41,5 +45,5 @@ the window. The app still walks horizontally only.
 
 [Inspect the activity and sleep drawings](neko-activity-catalog-frames.png).
 
-The catalog covers every current non-petting clip. No runtime art, timing,
-behavior, settings or executable was changed to create it.
+The catalog covers every current non-petting clip. See [tail and lifecycle notes](tail-lifecycle-notes.md)
+for the added art, research references, and startup/shutdown behavior.

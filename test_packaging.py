@@ -25,6 +25,8 @@ class PackagingTests(unittest.TestCase):
         self.assertNotIn("assets/neko-petting-v1.png", names)
         self.assertIn("assets/neko-petting-a-v1.png", names)
         self.assertIn("assets/neko-petting-b-v1.png", names)
+        self.assertIn("assets/neko-tailplay-v1.png", names)
+        self.assertIn("assets/neko-lifecycle-v1.png", names)
         self.assertNotIn("assets/neko-atlas.png", names)
         for kind in ("mew", "chirp", "purr"):
             self.assertIn(f"assets/sounds/{kind}.wav", names)

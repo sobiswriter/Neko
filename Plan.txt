@@ -21,7 +21,11 @@ Interaction rules
   Two 4-column by 3-row sheets add front stretch, back arch, hop, side flop,
   shoulder peek and a corrected paw offer. No six-frame petting reactions.
   Nap duration is independently configurable: 1–3600 seconds or 0 until petted (default).
-  Nine idle moods avoid consecutive repeats.
+  Eleven idle moods avoid consecutive repeats, including two eight-frame tail games.
+  Tail chase turns clockwise; tail catch stays seated and traps the tip between forepaws.
+  Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
+  finishes its wistful pause and downward hop before quitting. No window position changes.
+  Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
   298 offline lines use context shuffle bags, with personal questions and app rituals.
   Local foreground app names and media title hints select lines and matching gestures.
   Shared speech cooldown prevents spam. No recording or actual playback detection.
@@ -42,7 +46,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  112 loaded drawings including twelve pet reactions and sleep/wake transitions.
+  144 loaded drawings including twelve pet reactions, tail play, arrival, departure and sleep.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 
