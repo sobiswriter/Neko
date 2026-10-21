@@ -53,13 +53,13 @@ class Clip:
 
 CLIPS = {
     "idle": Clip("idle", 0, (2500, 120, 160, 2400), loop=True),
-    "tail": Clip("idle", 1, (650, 650, 650, 650), loop=True),
+    "tail": Clip("tailswish", 0, (450, 220, 220, 350, 220, 220, 280, 900), tuple(range(8))),
     "ears": Clip("idle", 2, (700, 250, 350, 900)),
     "sniff": Clip("idle", 3, (450, 350, 450, 850)),
-    "tail_chase": Clip("tailplay", 0, (500, 250, 250, 250, 250, 250, 250, 250, 900), tuple(range(8)) + (0,)),
-    "tail_catch": Clip("tailplay", 2, (400, 350, 350, 400, 650, 350, 350, 650), tuple(range(8))),
-    "arrive": Clip("lifecycle", 0, (200, 180, 180, 180, 280, 280, 300, 600), tuple(range(8))),
-    "depart": Clip("lifecycle", 2, (650, 300, 200, 180, 180, 180, 200, 210), tuple(range(8))),
+    "tail_chase": Clip("tailplay", 0, (450, 400, 220, 220, 220, 220, 300, 800), tuple(range(8))),
+    "tail_catch": Clip("tailplay", 2, (450, 400, 320, 250, 550, 300, 350, 800), tuple(range(8))),
+    "arrive": Clip("lifecycle", 0, (140, 140, 140, 100, 180, 200, 200, 500), tuple(range(8))),
+    "depart": Clip("lifecycle", 2, (400, 250, 200, 150, 200, 200, 200, 200), tuple(range(8))),
     "happy": Clip("pets", 0, (450, 600, 650, 900)),
     "nuzzle": Clip("pets", 1, (400, 550, 650, 1000)),
     "pet_stretch": Clip("petting-a", 0, (400, 550, 1100, 650, 800), (0, 1, 2, 3, 0)),
@@ -94,20 +94,20 @@ class SpriteAtlas:
         for bank, version, rows in (("idle", 3, 4), ("pets", 3, 4), ("activity", 3, 4),
                                     ("movement", 3, 4), ("transitions", 1, 4), ("affection", 1, 4),
                                     ("petting-a", 1, 3), ("petting-b", 1, 3),
-                                    ("tailplay", 1, 4), ("lifecycle", 1, 4)):
+                                    ("tailplay", 2, 4), ("lifecycle", 2, 4), ("tailswish", 1, 2)):
             filename = f"neko-{bank}-v{version}.png"
             image = QImage(str(Path(path) / filename))
             if image.isNull():
                 return
             for row in range(rows):
                 # Retired wave and malformed paw offer never enter the runtime atlas.
-                if (bank, row) in (("pets", 2), ("affection", 2)):
+                if (bank, row) in (("pets", 2), ("affection", 2), ("idle", 1)):
                     continue
                 for col in range(4):
                     left, top = col * image.width() // 4, row * image.height() // rows
                     right, bottom = (col + 1) * image.width() // 4, (row + 1) * image.height() // rows
                     region = QRect(left, top, right - left, bottom - top)
-                    if bank in ("petting-a", "petting-b", "tailplay", "lifecycle"):
+                    if bank in ("petting-a", "petting-b"):
                         # Drawn baselines can cross a nominal row; isolate the center silhouette with padding.
                         margin = region.height() // 5
                         region = region.adjusted(0, -margin, 0, margin).intersected(image.rect())
@@ -119,11 +119,13 @@ class SpriteAtlas:
                     cells[bank, row, col] = cell.copy(bounds)
         for key, cell in cells.items():
             # Seated drawings share a height; low poses keep their natural proportions.
-            if key[0] in ("petting-a", "petting-b", "tailplay", "lifecycle"):
-                start_row = key[1] // 2 * 2 if key[0] in ("tailplay", "lifecycle") else key[1]
-                rows = range(start_row, start_row + (2 if key[0] in ("tailplay", "lifecycle") else 1))
+            if key[0] in ("petting-a", "petting-b", "tailplay", "lifecycle", "tailswish"):
+                two_rows = key[0] in ("tailplay", "lifecycle", "tailswish")
+                start_row = key[1] // 2 * 2 if two_rows else key[1]
+                rows = range(start_row, start_row + (2 if two_rows else 1))
                 row_cells = [cells[key[0], row, col] for row in rows for col in range(4)]
-                scale = min(82 / row_cells[0].height(),
+                reference = cells["lifecycle", 1, 3] if key[0] == "lifecycle" and start_row == 0 else row_cells[0]
+                scale = min(82 / reference.height(),
                             104 / max(cell.width() for cell in row_cells),
                             82 / max(cell.height() for cell in row_cells))
                 sprite = QPixmap.fromImage(cell).scaled(
@@ -142,15 +144,39 @@ class SpriteAtlas:
             frame.fill(Qt.transparent)
             painter = QPainter(frame)
             ground = 88 if key == ("petting-a", 2, 2) else 98
-            if key[0] == "lifecycle":
-                index = key[1] % 2 * 4 + key[2]
-                offsets = (-95, -65, -35, -10, 0, 0, 0, 0) if key[1] < 2 else (0, 0, 0, -8, 12, 40, 75, 115)
-                ground += offsets[index]
-            painter.drawPixmap((112 - sprite.width()) // 2, ground - sprite.height(), sprite)
+            left = (112 - sprite.width()) // 2
+            if key[0] == "tailswish":
+                # Anchor the seated body, not the changing width of its tail.
+                left += (0, 1, 3, 4, 1, 1, 0, 0)[key[1] * 4 + key[2]]
+            painter.drawPixmap(left, ground - sprite.height(), sprite)
             painter.end()
             self.frames[key] = frame
+        # The shared seated drawing prevents a different face popping in at rest.
+        idle = self.frames["idle", 0, 0]
+        for key in (("lifecycle", 1, 3), ("lifecycle", 2, 0),
+                    ("tailplay", 0, 0), ("tailplay", 1, 3),
+                    ("tailplay", 2, 0), ("tailplay", 3, 3),
+                    ("tailswish", 0, 0), ("tailswish", 1, 3)):
+            self.frames[key] = idle
 
     def frame(self, name, elapsed, motion=True):
+        if not motion and name in ("arrive", "depart"):
+            return self.frames.get(("idle", 0, 0), QPixmap())
         clip = CLIPS[name]
         index = clip.frame_index(elapsed if motion else 0)
-        return self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())
+        source = self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())
+        if source.isNull() or name not in ("arrive", "depart"):
+            return source
+        # Flight follows elapsed time, independently of the held drawing.
+        if name == "arrive":
+            progress = max(0, min(1, elapsed / 0.42))
+            offset = round(-112 * (1 - progress * progress))
+        else:
+            progress = max(0, min(1, (elapsed - 0.85) / 0.75))
+            offset = round(-96 * progress + 208 * progress * progress)
+        frame = QPixmap(112, 100)
+        frame.fill(Qt.transparent)
+        painter = QPainter(frame)
+        painter.drawPixmap(0, offset, source)
+        painter.end()
+        return frame

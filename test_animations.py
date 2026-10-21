@@ -13,21 +13,21 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_144_drawings_without_retired_or_malformed_frames(self):
+    def test_atlas_has_148_drawings_without_retired_or_malformed_frames(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 144)
-        self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2))
+        self.assertEqual(len(atlas.frames), 148)
+        self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
                              for key in atlas.frames))
         for retired in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
             self.assertNotIn(retired, CLIPS)
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
-        self.assertNotEqual(atlas.frames["idle", 1, 0].toImage(), atlas.frames["idle", 1, 1].toImage())
+        self.assertNotEqual(atlas.frames["tailswish", 0, 1].toImage(), atlas.frames["tailswish", 0, 2].toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
         self.assertTrue(all(frame.width() == 112 and frame.height() == 100 for frame in atlas.frames.values()))
 
     def test_affection_and_look_frames_never_shrink_the_seated_cat(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        for bank, rows in (("idle", range(4)), ("pets", (0, 1, 3)), ("affection", (0, 1, 3)),
+        for bank, rows in (("idle", (0, 2, 3)), ("pets", (0, 1, 3)), ("affection", (0, 1, 3)),
                            ("activity", range(3)), ("movement", (1, 2))):
             for row in rows:
                 for col in range(4):
@@ -63,7 +63,7 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(clip.frame_index(5.8), 0)
 
     def test_continuous_motions_use_a_gentle_cycle_speed(self):
-        for name, minimum in (("tail", 2400), ("knead", 1600), ("typing", 1200), ("walk", 900)):
+        for name, minimum in (("knead", 1600), ("typing", 1200), ("walk", 900)):
             self.assertTrue(CLIPS[name].loop)
             self.assertGreaterEqual(sum(CLIPS[name].durations), minimum, name)
 
@@ -75,11 +75,44 @@ class AnimationTests(unittest.TestCase):
             self.assertFalse(clip.loop)
             self.assertLess(sum(clip.durations), 6000)
             images = [atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage() for i in range(8)]
-            self.assertEqual(len({bytes(image.constBits()) for image in images}), 8, name)
+            expected = 7 if name in ("tail_chase", "tail_catch") else 8
+            self.assertEqual(len({bytes(image.constBits()) for image in images}), expected, name)
         departed = atlas.frame("depart", 999).toImage()
         self.assertEqual(departed.pixelColor(56, 50).alpha(), 0)
         self.assertTrue(all(byte == 0 for byte in bytes(departed.constBits())))
         self.assertNotEqual(atlas.frame("arrive", 0).toImage(), atlas.frame("arrive", 999).toImage())
+
+    def test_tail_actions_share_idle_endpoints_and_finish_before_the_idle_slot(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        idle = atlas.frame("idle", 0).toImage()
+        for name in ("tail", "tail_chase", "tail_catch"):
+            self.assertFalse(CLIPS[name].loop, name)
+            self.assertLess(sum(CLIPS[name].durations), 6000, name)
+            self.assertEqual(atlas.frame(name, 0).toImage(), idle, name)
+            self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
+
+    def test_tail_swishing_does_not_pull_the_head_sideways(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        centers = []
+        for index in range(8):
+            image = atlas.frames["tailswish", index // 4, index % 4].toImage()
+            opaque = [x for x in range(112) if image.pixelColor(x, 36).alpha() > 128]
+            centers.append((min(opaque) + max(opaque)) / 2)
+        self.assertLessEqual(max(centers) - min(centers), 1)
+
+    def test_lifecycle_motion_continues_between_drawn_poses_and_has_clean_endpoints(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        idle = atlas.frame("idle", 0).toImage()
+        self.assertEqual(atlas.frame("arrive", 999).toImage(), idle)
+        self.assertEqual(atlas.frame("depart", 0).toImage(), idle)
+        self.assertNotEqual(atlas.frame("arrive", 0.20).toImage(),
+                            atlas.frame("arrive", 0.22).toImage())
+        self.assertEqual(CLIPS["arrive"].frame_index(0.20), CLIPS["arrive"].frame_index(0.22))
+        for name in ("arrive", "depart"):
+            self.assertEqual(atlas.frame(name, 0.2, motion=False).toImage(), idle)
+        for name, elapsed in (("arrive", 0), ("depart", 999)):
+            image = atlas.frame(name, elapsed).toImage()
+            self.assertFalse(any(bytes(image.constBits())))
 
     def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")

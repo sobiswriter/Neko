@@ -74,6 +74,7 @@ class DesktopTests(unittest.TestCase):
         with patch.object(self.neko, "offline_line") as words:
             self.neko.show_neko(greet=True)
             self.assertEqual(self.neko.current_clip, "arrive")
+            self.assertEqual(self.neko.animation_timer.interval(), 33)
             self.assertTrue(self.neko.transition_timer.isActive())
             self.neko.pet_reaction()
             with patch("main.desktop_activity", return_value=(9999, 100, False)):
@@ -83,6 +84,7 @@ class DesktopTests(unittest.TestCase):
             self.neko.finish_transition()
             words.assert_called_once_with("hello")
         self.assertEqual(self.neko.current_clip, "idle")
+        self.assertEqual(self.neko.animation_timer.interval(), 100)
         self.assertGreater(self.neko.companion.next_nap, time.monotonic())
         self.assertEqual(self.neko.companion.pets, 0)
         self.assertEqual(self.neko.pos(), origin)
@@ -140,6 +142,19 @@ class DesktopTests(unittest.TestCase):
             words.assert_called_once_with("hello")
         self.assertEqual(self.neko.current_clip, "idle")
         self.assertFalse(self.neko.transition_timer.isActive())
+
+    def test_jump_playback_repaints_between_poses_without_moving_the_window(self):
+        origin = self.neko.pos()
+        for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.20, 0.22)),
+                                     (NekoState.LEAVING, "depart", (1.42, 1.44))):
+            self.neko.start_transition(state, clip)
+            start = self.neko.pose_started
+            frames = []
+            for elapsed in samples:
+                with patch("main.time.monotonic", return_value=start + elapsed):
+                    frames.append(self.neko.grab().toImage())
+                self.assertEqual(self.neko.pos(), origin)
+            self.assertNotEqual(frames[0], frames[1], clip)
 
     def test_speech_does_not_change_sleep_or_geometry(self):
         original = self.neko.geometry()
