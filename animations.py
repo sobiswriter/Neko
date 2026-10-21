@@ -58,14 +58,15 @@ CLIPS = {
     "sniff": Clip("idle", 3, (450, 350, 450, 850)),
     "happy": Clip("pets", 0, (450, 600, 650, 900)),
     "nuzzle": Clip("pets", 1, (400, 550, 650, 1000)),
-    "wave": Clip("petting", 0, (350, 400, 450, 650, 450, 700), tuple(range(6))),
-    "shy_dip": Clip("petting", 1, (350, 400, 450, 650, 450, 700), tuple(range(6))),
-    "nose_wiggle": Clip("petting", 2, (350, 400, 450, 650, 450, 700), tuple(range(6))),
-    "tail_curl": Clip("petting", 3, (350, 400, 450, 650, 450, 700), tuple(range(6))),
+    "pet_stretch": Clip("petting-a", 0, (400, 550, 1100, 650, 800), (0, 1, 2, 3, 0)),
+    "back_arch": Clip("petting-a", 1, (400, 550, 1100, 650, 800), (0, 1, 2, 3, 0)),
+    "happy_hop": Clip("petting-a", 2, (450, 300, 350, 550, 800), (0, 1, 2, 3, 0)),
+    "side_flop": Clip("petting-b", 0, (350, 450, 550, 1000, 450, 450, 650), (0, 1, 2, 3, 2, 1, 0)),
+    "shoulder_peek": Clip("petting-b", 1, (400, 550, 1100, 650, 800), (0, 1, 2, 3, 0)),
     "knead": Clip("pets", 3, (450, 450, 450, 450), loop=True),
     "chin_scritch": Clip("affection", 0, (450, 650, 950, 850)),
     "blep": Clip("affection", 1, (500, 450, 750, 1100)),
-    "paw_offer": Clip("affection", 2, (450, 650, 850, 950)),
+    "paw_offer": Clip("petting-b", 2, (400, 550, 950, 500, 450, 800), (0, 1, 2, 3, 1, 0)),
     "ear_rub": Clip("affection", 3, (450, 600, 850, 1000)),
     "typing": Clip("activity", 0, (330, 330, 330, 330), loop=True),
     "groom": Clip("activity", 1, (600, 550, 700, 850)),
@@ -86,23 +87,42 @@ class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
         cells = {}
-        for bank in ("idle", "pets", "activity", "movement", "transitions", "affection", "petting"):
-            filename = f"neko-{bank}-v1.png" if bank in ("transitions", "affection", "petting") else f"neko-{bank}-v3.png"
-            columns = 6 if bank == "petting" else 4
+        for bank, version, rows in (("idle", 3, 4), ("pets", 3, 4), ("activity", 3, 4),
+                                    ("movement", 3, 4), ("transitions", 1, 4), ("affection", 1, 4),
+                                    ("petting-a", 1, 3), ("petting-b", 1, 3)):
+            filename = f"neko-{bank}-v{version}.png"
             image = QImage(str(Path(path) / filename))
             if image.isNull():
                 return
-            image = image.scaled(columns * 128, 512, Qt.IgnoreAspectRatio, Qt.FastTransformation)
-            for row in range(4):
-                for col in range(columns):
-                    cell = image.copy(col * 128, row * 128, 128, 128)
+            for row in range(rows):
+                # Retired wave and malformed paw offer never enter the runtime atlas.
+                if (bank, row) in (("pets", 2), ("affection", 2)):
+                    continue
+                for col in range(4):
+                    left, top = col * image.width() // 4, row * image.height() // rows
+                    right, bottom = (col + 1) * image.width() // 4, (row + 1) * image.height() // rows
+                    region = QRect(left, top, right - left, bottom - top)
+                    if bank in ("petting-a", "petting-b"):
+                        # Drawn baselines can cross a nominal row; isolate the center silhouette with padding.
+                        margin = region.height() // 5
+                        region = region.adjusted(0, -margin, 0, margin).intersected(image.rect())
+                    cell = image.copy(region).scaled(
+                        128, 128, Qt.KeepAspectRatio, Qt.FastTransformation)
                     bounds = sprite_bounds(cell)
                     if bounds.isEmpty():
                         return
                     cells[bank, row, col] = cell.copy(bounds)
         for key, cell in cells.items():
             # Seated drawings share a height; low poses keep their natural proportions.
-            if key[0] == "transitions":
+            if key[0] in ("petting-a", "petting-b"):
+                row_cells = [cells[key[0], key[1], col] for col in range(4)]
+                scale = min(82 / row_cells[0].height(),
+                            104 / max(cell.width() for cell in row_cells),
+                            82 / max(cell.height() for cell in row_cells))
+                sprite = QPixmap.fromImage(cell).scaled(
+                    round(cell.width() * scale), round(cell.height() * scale),
+                    Qt.IgnoreAspectRatio, Qt.FastTransformation)
+            elif key[0] == "transitions":
                 scale = 82 / cells["transitions", 0, 0].height()
                 sprite = QPixmap.fromImage(cell).scaled(
                     round(cell.width() * scale), round(cell.height() * scale),
@@ -114,12 +134,12 @@ class SpriteAtlas:
             frame = QPixmap(112, 100)
             frame.fill(Qt.transparent)
             painter = QPainter(frame)
-            painter.drawPixmap((112 - sprite.width()) // 2, 98 - sprite.height(), sprite)
+            ground = 88 if key == ("petting-a", 2, 2) else 98
+            painter.drawPixmap((112 - sprite.width()) // 2, ground - sprite.height(), sprite)
             painter.end()
             self.frames[key] = frame
 
     def frame(self, name, elapsed, motion=True):
         clip = CLIPS[name]
         index = clip.frame_index(elapsed if motion else 0)
-        columns = 6 if clip.bank == "petting" else 4
-        return self.frames.get((clip.bank, clip.row + index // columns, index % columns), QPixmap())
+        return self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())

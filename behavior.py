@@ -20,7 +20,6 @@ class NekoState(Enum):
     EAR_FLICK = auto()
     SNIFFING = auto()
     CHEEK_RUB = auto()
-    WAVING = auto()
     KNEADING = auto()
     LOAFING = auto()
     FOLLOWING = auto()
@@ -28,20 +27,23 @@ class NekoState(Enum):
     BLEPPING = auto()
     PAW_OFFER = auto()
     EAR_RUB = auto()
-    SHY_DIP = auto()
-    NOSE_WIGGLE = auto()
-    TAIL_CURL = auto()
+    PET_STRETCH = auto()
+    BACK_ARCH = auto()
+    HAPPY_HOP = auto()
+    SIDE_FLOP = auto()
+    SHOULDER_PEEK = auto()
 
 
-PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.WAVING, NekoState.KNEADING,
+PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
               NekoState.CHIN_SCRITCH, NekoState.BLEPPING, NekoState.PAW_OFFER, NekoState.EAR_RUB,
-              NekoState.SHY_DIP, NekoState.NOSE_WIGGLE, NekoState.TAIL_CURL)
+              NekoState.PET_STRETCH, NekoState.BACK_ARCH, NekoState.HAPPY_HOP,
+              NekoState.SIDE_FLOP, NekoState.SHOULDER_PEEK)
 IDLE_STATES = (NekoState.STRETCHING, NekoState.GROOMING, NekoState.PEEKING,
                NekoState.YAWNING, NekoState.TAIL_SWISH, NekoState.EAR_FLICK,
                NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS)
 APP_MOODS = {"music": NekoState.TAIL_SWISH, "video": NekoState.LOAFING,
              "coding": NekoState.TYPING, "drawing": NekoState.CURIOUS,
-             "writing": NekoState.TYPING, "chat": NekoState.WAVING,
+             "writing": NekoState.TYPING, "chat": NekoState.CHEEK_RUB,
              "game": NekoState.PEEKING, "files": NekoState.SNIFFING,
              "terminal": NekoState.EAR_FLICK}
 

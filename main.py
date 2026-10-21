@@ -691,12 +691,13 @@ class NekoWidget(QWidget):
             NekoState.YAWNING: "yawn", NekoState.WAKING: "wake",
             NekoState.TAIL_SWISH: "tail", NekoState.EAR_FLICK: "ears",
             NekoState.SNIFFING: "sniff", NekoState.LOAFING: "loaf",
-            NekoState.CHEEK_RUB: "nuzzle", NekoState.WAVING: "wave",
+            NekoState.CHEEK_RUB: "nuzzle",
             NekoState.KNEADING: "knead", NekoState.FOLLOWING: "walk",
             NekoState.CHIN_SCRITCH: "chin_scritch", NekoState.BLEPPING: "blep",
             NekoState.PAW_OFFER: "paw_offer", NekoState.EAR_RUB: "ear_rub",
-            NekoState.SHY_DIP: "shy_dip", NekoState.NOSE_WIGGLE: "nose_wiggle",
-            NekoState.TAIL_CURL: "tail_curl",
+            NekoState.PET_STRETCH: "pet_stretch", NekoState.BACK_ARCH: "back_arch",
+            NekoState.HAPPY_HOP: "happy_hop", NekoState.SIDE_FLOP: "side_flop",
+            NekoState.SHOULDER_PEEK: "shoulder_peek",
         }.get(self.companion.state, "idle")
         self.current_asset = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",

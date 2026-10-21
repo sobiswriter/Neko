@@ -155,6 +155,7 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(seen, set(IDLE_STATES))
 
     def test_pet_rotation_shows_every_response_before_repeating(self):
+        self.assertEqual(len(PET_STATES), 12)
         for cycle in range(4):
             seen = set()
             for index in range(len(PET_STATES)):

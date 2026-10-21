@@ -293,9 +293,10 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.companion.sleep_duration, 0)
         self.assertEqual(self.settings.value("sleep_duration", type=int), 0)
 
-    def test_new_pet_states_select_their_six_frame_clips(self):
-        for state, name in ((NekoState.WAVING, "wave"), (NekoState.SHY_DIP, "shy_dip"),
-                            (NekoState.NOSE_WIGGLE, "nose_wiggle"), (NekoState.TAIL_CURL, "tail_curl")):
+    def test_new_pet_states_select_their_four_frame_clips(self):
+        for state, name in ((NekoState.PET_STRETCH, "pet_stretch"), (NekoState.BACK_ARCH, "back_arch"),
+                            (NekoState.HAPPY_HOP, "happy_hop"), (NekoState.SIDE_FLOP, "side_flop"),
+                            (NekoState.SHOULDER_PEEK, "shoulder_peek"), (NekoState.PAW_OFFER, "paw_offer")):
             self.neko.companion.state = state
             self.neko.refresh_asset()
             self.assertEqual(self.neko.current_clip, name)

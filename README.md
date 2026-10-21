@@ -4,15 +4,16 @@ A little company for your Windows desktop. Neko stretches, settles down, notices
 your cursor, and naps when you step away. No chores, guilt, or attention meter.
 Soft sounds are optional and off until you enable them.
 
-![Neko's new drawn animations](docs/neko-preview.gif)
+![Neko's petting animations](docs/neko-pet-catalog.gif)
 
 ## Living with Neko
 
-- **Click to pet.** Eleven reactions: head pats, cheek nuzzles, seated hellos,
+- **Click to pet.** Twelve four-frame reactions: head pats, cheek nuzzles,
   kneading, chin scritches, a tiny blep, offering a paw, relaxed ear rubs,
-  a shy head dip, nose wiggles, and a contented tail curl.
-  The corrected greeting keeps both paws planted; it and the three new reactions use six drawings each.
-  Each plays gently and settles; all eleven appear before the rotation repeats.
+  a front stretch, back arch, tiny hop, side flop, and shoulder peek.
+  Paw offer uses a new drawing sequence; the old malformed wave and paw drawings
+  are excluded from playback. Each plays gently and settles; all twelve appear
+  before the rotation repeats. Six-frame reactions have been removed.
   If she's asleep, a pet plays her waking sequence instead.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
@@ -20,13 +21,14 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 120 drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 112 loaded drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes, kneading and paw taps use slower continuous cycles. Rendering runs at
   10 FPS, keeping the same action lengths and walking speed.
   Every frame has a 112 × 100 transparent canvas;
-  seated poses share an 82-pixel height so petting no longer makes her shrink.
+  retained seated poses share an 82-pixel height. New body movements keep one
+  scale across each sequence so crouching and lying down do not enlarge her head.
   Walking, loafing and sleep preserve their natural posture and proportions.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
@@ -167,7 +169,10 @@ processes they launch.
 The four `assets/neko-*-v3.png` sheets each contain four sequences of four drawings.
 `assets/neko-transitions-v1.png` adds sixteen sleep/wake drawings with a constant
 character scale through the change in posture. `assets/neko-affection-v1.png`
-adds sixteen drawings for four extra petting reactions. Frame
+supplies the retained chin scritches, blep and ear rubs.
+`assets/neko-petting-a-v1.png` and `assets/neko-petting-b-v1.png` each contain
+three rows of four drawings, for five new reactions and the remade paw offer.
+The old wave and old paw-offer rows are never loaded into the atlas. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
 neighboring cells is excluded when locating each silhouette.

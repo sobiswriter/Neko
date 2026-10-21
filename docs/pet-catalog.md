@@ -1,27 +1,31 @@
 # Petting selection catalog
 
-![All petting reactions at their current playback speed](neko-pet-catalog.gif)
+![All twelve active pet reactions at their actual playback speed](neko-pet-catalog.gif)
 
-Numbers 1–11 are currently active; number 12 is the retired four-frame wave,
-shown only for comparison. Numbers 8–11 use six frames; the others use four.
-Number 6 (paw offer) still has a duplicated-paw pose in its source art.
-No runtime selections or source art were changed to produce these previews.
+Exactly twelve reactions are active, each with four distinct source drawings.
+The retained six are 1–5 and 7. Number 6 is remade, and 8–12 are new.
+The user's later approval retains the tiny blep, superseding its earlier removal request.
 
 1. Head pats
 2. Cheek nuzzle
 3. Kneading
 4. Chin scritches
 5. Tiny blep
-6. Paw offer — extra-paw issue
+6. Paw offer — remade
 7. Ear rubs
-8. Seated hello — six-frame replacement for the old wave
-9. Shy head dip — six frames
-10. Nose wiggle — six frames
-11. Tail curl — six frames
-12. Old paw wave — disabled, comparison only
+8. Big front stretch
+9. Happy back arch
+10. Tiny happy hop
+11. Cozy side flop
+12. Over-the-shoulder peek
 
-The GIF uses the app's SpriteAtlas and Clip timing at 10 FPS, including the rest
-at the end of the 5.8-second petting slot. Kneading loops as it does in the app.
-The disabled wave is loaded into the preview process only.
+Seated hello, shy head dip, nose wiggle, tail curl, and old paw wave have been
+removed from the active set. The old malformed paw offer is also excluded.
+The obsolete six-frame sheet and its previews have been deleted.
 
-[Inspect every source frame in order](neko-pet-frames.png).
+The GIF uses the app's SpriteAtlas and Clip timing at 10 FPS, including rest at
+the end of each 5.8-second petting slot. Kneading loops as it does in the app;
+the other gestures play once and return to rest. Side flop retraces its
+intermediate drawings to rise gently. No extra petting loaf was added.
+
+[Inspect every source drawing](neko-pet-frames.png).

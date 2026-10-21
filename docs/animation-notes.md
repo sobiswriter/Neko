@@ -1,5 +1,9 @@
 # Neko animation art
 
+Current petting art and final prompts are documented in [petting-notes.md](petting-notes.md).
+The notes below record earlier sheets. Their wave and paw-offer rows are retired,
+and historical preview GIFs containing those reactions have been removed.
+
 Generated with the built-in ImageGen tool using assets/neko_idle.png as the
 character reference. Four separate 4 x 4 sheets replace the earlier 8 x 8 atlas.
 Smaller action groups made it easier to keep paws, tails and head proportions

@@ -16,8 +16,10 @@ Interaction rules
   Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
   Eight frames lower her into sleep; a pet or optional nap deadline plays the eight-frame wake.
   Typing, window changes and dragging do not wake her; the optional nap deadline does.
-  Eleven pet responses rotate through a shuffled bag before repeating.
-  A corrected seated hello and three new pet responses use six frames each.
+  Exactly twelve four-frame pet responses rotate through a shuffled bag before repeating.
+  Keep head pats, cheek nuzzle, kneading, chin scritches, blep and ear rubs.
+  Two 4-column by 3-row sheets add front stretch, back arch, hop, side flop,
+  shoulder peek and a corrected paw offer. No six-frame petting reactions.
   Nap duration is independently configurable: 1–3600 seconds or 0 until petted (default).
   Nine idle moods avoid consecutive repeats.
   298 offline lines use context shuffle bags, with personal questions and app rituals.
@@ -40,7 +42,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  120 drawings including eleven pet reactions and sleep/wake transitions.
+  112 loaded drawings including twelve pet reactions and sleep/wake transitions.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

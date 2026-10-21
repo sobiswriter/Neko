@@ -13,9 +13,13 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_120_drawings_including_six_frame_pet_responses(self):
+    def test_atlas_has_112_drawings_without_retired_or_malformed_frames(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 120)
+        self.assertEqual(len(atlas.frames), 112)
+        self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2))
+                             for key in atlas.frames))
+        for retired in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
+            self.assertNotIn(retired, CLIPS)
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
         self.assertNotEqual(atlas.frames["idle", 1, 0].toImage(), atlas.frames["idle", 1, 1].toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
@@ -23,7 +27,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_affection_and_look_frames_never_shrink_the_seated_cat(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        for bank, rows in (("idle", range(4)), ("pets", range(4)), ("affection", range(4)),
+        for bank, rows in (("idle", range(4)), ("pets", (0, 1, 3)), ("affection", (0, 1, 3)),
                            ("activity", range(3)), ("movement", (1, 2))):
             for row in rows:
                 for col in range(4):
@@ -31,28 +35,32 @@ class AnimationTests(unittest.TestCase):
                     self.assertAlmostEqual(bounds.height(), 84, delta=2)
 
     def test_idle_gestures_finish_once_and_rest_instead_of_repeating_frantically(self):
-        for name in ("ears", "sniff", "happy", "nuzzle", "wave", "groom", "stretch",
+        for name in ("ears", "sniff", "happy", "nuzzle", "groom", "stretch",
                      "look_left", "look_right", "peek", "chin_scritch", "blep", "paw_offer", "ear_rub"):
             clip = CLIPS[name]
             self.assertFalse(clip.loop, name)
             self.assertEqual(clip.frame_index(5), clip.order[-1], name)
             self.assertEqual(clip.frame_index(6), clip.order[-1], name)
 
-    def test_new_pet_reactions_use_six_real_frames_then_rest(self):
+    def test_new_pet_reactions_use_four_distinct_drawings_and_return_to_rest(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        for name in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
+        for name in ("pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
             clip = CLIPS[name]
-            self.assertEqual(clip.order, tuple(range(6)))
+            self.assertEqual(set(clip.order), set(range(4)))
             self.assertFalse(clip.loop)
-            self.assertEqual(sum(clip.durations), 3000)
+            self.assertLess(sum(clip.durations), 5800)
+            drawings = [atlas.frames[clip.bank, clip.row, col].toImage() for col in range(4)]
+            for col in range(4):
+                for other in range(col):
+                    self.assertNotEqual(drawings[col], drawings[other], (name, col, other))
             elapsed = 0
-            for col, duration in enumerate(clip.durations):
-                frame = atlas.frame(name, elapsed / 1000)
+            for col, duration in zip(clip.order, clip.durations):
+                frame = atlas.frame(name, (elapsed + duration / 2) / 1000)
                 self.assertFalse(frame.isNull())
-                self.assertEqual(frame.toImage(), atlas.frames["petting", clip.row, col].toImage())
-                self.assertAlmostEqual(sprite_bounds(frame.toImage()).height(), 84, delta=2)
+                self.assertEqual(frame.toImage(), atlas.frames[clip.bank, clip.row, col].toImage())
+                self.assertLessEqual(sprite_bounds(frame.toImage()).bottom(), 99)
                 elapsed += duration
-            self.assertEqual(clip.frame_index(5.8), 5)
+            self.assertEqual(clip.frame_index(5.8), 0)
 
     def test_continuous_motions_use_a_gentle_cycle_speed(self):
         for name, minimum in (("tail", 2400), ("knead", 1600), ("typing", 1200), ("walk", 900)):
