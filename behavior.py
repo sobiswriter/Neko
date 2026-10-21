@@ -178,7 +178,8 @@ class Companion:
             return "fidget"
 
         if now >= self.next_idle:
-            choices = [s for s in IDLE_STATES if s != self.last_idle]
+            choices = [s for s in IDLE_STATES if s != self.last_idle
+                       for _ in range(3 if s in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH) else 1)]
             self.last_idle = self.rng.choice(choices)
             self.pose(self.last_idle, now, 8 if self.last_idle == NekoState.LOAFING else 6)
             self.next_idle = now + self.idle_seconds * self.rng.uniform(0.8, 1.3)

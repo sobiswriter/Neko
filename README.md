@@ -24,7 +24,7 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 150 loaded drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 158 loaded drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; kneading and paw taps use slower continuous cycles.
@@ -36,9 +36,12 @@ Soft sounds are optional and off until you enable them.
   head position. Each reaction retains the same calibration throughout its poses,
   so crouching and lying down do not cause the old whole-body fitting size jump.
   Walking, loafing and sleep preserve their natural posture and proportions.
-- **A little tail trouble.** She runs low with closed eyes and a trailing tail through two quick
-  turns, following the supplied GIF's eleven 50ms poses. The catch game takes three turns, then a small pounce and a
-  two-paw catch before the tip slips away. Each finishes in her normal sitting drawing.
+- **A little tail trouble.** She runs low with closed eyes and a trailing tail through five quick
+  turns, following the supplied GIF's eleven 50ms poses. The catch game takes two turns, then a small pounce and a
+  two-paw catch before the tip slips away. An eager head tilt and crouch lead into play;
+  a half-sit and contented blink bring her back to sitting. Chase lasts 4.69 seconds,
+  catch 3.68 seconds. Each gets three times an ordinary idle's selection weight,
+  with no consecutive repeats and the same rest between gestures.
   These do not change the twelve pet reactions.
 - **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
   sit-up before her greeting. She enters from her monitor's top edge and lands at
@@ -191,6 +194,8 @@ supplies the retained chin scritches, blep and ear rubs.
 `assets/neko-petting-a-v1.png` and `assets/neko-petting-b-v1.png` each contain
 three rows of four drawings, for five new reactions and the remade paw offer.
 `assets/neko-tailplay-v4.png` supplies the eleven-pose running cycle and five preparation/payoff poses.
+`assets/neko-tailsettle-v1.png` adds eight entry/recovery poses, calibrated separately
+and appended to the tail sequence without altering the accepted running artwork.
 `assets/neko-arrival-v1.png` supplies the graceful landing; the first two drawings in
 `assets/neko-farewell-v1.png` introduce sadness before the retained hop in
 `assets/neko-lifecycle-v2.png`. `assets/neko-tailswish-v1.png` supplies the lazy swish.

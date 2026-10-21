@@ -1,5 +1,6 @@
 import random
 import unittest
+from unittest.mock import patch
 
 from behavior import Companion, NekoState, PET_STATES, IDLE_STATES
 
@@ -108,6 +109,30 @@ class CompanionTests(unittest.TestCase):
         self.assertIn(NekoState.TAIL_CHASE, IDLE_STATES)
         self.assertIn(NekoState.TAIL_CATCH, IDLE_STATES)
         self.assertEqual(len(PET_STATES), 12)
+
+    def test_tail_games_get_three_times_the_idle_weight_without_repeating(self):
+        self.pet.last_idle = NekoState.TAIL_CHASE
+        with patch.object(self.pet.rng, "choice", wraps=self.pet.rng.choice) as choose:
+            self.assertEqual(self.pet.tick(20, 0, quiet=True), "fidget")
+        choices = choose.call_args.args[0]
+        self.assertNotIn(NekoState.TAIL_CHASE, choices)
+        for state in IDLE_STATES:
+            if state != NekoState.TAIL_CHASE:
+                self.assertEqual(choices.count(state), 3 if state == NekoState.TAIL_CATCH else 1)
+
+    def test_weighted_tail_games_still_leave_room_for_every_other_idle(self):
+        counts = dict.fromkeys(IDLE_STATES, 0)
+        previous = None
+        for _ in range(3000):
+            self.assertEqual(self.pet.tick(self.pet.next_idle + 1, 0, quiet=True), "fidget")
+            self.assertNotEqual(self.pet.state, previous)
+            counts[self.pet.state] += 1
+            previous = self.pet.state
+            self.pet.tick(self.pet.pose_until, 0, quiet=True)
+        share = (counts[NekoState.TAIL_CHASE] + counts[NekoState.TAIL_CATCH]) / 3000
+        self.assertGreater(share, 0.30)
+        self.assertLess(share, 0.45)
+        self.assertTrue(all(counts.values()))
 
     def test_timed_nap_counts_from_settling_and_wakes_gently_without_immediate_resleep(self):
         pet = Companion(0, sleep_seconds=45, sleep_duration=60)

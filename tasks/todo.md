@@ -1,5 +1,12 @@
 # Animation rebuild checklist
 
+## Tail duration, transitions and frequency
+
+- [x] Set timing and selection acceptance criteria; write failing regressions.
+- [x] Generate and inspect eight entry/recovery drawings; preserve accepted running poses.
+- [x] Verify longer chase, cute handoffs, weighted selection and regression suite.
+- [x] Refresh previews, build, validate packaging and record ideas for other idles.
+
 ## Direct GIF correction
 
 - [x] Inspect all eleven GIF frames and their 50ms durations.

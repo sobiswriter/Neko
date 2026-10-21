@@ -50,7 +50,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  150 loaded drawings including twelve pet reactions, two/three-turn tail games, arrival, departure and sleep.
+  158 loaded drawings including twelve pet reactions, five/two-turn tail games with drawn entry/recovery, arrival, departure and sleep. Tail games get triple idle selection weight.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Longer chase and frequent special idles
+
+Make chase longer than catch while preserving the accepted 50ms running poses. Chase takes five turns and catch two; both gain a drawn eager lean/crouch entry and a relaxed half-sit/blink recovery. Target 4.69s versus 3.68s, inside existing six-second slots. Generate eight transition poses without redrawing the running cycle. Give each tail game three times the ordinary idle selection weight, preserving no consecutive repeats and all other idles. Review anatomy/scale/handoffs, exercise selection and timing, regenerate previews and rebuild. Other-idle ideas are suggestions for the user, not additional animation changes in this revision.
+
 ## Playfulness revision requested after review
 
 The user supplied a crouched tail-chasing GIF and a graceful cat landing reference.

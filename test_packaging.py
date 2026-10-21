@@ -26,6 +26,7 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("assets/neko-petting-a-v1.png", names)
         self.assertIn("assets/neko-petting-b-v1.png", names)
         self.assertIn("assets/neko-tailplay-v4.png", names)
+        self.assertIn("assets/neko-tailsettle-v1.png", names)
         self.assertNotIn("assets/neko-tailplay-v3.png", names)
         self.assertIn("assets/neko-arrival-v1.png", names)
         self.assertIn("assets/neko-farewell-v1.png", names)

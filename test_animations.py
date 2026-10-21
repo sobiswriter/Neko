@@ -13,9 +13,9 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_150_drawings_without_retired_or_malformed_frames(self):
+    def test_atlas_has_158_drawings_without_retired_or_malformed_frames(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 150)
+        self.assertEqual(len(atlas.frames), 158)
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
                              for key in atlas.frames))
         for retired in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
@@ -117,15 +117,18 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(atlas.frame(name, 0).toImage(), idle, name)
             self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
 
-    def test_tail_chase_has_two_turns_and_catch_has_three_before_its_pounce(self):
-        for name, turns in (("tail_chase", 2), ("tail_catch", 3)):
+    def test_tail_chase_lasts_longer_than_catch_with_shared_drawn_transitions(self):
+        for name, turns in (("tail_chase", 5), ("tail_catch", 2)):
             clip = CLIPS[name]
             cycle = tuple(range(11))
-            self.assertEqual(clip.order[2:2 + turns * 11], cycle * turns, name)
-            self.assertEqual(clip.durations[2:2 + turns * 11], (50,) * (turns * 11), name)
+            self.assertEqual(clip.order[:4], (16, 17, 18, 19), name)
+            self.assertEqual(clip.order[4:4 + turns * 11], cycle * turns, name)
+            self.assertEqual(clip.durations[4:4 + turns * 11], (50,) * (turns * 11), name)
+            self.assertEqual(clip.order[-3:], (21, 22, 23), name)
             self.assertFalse(clip.loop)
             self.assertLess(sum(clip.durations), 6000)
-        self.assertIn(14, CLIPS["tail_catch"].order[35:])
+        self.assertIn(14, CLIPS["tail_catch"].order[26:])
+        self.assertGreater(sum(CLIPS["tail_chase"].durations), sum(CLIPS["tail_catch"].durations) + 800)
 
     def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
