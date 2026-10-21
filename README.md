@@ -28,15 +28,16 @@ Soft sounds are optional and off until you enable them.
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; kneading and paw taps use slower continuous cycles.
-  Normal rendering runs at 10 FPS; arrival/departure briefly use 30 FPS for smooth travel,
+  Normal rendering runs at 10 FPS; tail running uses 20 FPS to match the reference's quick steps.
+  Arrival/departure briefly use 30 FPS for smooth travel,
   keeping walking speed unchanged.
   Every frame has a 112 × 112 transparent canvas. Idle is about 82 pixels tall;
   all twelve pet reactions use idle's 62 × 50-pixel head reference and starting
   head position. Each reaction retains the same calibration throughout its poses,
   so crouching and lying down do not cause the old whole-body fitting size jump.
   Walking, loafing and sleep preserve their natural posture and proportions.
-- **A little tail trouble.** She crouches and follows her tail through two compact
-  stepping turns. The catch game takes three turns, then a small pounce and a
+- **A little tail trouble.** She runs low with closed eyes and a trailing tail through two quick
+  turns, following the supplied GIF's eleven 50ms poses. The catch game takes three turns, then a small pounce and a
   two-paw catch before the tip slips away. Each finishes in her normal sitting drawing.
   These do not change the twelve pet reactions.
 - **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
@@ -189,7 +190,7 @@ character scale through the change in posture. `assets/neko-affection-v1.png`
 supplies the retained chin scritches, blep and ear rubs.
 `assets/neko-petting-a-v1.png` and `assets/neko-petting-b-v1.png` each contain
 three rows of four drawings, for five new reactions and the remade paw offer.
-`assets/neko-tailplay-v3.png` supplies the eight-view turning cycle and eight preparation/payoff poses.
+`assets/neko-tailplay-v4.png` supplies the eleven-pose running cycle and five preparation/payoff poses.
 `assets/neko-arrival-v1.png` supplies the graceful landing; the first two drawings in
 `assets/neko-farewell-v1.png` introduce sadness before the retained hop in
 `assets/neko-lifecycle-v2.png`. `assets/neko-tailswish-v1.png` supplies the lazy swish.

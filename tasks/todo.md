@@ -1,5 +1,12 @@
 # Animation rebuild checklist
 
+## Direct GIF correction
+
+- [x] Inspect all eleven GIF frames and their 50ms durations.
+- [x] Replace the tucked-tail turning cycle with low running poses and an outward trailing tail.
+- [x] Match the reference cadence at 20 FPS and preserve two/three turns.
+- [x] Review runtime poses, regenerate previews, run checks and rebuild the executable. Source suite: 121 passed; packaged checks: 2 passed; native checks: 3 passed.
+
 ## Playfulness revision
 
 - [x] Inspect the supplied reference GIF and both attached pose images; record revised scope.

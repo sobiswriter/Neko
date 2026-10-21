@@ -1,5 +1,21 @@
 # Playfulness revision verification — 2026-10-21
 
+## Direct attached GIF correction (current)
+
+The user rejected the earlier tucked-tail movement and attached the actual reference GIF. It contains eleven frames at 50ms each, a 550ms turn. Every frame was inspected in sequence. The v4 tail sheet now follows its low curved running body, closed determined eyes, alternating paw contacts and long outward trailing tail. The cycle has eleven distinct runtime drawings, repeated twice for chase and three times for catch. Intro/recovery use five other source poses; total atlas entries remain 150.
+
+Chase lasts 2.28s; catch lasts 3.34s, then rests for the remainder of the six-second idle slot. Tail playback alone uses a 50ms timer (20 FPS); walking and other ordinary gestures retain 100ms. The tail-only documentation GIF uses exact 50ms samples, so the reference cadence is visible without resampling to 30 FPS.
+
+All used source silhouettes were reviewed for extra paws, tail continuity, complete extremities and the full turn. Review caught a tail tip crossing its nominal column: horizontal padding plus connected-silhouette extraction now retains it, with a common sampling scale across all cells. Arrival, goodbye, swish, petting and palm artwork are unchanged. The v3 tail sheet is removed from the bundle; v4 replaces it. Source art was produced using built-in ImageGen; scripts only extract/render runtime frames.
+
+Native Windows checks passed for the new tail timer versus walking speed, all-state rendering, and uncut silhouette borders. An isolated in-memory mutation reverting the tail timer to 100ms made the new regression fail as expected; production files were untouched.
+
+Current checks: 123 discovered tests, 121 passed and two packaging checks skipped during the source run; those two packaging checks subsequently passed against the rebuilt executable. Three selected native Windows tests passed. PyInstaller clean build and diff whitespace validation passed. No new physical multi-monitor run was performed.
+
+![Corrected tail playback](neko-tail-reference-preview.gif)
+
+## Earlier revision verification
+
 Branch: `codex/animation-rebuild`. This revision supersedes the original one-turn/seated-catch and neutral-goodbye storyboards.
 
 ## Visual review

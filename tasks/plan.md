@@ -5,7 +5,7 @@
 The user supplied a crouched tail-chasing GIF and a graceful cat landing reference.
 The new acceptance criteria supersede the earlier seated tail trap and neutral departure:
 
-1. Tail chase uses two full compact turns; tail catch uses three, followed by a crouched pounce/catch and recovery. A shared eight-view stepping cycle must have one attached tail and four anatomical legs; no repeated sitting interruption between turns.
+1. Tail chase uses two full compact turns; tail catch uses three, followed by a crouched pounce/catch and recovery. After the direct GIF correction, use its eleven 50ms running poses: low stretched body, closed eyes, alternating scrambling paws and long tail trailing outside the turn. One attached tail and four anatomical legs; no sitting interruption between turns.
 2. Arrival actually travels from above the target monitor's top edge to the saved position. New airborne/contact/compression/rebound poses add kitten playfulness. Position saves, hide, reduced motion, fullscreen and quit must never persist an intermediate airborne position.
 3. Departure immediately shows a small sad expression and lowered ears before crouching. Preserve the existing accepted hop-down drawings and arc. No guilt text is added.
 4. Inspect source drawings, actual-size runtime playback, complete turns, and a monitor-scene drop preview. Keep the new pet-size calibration and palm behavior intact. Run regression/native rendering checks, rebuild and inspect the executable.

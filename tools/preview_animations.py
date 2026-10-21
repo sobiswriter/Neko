@@ -50,7 +50,8 @@ def displayed(atlas, name, elapsed):
     if name in {item[0] for item in IDLES} and elapsed >= slot:
         name, elapsed = "idle", elapsed - slot
     if name not in ("arrive", "depart"):
-        elapsed = int(elapsed * 10) / 10
+        fps = 20 if name in ("tail_chase", "tail_catch") else 10
+        elapsed = int(elapsed * fps) / fps
     return pixels(atlas.frame(name, elapsed))
 
 
@@ -122,8 +123,9 @@ def flight_sheet(atlas, destination):
 def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
     width, height = columns * 160, ((len(entries) + columns - 1) // columns) * 152
     frames = []
-    # GIF uses centiseconds; 30/30/40ms yields exactly 30 frames per second.
-    durations = [30, 30, 40] * (seconds * 10)
+    tail_only = all(name in ("tail_chase", "tail_catch") for name, _ in entries)
+    # Tail-only playback preserves the reference's exact 50ms footfalls.
+    durations = [50] * (seconds * 20) if tail_only else [30, 30, 40] * (seconds * 10)
     elapsed_ms = 0
     for duration in durations:
         canvas = Image.new("RGB", (width, height), BACKGROUND)
@@ -141,7 +143,7 @@ def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
     frames[0].save(stem.with_suffix(".gif"), save_all=True, append_images=frames[1:],
                    duration=durations, loop=0, disposal=2)
     frames[18].save(stem.with_suffix(".png"))
-    assert len(frames) == seconds * 30
+    assert len(frames) == seconds * (20 if tail_only else 30)
 
 
 def cursor_preview(atlas, destination):
@@ -179,4 +181,5 @@ if __name__ == "__main__":
     lifecycle_scene(atlas, folder / "neko-lifecycle-scene.gif")
     catalog(atlas, REWORK, folder / "neko-tail-life-native", columns=5, seconds=6)
     catalog(atlas, REWORK, folder / "neko-tail-life-preview", columns=5, scale=2, seconds=6)
+    catalog(atlas, IDLES[-2:], folder / "neko-tail-reference-preview", columns=2, scale=2, seconds=6)
     print("Rebuilt idle, activity and animation-rework previews from SpriteAtlas.")

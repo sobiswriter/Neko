@@ -225,6 +225,15 @@ class DesktopTests(unittest.TestCase):
                 self.assertEqual(positions, [origin, origin])
                 self.assertNotEqual(frames[0], frames[1], clip)
 
+    def test_tail_run_uses_the_reference_cadence_without_speeding_up_walking(self):
+        for state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):
+            self.neko.companion.state = state
+            self.neko.refresh_asset()
+            self.assertEqual(self.neko.animation_timer.interval(), 50)
+        self.neko.companion.state = NekoState.FOLLOWING
+        self.neko.refresh_asset()
+        self.assertEqual(self.neko.animation_timer.interval(), 100)
+
     def test_speech_does_not_change_sleep_or_geometry(self):
         original = self.neko.geometry()
         self.assertTrue(self.neko.say("comfy."))

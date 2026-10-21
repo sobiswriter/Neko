@@ -1,5 +1,41 @@
 # Playfulness revision: exact ImageGen prompts
 
+
+## Direct attached GIF correction
+
+The attached `dm4uz3-sakamoto.gif` has eleven frames, each 50ms. All eleven were extracted into a contact sheet as a motion reference; no source pixels enter the runtime art. Built-in ImageGen generated `assets/neko-tailplay-v4.png` from that contact sheet and the existing idle character sheet, with transparent background. This supersedes the earlier tucked-tail cycle.
+
+```text
+Use case: stylized-concept. Create a production transparent PIXEL ART sprite sheet for existing WHITE kitten desktop pet. Image1 is CHARACTER IDENTITY ONLY: white fur, charcoal pixel outline, gray shading, pink ears/nose, constant large round head, small normal kitten ears and compact feline proportions. Image2 is the EXACT MOTION STORYBOARD: 11 consecutive frames of a real tail-chasing animation. Adapt those 11 poses faithfully to the white kitten. Do not copy black fur, red scarf, long pointy ears, room/floor, labels or background. True transparent alpha.
+
+EXACT 4 equal columns x4 equal rows, 16 separate complete sprites, row-major reading order. Constant physical head/body scale, generous clear padding inside EVERY cell. Each sprite fully contained, no cell-edge clipping. Crisp stepped pixel edges. No labels/shadows/ground/effects.
+
+CRITICAL MOTION: TOP ELEVEN drawings reproduce the FIRST ELEVEN consecutive reference frames, in order. The kitten is RUNNING IN A TIGHT CIRCLE after her own tail. Body LOW and stretched HORIZONTALLY, curved like a broad C, hips leaning into the turn. Head leads the body around the circle with eyes SQUEEZED CLOSED in playful determination. Forelegs paddle/scramble, hindlegs push under rump, alternating paw contacts with small bounds. Tail is LONG and TRAILS OUTSIDE the turning body in a wide curved arc, tip escaping away from the nose. Keep clear negative space between tail and torso. Do not put tail under chin/in mouth or wrap it around chest. Do not animate an upright seated mannequin turning on a pedestal. Whole torso changes direction naturally; no face on back of head. The reference pose at each angle is more important than making cute front portraits.
+
+Frame mapping, match the corresponding numbered reference cell:
+1 head/front paws toward LOWER RIGHT, curved body extends UPPER LEFT, trailing tail curls wide around LOWER LEFT. One foreleg reaching.
+2 head points DOWN, hips upper right; long tail sweeps across upper left, tip far left. Other foreleg reaching.
+3 same down/front orientation with next RUNNING FOOT CONTACT (not an identical drawing).
+4 head LEFT and a little down, hips right, body bent strongly toward left; long tail sweeps outside at top.
+5 head LEFT, body extends right and lower, near foreleg reaching LEFT, tail curves from right rump upward ending high near center.
+6 same left orientation next running stride, forepaw replaces old position, different hindpaw contact.
+7 head points UP and LEFT, back of head visible, body lower right, tail long on outer RIGHT of turn.
+8 head UP and away, back of skull only, body below/left, long tail sweeps RIGHT outside.
+9 head UP and RIGHT, near cheek barely visible, body below/left, tail sweeps lower right.
+10 head RIGHT and slightly down, body left/lower, long tail curls outside along BOTTOM.
+11 almost matches frame1: head LOWER RIGHT, body UPPER LEFT, tail trailing wide around lower-left, opposite foot contact so 11->1 is a seamless RUNNING cycle.
+
+LAST FIVE drawings:
+12 neutral front-facing seated white kitten, EXACT identity image, one curled tail and two planted forepaws.
+13 drops to LOW CURVED crouch noticing tail, eyes eager, rear hips slightly raised, all four legs coherent, one long tail behind.
+14 low short pounce to own trailing tail, both forepaws reach together replacing planted paws, hindlegs tuck behind. Four legs TOTAL.
+15 belly low, both forepaws hold own single tailtip on floor, head low, closed happy eyes, hindfeet hidden tucked. No third foreleg, no raised human arms.
+16 normal neutral seated EXACTLY same as frame12.
+
+ANATOMY: one head/torso, FOUR anatomical legs TOTAL, only TWO forelegs, one continuous tail ATTACHED AT RUMP. Far legs occluded where appropriate. Every moving paw REPLACES its original location. No extra limbs, duplicate feet, detached parts, second tails or changing skull size. Broad low running silhouettes like the reference, not old upright turning poses. Reference motion silhouette and footfall are the core request.
+```
+
+
 Character reference: `assets/neko-idle-v3.png`. Pose references: the user's two attached images and [tail-chasing GIF](https://media.tenor.com/Gxa1JfN3334AAAAM/dm4uz3-sakamoto.gif), opened through the supplied Google share link. Pose references supply motion only; the existing white kitten supplies identity. All calls used built-in ImageGen with transparent background. Corrections reference the corresponding generated sheet. All four farewell candidates are retained in the source sheet; only the first two are used.
 
 ## playful-tail

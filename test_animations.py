@@ -120,11 +120,12 @@ class AnimationTests(unittest.TestCase):
     def test_tail_chase_has_two_turns_and_catch_has_three_before_its_pounce(self):
         for name, turns in (("tail_chase", 2), ("tail_catch", 3)):
             clip = CLIPS[name]
-            cycle = tuple(range(8))
-            self.assertEqual(clip.order[2:2 + turns * 8], cycle * turns, name)
+            cycle = tuple(range(11))
+            self.assertEqual(clip.order[2:2 + turns * 11], cycle * turns, name)
+            self.assertEqual(clip.durations[2:2 + turns * 11], (50,) * (turns * 11), name)
             self.assertFalse(clip.loop)
             self.assertLess(sum(clip.durations), 6000)
-        self.assertIn(12, CLIPS["tail_catch"].order[26:])
+        self.assertIn(14, CLIPS["tail_catch"].order[35:])
 
     def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")

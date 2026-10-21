@@ -583,7 +583,9 @@ class NekoWidget(QWidget):
     def sync_animation(self):
         active = self.isVisible() and not self.is_manually_hidden and not self.closing
         if active and self.motion:
-            self.animation_timer.start(33 if self.current_clip in ("arrive", "depart") else 100)
+            interval = (33 if self.current_clip in ("arrive", "depart") else
+                        50 if self.current_clip in ("tail_chase", "tail_catch") else 100)
+            self.animation_timer.start(interval)
         else:
             self.animation_timer.stop()
         for name, movie in self.movies.items():

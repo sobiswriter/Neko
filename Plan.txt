@@ -38,7 +38,7 @@ Interaction rules
   Keep 5–6 second gesture slots: one natural gesture followed by a relaxed rest.
   No repeated grooming, stretching, waving or head-bobbing within one gesture slot.
   Tail swishes, kneading and paw taps use gentle continuous cycles.
-  Rendering runs at 10 FPS; arrival/departure briefly use 30 FPS for continuous travel.
+  Rendering runs at 10 FPS; tail running uses 20 FPS and arrival/departure use 30 FPS.
   Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
   Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.

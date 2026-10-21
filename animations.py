@@ -56,10 +56,10 @@ CLIPS = {
     "tail": Clip("tailswish", 0, (450, 220, 220, 350, 220, 220, 280, 900), tuple(range(8))),
     "ears": Clip("idle", 2, (700, 250, 350, 900)),
     "sniff": Clip("idle", 3, (450, 350, 450, 850)),
-    "tail_chase": Clip("tailplay", 0, (350, 350) + (160,) * 16 + (250, 600),
-                       (8, 9) + tuple(range(8)) * 2 + (14, 15)),
-    "tail_catch": Clip("tailplay", 0, (350, 250) + (140,) * 24 + (160, 180, 300, 220, 200, 400),
-                       (8, 9) + tuple(range(8)) * 3 + (10, 11, 12, 13, 14, 15)),
+    "tail_chase": Clip("tailplay", 0, (300, 200) + (50,) * 22 + (180, 500),
+                       (11, 12) + tuple(range(11)) * 2 + (12, 15)),
+    "tail_catch": Clip("tailplay", 0, (300, 200) + (50,) * 33 + (100, 120, 300, 120, 150, 400),
+                       (11, 12) + tuple(range(11)) * 3 + (12, 13, 14, 13, 12, 15)),
     "arrive": Clip("arrival", 0, (200, 200, 300, 120, 180, 160, 220, 520), tuple(range(8))),
     "depart": Clip("lifecycle", 2, (650, 350, 200, 150, 200, 200, 200, 200), tuple(range(8))),
     "happy": Clip("pets", 0, (450, 600, 650, 900)),
@@ -110,7 +110,7 @@ class SpriteAtlas:
         for bank, version, rows in (("idle", 3, 4), ("pets", 3, 4), ("activity", 3, 4),
                                     ("movement", 3, 4), ("transitions", 1, 4), ("affection", 1, 4),
                                     ("petting-a", 1, 3), ("petting-b", 1, 3),
-                                    ("tailplay", 3, 4), ("lifecycle", 2, 4), ("tailswish", 1, 2),
+                                    ("tailplay", 4, 4), ("lifecycle", 2, 4), ("tailswish", 1, 2),
                                     ("arrival", 1, 2), ("farewell", 1, 1)):
             filename = f"neko-{bank}-v{version}.png"
             image = QImage(str(Path(path) / filename))
@@ -131,9 +131,13 @@ class SpriteAtlas:
                         # Drawn baselines can cross a nominal row; isolate the center silhouette with padding.
                         margin = region.height() // 5
                         region = region.adjusted(0, -margin, 0, margin).intersected(image.rect())
+                    if bank == "tailplay":
+                        margin = (right - left) // 5
+                        region = region.adjusted(-margin, 0, margin, 0).intersected(image.rect())
                     cell = image.copy(region)
                     if bank in ("arrival", "tailplay"):
-                        cell = cell.scaledToWidth(128, Qt.FastTransformation)
+                        cell = cell.scaledToWidth(round(128 * region.width() / (right - left)),
+                                                  Qt.FastTransformation)
                     else:
                         cell = cell.scaled(128, 128, Qt.KeepAspectRatio, Qt.FastTransformation)
                     bounds = sprite_bounds(cell)
@@ -185,7 +189,7 @@ class SpriteAtlas:
             self.frames[key] = frame
         # The shared seated drawing prevents a different face popping in at rest.
         idle = self.frames["idle", 0, 0]
-        for key in (("arrival", 1, 3), ("tailplay", 2, 0), ("tailplay", 3, 3),
+        for key in (("arrival", 1, 3), ("tailplay", 2, 3), ("tailplay", 3, 3),
                     ("tailswish", 0, 0), ("tailswish", 1, 3)):
             self.frames[key] = idle
         self.frames["lifecycle", 2, 0] = self.frames["farewell", 0, 0]
