@@ -123,7 +123,8 @@
         "scale_x": "153/229 (neutral head width)",
         "scale_y": "214/355 (neutral seated full height)"
       },
-      "final": "Select main neutral M0 for final source slot after recovery."
+      "final": "Select main neutral M0 for final source slot after recovery.",
+      "rejected_slot_14": "Final light/dark review found a detached 16-pixel sheet fragment. Source slot 14 selects the complete clean drawing from slot 13, extending its natural stretch hold; no anatomy pixels are painted or deleted."
     },
     "nuzzle": {
       "source": "exec-058dded9-f532-4680-8023-4d5a173d951a.png",

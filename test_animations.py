@@ -13,6 +13,29 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
+    def test_pet_drawings_have_no_detached_sheet_fragments(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for name, rows in PET_ROWS.items():
+            for index in range(rows * 4):
+                image = atlas.frames[CLIPS[name].bank, index // 4, index % 4].toImage()
+                opaque = {(x, y) for y in range(image.height()) for x in range(image.width())
+                          if image.pixelColor(x, y).alpha() >= 128}
+                sizes = []
+                while opaque:
+                    pending = [opaque.pop()]
+                    size = 0
+                    while pending:
+                        x, y = pending.pop()
+                        size += 1
+                        for neighbor in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1),
+                                         (x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1)):
+                            if neighbor in opaque:
+                                opaque.remove(neighbor)
+                                pending.append(neighbor)
+                    sizes.append(size)
+                # Ignore isolated one/two-pixel edge specks, not paw/outline fragments.
+                self.assertEqual(sum(size > 2 for size in sizes), 1, (name, index, sizes))
+
     def test_drawn_neutral_recovery_matches_the_idle_head_position(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         idle = atlas.frame("idle", 0).toImage()
