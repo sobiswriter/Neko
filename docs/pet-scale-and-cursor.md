@@ -1,5 +1,7 @@
 # Pet scale and palm cursor
 
+The cursor behavior below remains current. The pet source calibration described here is historical; the [new petting rebuild](petting-rebuild-validation.md) uses full sequences with one seated-reference calibration and shared idle/blink endpoints.
+
 ## Size matching
 
 The previous loader fit every source silhouette to an 82-pixel height. That made

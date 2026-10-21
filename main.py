@@ -465,6 +465,7 @@ class NekoWidget(QWidget):
     def set_motion(self, enabled):
         self.motion = enabled
         if not enabled:
+            self.companion.pet_pending = False
             self.reset_pet_cursor()
             self.stop_following()
             if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
@@ -524,6 +525,11 @@ class NekoWidget(QWidget):
         self.follow_origin = None
 
     def animate(self):
+        now = time.monotonic()
+        if self.companion.state in PET_STATES and now >= self.companion.pose_until:
+            self.companion.finish_pet(now)
+            self.pose_started = now
+            self.refresh_asset()
         if self.arrival_target is not None:
             # Startup work must not consume the fall before Qt can animate it.
             if not self.transition_timer.isActive():
@@ -597,7 +603,9 @@ class NekoWidget(QWidget):
         active = self.isVisible() and not self.is_manually_hidden and not self.closing
         if active and self.motion:
             interval = (33 if self.current_clip in ("arrive", "depart") else
-                        50 if self.current_clip in ("tail_chase", "tail_catch") else 100)
+                        50 if self.companion.state in PET_STATES
+                        or self.current_clip in ("tail_chase", "tail_catch") else 100)
+            self.animation_timer.setTimerType(Qt.PreciseTimer if self.companion.state in PET_STATES else Qt.CoarseTimer)
             self.animation_timer.start(interval)
         else:
             self.animation_timer.stop()
@@ -731,6 +739,8 @@ class NekoWidget(QWidget):
             NekoState.TAIL_CHASE: "tail_chase", NekoState.TAIL_CATCH: "tail_catch",
             NekoState.ARRIVING: "arrive", NekoState.LEAVING: "depart",
         }.get(self.companion.state, "idle")
+        if self.companion.state in PET_STATES:
+            self.companion.pose_until = self.pose_started + sum(CLIPS[self.current_clip].durations) / 1000
         self.current_asset = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",
             NekoState.CURIOUS: "curious", NekoState.HAPPY: "happy",
@@ -772,7 +782,7 @@ class NekoWidget(QWidget):
                 painter.scale(-1, 1)
             painter.drawPixmap(-pixmap.width() // 2, top, pixmap)
         painter.restore()
-        if state in PET_STATES and elapsed < 5.8:
+        if state in PET_STATES:
             painter.setPen(QColor("#cf9699"))
             painter.setFont(QFont("Segoe UI Symbol", 12))
             painter.drawText(QRectF(78, 12 - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
@@ -822,11 +832,10 @@ class NekoWidget(QWidget):
             return
         now = time.monotonic()
         was_sleeping = self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
-        was_waking = self.companion.state == NekoState.WAKING
         self.ai_generation += 1
-        self.companion.pet(now)
+        started = self.companion.pet(now)
         self.play_sound(random.choice(("mew", "purr")), prompted=True)
-        if was_waking:
+        if not started:
             return
         self.pose_started = now
         self.refresh_asset()
@@ -965,6 +974,7 @@ class NekoWidget(QWidget):
             self.hide_neko()
 
     def hide_neko(self):
+        self.companion.pet_pending = False
         self.reset_pet_cursor()
         self.restore_arrival_position()
         if self.companion.state == NekoState.LEAVING:

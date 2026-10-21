@@ -40,17 +40,19 @@ def pixels(pixmap):
 
 def displayed(atlas, name, elapsed):
     if name in {item[0] for item in PETS}:
+        end = 0.8 + sum(CLIPS[name].durations) / 1000
         if elapsed < 0.8:
             name = "idle"
-        elif elapsed >= 6.6:
-            name, elapsed = "idle", elapsed - 6.6
+        elif elapsed >= end:
+            name, elapsed = "idle", elapsed - end
         else:
-            elapsed -= 0.8
+            # Keep the 50ms samples exact after subtracting the idle introduction.
+            elapsed = round(elapsed - 0.8, 3)
     slot = 8 if name == "loaf" else 6
     if name in {item[0] for item in IDLES} and elapsed >= slot:
         name, elapsed = "idle", elapsed - slot
     if name not in ("arrive", "depart"):
-        fps = 20 if name in ("tail_chase", "tail_catch") else 10
+        fps = 20 if name in ("tail_chase", "tail_catch") or name in {item[0] for item in PETS} else 10
         elapsed = int(elapsed * fps) / fps
     return pixels(atlas.frame(name, elapsed))
 
@@ -123,9 +125,10 @@ def flight_sheet(atlas, destination):
 def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
     width, height = columns * 160, ((len(entries) + columns - 1) // columns) * 152
     frames = []
-    tail_only = all(name in ("tail_chase", "tail_catch") for name, _ in entries)
+    fast_only = all(name in ("tail_chase", "tail_catch") or name in {item[0] for item in PETS}
+                    for name, _ in entries)
     # Tail-only playback preserves the reference's exact 50ms footfalls.
-    durations = [50] * (seconds * 20) if tail_only else [30, 30, 40] * (seconds * 10)
+    durations = [50] * (seconds * 20) if fast_only else [30, 30, 40] * (seconds * 10)
     elapsed_ms = 0
     for duration in durations:
         canvas = Image.new("RGB", (width, height), BACKGROUND)
@@ -143,7 +146,7 @@ def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
     frames[0].save(stem.with_suffix(".gif"), save_all=True, append_images=frames[1:],
                    duration=durations, loop=0, disposal=2)
     frames[18].save(stem.with_suffix(".png"))
-    assert len(frames) == seconds * (20 if tail_only else 30)
+    assert len(frames) == seconds * (20 if fast_only else 30)
 
 
 def cursor_preview(atlas, destination):
@@ -167,13 +170,15 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 195
+    assert len(atlas.frames) == 307
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)
         frame_sheet(atlas, entries, folder / (stem + "-frames.png"))
     catalog(atlas, PETS, folder / "neko-pet-catalog")
     frame_sheet(atlas, PETS, folder / "neko-pet-frames.png", source=True)
+    frame_sheet(atlas, PETS[:6], folder / "neko-pet-frames-a.png", source=True)
+    frame_sheet(atlas, PETS[6:], folder / "neko-pet-frames-b.png", source=True)
     cursor_preview(atlas, folder / "neko-palm-preview.gif")
     frame_sheet(atlas, REWORK, folder / "neko-tail-life-frames.png")
     frame_sheet(atlas, REWORK, folder / "neko-tail-life-source-frames.png", source=True)

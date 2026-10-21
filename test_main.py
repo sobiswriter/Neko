@@ -22,6 +22,43 @@ APP.setQuitOnLastWindowClosed(False)
 
 
 class DesktopTests(unittest.TestCase):
+    def test_pet_motion_uses_tail_cadence_and_returns_to_idle_when_the_clip_finishes(self):
+        self.neko.companion.pet_bag = [NekoState.HAPPY_HOP]
+        self.neko.pet_reaction()
+        self.assertEqual(self.neko.animation_timer.interval(), 50)
+        self.assertEqual(self.neko.animation_timer.timerType(), Qt.PreciseTimer)
+        end = self.neko.companion.pose_until
+        with patch("main.time.monotonic", return_value=end + 0.01):
+            self.neko.animate()
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+        self.assertEqual(self.neko.current_clip, "idle")
+        self.assertEqual(self.neko.animation_timer.interval(), 100)
+        self.assertEqual(self.neko.animation_timer.timerType(), Qt.CoarseTimer)
+
+    def test_repeated_petting_preserves_the_current_pose_clock_until_recovery(self):
+        self.neko.companion.pet_bag = [NekoState.CHEEK_RUB, NekoState.HAPPY_HOP]
+        self.neko.pet_reaction()
+        started, end = self.neko.pose_started, self.neko.companion.pose_until
+        with patch("main.time.monotonic", return_value=started + 0.2):
+            self.neko.pet_reaction()
+        self.assertEqual(self.neko.current_clip, "happy_hop")
+        self.assertEqual(self.neko.pose_started, started)
+        self.assertEqual(self.neko.companion.pets, 2)
+        with patch("main.time.monotonic", return_value=end + 0.01):
+            self.neko.animate()
+        self.assertEqual(self.neko.current_clip, "nuzzle")
+        self.assertEqual(self.neko.companion.pets, 2)
+
+    def test_hiding_or_reduced_motion_cancels_a_pending_pet(self):
+        for cancel in (self.neko.hide_neko, lambda: self.neko.set_motion(False)):
+            self.neko.show_neko()
+            self.neko.set_motion(True)
+            self.neko.companion.state = NekoState.IDLE
+            self.neko.pet_reaction()
+            self.neko.pet_reaction()
+            self.assertTrue(self.neko.companion.pet_pending)
+            cancel()
+            self.assertFalse(self.neko.companion.pet_pending)
     def setUp(self):
         self.folder = tempfile.TemporaryDirectory()
         self.settings = QSettings(str(Path(self.folder.name) / "prefs.ini"), QSettings.IniFormat)
@@ -569,7 +606,7 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.companion.sleep_duration, 0)
         self.assertEqual(self.settings.value("sleep_duration", type=int), 0)
 
-    def test_new_pet_states_select_their_four_frame_clips(self):
+    def test_new_pet_states_select_their_full_sequences(self):
         for state, name in ((NekoState.PET_STRETCH, "pet_stretch"), (NekoState.BACK_ARCH, "back_arch"),
                             (NekoState.HAPPY_HOP, "happy_hop"), (NekoState.SIDE_FLOP, "side_flop"),
                             (NekoState.SHOULDER_PEEK, "shoulder_peek"), (NekoState.PAW_OFFER, "paw_offer")):

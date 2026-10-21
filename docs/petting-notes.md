@@ -1,5 +1,7 @@
 # Curated four-frame petting set
 
+Historical record: all twelve reactions have since been replaced by the [12–16-pose rebuild](petting-rebuild-validation.md). The source prompts and original checks below describe the earlier four-frame set, which is no longer loaded for petting.
+
 The user approved twelve total reactions: retain head pats, cheek nuzzle,
 kneading, chin scritches, tiny blep and ear rubs; remake paw offer; add front
 stretch, back arch, tiny hop, side flop and shoulder peek. No new loaf, since

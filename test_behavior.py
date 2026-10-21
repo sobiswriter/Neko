@@ -6,6 +6,29 @@ from behavior import Companion, NekoState, PET_STATES, IDLE_STATES
 
 
 class CompanionTests(unittest.TestCase):
+    def test_repeated_pets_wait_for_recovery_and_coalesce_without_losing_click_counts(self):
+        pet = Companion(0, random.Random(4))
+        pet.pet(10)
+        first, deadline = pet.state, pet.pose_until
+        pet.pet(10.1)
+        pet.pet(10.2)
+        self.assertEqual(pet.state, first)
+        self.assertEqual(pet.pose_until, deadline)
+        self.assertEqual(pet.pets, 3)
+        self.assertIsNone(pet.tick(10.3, 0))
+        self.assertEqual(pet.tick(deadline, 0), "pet")
+        self.assertNotEqual(pet.state, first)
+        self.assertEqual(pet.pets, 3)
+        self.assertFalse(pet.pet_pending)
+
+    def test_nap_deadline_does_not_cut_through_a_pet_recovery(self):
+        self.pet.pet(10)
+        state = self.pet.state
+        self.assertIsNone(self.pet.tick(11, 9999))
+        self.assertEqual(self.pet.state, state)
+        self.assertEqual(self.pet.tick(self.pet.pose_until, 9999), "idle")
+        self.assertEqual(self.pet.tick(20, 9999), "sleep")
+
     def setUp(self):
         self.pet = Companion(0, random.Random(4))
 
@@ -183,7 +206,7 @@ class CompanionTests(unittest.TestCase):
     def test_pet_and_idle_choices_do_not_repeat_consecutively(self):
         previous = None
         seen = set()
-        for now in range(0, 500, 5):
+        for now in range(0, 600, 6):
             self.pet.pet(now)
             self.assertNotEqual(previous, self.pet.state)
             seen.add(self.pet.state)
@@ -213,6 +236,7 @@ class CompanionTests(unittest.TestCase):
     def test_window_switches_do_not_interrupt_a_nap_or_pet(self):
         self.pet.pet(50)
         self.assertIsNone(self.pet.tick(51, 0, window_changed=True))
+        self.pet.tick(self.pet.pose_until, 0)
         self.pet.tick(200, 200)
         self.assertIsNone(self.pet.tick(201, 201, window_changed=True))
         self.pet.tick(203, 203)

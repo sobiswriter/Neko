@@ -25,6 +25,9 @@ class PackagingTests(unittest.TestCase):
         self.assertNotIn("assets/neko-petting-v1.png", names)
         self.assertIn("assets/neko-petting-a-v1.png", names)
         self.assertIn("assets/neko-petting-b-v1.png", names)
+        for reaction in ("happy", "nuzzle", "knead", "chin_scritch", "blep", "paw_offer", "ear_rub",
+                         "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek"):
+            self.assertIn(f"assets/neko-pet-{reaction}-v1.png", names)
         self.assertIn("assets/neko-tailplay-v4.png", names)
         self.assertIn("assets/neko-tailsettle-v1.png", names)
         self.assertNotIn("assets/neko-tailplay-v3.png", names)

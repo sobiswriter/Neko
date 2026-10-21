@@ -74,6 +74,7 @@ class Companion:
         self.last_idle = None
         self.last_pet = None
         self.pet_bag = []
+        self.pet_pending = False
         self.pending_window = None
         self.reaction_kind = "switch"
         self.pets = 0
@@ -81,21 +82,31 @@ class Companion:
         self.comments = 0
 
     def pose(self, state, now, seconds):
+        if state not in PET_STATES:
+            self.pet_pending = False
         self.state = state
         self.pose_until = now + seconds
         self.next_idle = max(self.next_idle, now + self.idle_seconds)
 
     def pet(self, now):
         if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
-            return
+            return False
         self.pets += 1
         self.last_interaction = now
         if self.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
             self.wake(now)
-            return
+            return True
         if self.state == NekoState.WAKING:
-            return
+            return False
         self.next_comment = max(self.next_comment, now + 15)
+        if self.state in PET_STATES and now < self.pose_until:
+            self.pet_pending = True
+            return False
+        self.start_pet(now)
+        return True
+
+    def start_pet(self, now):
+        self.pet_pending = False
         if not self.pet_bag:
             self.pet_bag = list(PET_STATES)
             self.rng.shuffle(self.pet_bag)
@@ -103,6 +114,15 @@ class Companion:
                 self.pet_bag[0], self.pet_bag[-1] = self.pet_bag[-1], self.pet_bag[0]
         self.last_pet = self.pet_bag.pop()
         self.pose(self.last_pet, now, 5.8)
+
+    def finish_pet(self, now):
+        pending = self.pet_pending
+        self.pet_pending = False
+        if pending:
+            self.start_pet(now)
+            return "pet"
+        self.state = NekoState.IDLE
+        return "idle"
 
     def wake(self, now):
         self.pending_window = None
@@ -139,6 +159,8 @@ class Companion:
                 return "idle"
             return None
 
+        if self.state in PET_STATES:
+            return self.finish_pet(now) if now >= self.pose_until else None
         if idle_seconds >= self.sleep_seconds and now >= self.next_nap:
             self.pending_window = None
             self.pose(NekoState.FALLING_ASLEEP, now, 2.6)

@@ -1,5 +1,7 @@
 # Petting motion study
 
+Implemented in the later [twelve-reaction rebuild](petting-rebuild-validation.md). The findings below record the old set and the proposal that guided that work.
+
 Study of the current twelve reactions, using the accepted tail chase as the quality reference. This is a proposal for the upcoming QOL work; no runtime behavior or artwork was changed.
 
 [Current pet playback](neko-pet-catalog.gif) · [All 48 runtime pet poses](neko-pet-frames.png) · [Accepted tail playback](neko-tail-reference-preview.gif)

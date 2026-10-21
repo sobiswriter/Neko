@@ -6,13 +6,27 @@ import unittest
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QColor, QImage
 
-from animations import CLIPS, SpriteAtlas, sprite_bounds
+from animations import CLIPS, PET_ROWS, SpriteAtlas, sprite_bounds
 
 
 APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
+    def test_all_pet_sequences_have_real_transitions_and_shared_idle_endpoints(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        idle = atlas.frame("idle", 0).toImage()
+        for name in ("happy", "nuzzle", "knead", "chin_scritch", "blep", "paw_offer", "ear_rub",
+                     "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek"):
+            clip = CLIPS[name]
+            self.assertTrue(clip.bank.startswith("pet-"), name)
+            self.assertGreaterEqual(len(set(clip.order)), 8, name)
+            self.assertFalse(clip.loop, name)
+            self.assertEqual(len(clip.order), len(clip.durations), name)
+            self.assertLessEqual(sum(clip.durations), 5800, name)
+            self.assertEqual(atlas.frame(name, 0).toImage(), idle, name)
+            self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
+
     def test_reworked_idles_have_drawn_entry_action_and_return_to_idle(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         idle = atlas.frame("idle", 0).toImage()
@@ -25,9 +39,11 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(atlas.frame(name, 0).toImage(), idle, name)
             self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
 
-    def test_atlas_has_195_drawings_without_retired_or_malformed_frames(self):
+    def test_atlas_has_307_drawings_without_retired_or_malformed_frames(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 195)
+        self.assertEqual(len(atlas.frames), 307)
+        self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
+                             for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
                              for key in atlas.frames))
         for retired in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
@@ -56,8 +72,8 @@ class AnimationTests(unittest.TestCase):
         for name in ("happy", "nuzzle", "knead", "chin_scritch", "blep", "ear_rub",
                      "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
             clip = CLIPS[name]
-            for index in range(4):
-                image = atlas.frames[clip.bank, clip.row, index].toImage()
+            for index in set(clip.order):
+                image = atlas.frames[clip.bank, clip.row + index // 4, index % 4].toImage()
                 self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
                                     for x in range(112) for y in (0, 111)), (name, index))
                 self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
@@ -79,30 +95,51 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(clip.frame_index(5), clip.order[-1], name)
             self.assertEqual(clip.frame_index(6), clip.order[-1], name)
 
-    def test_new_pet_reactions_use_four_distinct_drawings_and_return_to_rest(self):
+    def test_pet_sequences_use_all_their_drawings_and_return_to_rest(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        for name in ("pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
+        for name in PET_ROWS:
             clip = CLIPS[name]
-            self.assertEqual(set(clip.order), set(range(4)))
+            self.assertEqual(set(clip.order), set(range(PET_ROWS[name] * 4)))
             self.assertFalse(clip.loop)
             self.assertLess(sum(clip.durations), 5800)
-            drawings = [atlas.frames[clip.bank, clip.row, col].toImage() for col in range(4)]
-            for col in range(4):
-                for other in range(col):
-                    self.assertNotEqual(drawings[col], drawings[other], (name, col, other))
+            drawings = [atlas.frames[clip.bank, index // 4, index % 4].toImage()
+                        for index in sorted(set(clip.order))]
+            self.assertGreaterEqual(len({bytes(image.constBits()) for image in drawings}), 8, name)
             elapsed = 0
             for col, duration in zip(clip.order, clip.durations):
                 frame = atlas.frame(name, (elapsed + duration / 2) / 1000)
                 self.assertFalse(frame.isNull())
-                self.assertEqual(frame.toImage(), atlas.frames[clip.bank, clip.row, col].toImage())
+                self.assertEqual(frame.toImage(), atlas.frames[clip.bank, col // 4, col % 4].toImage())
                 self.assertLessEqual(sprite_bounds(frame.toImage()).bottom(), 110)
                 elapsed += duration
-            self.assertEqual(clip.frame_index(5.8), 0)
+            self.assertEqual(clip.frame_index(5.8), clip.order[-1])
 
     def test_continuous_motions_use_a_gentle_cycle_speed(self):
-        for name, minimum in (("knead", 1600), ("typing", 1200), ("walk", 900)):
+        for name, minimum in (("typing", 1200), ("walk", 900)):
             self.assertTrue(CLIPS[name].loop)
             self.assertGreaterEqual(sum(CLIPS[name].durations), minimum, name)
+
+    def test_kneading_uses_three_alternating_cycles_then_recovers(self):
+        clip = CLIPS["knead"]
+        self.assertFalse(clip.loop)
+        self.assertEqual(clip.order[2:-3], tuple(range(2, 9)) * 3)
+        self.assertEqual(clip.order[-3:], (9, 10, 11))
+
+    def test_near_neutral_pet_poses_keep_idle_head_scale(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for name in PET_ROWS:
+            clip = CLIPS[name]
+            for index in (1, PET_ROWS[name] * 4 - 2):
+                image = atlas.frames[clip.bank, index // 4, index % 4].toImage()
+                widest = 0
+                for y in range(20, 55):
+                    run = 0
+                    for x in range(112):
+                        run = run + 1 if image.pixelColor(x, y).alpha() >= 128 else 0
+                        widest = max(widest, run)
+                self.assertAlmostEqual(widest, 62, delta=4, msg=(name, index))
+                if index == PET_ROWS[name] * 4 - 2:
+                    self.assertAlmostEqual(sprite_bounds(image).top(), 16, delta=2, msg=(name, index))
 
     def test_tail_play_and_lifecycle_load_all_their_drawings(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")

@@ -1,5 +1,13 @@
 # Animation rebuild
 
+## Twelve smooth, distinct pet reactions
+
+Implement the approved [motion study](../docs/petting-motion-study.md). Generate dedicated sequences from the canonical idle identity, starting with cheek nuzzle and tiny hop, then complete all twelve. Use 8–16 source drawings per reaction, shared idle endpoints, consistent head calibration, planted-paw registration and 50 ms pet repaints. Give large actions drawn entry/contact/recovery and give every gesture its own rhythm. Retain the accepted tail artwork and cadence.
+
+Verify each source pose and every adjacent handoff at native and enlarged sizes. Add regression checks for shared idle endpoints, full-sequence scale/clipping, finite motion, normal blink after settling, and repeated clicks that wait for a safe return instead of cutting through an airborne/lying pose. Keep the twelve-item shuffled rotation, sleeping/waking, reduced motion, palm cursor and background-free thoughts intact. Refresh runtime catalogs, record exact prompts and per-reaction QA, run the regression/native checks, then rebuild and inspect the executable.
+
+Completed: [per-reaction QA and verification](../docs/petting-rebuild-validation.md). All twelve are integrated; the final build is `dist/petting-qol/DesktopNeko.exe`.
+
 ## Startup and text-only correction
 
 Start the drop-in clock on the first animation tick, cover delayed and visible-fullscreen launches, and safely finish if fullscreen hiding or monitor changes interrupt arrival. Replace the cream thought panel with transparent, shadowed lettering while retaining wrapping, reading time and quiet controls. Verify native rendering, lifecycle regressions and the bundled source; deliver under `dist/updated` while the old executable is running. See [verification](../docs/startup-thought-validation.md).

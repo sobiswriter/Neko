@@ -8,12 +8,15 @@ Soft sounds are optional and off until you enable them.
 
 ## Living with Neko
 
-- **Click to pet.** Twelve four-frame reactions: head pats, cheek nuzzles,
+- **Click to pet.** Twelve individually paced reactions with 12–16 pose slots: head pats, cheek nuzzles,
   kneading, chin scritches, a tiny blep, offering a paw, relaxed ear rubs,
   a front stretch, back arch, tiny hop, side flop, and shoulder peek.
-  Paw offer uses a new drawing sequence; the old malformed wave and paw drawings
-  are excluded from playback. Each plays gently and settles; all twelve appear
-  before the rotation repeats. Six-frame reactions have been removed.
+  Each has drawn anticipation/action/recovery and uses the actual idle drawing
+  at both ends, plus its shared seated blink. The old four-frame pet rows are
+  excluded from playback. Each plays once and returns to normal idle blinking;
+  kneading makes three alternating cycles first. All twelve appear before the
+  rotation repeats. Repeated clicks count immediately and coalesce into one
+  next reaction, which waits for the current landing/get-up to finish.
   If she's asleep, a pet plays her waking sequence instead.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
@@ -24,17 +27,19 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 195 loaded drawings, including eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 307 entries, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
-  Tail swishes make one lazy sweep and rest; kneading and paw taps use slower continuous cycles.
-  Normal rendering runs at 10 FPS; tail running uses 20 FPS to match the reference's quick steps.
+  Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
+  Normal rendering runs at 10 FPS; tail running and petting use 20 FPS.
+  Petting uses a precise Qt timer so its short connecting poses get screen time.
   Arrival/departure briefly use 30 FPS for smooth travel,
   keeping walking speed unchanged.
   Every frame has a 112 × 112 transparent canvas. Idle is about 82 pixels tall;
-  all twelve pet reactions use idle's 62 × 50-pixel head reference and starting
-  head position. Each reaction retains the same calibration throughout its poses,
-  so crouching and lying down do not cause the old whole-body fitting size jump.
+  pet sequences use a 62px-wide seated head reference and 82px-tall reference body.
+  Each retains one calibration throughout its poses, with ground contacts used
+  for registration. Crouching and lying down preserve their natural posture;
+  no whole-body refitting happens per frame. The hop follows a small in-canvas arc.
   Walking, loafing and sleep preserve their natural posture and proportions.
   Grooming, stretching, loafing, sniffing, ear flicks, yawning, sleepy peeks and
   directional looks now have drawn anticipation and recovery: paw lick and ear wipe,
@@ -176,6 +181,9 @@ The startup/thought correction build is `dist\updated\DesktopNeko.exe` while the
 previous executable is running. Quit the existing Neko from her tray menu before
 launching it; the single-instance lock prevents two kittens running together.
 
+The newer twelve-reaction petting build is `dist\petting-qol\DesktopNeko.exe`.
+Use that build for the new petting animations; quit the existing Neko first.
+
 ## Check the behavior
 
 ```powershell
@@ -233,6 +241,8 @@ the [generation prompts](docs/idle-personality-prompts.md) and the
 [native before/after bubble preview](docs/neko-thought-readability.png).
 The later [startup and transparent-thought correction](docs/startup-thought-validation.md)
 supersedes that bubble styling; see the [current text-only preview](docs/neko-thought-transparent.png).
+The [petting rebuild and per-reaction verification](docs/petting-rebuild-validation.md)
+records the twelve smooth sequences, native rendering and safe repeated-click handoffs.
 The original six
 transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can

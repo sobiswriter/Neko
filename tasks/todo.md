@@ -1,5 +1,14 @@
 # Animation rebuild checklist
 
+## Smooth twelve-reaction petting rebuild
+
+- [x] Read the study, runtime/import/selection paths, callers, previews and tests; record acceptance criteria.
+- [x] Generate/review cheek nuzzle and hop pilots using canonical idle identity.
+- [x] Generate/review the remaining ten distinct sequences; revise paw/knead anatomy, stretch fit and chin/flop transparency.
+- [x] Integrate calibrated full sequences, precise 20 FPS playback, shared idle endpoints and safe repeated-pet handoffs with regressions.
+- [x] Inspect every source/runtime pose and transition, refresh catalogs and record individual QA.
+- [x] Run full checks (142 passed), focused native checks, mutation and byte-preservation checks; build and pass both packaged checks plus actual falling-window startup probe.
+
 ## Startup drop-in and background-free thoughts
 
 - [x] Reproduce delayed-first-tick and visible-fullscreen startup skips with failing tests.
