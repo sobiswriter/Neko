@@ -6,7 +6,7 @@ The main catalog includes the default sitting loop and all eleven ambient moods.
 Looking around has two directional variants, producing thirteen numbered entries.
 
 1. Sitting / slow blink — default resting loop
-2. Tail swish
+2. Tail swish — one lazy eight-pose sweep, then rest
 3. Ear flick
 4. Sniffing — also responds to a nearby moving cursor
 5. Seated stretch
@@ -17,9 +17,10 @@ Looking around has two directional variants, producing thirteen numbered entries
 10. Looking around, left-leading
 11. Looking around, right-leading — same four drawings, different playback order
 12. Chasing her own tail — eight drawings, a compact clockwise turn
-13. Catching her tail — eight drawings, a seated attempt to trap the tip
+13. Catching her tail — eight drawings, a seated attempt to pin the tip with one forepaw
 
-All use the actual runtime SpriteAtlas and Clip timing at 10 FPS. Ambient moods
+All use the actual runtime SpriteAtlas and Clip timing. Ambient moods run at 10 FPS;
+arrival/departure use continuous travel with approximately 30 FPS repainting. Ambient moods
 are shown for their six-second slot, then return to the default sitting loop;
 loaf has its eight-second slot. The catalog repeats every eight seconds and omits
 the random wait between gestures so they can be compared side by side.
@@ -46,4 +47,4 @@ the window. The app still walks horizontally only.
 [Inspect the activity and sleep drawings](neko-activity-catalog-frames.png).
 
 The catalog covers every current non-petting clip. See [tail and lifecycle notes](tail-lifecycle-notes.md)
-for the added art, research references, and startup/shutdown behavior.
+for the rebuilt art, exact generation prompts, visual QA, and startup/shutdown behavior.

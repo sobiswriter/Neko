@@ -22,9 +22,9 @@ Interaction rules
   shoulder peek and a corrected paw offer. No six-frame petting reactions.
   Nap duration is independently configurable: 1–3600 seconds or 0 until petted (default).
   Eleven idle moods avoid consecutive repeats, including two eight-frame tail games.
-  Tail chase turns clockwise; tail catch stays seated and traps the tip between forepaws.
+  Tail chase turns clockwise; tail catch pins the tip beneath one forepaw before it slips away.
   Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
-  finishes its wistful pause and downward hop before quitting. No window position changes.
+  finishes a relaxed downward glance and small hop before quitting. No window position changes.
   Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
   298 offline lines use context shuffle bags, with personal questions and app rituals.
   Local foreground app names and media title hints select lines and matching gestures.
@@ -35,7 +35,8 @@ Interaction rules
   Keep 5–6 second gesture slots: one natural gesture followed by a relaxed rest.
   No repeated grooming, stretching, waving or head-bobbing within one gesture slot.
   Tail swishes, kneading and paw taps use gentle continuous cycles.
-  Rendering runs at 10 FPS, preserving action lengths and cursor-walk speed.
+  Rendering runs at 10 FPS; arrival/departure briefly use 30 FPS for continuous travel.
+  Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
   Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
   Automatic sound has a 45-second pause; quiet/fullscreen/media suppress it.
@@ -46,7 +47,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  144 loaded drawings including twelve pet reactions, tail play, arrival, departure and sleep.
+  148 loaded drawings including twelve pet reactions, tail play, arrival, departure and sleep.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

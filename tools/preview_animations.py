@@ -1,0 +1,118 @@
+"""Rebuild documentation previews from the actual atlas (requires optional Pillow)."""
+
+import os
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+from pathlib import Path
+import sys
+
+from PIL import Image, ImageDraw
+from PySide6.QtGui import QImage
+from PySide6.QtWidgets import QApplication
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from animations import CLIPS, SpriteAtlas
+
+
+IDLES = [("idle", "Sitting / blink"), ("tail", "Tail swish"), ("ears", "Ear flick"),
+         ("sniff", "Sniffing"), ("stretch", "Seated stretch"), ("groom", "Grooming"),
+         ("yawn", "Yawning"), ("loaf", "Loaf"), ("peek", "Sleepy peek"),
+         ("look_left", "Looking left"), ("look_right", "Looking right"),
+         ("tail_chase", "Tail chase"), ("tail_catch", "Tail catch")]
+ACTIVITIES = [("typing", "Typing"), ("walk", "Walking"), ("fall_asleep", "Settling"),
+              ("sleep", "Sleeping"), ("wake", "Waking"),
+              ("arrive", "Drop in / hello"), ("depart", "Hop down / goodbye")]
+REWORK = [ACTIVITIES[-2], ACTIVITIES[-1], IDLES[1], IDLES[-2], IDLES[-1]]
+BACKGROUND = (248, 246, 241)
+
+
+def pixels(pixmap):
+    assert not pixmap.isNull(), "Missing runtime sprite"
+    image = pixmap.toImage().convertToFormat(QImage.Format_RGBA8888)
+    return Image.frombytes("RGBA", (image.width(), image.height()), bytes(image.constBits()))
+
+
+def displayed(atlas, name, elapsed):
+    slot = 8 if name == "loaf" else 6
+    if name in {item[0] for item in IDLES} and elapsed >= slot:
+        name, elapsed = "idle", elapsed - slot
+    if name not in ("arrive", "depart"):
+        elapsed = int(elapsed * 10) / 10
+    return pixels(atlas.frame(name, elapsed))
+
+
+def frame_sheet(atlas, entries, destination, source=False):
+    sheet = Image.new("RGB", (180 + 8 * 180, len(entries) * 210), BACKGROUND)
+    draw = ImageDraw.Draw(sheet)
+    for row, (name, label) in enumerate(entries):
+        draw.text((8, row * 210 + 12), label, fill="#514a43")
+        clip = CLIPS[name]
+        indices = sorted(set(clip.order))
+        for col, index in enumerate(indices):
+            if source:
+                frame = pixels(atlas.frames[clip.bank, clip.row + index // 4, index % 4])
+            else:
+                first = clip.order.index(index)
+                elapsed = (sum(clip.durations[:first]) + clip.durations[first] / 2) / 1000
+                frame = pixels(atlas.frame(name, elapsed))
+            sheet.paste(frame.resize((168, 150), Image.Resampling.NEAREST),
+                        (180 + col * 180, row * 210 + 35), frame.resize((168, 150), Image.Resampling.NEAREST))
+            draw.text((184 + col * 180, row * 210 + 190), str(index + 1), fill="#514a43")
+    sheet.save(destination)
+
+
+def flight_sheet(atlas, destination):
+    sheet = Image.new("RGB", (160 + 10 * 112, 4 * 130), BACKGROUND)
+    draw = ImageDraw.Draw(sheet)
+    for row in range(4):
+        name = "arrive" if row < 2 else "depart"
+        draw.text((8, row * 130 + 8), name, fill="#514a43")
+        for col in range(10):
+            elapsed = (row % 2 * 10 + col) / 10
+            frame = pixels(atlas.frame(name, elapsed))
+            left, top = 160 + col * 112, row * 130
+            sheet.paste(frame, (left, top), frame)
+            draw.text((left + 6, top + 108), f"{elapsed:.1f}s", fill="#514a43")
+    sheet.save(destination)
+
+
+def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
+    width, height = columns * 160, ((len(entries) + columns - 1) // columns) * 140
+    frames = []
+    # GIF uses centiseconds; 30/30/40ms yields exactly 30 frames per second.
+    durations = [30, 30, 40] * (seconds * 10)
+    elapsed_ms = 0
+    for duration in durations:
+        canvas = Image.new("RGB", (width, height), BACKGROUND)
+        draw = ImageDraw.Draw(canvas)
+        for index, (name, label) in enumerate(entries):
+            left, top = index % columns * 160, index // columns * 140
+            draw.text((left + 8, top + 8), label, fill="#514a43")
+            frame = displayed(atlas, name, elapsed_ms / 1000)
+            canvas.paste(frame, (left + 24, top + 30), frame)
+        if scale != 1:
+            canvas = canvas.resize((width * scale, height * scale), Image.Resampling.NEAREST)
+        frames.append(canvas)
+        elapsed_ms += duration
+    assert elapsed_ms == seconds * 1000
+    frames[0].save(stem.with_suffix(".gif"), save_all=True, append_images=frames[1:],
+                   duration=durations, loop=0, disposal=2)
+    frames[18].save(stem.with_suffix(".png"))
+    assert len(frames) == seconds * 30
+
+
+if __name__ == "__main__":
+    app = QApplication.instance() or QApplication([])
+    atlas = SpriteAtlas(ROOT / "assets")
+    assert len(atlas.frames) == 148
+    folder = ROOT / "docs"
+    for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
+        catalog(atlas, entries, folder / stem)
+        frame_sheet(atlas, entries, folder / (stem + "-frames.png"))
+    frame_sheet(atlas, REWORK, folder / "neko-tail-life-frames.png")
+    frame_sheet(atlas, REWORK, folder / "neko-tail-life-source-frames.png", source=True)
+    flight_sheet(atlas, folder / "neko-lifecycle-flight.png")
+    catalog(atlas, REWORK, folder / "neko-tail-life-native", columns=5, seconds=6)
+    catalog(atlas, REWORK, folder / "neko-tail-life-preview", columns=5, scale=2, seconds=6)
+    print("Rebuilt idle, activity and animation-rework previews from SpriteAtlas.")

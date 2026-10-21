@@ -21,22 +21,25 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 144 loaded drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 148 loaded drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
-  Tail swishes, kneading and paw taps use slower continuous cycles. Rendering runs at
-  10 FPS, keeping the same action lengths and walking speed.
+  Tail swishes make one lazy sweep and rest; kneading and paw taps use slower continuous cycles.
+  Normal rendering runs at 10 FPS; arrival/departure briefly use 30 FPS for smooth travel,
+  keeping walking speed unchanged.
   Every frame has a 112 × 100 transparent canvas;
   retained seated poses share an 82-pixel height. New body movements keep one
   scale across each sequence so crouching and lying down do not enlarge her head.
   Walking, loafing and sleep preserve their natural posture and proportions.
 - **A little tail trouble.** Two eight-drawing idle games: she turns in a compact
-  circle chasing her tail, or stays seated and tries to trap its tip between her
-  forepaws. Each plays once, then rests. These do not change the twelve pet reactions.
+  circle chasing her tail, or stays seated and pins its tip with one forepaw before
+  it slips away. Each plays once, then returns to her normal sitting drawing.
+  These do not change the twelve pet reactions.
 - **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
-  sit-up before her greeting. **Let her go · quit** gives her a wistful pause and
-  a hop down out of view before closing. These eight-drawing transitions last
-  about two seconds, keep her saved desktop position, and do not accept pets or
+  sit-up before her greeting. **Let her go · quit** gives her a relaxed glance down,
+  a crouch and a small hop before she drops out of view. These rebuilt eight-drawing
+  transitions last 1.6 and 1.8 seconds, use continuous travel between poses,
+  keep her saved desktop position, and do not accept pets or
   window reactions midway through. Reduced motion skips the jumps; quitting
   while hidden or fullscreen is immediate. Hide/Show remains immediate.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
@@ -181,14 +184,18 @@ character scale through the change in posture. `assets/neko-affection-v1.png`
 supplies the retained chin scritches, blep and ear rubs.
 `assets/neko-petting-a-v1.png` and `assets/neko-petting-b-v1.png` each contain
 three rows of four drawings, for five new reactions and the remade paw offer.
-The old wave and old paw-offer rows are never loaded into the atlas. Frame
+`assets/neko-tailplay-v2.png` rebuilds both tail games; `assets/neko-lifecycle-v2.png`
+rebuilds arrival/departure; `assets/neko-tailswish-v1.png` adds the eight-pose lazy swish.
+The retired wave, old paw-offer and original tail-swish rows are never loaded into the atlas. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
 neighboring cells is excluded when locating each silhouette.
 
 The [generation prompts and art notes](docs/animation-notes.md) document the built-in
 ImageGen workflow; [tail and lifecycle notes](docs/tail-lifecycle-notes.md) include
-the new motion references, prompts and eight-frame previews. The original six
+the rebuilt motion, [exact prompts](docs/animation-rebuild-prompts.md), and frame-by-frame QA.
+Run `tools/preview_animations.py` with optional Pillow installed to regenerate the runtime catalogs.
+The original six
 transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can
 be disabled in the nook, holding a still frame without losing direct interaction.
