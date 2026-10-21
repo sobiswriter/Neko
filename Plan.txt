@@ -19,10 +19,12 @@ Interaction rules
   Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
   Eight frames lower her into sleep; a pet or optional nap deadline plays the eight-frame wake.
   Typing, window changes and dragging do not wake her; the optional nap deadline does.
-  Exactly twelve four-frame pet responses rotate through a shuffled bag before repeating.
-  Keep head pats, cheek nuzzle, kneading, chin scritches, blep and ear rubs.
-  Two 4-column by 3-row sheets add front stretch, back arch, hop, side flop,
-  shoulder peek and a corrected paw offer. No six-frame petting reactions.
+  Exactly twelve dedicated pet sequences rotate through a shuffled bag before repeating.
+  Keep head pats, cheek nuzzle, kneading, chin scritches, playful roll and ear rubs.
+  Paw offer, front stretch, back arch, three little hops, sleepy side flop and both-shoulder peek complete the set.
+  Use 16–28 source slots per sequence plus canonical idle after complete drawn recovery.
+  Pet stories last 2.8–6.8 seconds, with distinct soft lids, winks, excited eyes, sleep and yawn acting.
+  Kneading has four alternating paw pairs; the flop sleeps, winks, wakes and rises; peek looks both ways then yawns and holds a sleepy face.
   Nap duration is independently configurable: 1–3600 seconds or 0 until petted (default).
   Eleven idle moods avoid consecutive repeats, including extended tail games and idle stories with drawn anticipation/recovery.
   Tail chase turns clockwise; tail catch pins the tip beneath one forepaw before it slips away.
@@ -35,10 +37,10 @@ Interaction rules
   Ambient thoughts default to 75 seconds; configurable from 15 to 600. Quiet removes them.
   Cursor walks move only left/right at the same height, keep a gap, last at most 6.5 seconds and travel about 220 pixels maximum.
   Eligible moving cursors invite another walk after 25 seconds.
-  Keep 5–6 second gesture slots: one natural gesture followed by a relaxed rest.
+  Spontaneous idles keep 5–6 second slots; pet reactions finish at their actual clip deadlines.
   No repeated grooming, stretching, waving or head-bobbing within one gesture slot.
   Kneading and paw taps use gentle continuous cycles; the lazy swish plays once and settles with a blink.
-  Rendering runs at 10 FPS; tail running uses 20 FPS and arrival/departure use 30 FPS.
+  Rendering runs at 10 FPS; tail running and petting use 20 FPS, with a precise pet timer; arrival/departure use 30 FPS.
   Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
   Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
@@ -50,8 +52,9 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  195 loaded drawings including twelve pet reactions, new idle stories, five/two-turn tail games with drawn entry/recovery, arrival, departure and sleep. Tail games get triple idle selection weight.
-  Every idle attempts a matching local thought. Bubble text is 16px semibold, dark on painted cream, visible for 5.5-10 seconds.
+  427 atlas entries include twelve pet stories, idle stories, five/two-turn tail games, arrival, departure and sleep. Tail games get triple idle selection weight.
+  Keep visible idle scale and saved visible origin; a 192x112 transparent canvas supplies horizontal gesture room.
+  Every idle attempts a matching local thought. Text is 16px semibold cream with a small dark glyph shadow, no background panel, visible for 5.5-10 seconds.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

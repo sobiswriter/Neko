@@ -8,13 +8,16 @@ Soft sounds are optional and off until you enable them.
 
 ## Living with Neko
 
-- **Click to pet.** Twelve individually paced reactions with 12–16 pose slots: head pats, cheek nuzzles,
-  kneading, chin scritches, a tiny blep, offering a paw, relaxed ear rubs,
+- **Click to pet.** Twelve individually paced reactions with 16–28 source pose slots: head pats, cheek nuzzles,
+  kneading, chin scritches, a playful roll, offering a paw, relaxed ear rubs,
   a front stretch, back arch, tiny hop, side flop, and shoulder peek.
   Each has drawn anticipation/action/recovery and uses the actual idle drawing
-  at both ends, plus its shared seated blink. The old four-frame pet rows are
+  at both ends, with a complete drawn recovery before the final idle. The old four-frame pet rows are
   excluded from playback. Each plays once and returns to normal idle blinking;
-  kneading makes three alternating cycles first. All twelve appear before the
+  kneading makes four alternating paw pairs first. The hop has three little jumps;
+  shoulder peek looks both ways, yawns and holds a sleepy face; side flop snoozes,
+  winks and wakes before getting up. Contact gestures linger with soft lids and
+  small ear/paw movements. All twelve appear before the
   rotation repeats. Repeated clicks count immediately and coalesce into one
   next reaction, which waits for the current landing/get-up to finish.
   If she's asleep, a pet plays her waking sequence instead.
@@ -27,7 +30,7 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 307 entries, including eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 427 entries, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
@@ -35,11 +38,12 @@ Soft sounds are optional and off until you enable them.
   Petting uses a precise Qt timer so its short connecting poses get screen time.
   Arrival/departure briefly use 30 FPS for smooth travel,
   keeping walking speed unchanged.
-  Every frame has a 112 × 112 transparent canvas. Idle is about 82 pixels tall;
+  Every frame has a 192 × 112 transparent canvas, with extra horizontal room for
+  rolls and deeper reaches. Idle remains about 82 pixels tall;
   pet sequences use a 62px-wide seated head reference and 82px-tall reference body.
   Each retains one calibration throughout its poses, with ground contacts used
   for registration. Crouching and lying down preserve their natural posture;
-  no whole-body refitting happens per frame. The hop follows a small in-canvas arc.
+  no whole-body refitting happens per frame. The hops follow three small in-canvas arcs.
   Walking, loafing and sleep preserve their natural posture and proportions.
   Grooming, stretching, loafing, sniffing, ear flicks, yawning, sleepy peeks and
   directional looks now have drawn anticipation and recovery: paw lick and ear wipe,
@@ -241,8 +245,9 @@ the [generation prompts](docs/idle-personality-prompts.md) and the
 [native before/after bubble preview](docs/neko-thought-readability.png).
 The later [startup and transparent-thought correction](docs/startup-thought-validation.md)
 supersedes that bubble styling; see the [current text-only preview](docs/neko-thought-transparent.png).
-The [petting rebuild and per-reaction verification](docs/petting-rebuild-validation.md)
-records the twelve smooth sequences, native rendering and safe repeated-click handoffs.
+The [expressive petting revision and per-reaction verification](docs/petting-revision-validation.md)
+records current timings, expression choices, native rendering and safe repeated-click handoffs.
+See the [expression/gesture study](docs/petting-expression-study.md) for the acting references.
 The original six
 transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can

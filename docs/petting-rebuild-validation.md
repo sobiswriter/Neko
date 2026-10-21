@@ -1,5 +1,7 @@
 # Twelve smooth petting reactions — 2026-10-22
 
+Historical record of the first rebuild. The [later expressive revision](petting-revision-validation.md) supersedes its timings, pose counts and handoff policy. Linked catalog images now show the current revision.
+
 ![All twelve reactions at production timing](neko-pet-catalog.gif)
 
 [All imported poses](neko-pet-frames.png) · [First six](neko-pet-frames-a.png) · [Last six](neko-pet-frames-b.png) · [Native light/dark rendering](neko-petting-native.png)

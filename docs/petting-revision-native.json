@@ -1,0 +1,94 @@
+{
+  "platform": "windows",
+  "dpr": 1.0,
+  "reactions": {
+    "happy": {
+      "duration_ms": 2800,
+      "observed_poses": 17,
+      "median_paint_gap_ms": 49.9
+    },
+    "nuzzle": {
+      "duration_ms": 3700,
+      "observed_poses": 21,
+      "median_paint_gap_ms": 49.88
+    },
+    "knead": {
+      "duration_ms": 5800,
+      "observed_poses": 25,
+      "median_paint_gap_ms": 50.03
+    },
+    "chin_scritch": {
+      "duration_ms": 3000,
+      "observed_poses": 17,
+      "median_paint_gap_ms": 50.03
+    },
+    "roll": {
+      "duration_ms": 5800,
+      "observed_poses": 25,
+      "median_paint_gap_ms": 50.02
+    },
+    "paw_offer": {
+      "duration_ms": 3600,
+      "observed_poses": 21,
+      "median_paint_gap_ms": 49.96
+    },
+    "ear_rub": {
+      "duration_ms": 2950,
+      "observed_poses": 17,
+      "median_paint_gap_ms": 49.85
+    },
+    "pet_stretch": {
+      "duration_ms": 5200,
+      "observed_poses": 25,
+      "median_paint_gap_ms": 50.0
+    },
+    "back_arch": {
+      "duration_ms": 4900,
+      "observed_poses": 25,
+      "median_paint_gap_ms": 49.95
+    },
+    "happy_hop": {
+      "duration_ms": 5000,
+      "observed_poses": 29,
+      "median_paint_gap_ms": 49.98
+    },
+    "side_flop": {
+      "duration_ms": 6800,
+      "observed_poses": 29,
+      "median_paint_gap_ms": 49.95
+    },
+    "shoulder_peek": {
+      "duration_ms": 6400,
+      "observed_poses": 29,
+      "median_paint_gap_ms": 49.99
+    }
+  },
+  "queued_recovery": "passed",
+  "window_position": "unchanged",
+  "saved_visible_origin": "passed",
+  "final_stretch_clean_hold": {
+    "observed_poses": 25,
+    "result": "passed"
+  },
+  "desktop_input": {
+    "transparent_left_padding": "passes through",
+    "transparent_right_padding": "passes through",
+    "kitten": "clickable",
+    "screen_corners": "all four clamped inside available area"
+  },
+  "tests": {
+    "full_discovery": {
+      "run": 149,
+      "passed": 147,
+      "skipped_packaging": 2
+    },
+    "final_fragment_and_alignment_checks": "3 passed after the one-pose correction",
+    "final_packaged_checks": "2 passed; all twelve pet sheets hash-match the working tree"
+  },
+  "release": {
+    "path": "dist\\expressive-petting\\DesktopNeko.exe",
+    "bytes": 91265209,
+    "sha256": "c6a3448794b327e667a9c217971291b9c988a964f34407de9ccb0803114d57f4",
+    "source_commit": "28c46205f5aeb04e75dde23142035eb93f758a37"
+  }
+}

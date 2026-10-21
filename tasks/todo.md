@@ -1,5 +1,88 @@
 # Animation rebuild checklist
 
+## Expressive petting revision — approved and completed
+
+- [x] Inspect the current timings, shared idle handoff, canvas/registration, behavior deadlines, preview sampling and packaging references; record the detailed revised plan in `tasks/plan.md`.
+- [x] User reviewed the proposed plan and authorized implementation; expression/gesture study added to the first slice.
+
+### 1. Native-size expression and pose-space trial
+
+Description: establish relaxed, wink, excited, sleepy and yawning faces plus roll/knead/deep-stretch key poses at the canonical idle scale.
+
+- [x] Acceptance: expressions read at native size; key poses have coherent anatomy; deepest silhouettes fit without shrinking the kitten or concealing the reach.
+- [x] Verification: review idle-overlaid contact sheets and proposed support/limb-visibility maps; measure transparent-space needs. Record the canvas decision before integration.
+- Dependencies: plan review. Likely files: trial art and revision QA notes (2–4 files; medium).
+
+### 2. Playful roll replaces Tiny blep
+
+Description: make the complete 5.8-second side/back/other-side/upright story replace blep within the existing twelve-reaction rotation. Split the work into art, runtime mapping and packaging follow-through as below.
+
+- [x] Art acceptance/verification: draw/review 24–32 pose slots including support, tuck, belly-up wriggle and supported rise; inspect every adjacent handoff at native/enlarged size. Files: roll sheet, prompt/QA record (2–3; small).
+- [x] Runtime acceptance/verification: replace BLEPPING/blep selection, clip, mapping and description; true clip deadline and canonical idle endpoints pass focused behavior/animation tests. Files: `behavior.py`, `animations.py`, `main.py`, focused tests (up to 5; medium).
+- [x] Packaging acceptance/verification: preview/required-asset lists use roll, blep is no longer selectable; asset-presence and full-preview checks pass. Files: preview tool, packaging tests (2; small).
+- Dependencies: task 1; complete art before runtime calibration. If task 1 requires expanded transparent space, first implement and test the minimal fixed-anchor canvas change as a separate slice before mapping roll.
+
+### 3. Kneading rebuilt from one clean alternating pair
+
+Description: establish left pressure/right release and right pressure/left release, then play four pairs with a relaxed face and full entry/recovery, targeting 5.8 seconds.
+
+- [x] Acceptance: two connected forelegs, alternating pressure, stable hindquarters and no head pumping; four pairs; complete seated recovery.
+- [x] Verification: inspect a slowed single pair and every seam, then full native playback; cycle/order/deadline and endpoint checks pass.
+- Dependencies: task 1 and task 2's shared importer/space decisions. Files: knead sheet, `animations.py`, focused animation tests, prompt/QA record (4–5; medium).
+
+Checkpoint: inspect roll and knead source/runtime previews before generating the remaining full sheets. Reject anatomy drift and repair the affected passage.
+
+### 4. Extended stretches (two separate slices)
+
+Description: build front stretch's farther reach/deep bow/release (5.2 seconds), then arch's gradual rounding/comfortable effort/unroll (4.9 seconds).
+
+- [x] Front acceptance/verification: longer forward reach is visible with fixed hind support; effort becomes relaxed; native slow/normal playback and scale/contact/endpoint checks pass.
+- [x] Arch acceptance/verification: four-paw rounded-spine action stays distinct from bowing and fear; face relaxes before sitting; the same checks pass.
+- Dependencies: task 1 and shared importer decisions. Per slice files: one sheet, `animations.py`, animation tests, prompt/QA record (4–5; medium).
+
+### 5. Three connected excited hops
+
+Description: create three subtly different hops with shared ground support and complete final recovery, targeting 5.0 seconds.
+
+- [x] Acceptance: exactly three push-offs/airborne arcs/landings; second hop slightly bouncier; excited eyes with readable landing glances; no seated snap between hops.
+- [x] Verification: review each takeoff/contact/compression and native full playback; launch count, deliberate lift, grounded recovery and real deadline checks pass.
+- Dependencies: task 1 and shared importer decisions. Files: hop sheet, `animations.py`, animation tests, prompt/QA record (4–5; medium).
+
+Checkpoint: review stretches/hops at native scale against idle and tail playback; check reach, continuity and transparent edges before smaller contact gestures.
+
+### 6. Paw offer and cheek nuzzle (two separate slices)
+
+Description: make offer 3.6 seconds and nuzzle 3.7 seconds using animated contact/expressions and gradual withdrawal.
+
+- [x] Paw acceptance/verification: supporting paw stays grounded; offered paw has one small beckon and a wink, then plants cleanly. Source/runtime adjacent-pose review and timing/contact checks pass.
+- [x] Nuzzle acceptance/verification: visible cheek pressure/curved rub, contact-side eye softness, wink and shoulder release; planted support and smooth idle handoff pass the same review/checks.
+- Dependencies: task 1; reuse established import/space. Per slice files: one sheet, `animations.py`, animation tests, prompt/QA record (4–5; medium).
+
+### 7. Shoulder story and sleepy flop (two separate slices)
+
+Description: peek both directions, yawn, close the mouth and hold `=_=` (6.4 seconds); separately flop, briefly sleep, wink, wake and rise (6.8 seconds).
+
+- [x] Peek acceptance/verification: both glances and yawn/deadpan are readable in order; connected neck/jaw and planted paws pass source/runtime review and ordered-phase/deadline checks.
+- [x] Flop acceptance/verification: sleep precedes wink/wake; supported rise precedes idle; this remains a pet state. Review occlusion/get-up and test the >5.8-second queued-pet/nap boundary.
+- Dependencies: task 1 and shared deadline decisions. Per slice files: one sheet, `animations.py`, focused animation/behavior tests, prompt/QA record (up to 5; medium).
+
+Checkpoint: native playback proves every expression beat remains visible and the body finishes recovering before the shared idle blink appears.
+
+### 8. Remaining seated facial acting (one reaction per slice)
+
+Description: refine head pats (2.8 seconds), chin scritches (3.0 seconds) and ear rubs (3.0 seconds), reusing clean body art and drawing missing face/contact/recovery passages.
+
+- [x] Acceptance: forehead-down contentment, chin-up bliss and asymmetric ear/eye melt read as distinct actions without relying on the same smile; all three return smoothly to idle.
+- [x] Verification: compare native light/dark previews side by side; per-reaction timing, scale and handoff checks pass.
+- Dependencies: task 1. Per reaction files: one sheet, `animations.py`, animation tests, prompt/QA record (4–5; medium).
+
+### 9. Complete previews and delivery validation (sequential slices)
+
+- [x] Preview acceptance/verification: derive duration from clip length, include >=0.8 seconds of idle after recovery, sample every used pose, refresh full catalog/contact sheets and inspect at native/enlarged/slow speed. Files: preview tool, catalogs and QA record (medium; split generated outputs from tool edits).
+- [x] Interaction acceptance/verification: all twelve appear in rotation; clicks count immediately with at most one pending reaction; longer clips finish before queued pets/naps; hiding/motion/drag/position behavior passes focused native checks, followed by full test discovery. Files: relevant animation/behavior/widget tests, QA record (up to 5; medium).
+- [x] Release acceptance/verification: accepted tail/non-pet art and cadence compare with baseline; rebuild executable, pass required-asset and native packaged startup/single-instance checks, document actual results and remaining display limits. Files: QA/delivery records plus build output (small).
+- Dependencies: tasks 2–8; previews/interaction checks before release build. Completed: full discovery passed (147 tests; two packaged checks then passed separately), final native playback covered all 280 pet pose entries, and the final fragment regression/related rendering checks passed. See `docs/petting-revision-validation.md`.
+
 ## Smooth twelve-reaction petting rebuild
 
 - [x] Read the study, runtime/import/selection paths, callers, previews and tests; record acceptance criteria.

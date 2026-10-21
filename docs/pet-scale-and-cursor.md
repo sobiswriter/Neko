@@ -1,6 +1,6 @@
 # Pet scale and palm cursor
 
-The cursor behavior below remains current. The pet source calibration described here is historical; the [new petting rebuild](petting-rebuild-validation.md) uses full sequences with one seated-reference calibration and shared idle/blink endpoints.
+The cursor behavior below remains current. The pet source calibration described here is historical; the [expressive petting revision](petting-revision-validation.md) uses full sequences, a fixed seated-reference calibration, aligned drawn recovery and extra transparent drawing room.
 
 ## Size matching
 

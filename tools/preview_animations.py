@@ -4,6 +4,7 @@ import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from pathlib import Path
+import math
 import sys
 
 from PIL import Image, ImageDraw
@@ -12,7 +13,7 @@ from PySide6.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, SpriteAtlas, drop_progress
+from animations import CLIPS, PET_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING
 from cursors import petting_cursors
 
 
@@ -26,7 +27,7 @@ ACTIVITIES = [("typing", "Typing"), ("walk", "Walking"), ("fall_asleep", "Settli
               ("arrive", "Drop in / hello"), ("depart", "Hop down / goodbye")]
 REWORK = [ACTIVITIES[-2], ACTIVITIES[-1], IDLES[1], IDLES[-2], IDLES[-1]]
 PETS = [("happy", "Head pats"), ("nuzzle", "Cheek nuzzle"), ("knead", "Kneading"),
-        ("chin_scritch", "Chin scritches"), ("blep", "Tiny blep"), ("paw_offer", "Paw offer"),
+        ("chin_scritch", "Chin scritches"), ("roll", "Playful roll"), ("paw_offer", "Paw offer"),
         ("ear_rub", "Ear rubs"), ("pet_stretch", "Front stretch"), ("back_arch", "Back arch"),
         ("happy_hop", "Tiny hop"), ("side_flop", "Side flop"), ("shoulder_peek", "Shoulder peek")]
 BACKGROUND = (248, 246, 241)
@@ -59,11 +60,11 @@ def displayed(atlas, name, elapsed):
 
 def frame_sheet(atlas, entries, destination, source=False):
     bands = [((len(set(CLIPS[name].order)) + 7) // 8) for name, _ in entries]
-    sheet = Image.new("RGB", (180 + 8 * 180, sum(bands) * 225), BACKGROUND)
+    sheet = Image.new("RGB", (180 + 8 * 208, sum(bands) * 160), BACKGROUND)
     draw = ImageDraw.Draw(sheet)
     band = 0
     for row, (name, label) in enumerate(entries):
-        draw.text((8, band * 225 + 12), label, fill="#514a43")
+        draw.text((8, band * 160 + 12), label, fill="#514a43")
         clip = CLIPS[name]
         indices = sorted(set(clip.order))
         for col, index in enumerate(indices):
@@ -73,10 +74,9 @@ def frame_sheet(atlas, entries, destination, source=False):
                 first = clip.order.index(index)
                 elapsed = (sum(clip.durations[:first]) + clip.durations[first] / 2) / 1000
                 frame = pixels(atlas.frame(name, elapsed))
-            frame = frame.resize((168, 168), Image.Resampling.NEAREST)
-            left, top = 180 + col % 8 * 180, (band + col // 8) * 225
-            sheet.paste(frame, (left, top + 35), frame)
-            draw.text((left + 4, top + 210), str(index + 1), fill="#514a43")
+            left, top = 180 + col % 8 * 208, (band + col // 8) * 160
+            sheet.paste(frame, (left, top + 25), frame)
+            draw.text((left + 4, top + 140), str(index + 1), fill="#514a43")
         band += bands[row]
     sheet.save(destination)
 
@@ -94,12 +94,13 @@ def lifecycle_scene(atlas, destination):
         draw.line((0, 299, 480, 299), fill="#bcb4a7")
         elapsed = elapsed_ms / 1000
         y = round(-82 + 270 * drop_progress(elapsed))
-        arrival = displayed(atlas, "arrive", elapsed)
-        # Same 112px window, top-edge clip and trajectory as NekoWidget.
+        arrival = displayed(atlas, "arrive", elapsed).crop((CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
+        # Crop horizontal transparent padding; retain the native top-edge clip/trajectory.
         canvas.paste(arrival, (64, y), arrival)
         draw.rectangle((0, 0, 239, 29), fill=BACKGROUND)
         draw.text((12, 10), "Monitor top", fill="#514a43")
-        departure = pixels(atlas.frame("depart", max(0, elapsed - 0.5)))
+        departure = pixels(atlas.frame("depart", max(0, elapsed - 0.5))).crop(
+            (CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
         canvas.paste(departure, (304, 188), departure)
         frames.append(canvas)
         elapsed_ms += duration
@@ -115,7 +116,7 @@ def flight_sheet(atlas, destination):
         draw.text((8, row * 144 + 8), name, fill="#514a43")
         for col in range(10):
             elapsed = (row % 2 * 10 + col) / 10
-            frame = pixels(atlas.frame(name, elapsed))
+            frame = pixels(atlas.frame(name, elapsed)).crop((CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
             left, top = 160 + col * 112, row * 144
             sheet.paste(frame, (left, top), frame)
             draw.text((left + 6, top + 124), f"{elapsed:.1f}s", fill="#514a43")
@@ -123,7 +124,10 @@ def flight_sheet(atlas, destination):
 
 
 def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
-    width, height = columns * 160, ((len(entries) + columns - 1) // columns) * 152
+    if any(name in PET_ROWS for name, _ in entries):
+        seconds = max(seconds, math.ceil(max(sum(CLIPS[name].durations) / 1000
+                                            for name, _ in entries) + 1.6))
+    width, height = columns * 240, ((len(entries) + columns - 1) // columns) * 152
     frames = []
     fast_only = all(name in ("tail_chase", "tail_catch") or name in {item[0] for item in PETS}
                     for name, _ in entries)
@@ -134,7 +138,7 @@ def catalog(atlas, entries, stem, columns=4, scale=1, seconds=8):
         canvas = Image.new("RGB", (width, height), BACKGROUND)
         draw = ImageDraw.Draw(canvas)
         for index, (name, label) in enumerate(entries):
-            left, top = index % columns * 160, index // columns * 152
+            left, top = index % columns * 240, index // columns * 152
             draw.text((left + 8, top + 8), label, fill="#514a43")
             frame = displayed(atlas, name, elapsed_ms / 1000)
             canvas.paste(frame, (left + 24, top + 30), frame)
@@ -156,7 +160,8 @@ def cursor_preview(atlas, destination):
     for index in range(48):
         elapsed = index / 20 - 0.6
         canvas = Image.new("RGB", (160, 152), BACKGROUND)
-        frame = pixels(atlas.frame("idle" if elapsed < 0 else "happy", max(0, elapsed)))
+        frame = pixels(atlas.frame("idle" if elapsed < 0 else "happy", max(0, elapsed))).crop(
+            (CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
         canvas.paste(frame, (24, 30), frame)
         if 0 <= elapsed < len(hands) * 0.07:
             hand = hands[min(len(hands) - 1, int(elapsed / 0.07))]
@@ -170,7 +175,7 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 307
+    assert len(atlas.frames) == 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS)
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)
