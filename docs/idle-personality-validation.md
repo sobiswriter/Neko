@@ -1,5 +1,7 @@
 # Idle personality and readable thoughts
 
+The cream bubble described below records the earlier revision. It has since been replaced by [background-free thoughts and startup fixes](startup-thought-validation.md).
+
 ![Native thoughts with idle playback](neko-idle-thoughts.gif)
 
 [All idle poses](neko-idle-catalog-frames.png) · [Full idle catalog](neko-idle-catalog.gif) · [Native before/after thoughts](neko-thought-readability.png) · [Exact prompts](idle-personality-prompts.md)

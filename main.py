@@ -17,7 +17,7 @@ import win32con
 from PySide6.QtCore import QLockFile, QPoint, QRect, QRectF, QSettings, QStandardPaths, Qt, QTimer
 from PySide6.QtGui import QColor, QCursor, QFont, QIcon, QMovie, QPainter, QPixmap
 from PySide6.QtWidgets import (
-    QApplication, QCheckBox, QDialog, QHBoxLayout, QLabel, QMenu, QMessageBox,
+    QApplication, QCheckBox, QDialog, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QMenu, QMessageBox,
     QPushButton, QSpinBox, QFormLayout, QTabWidget, QSystemTrayIcon, QVBoxLayout, QWidget,
 )
 
@@ -370,14 +370,17 @@ class NekoWidget(QWidget):
                              | Qt.WindowTransparentForInput)
         self.bubble.setAttribute(Qt.WA_ShowWithoutActivating)
         self.bubble.setAttribute(Qt.WA_TranslucentBackground)
-        # Qt otherwise leaves this top-level label's styled background unpainted.
-        self.bubble.setAttribute(Qt.WA_NoSystemBackground, False)
         self.bubble.setAttribute(Qt.WA_TransparentForMouseEvents)
         self.bubble.setTextFormat(Qt.PlainText)
         self.bubble.setWordWrap(True)
         self.bubble.setFixedWidth(270)
-        self.bubble.setStyleSheet("background: #fffaf0; color: #33261f; border: 1px solid #b49a80;"
-                                 "border-radius: 12px; padding: 11px 14px; font: 600 16px 'Segoe UI';")
+        self.bubble.setStyleSheet("background: transparent; color: #fffaf0; border: 0;"
+                                 "padding: 6px; font: 600 16px 'Segoe UI';")
+        shadow = QGraphicsDropShadowEffect(self.bubble)
+        shadow.setBlurRadius(4)
+        shadow.setOffset(0, 1)
+        shadow.setColor(QColor("#33261f"))
+        self.bubble.setGraphicsEffect(shadow)
         self.bubble_timer = QTimer(self)
         self.bubble_timer.setSingleShot(True)
         self.bubble_timer.timeout.connect(self.bubble.hide)
@@ -522,6 +525,12 @@ class NekoWidget(QWidget):
 
     def animate(self):
         if self.arrival_target is not None:
+            # Startup work must not consume the fall before Qt can animate it.
+            if not self.transition_timer.isActive():
+                self.pose_started = time.monotonic()
+                duration = sum(CLIPS["arrive"].durations)
+                self.companion.pose_until = self.pose_started + duration / 1000
+                self.transition_timer.start(duration)
             progress = drop_progress(time.monotonic() - self.pose_started)
             y = self.arrival_top + (self.arrival_target.y() - self.arrival_top) * progress
             self.move(self.arrival_target.x(), round(y))
@@ -551,6 +560,8 @@ class NekoWidget(QWidget):
 
     def set_hide_fullscreen(self, enabled):
         self.hide_fullscreen = enabled
+        if enabled and self.fullscreen and self.companion.state == NekoState.ARRIVING:
+            self.finish_transition()
         self.dismiss_bubble()
         self.setVisible(not self.is_manually_hidden and not self.closing
                         and not (enabled and self.fullscreen))
@@ -636,7 +647,7 @@ class NekoWidget(QWidget):
         if fullscreen_changed:
             self.reset_pet_cursor()
             self.fullscreen = fullscreen
-            if fullscreen and self.companion.state == NekoState.ARRIVING:
+            if fullscreen and self.hide_fullscreen and self.companion.state == NekoState.ARRIVING:
                 self.finish_transition()
             self.ai_generation += 1
             self.stop_following()
@@ -939,6 +950,8 @@ class NekoWidget(QWidget):
         self.dismiss_bubble()
 
     def clamp_position(self, *args):
+        if self.companion.state == NekoState.ARRIVING:
+            self.finish_transition()
         self.restore_arrival_position()
         screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
         area = screen.availableGeometry()
@@ -981,7 +994,7 @@ class NekoWidget(QWidget):
         self.fullscreen = desktop_activity()[2]
         self.activity.enabled = self.reactive and not self.fullscreen
         self.setVisible(not (self.fullscreen and self.hide_fullscreen))
-        if greet and self.isVisible() and not self.fullscreen:
+        if greet and self.isVisible():
             if self.motion and not self.atlas.frame("arrive", 0).isNull():
                 self.start_transition(NekoState.ARRIVING, "arrive")
             else:
@@ -1044,6 +1057,7 @@ class NekoWidget(QWidget):
 
     def start_transition(self, state, clip):
         self.reset_pet_cursor()
+        self.transition_timer.stop()
         self.restore_arrival_position()
         now = time.monotonic()
         duration = sum(CLIPS[clip].durations)
@@ -1055,7 +1069,8 @@ class NekoWidget(QWidget):
             self.arrival_top = screen.geometry().top() - self.height()
             self.move(self.arrival_target.x(), self.arrival_top)
         self.refresh_asset()
-        self.transition_timer.start(duration)
+        if state != NekoState.ARRIVING:
+            self.transition_timer.start(duration)
 
     def finish_transition(self):
         self.transition_timer.stop()

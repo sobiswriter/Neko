@@ -1,5 +1,12 @@
 # Animation rebuild checklist
 
+## Startup drop-in and background-free thoughts
+
+- [x] Reproduce delayed-first-tick and visible-fullscreen startup skips with failing tests.
+- [x] Start the arrival clock when Qt can animate; preserve hiding, saved position and reduced motion.
+- [x] Replace the thought panel with transparent text and a small glyph shadow; inspect native light/dark rendering.
+- [x] Finish regression (134 passed), native rendering, mutation, build and bundle checks; record that cold EXE startup remains blocked by the running copy.
+
 ## Other-idle personality and readable thoughts
 
 - [x] Read art/idle selection, dialogue dispatch, bubbles and tests; define scope and failing regressions.

@@ -52,7 +52,10 @@ Soft sounds are optional and off until you enable them.
   her saved position. **Let her go · quit** gives her a little sad look and lowered
   ears, then the existing crouch and graceful hop. These eight-drawing
   transitions last 1.9 and 2.15 seconds, use continuous travel between poses,
-  keep her saved desktop position, and do not accept pets or
+  and start the arrival clock on Qt's first animation tick so a slow launch
+  cannot spend the fall before it appears. Visible fullscreen launches also
+  play the drop-in, silently; the fullscreen hiding preference still applies.
+  They keep her saved desktop position, and do not accept pets or
   window reactions midway through. Reduced motion skips the jumps; quitting
   while hidden or fullscreen is immediate. Hide/Show remains immediate.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
@@ -77,9 +80,9 @@ Soft sounds are optional and off until you enable them.
   All automatic words share an 8–30 second pause and never replace a visible bubble.
   Every spontaneous idle attempts its own local thought, including “Look at meeee!”
   and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
-  Thoughts use dark 16px semibold text on a painted cream background, a 270px-wide
-  bubble and 5.5–10 seconds of reading time. The previous transparent-background
-  painting bug is fixed, so words remain readable over dark apps.
+  Thoughts use cream 16px semibold text with a small dark shadow around the letters,
+  transparent margins and no background or border. They wrap within 270px and
+  remain for 5.5–10 seconds of reading time.
 - **Little app rituals.** VLC gets a watch-buddy loaf and questions about what
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
@@ -169,6 +172,10 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
+The startup/thought correction build is `dist\updated\DesktopNeko.exe` while the
+previous executable is running. Quit the existing Neko from her tray menu before
+launching it; the single-instance lock prevents two kittens running together.
+
 ## Check the behavior
 
 ```powershell
@@ -224,6 +231,8 @@ Run `tools/preview_animations.py` with optional Pillow installed to regenerate t
 See [idle personality and readability verification](docs/idle-personality-validation.md),
 the [generation prompts](docs/idle-personality-prompts.md) and the
 [native before/after bubble preview](docs/neko-thought-readability.png).
+The later [startup and transparent-thought correction](docs/startup-thought-validation.md)
+supersedes that bubble styling; see the [current text-only preview](docs/neko-thought-transparent.png).
 The original six
 transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can

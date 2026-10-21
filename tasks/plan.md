@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Startup and text-only correction
+
+Start the drop-in clock on the first animation tick, cover delayed and visible-fullscreen launches, and safely finish if fullscreen hiding or monitor changes interrupt arrival. Replace the cream thought panel with transparent, shadowed lettering while retaining wrapping, reading time and quiet controls. Verify native rendering, lifecycle regressions and the bundled source; deliver under `dist/updated` while the old executable is running. See [verification](../docs/startup-thought-validation.md).
+
 ## Personality for all other idles and readable thoughts
 
 Rebuild grooming, stretch, loaf, sniff, ears, lazy swish, yawn, sleepy peek and directional looks as small stories with drawn entry/action/recovery. Three 4-column/6-row sheets supply eight drawings per action (directional looks share left/right alternatives). Keep the accepted tail games, pet reactions and lifecycle artwork. Retire replaced source rows from runtime import. Every spontaneous idle attempts an action-specific offline thought, subject to existing quiet/fullscreen/bubble/cooldown rules. Increase bubble font to 16px semibold, width to 270px, dark text/cream fill/clear border and reading time to 5.5–10s. Review each used pose and handoff, test state/line/visibility behavior, inspect actual bubble rendering, regenerate catalogs and rebuild.

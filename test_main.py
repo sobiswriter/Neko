@@ -75,6 +75,8 @@ class DesktopTests(unittest.TestCase):
             self.neko.show_neko(greet=True)
             self.assertEqual(self.neko.current_clip, "arrive")
             self.assertEqual(self.neko.animation_timer.interval(), 33)
+            self.assertFalse(self.neko.transition_timer.isActive())
+            self.neko.animate()
             self.assertTrue(self.neko.transition_timer.isActive())
             self.neko.pet_reaction()
             with patch("main.desktop_activity", return_value=(9999, 100, False)):
@@ -94,6 +96,7 @@ class DesktopTests(unittest.TestCase):
         self.neko.show_neko(greet=True)
         screen = QApplication.screenAt(target + QPoint(56, 56)) or QApplication.primaryScreen()
         self.assertLessEqual(self.neko.geometry().bottom(), screen.geometry().top())
+        self.neko.animate()
         start = self.neko.pose_started
         with patch("main.time.monotonic", return_value=start + 0.35):
             self.neko.animate()
@@ -106,6 +109,51 @@ class DesktopTests(unittest.TestCase):
         self.neko.finish_transition()
         self.assertEqual(self.neko.pos(), target)
 
+    def test_slow_startup_does_not_spend_the_drop_before_the_first_animation_tick(self):
+        target = self.neko.pos()
+        self.neko.show_neko(greet=True)
+        top = self.neko.y()
+        ready = self.neko.pose_started + 2.5
+        with patch("main.time.monotonic", return_value=ready):
+            self.neko.animate()
+        self.assertEqual(self.neko.y(), top)
+        self.assertEqual(self.neko.current_clip, "arrive")
+        self.assertGreater(self.neko.companion.pose_until, ready + 1.8)
+        with patch("main.time.monotonic", return_value=ready + 0.35):
+            self.neko.animate()
+        self.assertGreater(self.neko.y(), top)
+        self.assertLess(self.neko.y(), target.y())
+        with patch("main.time.monotonic", return_value=ready + 0.75):
+            self.neko.animate()
+        self.assertEqual(self.neko.pos(), target)
+
+    def test_visible_fullscreen_startup_still_drops_but_stays_silent(self):
+        with patch("main.desktop_activity", return_value=(0, 100, True)):
+            self.neko.show_neko(greet=True)
+            self.assertTrue(self.neko.isVisible())
+            self.assertEqual(self.neko.companion.state, NekoState.ARRIVING)
+            self.neko.finish_transition()
+        self.assertFalse(self.neko.bubble.isVisible())
+
+    def test_visible_arrival_survives_fullscreen_detection_after_launch(self):
+        self.neko.show_neko(greet=True)
+        with patch("main.desktop_activity", return_value=(0, 100, True)):
+            self.neko.tick()
+        self.assertEqual(self.neko.companion.state, NekoState.ARRIVING)
+        self.assertIsNotNone(self.neko.arrival_target)
+        self.neko.set_hide_fullscreen(True)
+        self.assertFalse(self.neko.isVisible())
+        self.assertIsNone(self.neko.arrival_target)
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+
+    def test_hidden_fullscreen_startup_does_not_drop_or_greet(self):
+        self.neko.hide_fullscreen = True
+        with patch("main.desktop_activity", return_value=(0, 100, True)):
+            self.neko.show_neko(greet=True)
+        self.assertFalse(self.neko.isVisible())
+        self.assertIsNone(self.neko.arrival_target)
+        self.assertFalse(self.neko.bubble.isVisible())
+
     def test_interrupted_arrival_restores_the_saved_landing_position(self):
         target = self.neko.pos()
         for interrupt in (self.neko.hide_neko, lambda: self.neko.set_motion(False)):
@@ -115,6 +163,14 @@ class DesktopTests(unittest.TestCase):
             self.assertEqual(self.neko.pos(), target)
             self.neko.save_preferences()
             self.assertEqual(self.settings.value("position", type=QPoint), target)
+
+    def test_screen_change_before_the_first_animation_tick_does_not_leave_arrival_stuck(self):
+        target = self.neko.pos()
+        self.neko.show_neko(greet=True)
+        self.neko.clamp_position()
+        self.assertEqual(self.neko.pos(), target)
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+        self.assertIsNone(self.neko.arrival_target)
 
     def test_quitting_mid_arrival_starts_sad_goodbye_at_the_landing_position(self):
         target = self.neko.pos()
@@ -126,8 +182,9 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.atlas.frame("depart", 0).toImage(),
                          self.neko.atlas.frames["farewell", 0, 0].toImage())
 
-    def test_fullscreen_interrupts_arrival_without_greeting_or_losing_position(self):
+    def test_fullscreen_hiding_interrupts_arrival_without_greeting_or_losing_position(self):
         target = self.neko.pos()
+        self.neko.hide_fullscreen = True
         self.neko.show_neko(greet=True)
         with patch("main.desktop_activity", return_value=(0, 100, True)), \
                 patch.object(self.neko, "offline_line") as words:
@@ -141,6 +198,7 @@ class DesktopTests(unittest.TestCase):
         screen = QApplication.primaryScreen()
         self.neko.move(screen.geometry().left() + 80, screen.geometry().top() + 20)
         self.neko.show_neko(greet=True)
+        self.neko.animate()
         start = self.neko.pose_started
         with patch("main.time.monotonic", return_value=start + 0.35):
             self.neko.animate()
@@ -211,6 +269,7 @@ class DesktopTests(unittest.TestCase):
         for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.20, 0.22)),
                                      (NekoState.LEAVING, "depart", (1.77, 1.79))):
             self.neko.start_transition(state, clip)
+            self.neko.animate()
             start = self.neko.pose_started
             frames = []
             positions = []
@@ -263,7 +322,7 @@ class DesktopTests(unittest.TestCase):
             self.neko.tick()
         self.assertEqual(self.neko.bubble.text(), "a thought already here.")
 
-    def test_thoughts_use_larger_dark_text_and_allow_time_to_read(self):
+    def test_thoughts_are_background_free_and_allow_time_to_read(self):
         self.assertTrue(self.neko.say("Look at meeee!"))
         APP.processEvents()
         self.assertGreaterEqual(self.neko.bubble.font().pixelSize(), 16)
@@ -272,12 +331,25 @@ class DesktopTests(unittest.TestCase):
         self.assertGreaterEqual(self.neko.bubble_timer.interval(), 5500)
         image = self.neko.bubble.grab().toImage()
         background = image.pixelColor(6, image.height() // 2)
-        self.assertEqual(background.alpha(), 255)
-        self.assertGreaterEqual(background.red(), 240)
+        self.assertEqual(background.alpha(), 0)
+        self.assertTrue(all(image.pixelColor(x, 0).alpha() == 0
+                            for x in range(image.width())))
+        ink = [image.pixelColor(x, y) for x in range(image.width())
+               for y in range(image.height()) if image.pixelColor(x, y).alpha() > 0]
+        self.assertTrue(any(c.lightness() > 220 and c.alpha() > 200 for c in ink))
+        self.assertTrue(any(c.lightness() < 80 for c in ink))
         area = QApplication.primaryScreen().availableGeometry()
         self.assertTrue(area.contains(self.neko.bubble.geometry()))
         self.assertTrue(self.neko.say("a much longer little thought for you to read. " * 3))
         self.assertLessEqual(self.neko.bubble_timer.interval(), 10000)
+
+    def test_thought_render_changes_when_the_words_change(self):
+        self.assertTrue(self.neko.say("Look at meeee!"))
+        APP.processEvents()
+        first = self.neko.bubble.grab().toImage()
+        self.assertTrue(self.neko.say("Round.. around... around..."))
+        APP.processEvents()
+        self.assertNotEqual(first, self.neko.bubble.grab().toImage())
 
 
     def test_quiet_mode_still_accepts_a_deliberate_pet(self):
