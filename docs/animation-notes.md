@@ -62,7 +62,7 @@ Existing gestures play once and rest inside their 5–6 second behavior slots;
 tail swishes, kneading, walking and paw taps use slower continuous cycles.
 rendering runs at 10 FPS, with action lengths preserved and slower holds for blinks and sleep.
 docs/neko-sleep-preview.gif shows the actual frame player. The preview simulates
-a pet between sleep and waking; runtime sleep has no automatic wake deadline.
+a pet between sleep and waking; runtime now also supports an optional nap duration.
 
 ### Transition generation prompt
 

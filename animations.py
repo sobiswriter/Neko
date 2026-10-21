@@ -58,7 +58,10 @@ CLIPS = {
     "sniff": Clip("idle", 3, (450, 350, 450, 850)),
     "happy": Clip("pets", 0, (450, 600, 650, 900)),
     "nuzzle": Clip("pets", 1, (400, 550, 650, 1000)),
-    "wave": Clip("pets", 2, (400, 550, 500, 950)),
+    "wave": Clip("petting", 0, (350, 400, 450, 650, 450, 700), tuple(range(6))),
+    "shy_dip": Clip("petting", 1, (350, 400, 450, 650, 450, 700), tuple(range(6))),
+    "nose_wiggle": Clip("petting", 2, (350, 400, 450, 650, 450, 700), tuple(range(6))),
+    "tail_curl": Clip("petting", 3, (350, 400, 450, 650, 450, 700), tuple(range(6))),
     "knead": Clip("pets", 3, (450, 450, 450, 450), loop=True),
     "chin_scritch": Clip("affection", 0, (450, 650, 950, 850)),
     "blep": Clip("affection", 1, (500, 450, 750, 1100)),
@@ -83,14 +86,15 @@ class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
         cells = {}
-        for bank in ("idle", "pets", "activity", "movement", "transitions", "affection"):
-            filename = f"neko-{bank}-v1.png" if bank in ("transitions", "affection") else f"neko-{bank}-v3.png"
+        for bank in ("idle", "pets", "activity", "movement", "transitions", "affection", "petting"):
+            filename = f"neko-{bank}-v1.png" if bank in ("transitions", "affection", "petting") else f"neko-{bank}-v3.png"
+            columns = 6 if bank == "petting" else 4
             image = QImage(str(Path(path) / filename))
             if image.isNull():
                 return
-            image = image.scaled(512, 512, Qt.IgnoreAspectRatio, Qt.FastTransformation)
+            image = image.scaled(columns * 128, 512, Qt.IgnoreAspectRatio, Qt.FastTransformation)
             for row in range(4):
-                for col in range(4):
+                for col in range(columns):
                     cell = image.copy(col * 128, row * 128, 128, 128)
                     bounds = sprite_bounds(cell)
                     if bounds.isEmpty():
@@ -117,4 +121,5 @@ class SpriteAtlas:
     def frame(self, name, elapsed, motion=True):
         clip = CLIPS[name]
         index = clip.frame_index(elapsed if motion else 0)
-        return self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())
+        columns = 6 if clip.bank == "petting" else 4
+        return self.frames.get((clip.bank, clip.row + index // columns, index % columns), QPixmap())

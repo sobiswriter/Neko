@@ -207,7 +207,7 @@ class DesktopTests(unittest.TestCase):
     def test_nook_timing_controls_apply_and_persist(self):
         with patch("main.autostart_enabled", return_value=False):
             self.neko.open_stats_window()
-        for key, value in (("sleep_seconds", 45), ("chatter_seconds", 30), ("idle_seconds", 8)):
+        for key, value in (("sleep_seconds", 45), ("sleep_duration", 90), ("chatter_seconds", 30), ("idle_seconds", 8)):
             spin = self.neko.stats_window.timing[key]
             self.assertGreater(spin.lineEdit().width(), 35)
             spin.setValue(value)
@@ -258,7 +258,7 @@ class DesktopTests(unittest.TestCase):
     def test_timers_accept_typed_values_and_commit_on_enter(self):
         with patch("main.autostart_enabled", return_value=False):
             self.neko.open_stats_window()
-        for key, value in (("sleep_seconds", 10), ("chatter_seconds", 45), ("idle_seconds", 9)):
+        for key, value in (("sleep_seconds", 10), ("sleep_duration", 120), ("chatter_seconds", 45), ("idle_seconds", 9)):
             spin = self.neko.stats_window.timing[key]
             previous = getattr(self.neko.companion, key)
             QTest.mouseClick(spin, Qt.LeftButton, pos=QPoint(25, spin.height() // 2))
@@ -275,6 +275,30 @@ class DesktopTests(unittest.TestCase):
         with patch("main.time.monotonic", return_value=now):
             self.neko.set_timing("sleep_seconds", 10)
         self.assertEqual(self.neko.companion.next_nap, now + 10)
+
+    def test_nap_duration_persists_and_zero_disables_automatic_waking(self):
+        self.neko.set_timing("sleep_duration", 90)
+        other = NekoWidget(self.settings)
+        try:
+            self.assertEqual(other.companion.sleep_duration, 90)
+        finally:
+            other.tray_icon.hide()
+            other.bubble.deleteLater()
+            other.deleteLater()
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        spin = self.neko.stats_window.timing["sleep_duration"]
+        spin.setValue(0)
+        self.assertEqual(spin.text(), "Until petted")
+        self.assertEqual(self.neko.companion.sleep_duration, 0)
+        self.assertEqual(self.settings.value("sleep_duration", type=int), 0)
+
+    def test_new_pet_states_select_their_six_frame_clips(self):
+        for state, name in ((NekoState.WAVING, "wave"), (NekoState.SHY_DIP, "shy_dip"),
+                            (NekoState.NOSE_WIGGLE, "nose_wiggle"), (NekoState.TAIL_CURL, "tail_curl")):
+            self.neko.companion.state = state
+            self.neko.refresh_asset()
+            self.assertEqual(self.neko.current_clip, name)
 
     def test_sleep_edit_saves_when_leaving_the_field_and_survives_reload(self):
         from PySide6.QtWidgets import QPushButton

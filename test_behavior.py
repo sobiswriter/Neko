@@ -92,6 +92,39 @@ class CompanionTests(unittest.TestCase):
         self.assertNotEqual(pet.state, NekoState.SLEEPING)
         self.assertEqual(pet.tick(45, 45), "sleep")
 
+    def test_timed_nap_counts_from_settling_and_wakes_gently_without_immediate_resleep(self):
+        pet = Companion(0, sleep_seconds=45, sleep_duration=60)
+        pet.tick(45, 45)
+        pet.tick(48, 48)
+        self.assertIsNone(pet.tick(107, 107, keyboard_events=20, window_event="open"))
+        self.assertEqual(pet.state, NekoState.SLEEPING)
+        self.assertEqual(pet.tick(108, 108), "wake")
+        self.assertEqual(pet.state, NekoState.WAKING)
+        self.assertEqual(pet.pets, 0)
+        self.assertEqual(pet.tick(111, 111), "idle")
+        self.assertNotEqual(pet.tick(112, 112), "sleep")
+        self.assertEqual(pet.tick(153, 153), "sleep")
+
+    def test_active_nap_respects_duration_edits_and_can_be_petted_awake_early(self):
+        self.pet.tick(180, 180)
+        self.pet.tick(183, 183)
+        self.pet.sleep_duration = 60
+        self.assertIsNone(self.pet.tick(200, 0))
+        self.pet.sleep_duration = 0
+        self.assertIsNone(self.pet.tick(1000, 0))
+        self.pet.sleep_duration = 120
+        self.pet.pet(1001)
+        self.assertEqual(self.pet.state, NekoState.WAKING)
+        self.assertIsNone(self.pet.nap_started)
+
+    def test_shortening_an_active_nap_wakes_at_the_new_deadline(self):
+        self.pet.sleep_duration = 120
+        self.pet.tick(180, 180)
+        self.pet.tick(183, 183)
+        self.pet.sleep_duration = 30
+        self.assertIsNone(self.pet.tick(212, 0))
+        self.assertEqual(self.pet.tick(213, 0), "wake")
+
     def test_window_event_waits_for_current_animation(self):
         self.pet.pose(NekoState.GROOMING, 10, 3)
         self.pet.tick(11, 0, window_event="open")

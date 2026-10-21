@@ -31,6 +31,7 @@ from dialogue import OfflineDialogue
 ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "assets"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 TIMING_LIMITS = {"sleep_seconds": (180, 1, 3600),
+                 "sleep_duration": (0, 0, 3600),
                  "chatter_seconds": (75, 15, 600), "idle_seconds": (14, 5, 120)}
 
 
@@ -185,9 +186,10 @@ class StatsWindow(QDialog):
         company_layout.addWidget(self.follow)
         timing = QFormLayout()
         self.timing = {}
-        for key, label in (("sleep_seconds", "Sleep after inactivity"),
-                           ("chatter_seconds", "Little thoughts about every"),
-                           ("idle_seconds", "Idle gestures about every")):
+        for key, label in (("sleep_seconds", "Inactivity before nap"),
+                           ("sleep_duration", "Nap duration"),
+                           ("chatter_seconds", "Thoughts every"),
+                           ("idle_seconds", "Idle gestures every")):
             _, minimum, maximum = TIMING_LIMITS[key]
             spin = QSpinBox()
             spin.setRange(minimum, maximum)
@@ -195,13 +197,17 @@ class StatsWindow(QDialog):
             spin.setToolTip(f"{minimum}–{maximum} seconds. Type a number, then press Enter or click elsewhere.")
             spin.setMinimumWidth(100)
             spin.setSuffix(" sec")
+            if key == "sleep_duration":
+                spin.setMinimumWidth(130)
+                spin.setSpecialValueText("Until petted")
+                spin.setToolTip("0 = until petted; 1–3600 seconds asleep. Pet her to wake sooner.")
             spin.setValue(getattr(neko.companion, key))
             spin.setAccessibleName(label)
             spin.valueChanged.connect(lambda value, key=key: neko.set_timing(key, value))
             self.timing[key] = spin
             timing.addRow(label, spin)
         company_layout.addLayout(timing)
-        note = QLabel("She sleeps until you pet her awake.\nQuiet company still welcomes a deliberate pet.")
+        note = QLabel("Choose a timed nap or ‘Until petted’.\nTyping and window activity let her sleep.")
         note.setWordWrap(True)
         company_layout.addWidget(note)
         company_layout.addStretch()
@@ -689,6 +695,8 @@ class NekoWidget(QWidget):
             NekoState.KNEADING: "knead", NekoState.FOLLOWING: "walk",
             NekoState.CHIN_SCRITCH: "chin_scritch", NekoState.BLEPPING: "blep",
             NekoState.PAW_OFFER: "paw_offer", NekoState.EAR_RUB: "ear_rub",
+            NekoState.SHY_DIP: "shy_dip", NekoState.NOSE_WIGGLE: "nose_wiggle",
+            NekoState.TAIL_CURL: "tail_curl",
         }.get(self.companion.state, "idle")
         self.current_asset = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",
@@ -921,6 +929,7 @@ class NekoWidget(QWidget):
                            "sounds_enabled": self.sounds_enabled,
                            "follow_mouse": self.follow_mouse,
                            "sleep_seconds": self.companion.sleep_seconds,
+                           "sleep_duration": self.companion.sleep_duration,
                            "chatter_seconds": self.companion.chatter_seconds,
                            "idle_seconds": self.companion.idle_seconds,
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,

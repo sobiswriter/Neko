@@ -8,9 +8,11 @@ Soft sounds are optional and off until you enable them.
 
 ## Living with Neko
 
-- **Click to pet.** Eight reactions: head pats, cheek nuzzles, paw greetings,
-  kneading, chin scritches, a tiny blep, offering a paw, and relaxed ear rubs.
-  Each plays gently and settles; all eight appear before the rotation repeats.
+- **Click to pet.** Eleven reactions: head pats, cheek nuzzles, seated hellos,
+  kneading, chin scritches, a tiny blep, offering a paw, relaxed ear rubs,
+  a shy head dip, nose wiggles, and a contented tail curl.
+  The corrected greeting keeps both paws planted; it and the three new reactions use six drawings each.
+  Each plays gently and settles; all eleven appear before the rotation repeats.
   If she's asleep, a pet plays her waking sequence instead.
 - **Drag to move.** She looks around while held and blinks when set down. Dragging
   never counts as petting. Position is remembered, including on another monitor.
@@ -18,7 +20,7 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 96 drawings, including eight-frame transitions into
+  yawns and sleepy peeks use 120 drawings, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes, kneading and paw taps use slower continuous cycles. Rendering runs at
@@ -34,9 +36,12 @@ Soft sounds are optional and off until you enable them.
   ongoing animation instead of disappearing immediately.
 - **Step away.** She yawns and naps after a configurable period without input.
   The default is three minutes; choose 1–3600 seconds. Type a number and press Enter
-  or leave the field to save it. She curls down before sleeping and stays asleep
-  through typing, app switches and elapsed time. Only a deliberate pet wakes her;
-  dragging moves her without waking her. The old 90-second automatic wake is gone.
+  or leave the field to save it. **Nap duration** independently chooses how long
+  she stays asleep: 1–3600 seconds, or 0 (**Until petted**, the default).
+  The nap clock starts when she finishes curling down; changes apply to the current nap.
+  Typing, app switches and dragging let her sleep. A pet wakes her early,
+  and timed naps use the same gentle waking transition. After waking she stays
+  awake for at least the inactivity delay before another nap.
   Ignoring her never creates chores or penalties.
 - **Offline personality.** 298 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
@@ -53,7 +58,7 @@ Soft sounds are optional and off until you enable them.
   chirp on arrival. Automatic cues have a 45-second pause and are suppressed during media apps,
   quiet company and fullscreen. Turning sounds off or hiding stops playback.
 - **Right-click for her nook.** Quiet company, reduced motion, startup, optional
-  AI, mouse following, sleep delay, chatter and idle gesture frequency, and lifetime
+  AI, mouse following, sleep delay and duration, chatter and idle gesture frequency, and lifetime
   pet/nap counts live in one small window. Double-click the tray
   icon to find her again.
   Menus and the nook open beside her, with no periodic re-pinning over the controls.

@@ -28,10 +28,14 @@ class NekoState(Enum):
     BLEPPING = auto()
     PAW_OFFER = auto()
     EAR_RUB = auto()
+    SHY_DIP = auto()
+    NOSE_WIGGLE = auto()
+    TAIL_CURL = auto()
 
 
 PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.WAVING, NekoState.KNEADING,
-              NekoState.CHIN_SCRITCH, NekoState.BLEPPING, NekoState.PAW_OFFER, NekoState.EAR_RUB)
+              NekoState.CHIN_SCRITCH, NekoState.BLEPPING, NekoState.PAW_OFFER, NekoState.EAR_RUB,
+              NekoState.SHY_DIP, NekoState.NOSE_WIGGLE, NekoState.TAIL_CURL)
 IDLE_STATES = (NekoState.STRETCHING, NekoState.GROOMING, NekoState.PEEKING,
                NekoState.YAWNING, NekoState.TAIL_SWISH, NekoState.EAR_FLICK,
                NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS)
@@ -43,9 +47,12 @@ APP_MOODS = {"music": NekoState.TAIL_SWISH, "video": NekoState.LOAFING,
 
 
 class Companion:
-    def __init__(self, now, rng=None, sleep_seconds=180, chatter_seconds=75, idle_seconds=14):
+    def __init__(self, now, rng=None, sleep_seconds=180, chatter_seconds=75, idle_seconds=14,
+                 sleep_duration=0):
         self.rng = rng if rng is not None else random.Random()
         self.sleep_seconds = sleep_seconds
+        self.sleep_duration = sleep_duration
+        self.nap_started = None
         self.chatter_seconds = chatter_seconds
         self.idle_seconds = idle_seconds
         self.state = NekoState.IDLE
@@ -75,11 +82,7 @@ class Companion:
         self.pets += 1
         self.last_interaction = now
         if self.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
-            self.pending_window = None
-            self.next_nap = now + self.sleep_seconds
-            self.next_comment = max(self.next_comment, now + 15)
-            self.last_curiosity = now
-            self.pose(NekoState.WAKING, now, 2.6)
+            self.wake(now)
             return
         if self.state == NekoState.WAKING:
             return
@@ -91,6 +94,14 @@ class Companion:
                 self.pet_bag[0], self.pet_bag[-1] = self.pet_bag[-1], self.pet_bag[0]
         self.last_pet = self.pet_bag.pop()
         self.pose(self.last_pet, now, 5.8)
+
+    def wake(self, now):
+        self.pending_window = None
+        self.nap_started = None
+        self.next_nap = now + self.sleep_seconds
+        self.next_comment = max(self.next_comment, now + 15)
+        self.last_curiosity = now
+        self.pose(NekoState.WAKING, now, 2.6)
 
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
              window_changed=False, keyboard_events=0, window_event=None, app_kind=None):
@@ -105,7 +116,12 @@ class Companion:
             self.pending_window = None
             if self.state == NekoState.FALLING_ASLEEP and now >= self.pose_until:
                 self.state = NekoState.SLEEPING
+                self.nap_started = now
                 return "settled"
+            if (self.state == NekoState.SLEEPING and self.sleep_duration > 0
+                    and self.nap_started is not None and now >= self.nap_started + self.sleep_duration):
+                self.wake(now)
+                return "wake"
             if self.state == NekoState.WAKING and now >= self.pose_until:
                 self.state = NekoState.IDLE
                 return "idle"

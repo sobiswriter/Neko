@@ -13,9 +13,9 @@ APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
-    def test_atlas_has_96_drawings_including_extra_pet_responses(self):
+    def test_atlas_has_120_drawings_including_six_frame_pet_responses(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 96)
+        self.assertEqual(len(atlas.frames), 120)
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
         self.assertNotEqual(atlas.frames["idle", 1, 0].toImage(), atlas.frames["idle", 1, 1].toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
@@ -37,6 +37,22 @@ class AnimationTests(unittest.TestCase):
             self.assertFalse(clip.loop, name)
             self.assertEqual(clip.frame_index(5), clip.order[-1], name)
             self.assertEqual(clip.frame_index(6), clip.order[-1], name)
+
+    def test_new_pet_reactions_use_six_real_frames_then_rest(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        for name in ("wave", "shy_dip", "nose_wiggle", "tail_curl"):
+            clip = CLIPS[name]
+            self.assertEqual(clip.order, tuple(range(6)))
+            self.assertFalse(clip.loop)
+            self.assertEqual(sum(clip.durations), 3000)
+            elapsed = 0
+            for col, duration in enumerate(clip.durations):
+                frame = atlas.frame(name, elapsed / 1000)
+                self.assertFalse(frame.isNull())
+                self.assertEqual(frame.toImage(), atlas.frames["petting", clip.row, col].toImage())
+                self.assertAlmostEqual(sprite_bounds(frame.toImage()).height(), 84, delta=2)
+                elapsed += duration
+            self.assertEqual(clip.frame_index(5.8), 5)
 
     def test_continuous_motions_use_a_gentle_cycle_speed(self):
         for name, minimum in (("tail", 2400), ("knead", 1600), ("typing", 1200), ("walk", 900)):

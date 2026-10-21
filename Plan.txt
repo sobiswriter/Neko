@@ -14,9 +14,11 @@ Interaction rules
   Idle gestures default to about 14 seconds; configurable from five to 120 seconds.
   Sleep delay defaults to three minutes; configurable from one to 3600 seconds.
   Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
-  Eight frames lower her into sleep; only a deliberate pet plays the eight-frame wake.
-  Typing, window changes, dragging and elapsed time do not wake her. No timed wake-up.
-  Eight pet responses rotate through a shuffled bag before repeating.
+  Eight frames lower her into sleep; a pet or optional nap deadline plays the eight-frame wake.
+  Typing, window changes and dragging do not wake her; the optional nap deadline does.
+  Eleven pet responses rotate through a shuffled bag before repeating.
+  A corrected seated hello and three new pet responses use six frames each.
+  Nap duration is independently configurable: 1–3600 seconds or 0 until petted (default).
   Nine idle moods avoid consecutive repeats.
   298 offline lines use context shuffle bags, with personal questions and app rituals.
   Local foreground app names and media title hints select lines and matching gestures.
@@ -38,7 +40,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  Ninety-six drawings including eight pet reactions and sleep/wake transitions.
+  120 drawings including eleven pet reactions and sleep/wake transitions.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 
