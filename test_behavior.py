@@ -6,6 +6,52 @@ from behavior import Companion, NekoState, PET_STATES, IDLE_STATES
 
 
 class CompanionTests(unittest.TestCase):
+    def test_holding_owns_reactions_without_counting_pets_or_naps(self):
+        self.pet.pet(1)
+        self.pet.pet(1.1)
+        self.assertTrue(self.pet.begin_carry(2))
+        self.assertFalse(self.pet.pet_pending)
+        for now in (2.1, 12, 25, 10000):
+            self.assertIsNone(self.pet.tick(now, 9999, keyboard_events=50, window_event="open"))
+            self.assertFalse(self.pet.pet(now))
+            self.assertEqual(self.pet.state, NekoState.HELD)
+        self.assertEqual((self.pet.pets, self.pet.naps), (2, 0))
+        self.pet.release_carry(10001, 0.7)
+        self.assertIsNone(self.pet.tick(10001.69, 9999))
+        self.assertEqual(self.pet.tick(10001.7, 9999), "idle")
+        self.assertGreater(self.pet.next_nap, 10001.7)
+
+    def test_sleeping_carry_preserves_nap_and_defers_a_due_wake_until_set_down(self):
+        self.pet.sleep_duration = 10
+        self.pet.tick(180, 180)
+        self.pet.tick(183, 0)
+        started = self.pet.nap_started
+        self.pet.begin_carry(184)
+        self.assertIsNone(self.pet.tick(205, 0))
+        self.assertEqual(self.pet.nap_started, started)
+        self.pet.release_carry(205, 0.7)
+        self.assertEqual(self.pet.tick(205.7, 0), "wake")
+        self.assertEqual((self.pet.naps, self.pet.pets), (1, 0))
+        self.assertEqual(self.pet.state, NekoState.WAKING)
+
+    def test_regrab_keeps_the_same_underlying_nap_and_hold_clock(self):
+        self.pet.tick(180, 180)
+        deadline = self.pet.pose_until
+        self.pet.begin_carry(181)
+        self.pet.release_carry(182, 0.7)
+        self.pet.begin_carry(182.2)
+        self.assertEqual(self.pet.carry_started, 181)
+        self.pet.finish_carry(184)
+        self.assertEqual(self.pet.state, NekoState.SLEEPING)
+        self.assertEqual(self.pet.nap_started, deadline)
+        self.assertEqual(self.pet.naps, 1)
+
+    def test_carry_cannot_interrupt_arrival_or_departure(self):
+        for state in (NekoState.ARRIVING, NekoState.LEAVING):
+            self.pet.state = state
+            self.assertFalse(self.pet.begin_carry(10))
+            self.assertEqual(self.pet.state, state)
+
     def test_repeated_pets_wait_for_recovery_and_coalesce_without_losing_click_counts(self):
         pet = Companion(0, random.Random(4))
         pet.pet(10)

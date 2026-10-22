@@ -36,12 +36,15 @@ class NekoState(Enum):
     TAIL_CATCH = auto()
     ARRIVING = auto()
     LEAVING = auto()
+    HELD = auto()
+    SETTING_DOWN = auto()
 
 
 PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
               NekoState.CHIN_SCRITCH, NekoState.ROLLING, NekoState.PAW_OFFER, NekoState.EAR_RUB,
               NekoState.PET_STRETCH, NekoState.BACK_ARCH, NekoState.HAPPY_HOP,
               NekoState.SIDE_FLOP, NekoState.SHOULDER_PEEK)
+CARRY_STATES = (NekoState.HELD, NekoState.SETTING_DOWN)
 IDLE_STATES = (NekoState.STRETCHING, NekoState.GROOMING, NekoState.PEEKING,
                NekoState.YAWNING, NekoState.TAIL_SWISH, NekoState.EAR_FLICK,
                NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS,
@@ -80,6 +83,54 @@ class Companion:
         self.pets = 0
         self.naps = 0
         self.comments = 0
+        self.carry_rest = None
+        self.carry_started = 0
+
+    def begin_carry(self, now):
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
+            return False
+        if self.carry_rest is None:
+            self.carry_rest = (self.state, self.pose_until)
+            self.carry_started = now
+        self.state = NekoState.HELD
+        self.pet_pending = False
+        self.pending_window = None
+        self.pose_until = float("inf")
+        self.last_interaction = now
+        return True
+
+    def release_carry(self, now, seconds):
+        if self.state == NekoState.HELD:
+            self.state = NekoState.SETTING_DOWN
+            self.pose_until = now + seconds
+
+    def finish_carry(self, now):
+        if self.carry_rest is None:
+            return None
+        previous, deadline = self.carry_rest
+        self.carry_rest = None
+        self.state = previous
+        self.pose_until = deadline
+        self.pending_window = None
+        self.last_interaction = now
+        self.next_idle = now + self.idle_seconds
+        self.next_comment = max(self.next_comment, now + 15)
+        if previous == NekoState.FALLING_ASLEEP and now >= deadline:
+            self.state = NekoState.SLEEPING
+            self.nap_started = deadline
+        if self.state == NekoState.SLEEPING:
+            if (self.sleep_duration > 0 and self.nap_started is not None
+                    and now >= self.nap_started + self.sleep_duration):
+                self.wake(now)
+                return "wake"
+            return "settled"
+        if self.state == NekoState.FALLING_ASLEEP:
+            return "sleep"
+        if self.state == NekoState.WAKING and now < deadline:
+            return "wake"
+        self.state = NekoState.IDLE
+        self.next_nap = now + self.sleep_seconds
+        return "idle"
 
     def pose(self, state, now, seconds):
         if state not in PET_STATES:
@@ -89,7 +140,7 @@ class Companion:
         self.next_idle = max(self.next_idle, now + self.idle_seconds)
 
     def pet(self, now):
-        if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
             return False
         self.pets += 1
         self.last_interaction = now
@@ -134,6 +185,11 @@ class Companion:
 
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
              window_changed=False, keyboard_events=0, window_event=None, app_kind=None):
+        if self.state in CARRY_STATES:
+            self.pending_window = None
+            if self.state == NekoState.SETTING_DOWN and now >= self.pose_until:
+                return self.finish_carry(now)
+            return None
         if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
             self.pending_window = None
             return None
