@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 from unittest.mock import patch
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -22,7 +23,7 @@ def pixels(pixmap):
     return Image.frombytes("RGBA", (image.width(), image.height()), bytes(image.constBits()))
 
 
-def scene(atlas, destination):
+def scene(atlas, destination, silhouette=False):
     app = QApplication.instance() or QApplication([])
     frames = []
     with tempfile.TemporaryDirectory() as folder, \
@@ -31,19 +32,16 @@ def scene(atlas, destination):
             patch("main.desktop_activity", return_value=(0, 0, False)), \
             patch("main.NekoWidget.offline_line"), patch("main.QApplication.quit"):
         cats = []
-        for i, (clip, y) in enumerate((("arrive", 166), ("depart", 166), ("depart", 36))):
+        for i, (clip, y) in enumerate((("arrive", 166), ("depart", 166), ("depart", 4))):
             settings = QSettings(str(Path(folder) / f"{i}.ini"), QSettings.IniFormat)
             cat = NekoWidget(settings)
             cat.show_neko()
             for timer in (cat.tick_timer, cat.invitation_timer, cat.animation_timer, cat.save_timer):
                 timer.stop()
             cat.move(84, y)
-            with patch("main.time.monotonic", return_value=1000):
+            monitor = SimpleNamespace(geometry=lambda: QRect(0, 0, 360, 320))
+            with patch("main.time.monotonic", return_value=1000), patch("main.QApplication.screenAt", return_value=monitor):
                 cat.start_transition(NekoState.ARRIVING if clip == "arrive" else NekoState.LEAVING, clip)
-                cat.lifecycle_area = QRect(0, 0, 360, 320)
-                if clip == "arrive":
-                    cat.arrival_top = -64
-                    cat.move(84, -64)
                 cat.animate()
             cats.append((cat, clip))
         for i in range(90):
@@ -53,7 +51,7 @@ def scene(atlas, destination):
             for column, (cat, clip) in enumerate(cats):
                 left = column * 360
                 draw.rectangle((left, 30, left + 359, 349), fill=("#fbf9f5", "#343c4c", "#fbf9f5")[column])
-                draw.text((left + 12, 8), ("Curious visitor", "See you soon", "Goodbye from a higher perch")[column], fill="#4c4948")
+                draw.text((left + 12, 8), ("Reach - plant - fold", "Gather - push - leap", "A nearer edge from up high")[column], fill="#4c4948")
                 duration = sum(CLIPS[clip].durations) / 1000
                 with patch("main.time.monotonic", return_value=1000 + elapsed):
                     if elapsed >= duration:
@@ -64,6 +62,10 @@ def scene(atlas, destination):
                     else:
                         cat.animate()
                     frame = pixels(cat.grab())
+                    if silhouette:
+                        outline = Image.new("RGBA", frame.size, "#f7f4ec" if column == 1 else "#242830")
+                        outline.putalpha(frame.getchannel("A"))
+                        frame = outline
                 panel = Image.new("RGBA", (360, 320))
                 panel.paste(frame, (cat.x(), cat.y()))
                 canvas.paste(panel, (left, 30), panel)
@@ -86,7 +88,8 @@ def scene(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    sheet = Image.new("RGB", (1664, 1800), "#f8f5ef")
+    rows = sum((len(CLIPS[name].order) + 7) // 8 for name in ("arrive", "depart")) * 2
+    sheet = Image.new("RGB", (1664, rows * 180), "#f8f5ef")
     draw = ImageDraw.Draw(sheet)
     band = 0
     for background in ("#f8f5ef", "#343c4c"):
@@ -99,5 +102,6 @@ if __name__ == "__main__":
                 sheet.paste(frame, (x + 8, y + 16), frame)
                 draw.text((x + 8, y + 162), f"{name} {i}", fill="#918b83")
             band += (len(clip.order) + 7) // 8
-    sheet.save(ROOT / "docs/visitor-frames.png")
-    scene(atlas, ROOT / "docs/visitor-scene.gif")
+    sheet.save(ROOT / "docs/lifecycle-v2-frames.png")
+    scene(atlas, ROOT / "docs/lifecycle-v2-scene.gif")
+    scene(atlas, ROOT / "docs/lifecycle-v2-silhouette.gif", silhouette=True)

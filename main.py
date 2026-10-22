@@ -411,7 +411,9 @@ class NekoWidget(QWidget):
         self.last_cursor = QCursor.pos()
         self.arrival_target = None
         self.arrival_top = 0
+        self.arrival_left = 0
         self.departure_origin = None
+        self.departure_target = None
         self.lifecycle_area = None
         self.departure_direction = 1
         self.last_title_stamp = None
@@ -872,13 +874,13 @@ class NekoWidget(QWidget):
             if self.arrival_target is not None:
                 progress = drop_progress(elapsed)
                 y = self.arrival_top + (self.arrival_target.y() - self.arrival_top) * progress
-                self.move(self.arrival_target.x(), round(y))
+                x = self.arrival_left + (self.arrival_target.x() - self.arrival_left) * progress
+                self.move(round(x), round(y))
             else:
                 progress = departure_progress(elapsed)
-                distance = self.lifecycle_area.bottom() + 1 - self.departure_origin.y()
+                distance = self.departure_target.y() - self.departure_origin.y()
                 y = self.departure_origin.y() + departure_drop(progress, distance)
-                x = self.departure_origin.x() + self.departure_direction * 40 * progress
-                x = max(self.lifecycle_area.left(), min(x, self.lifecycle_area.right() - self.width() + 1))
+                x = self.departure_origin.x() + (self.departure_target.x() - self.departure_origin.x()) * progress
                 self.move(round(x), round(y))
         self.update()
 
@@ -1131,7 +1133,8 @@ class NekoWidget(QWidget):
             if (self.game and state in GAME_STATES and self.game.direction > 0
                     and self.game.phase not in ("loss", "loss_finish", "curl", "comfort", "win")):
                 painter.scale(-1, 1)
-            elif state == NekoState.LEAVING and self.departure_direction < 0:
+            elif (state == NekoState.LEAVING and self.departure_direction < 0
+                  and CLIPS["depart"].frame_index(elapsed) not in (0, 1, 2, 16)):
                 painter.scale(-1, 1)
             painter.drawPixmap(-pixmap.width() // 2, top, pixmap)
         painter.restore()
@@ -1664,6 +1667,7 @@ class NekoWidget(QWidget):
         if self.departure_origin is not None:
             self.move(self.departure_origin)
             self.departure_origin = None
+        self.departure_target = None
         self.lifecycle_area = None
 
     def start_transition(self, state, clip):
@@ -1678,11 +1682,27 @@ class NekoWidget(QWidget):
         self.lifecycle_area = screen.geometry()
         if state == NekoState.ARRIVING:
             self.arrival_target = self.pos()
-            self.arrival_top = screen.geometry().top() - 64
-            self.move(self.arrival_target.x(), self.arrival_top)
+            # Trace the drawn down-right reach back to the first upper/left boundary.
+            fall = min(self.y() + 120 - self.lifecycle_area.top(),
+                       (self.x() + 150 - self.lifecycle_area.left()) / 0.8)
+            self.arrival_top = round(self.y() - fall)
+            self.arrival_left = round(self.x() - fall * 0.8)
+            self.move(self.arrival_left, self.arrival_top)
         else:
             self.departure_origin = self.pos()
             self.departure_direction = -1 if self.geometry().center().x() > screen.geometry().center().x() else 1
+            center = self.geometry().center().x()
+            near_side = min(center - screen.geometry().left(), screen.geometry().right() - center)
+            if screen.geometry().bottom() - (self.y() + 130) > near_side:
+                self.departure_direction = -self.departure_direction
+                x = screen.geometry().right() + 1 if self.departure_direction > 0 else screen.geometry().left() - self.width()
+                fall = max(96, round(abs(x - self.x()) * 0.65))
+                self.departure_target = QPoint(x, min(self.y() + fall, screen.geometry().bottom() + 1))
+            else:
+                fall = screen.geometry().bottom() + 1 - self.y()
+                x = self.x() + self.departure_direction * max(96, round(fall * 0.8))
+                x = max(self.lifecycle_area.left(), min(x, self.lifecycle_area.right() - self.width() + 1))
+                self.departure_target = QPoint(x, screen.geometry().bottom() + 1)
         self.refresh_asset()
 
     def finish_transition(self):

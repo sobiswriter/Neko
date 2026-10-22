@@ -382,7 +382,7 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.y(), top)
         self.assertEqual(self.neko.current_clip, "arrive")
         self.assertGreater(self.neko.companion.pose_until, ready + 1.8)
-        with patch("main.time.monotonic", return_value=ready + 0.65):
+        with patch("main.time.monotonic", return_value=ready + 0.25):
             self.neko.animate()
         self.assertGreater(self.neko.y(), top)
         self.assertLess(self.neko.y(), target.y())
@@ -487,6 +487,19 @@ class DesktopTests(unittest.TestCase):
             self.neko.finish_transition()
             self.assertEqual(self.neko.pos(), origin)
 
+    def test_high_perch_goodbye_uses_a_nearer_side_exit(self):
+        area = QApplication.primaryScreen().geometry()
+        origin = QPoint(area.center().x() - 96, area.top() + 8)
+        self.neko.move(origin)
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        self.assertIsNotNone(self.neko.departure_target)
+        self.assertTrue(self.neko.departure_target.x() < area.left()
+                        or self.neko.departure_target.x() > area.right())
+        self.neko.animate()
+        with patch("main.time.monotonic", return_value=self.neko.pose_started + 1.5):
+            self.neko.animate()
+        self.assertGreater(abs(self.neko.x() - origin.x()), abs(self.neko.y() - origin.y()))
+
     def test_sleeping_quit_does_not_wake_her_for_a_performance(self):
         self.neko.companion.state = NekoState.SLEEPING
         self.neko.refresh_asset()
@@ -498,11 +511,11 @@ class DesktopTests(unittest.TestCase):
     def test_departure_is_clipped_at_its_monitor_not_a_neighbour_below(self):
         self.neko.start_transition(NekoState.LEAVING, "depart")
         self.neko.lifecycle_area = QRect(0, 0, 800, 800)
-        self.neko.move(100, 760)
+        self.neko.move(100, 715)
         with patch("main.time.monotonic", return_value=self.neko.pose_started + 1.7):
             image = self.neko.grab().toImage()
-        self.assertTrue(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(40)))
-        self.assertFalse(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(40, 144)))
+        self.assertTrue(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(85)))
+        self.assertFalse(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(85, 144)))
 
     def test_monitor_change_during_goodbye_restores_home_and_closes(self):
         origin = self.neko.pos()
@@ -520,7 +533,7 @@ class DesktopTests(unittest.TestCase):
             ready = self.neko.pose_started + 2.5
             with patch("main.time.monotonic", return_value=ready):
                 self.neko.animate()
-            self.assertGreater(self.neko.companion.pose_until, ready + 1.7)
+            self.assertAlmostEqual(self.neko.companion.pose_until, ready + 2.2)
 
     def test_quit_plays_goodbye_once_then_cleans_up_without_moving_saved_position(self):
         origin = self.neko.pos()
@@ -578,8 +591,8 @@ class DesktopTests(unittest.TestCase):
 
     def test_both_lifecycle_trajectories_move_between_drawn_poses(self):
         origin = self.neko.pos()
-        for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.65, 0.67)),
-                                     (NekoState.LEAVING, "depart", (1.4, 1.42))):
+        for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.25, 0.27)),
+                                     (NekoState.LEAVING, "depart", (1.8, 1.82))):
             self.neko.start_transition(state, clip)
             self.neko.animate()
             start = self.neko.pose_started
@@ -591,6 +604,58 @@ class DesktopTests(unittest.TestCase):
                     frames.append(self.neko.grab().toImage())
                     positions.append(self.neko.pos())
             self.assertNotEqual(positions[0], positions[1], clip)
+
+    def test_arrival_is_diagonal_and_stays_grounded_after_its_single_landing(self):
+        area = QApplication.primaryScreen().geometry()
+        home = QPoint(area.center().x() - 96, area.center().y())
+        self.neko.move(home)
+        self.neko.start_transition(NekoState.ARRIVING, "arrive")
+        entry = self.neko.pos()
+        self.assertGreater(home.x() - entry.x(), (home.y() - entry.y()) * 0.7)
+        self.assertLess(home.x() - entry.x(), home.y() - entry.y())
+        self.neko.animate()
+        start = self.neko.pose_started
+        last = entry
+        for elapsed in (0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1.2, 1.9):
+            with patch("main.time.monotonic", return_value=start + elapsed):
+                self.neko.animate()
+            position = self.neko.pos()
+            self.assertGreaterEqual(position.x(), last.x())
+            self.assertGreaterEqual(position.y(), last.y())
+            if elapsed >= 0.5:
+                self.assertEqual(position, home)
+            last = position
+
+    def test_low_goodbye_has_one_apex_and_a_diagonal_exit(self):
+        area = QApplication.primaryScreen().geometry()
+        home = QPoint(area.center().x() - 96, area.bottom() - 155)
+        self.neko.move(home)
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        self.assertGreaterEqual(abs(self.neko.departure_target.x() - home.x()), 96)
+        self.assertGreater(self.neko.departure_target.y(), home.y())
+        self.neko.animate()
+        start = self.neko.pose_started
+        ys = []
+        for elapsed in (1.2, 1.3, 1.4, 1.45, 1.5, 1.6, 1.8, 2.0, 2.15):
+            with patch("main.time.monotonic", return_value=start + elapsed):
+                self.neko.animate()
+            ys.append(self.neko.y())
+        apex = ys.index(min(ys))
+        self.assertEqual(ys[:apex + 1], sorted(ys[:apex + 1], reverse=True))
+        self.assertEqual(ys[apex:], sorted(ys[apex:]))
+
+    def test_sad_goodbye_does_not_flip_the_front_expression_before_turning(self):
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        for elapsed in (0, 0.15, 0.25, 0.5, 0.75):
+            frames = []
+            with patch("main.time.monotonic", return_value=self.neko.pose_started + elapsed):
+                for direction in (-1, 1):
+                    self.neko.departure_direction = direction
+                    frames.append(self.neko.grab().toImage())
+            if elapsed < 0.7:
+                self.assertEqual(*frames, elapsed)
+            else:
+                self.assertNotEqual(*frames, elapsed)
 
     def test_tail_run_uses_the_reference_cadence_without_speeding_up_walking(self):
         for state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):

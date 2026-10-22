@@ -66,12 +66,12 @@ CLIPS = {
                        (16, 17, 18, 19) + tuple(range(11)) * 5 + (20, 21, 22, 23)),
     "tail_catch": Clip("tailplay", 0, (300, 180, 180, 100) + (50,) * 22 + (120, 350, 120, 150, 180, 300, 600),
                        (16, 17, 18, 19) + tuple(range(11)) * 2 + (13, 14, 13, 12, 21, 22, 23)),
-    "arrive": Clip("visitor-arrive", 0,
-                   (120, 120, 160, 100, 100, 100, 120, 120, 110, 80, 90, 100,
-                    80, 90, 90, 110, 160, 100, 100, 100), tuple(range(1, 21))),
-    "depart": Clip("visitor-depart", 0,
-                   (100, 100, 100, 150, 100, 120, 130, 100, 150, 100, 100, 100,
-                    100, 100, 100, 150), tuple(range(16))),
+    "arrive": Clip("motion-arrive", 0,
+                   (180, 180, 140, 80, 80, 80, 90, 110) + (70,) * 8 + (160,) * 3,
+                   tuple(range(1, 20))),
+    "depart": Clip("motion-depart", 0,
+                   (100, 100, 140, 220, 140, 100, 100, 100, 100, 100) + (100,) * 10,
+                   (0, 1, 2, 16, 17, 18, 19, 20, 4, 5) + tuple(range(6, 16))),
     "happy": Clip("pet-happy", 0, (100, 100, 100, 150, 150, 200, 250, 150,
                                  200, 200, 150, 150, 200, 200, 150, 350), tuple(range(16))),
     "nuzzle": Clip("pet-nuzzle", 0, (100, 100, 150, 150, 150, 200, 200, 200, 200, 200,
@@ -191,14 +191,14 @@ IDLE_HEADS = {("idleplay-a", 0): (67, 56), ("idleplay-a", 2): (68, 54), ("idlepl
 
 
 def drop_progress(elapsed):
-    release = sum(CLIPS["arrive"].durations[:4]) / 1000
-    duration = sum(CLIPS["arrive"].durations[4:9]) / 1000
-    return max(0, min(1, (elapsed - release) / duration)) ** 2
+    duration = sum(CLIPS["arrive"].durations[:3]) / 1000
+    return max(0, min(1, elapsed / duration)) ** 2
 
 
 def departure_progress(elapsed):
-    launch = sum(CLIPS["depart"].durations[:9]) / 1000
-    duration = sum(CLIPS["depart"].durations[9:]) / 1000
+    flight = CLIPS["depart"].order.index(6)
+    launch = sum(CLIPS["depart"].durations[:flight]) / 1000
+    duration = sum(CLIPS["depart"].durations[flight:]) / 1000
     return max(0, min(1, (elapsed - launch) / duration))
 
 
@@ -358,6 +358,60 @@ class SpriteAtlas:
         self.load_carry(path)
         self.load_games(path)
         self.load_lifecycle(path)
+        self.load_motion(path)
+
+    def load_motion(self, path):
+        imported = {}
+        for name, rows in (("arrive", 5), ("depart", 4), ("bridge", 1), ("sad", 2)):
+            image = QImage(str(Path(path) / f"neko-lifecycle-{name}-v2.png"))
+            if image.isNull() or image.width() % 4 or image.height() % rows:
+                return
+            width, height = image.width() // 4, image.height() // rows
+            poses = []
+            for i in range(rows * 4):
+                cell = image.copy(i % 4 * width, i // 4 * height, width, height).scaledToWidth(128, Qt.FastTransformation)
+                bounds = sprite_bounds(cell)
+                if bounds.isEmpty():
+                    return
+                poses.append(cell.copy(bounds))
+            for i, pose in enumerate(poses):
+                # The recovery group has its own drawn neutral; never fit individual poses.
+                reference = poses[16] if name == "arrive" and i >= 12 else poses[0]
+                sx, sy = 62 / pet_landmarks(reference)[0], 85 / reference.height()
+                sprite = QPixmap.fromImage(pose).scaled(round(pose.width() * sx), round(pose.height() * sy),
+                                                       Qt.IgnoreAspectRatio, Qt.FastTransformation)
+                left = (CANVAS_WIDTH - sprite.width()) // 2
+                if name == "arrive" and i in range(1, 12):
+                    alpha = sprite.toImage().convertToFormat(QImage.Format_Alpha8)
+                    raw, stride = bytes(alpha.constBits()), alpha.bytesPerLine()
+                    # These reviewed poses have raised tails; the leading bottom contact is the foretoe.
+                    toes = [x for x in range(alpha.width()) for y in range(max(0, alpha.height() - 6), alpha.height())
+                            if raw[y * stride + x] >= 128]
+                    if not toes:
+                        return
+                    left = 130 - max(toes)
+                elif name == "arrive":
+                    left += {12: -3, 13: -3, 14: -2, 15: -12, 16: -10, 17: -14, 18: -12}.get(i, 0)
+                else:
+                    # Authored near-hind toe registration through wind-up and the final planted push.
+                    left += {3: -9, 4: 0, 5: 19}.get(i, 0)
+                top = 132 - sprite.height()
+                if min(left, top) < 2 or left + sprite.width() > CANVAS_WIDTH - 2:
+                    return
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawPixmap(left, top, sprite)
+                painter.end()
+                imported[f"motion-{name}", i // 4, i % 4] = frame
+        for key in (("motion-arrive", 4, 3), ("motion-depart", 0, 0)):
+            imported[key] = self.frames["idle", 0, 0]
+        # Whole replacement drawings; reject the source sheet's neighbouring-paw fragments.
+        for target, source in ((8, 1), (11, 2), (12, 3)):
+            imported["motion-depart", target // 4, target % 4] = imported["motion-bridge", 0, source]
+        for target, source in ((1, 1), (2, 2), (16, 3), (17, 4), (18, 5), (19, 6), (20, 7)):
+            imported["motion-depart", target // 4, target % 4] = imported["motion-sad", source // 4, source % 4]
+        self.frames.update(imported)
 
     def load_lifecycle(self, path):
         imported = {}

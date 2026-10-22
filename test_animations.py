@@ -6,7 +6,7 @@ import unittest
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QColor, QImage
 
-from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, departure_progress, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
 
 
 APP = QApplication.instance() or QApplication([])
@@ -25,11 +25,13 @@ class AnimationTests(unittest.TestCase):
         self.assertTrue(all(idle.toImage().pixelColor(x, y).alpha() == 0
                             for x in range(192) for y in range(32)))
 
-    def test_pet_drawings_have_no_detached_sheet_fragments(self):
+    def test_pet_and_lifecycle_drawings_have_no_detached_sheet_fragments(self):
         atlas = self.atlas
-        for name, rows in PET_ROWS.items():
-            for index in range(rows * 4):
-                image = atlas.frames[CLIPS[name].bank, index // 4, index % 4].toImage()
+        banks = [(CLIPS[name].bank, rows * 4) for name, rows in PET_ROWS.items()]
+        banks += [("motion-arrive", 20), ("motion-depart", 21), ("motion-bridge", 4), ("motion-sad", 8)]
+        for name, count in banks:
+            for index in range(count):
+                image = atlas.frames[name, index // 4, index % 4].toImage()
                 opaque = {(x, y) for y in range(image.height()) for x in range(image.width())
                           if image.pixelColor(x, y).alpha() >= 128}
                 sizes = []
@@ -100,7 +102,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
         atlas = self.atlas
-        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4 + 45)
+        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4 + 45 + 53)
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
@@ -226,11 +228,12 @@ class AnimationTests(unittest.TestCase):
         for name in ("tail_chase", "tail_catch", "arrive", "depart"):
             clip = CLIPS[name]
             indices = set(clip.order)
-            self.assertTrue(set(range(1 if name == "arrive" else 0, 8)) <= indices)
+            required = {0, 1, 2, 4, 5, 6, 7, 16, 17, 18, 19, 20} if name == "depart" else set(range(1 if name == "arrive" else 0, 8))
+            self.assertTrue(required <= indices)
             self.assertFalse(clip.loop)
             self.assertLess(sum(clip.durations), 6000)
             images = [atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage() for i in indices]
-            expected = len(indices) - (1 if name in ("tail_chase", "tail_catch") else 0)
+            expected = len(indices) - (1 if name in ("tail_chase", "tail_catch", "depart") else 0)
             self.assertEqual(len({bytes(image.constBits()) for image in images}), expected, name)
         departed = atlas.frame("depart", 999).toImage()
         self.assertTrue(any(bytes(departed.constBits())), "Screen travel, not local erasure, owns exit")
@@ -261,7 +264,7 @@ class AnimationTests(unittest.TestCase):
     def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
         atlas = self.atlas
         for key, frame in atlas.frames.items():
-            if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith(("idleplay-", "visitor-")):
+            if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith(("idleplay-", "visitor-", "motion-")):
                 continue
             image = frame.toImage()
             self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
@@ -286,9 +289,9 @@ class AnimationTests(unittest.TestCase):
         idle = atlas.frame("idle", 0).toImage()
         self.assertEqual(atlas.frame("arrive", 999).toImage(), idle)
         self.assertEqual(atlas.frame("depart", 0).toImage(), idle)
-        self.assertEqual(atlas.frame("depart", 1.77).toImage(),
-                            atlas.frame("depart", 1.79).toImage())
-        self.assertEqual(CLIPS["depart"].frame_index(1.77), CLIPS["depart"].frame_index(1.79))
+        self.assertEqual(atlas.frame("depart", 2.17).toImage(),
+                            atlas.frame("depart", 2.19).toImage())
+        self.assertEqual(CLIPS["depart"].frame_index(2.17), CLIPS["depart"].frame_index(2.19))
         self.assertTrue(any(bytes(atlas.frame("arrive", 0).toImage().constBits())))
         for name in ("arrive", "depart"):
             self.assertEqual(atlas.frame(name, 0.2, motion=False).toImage(), idle)
@@ -297,12 +300,30 @@ class AnimationTests(unittest.TestCase):
 
     def test_arrival_recovery_keeps_the_canonical_seated_size(self):
         idle = sprite_bounds(self.atlas.frame("idle", 0).toImage())
-        for i in (19, 20):
-            image = self.atlas.frames["visitor-arrive", i // 4, i % 4].toImage()
+        for i in (16, 19):
+            image = self.atlas.frames[CLIPS["arrive"].bank, i // 4, i % 4].toImage()
             bounds = sprite_bounds(image)
             self.assertAlmostEqual(bounds.top(), idle.top(), delta=3)
             self.assertAlmostEqual(pet_landmarks(image.copy(bounds))[0], 62, delta=4)
             self.assertAlmostEqual(bounds.bottom(), idle.bottom(), delta=1)
+
+    def test_arrival_fore_contact_stays_planted_through_the_fold(self):
+        tips = []
+        bank = CLIPS["arrive"].bank
+        for i in range(4, 9):
+            image = self.atlas.frames[bank, i // 4, i % 4].toImage()
+            xs = [x for x in range(100, 180) if any(image.pixelColor(x, y).alpha() >= 128 for y in range(126, 131))]
+            self.assertTrue(xs, i)
+            tips.append(max(xs))
+        self.assertLessEqual(max(tips) - min(tips), 1, tips)
+
+    def test_goodbye_draws_sadness_and_turn_before_a_single_push_off(self):
+        clip = CLIPS["depart"]
+        self.assertEqual(clip.order[:8], (0, 1, 2, 16, 17, 18, 19, 20))
+        self.assertGreaterEqual(sum(clip.durations[:5]), 700)
+        self.assertEqual(clip.order[8:], (4, 5) + tuple(range(6, 16)))
+        self.assertEqual(departure_progress(1.2), 0)
+        self.assertGreater(departure_progress(1.3), 0)
 
     def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
         atlas = self.atlas

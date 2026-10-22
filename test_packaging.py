@@ -52,6 +52,11 @@ class PackagingTests(unittest.TestCase):
             self.assertIn(asset, names)
             self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
                              hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest())
+        for name in ("arrive", "depart", "bridge", "sad"):
+            asset = f"assets/neko-lifecycle-{name}-v2.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest())
         self.assertNotIn("assets/neko-tailplay-v2.png", names)
         self.assertIn("assets/neko-lifecycle-v2.png", names)
         self.assertIn("assets/neko-tailswish-v1.png", names)

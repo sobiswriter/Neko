@@ -1,13 +1,16 @@
 # Animation rebuild checklist
 
-## Reference-led lifecycle v2 — planning delivered, 2026-10-23
+## Reference-led lifecycle v2 — delivered, 2026-10-23
 
 - [x] Preserve all five supplied originals in the project and verify byte-identical hashes; index source identities and motion-use limits.
 - [x] Decode the full 4.18s video and review timestamped scene/pose studies; distinguish observed contact/spine mechanics from proposed Neko acting.
 - [x] Update Frame Master for every future motion: selected references, connected masses, support maps, distinct silhouettes and face-hidden key-pose review.
 - [x] Record the user's rejection of the visitor acting and write [the replacement drop-in/drop-out plan](../docs/lifecycle-motion-v2-plan.md), preserving old validation evidence.
-- [ ] When implementation is requested: review the approximately eight key poses/support maps per action and normal-speed rough movement before full sheet generation.
-- [ ] Resolve contact anchoring, body folding, drawn turns and high-perch exit route; then author connections/acting and run focused native/release checks.
+- [x] Review twelve key poses per action, support maps and rough silhouette movement before full sheet generation; preserve both studies.
+- [x] Resolve contact anchoring, body folding, drawn turns and high-perch exit; author connections/acting and three complete corrective bridge drawings.
+- [x] Implement the user's single diagonal leap direction; 120 focused checks plus one final front-seam regression and native low/high playback pass. [Evidence and limits](../docs/lifecycle-v2-validation.md).
+- [x] Add the user's sad goodbye with drawn ear/eye/head transitions and grounded turn into take-off; preserve front-facing placement before directional mirroring.
+- [x] Pass all four exact-executable checks; record native pose coverage and2.209s UI readiness, preserve verified predecessor, update prompts/previews/README/Frame Master together.
 
 ## Entrance and goodbye — delivered, 2026-10-23
 

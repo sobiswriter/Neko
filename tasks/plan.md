@@ -1,8 +1,12 @@
 # Animation rebuild
 
-## Reference-led lifecycle v2 — plan only, 2026-10-23
+## Reference-led lifecycle v2 — delivered, 2026-10-23
 
-User rejected the delivered visitor acting and supplied a video plus four motion-study images. Originals are preserved and indexed in [the motion library](../references/motion/README.md); Frame Master now requires reference/support/spine study before any motion. [Revised concrete entrance/exit plan](../docs/lifecycle-motion-v2-plan.md): side-biased reach → planted forepaws → spine fold/pelvis follow-through → gathered landing → restrained recovery; departure look-back → hindquarter wind-up → planted hind push → stretched leap → tuck/reach → attached tail follow-through. Review key silhouettes without facial features and prototype the high-perch route before generating full sheets. This turn updates references, guide and plan only; the executable and runtime are unchanged. Technical verification of the prior build is preserved separately from the user's rejection of its appeal.
+Implementation authorized by the user's “Well let's hope you don't disappoint this time.” Latest direction requires one graceful diagonal leap per action. Delivered reference-led key art, face-hidden review, connected poses, planted contacts and diagonal routes; prior release/provenance preserved. [Current evidence](../docs/lifecycle-v2-validation.md).
+
+Final steering adds sad ears/eyes/head before a graceful exit pose: eight new expression/turn slots, then supported load/push and one diagonal leap. Departure20 selected entries/2.20s; arrival19/1.98s. Front sadness remains unmirrored until the authored turn.120 focused checks plus one final seam regression, four package checks, native coverage and2.209s local UI readiness are recorded; the flat release retains its verified predecessor.
+
+User rejected the delivered visitor acting and supplied a video plus four motion-study images. Originals are preserved and indexed in [the motion library](../references/motion/README.md); Frame Master requires reference/support/spine study before any motion. [Revised plan](../docs/lifecycle-motion-v2-plan.md): side-biased reach → planted forepaws → spine fold/pelvis follow-through → gathered landing → supported recovery; departure look-back → hindquarter wind-up → planted hind push → stretched leap → tuck/reach → attached tail follow-through. Arrival has one landing and no second bounce; high departures use a nearer side. Technical verification remains separate from the user's judgement of appeal.
 
 ## Entrance and goodbye — delivered, 2026-10-23
 

@@ -1,6 +1,10 @@
 # Lifecycle motion v2 — body mechanics before expressions
 
-2026-10-23 · Revised plan following the user's critique and supplied motion references. No new sprite generation or runtime change in this revision.
+2026-10-23 · Revised plan following the user's critique and supplied motion references. Subsequently authorized and implemented: [delivery and evidence](lifecycle-v2-validation.md).
+
+Latest user direction: **one graceful leap for each action, with diagonal entry and exit**. Arrival may enter through the side along its diagonal rather than appearing directly above home. Landing compression recovers under support; it must not become a second airborne bounce. Departure has one push-off and one arc.
+
+Final expression direction: “Let her go” should make her sad before she gracefully takes her exit pose. Replace the cheerful last-look acting with gradually lowered ears, soft heavy eyes and dipped head, a slow subdued blink/reopen, then supported turn/steps into the crouch. Give the expression700ms to read and draw the transition through the body; keep one leap afterwards. Final departure budget2.20s/20 selected entries supersedes the earlier1.5–1.9s target below.
 
 ## What the previous pass missed
 
@@ -16,7 +20,7 @@ Before a full sheet, prepare approximately eight **key poses per action**, with 
 
 Each pose brief must identify: head, chest and pelvis; concave/convex/neutral spine; which feet carry weight and which are swinging; planted contact positions; tail phase; and the next force/weight change. A broad torso outline with four decorative feet is not a solution. Judge the keys in silhouette at native size, then judge their transitions at normal speed. Add connecting drawings according to the actual gaps in the movement, not to fill a fixed four-by-five sheet. Only then polish expressions.
 
-## New drop-in: reach, fold, spring into composure
+## New drop-in: reach, fold, settle into composure
 
 Drop the current prolonged crouch floating near the top. Start with the kitten already committing to a small diagonal entry, as in the reference. The landing is the event, rather than a seated face waiting for a window to move.
 
@@ -27,7 +31,7 @@ Drop the current prolonged crouch floating near the top. Start with the kitten a
 | A3 · First support | Forepaws plant; elbows start yielding; rear is still high. | Paw contacts remain fixed while the body continues toward them. |
 | A4 · Fold | Shoulders lower; back rounds; pelvis follows through. | Distinct chest/pelvis phase delay, not a whole-sprite downscale. This is the video’s roughly 0.6–0.8s lesson. |
 | A5 · Gather | Hind feet arrive beneath the mass, completing a compact supported landing. | All four legs accounted for, a readable folded spine and no extra paw silhouettes. |
-| A6 · Release | Joint extension lifts the chest out of compression; tail still catches up. | One restrained rebound, arising from the landing. No repeated bouncing. |
+| A6 · Release | Supported joint extension lifts the chest out of compression; tail still catches up. | Paws retain support. No second airborne hop or bounce. |
 | A7 · Compose | Hindquarters settle into a sit; forepaws step/plant into their final positions; head turns toward the viewer. | A drawn support change and turn, not a cut to canonical idle. |
 | A8 · Attitude | A small pleased head lift and eye squeeze, then reopen to actual idle. | A brief “yes, I meant to do that” finish after the body earns it. |
 
@@ -72,4 +76,4 @@ Prototype near-bottom **and high** resting positions before fixing the route. Fo
 - Integrate with the existing first-visible clocks, real world movement, per-monitor clipping and persistent resting origin. Keep reduced motion, hide/fullscreen, sleep/carry, repeated quit and OS shutdown safe and prompt.
 - Verify retained frames and unrelated clips, source/packed equality, planted contacts and connection to actual idle. Record native paint coverage and startup timing; keep build-time baking. Update previews, README, Frame Master findings and release identities together, with the flat current/previous executable layout.
 
-This revision archives and studies the references and changes the plan/guide. It does not generate replacement sprites, modify animation code or replace the executable. The new poses, timing ranges and routes remain untested proposals.
+The initial planning revision archived the references without changing runtime. Its subsequent implementation uses 19 entrance entries/1.98s and 20 exit entries/2.20s, with one diagonal leap each. Exact selected/rejected artwork, registration corrections, native evidence and remaining limits are in [the delivery report](lifecycle-v2-validation.md). Proposed mechanisms above are not blanket approval for future artwork.

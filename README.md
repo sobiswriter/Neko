@@ -60,7 +60,7 @@ Soft sounds are optional and off until you enable them.
 - **Come close.** She can notice a nearby cursor while keeping her place.
   Cursor chasing belongs to Catch the Cursor; ordinary idle following has been removed.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 786 entries, including 212 game source slots and 45 lifecycle entries, with eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 839 entries, including 212 game source slots and 98 current/historical lifecycle entries, with eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
@@ -87,12 +87,15 @@ Soft sounds are optional and off until you enable them.
   catch 3.68 seconds. Each gets three times an ordinary idle's selection weight,
   with no consecutive repeats and the same rest between gestures.
   These do not change the twelve pet reactions.
-- **Hello and goodbye.** She leans curiously into view from the top, gathers into
-  a drop, yields through her forepaws and settles into a pleased head tilt and smile.
-  The 2.15s entrance uses 20 poses and ends at her actual idle and saved position.
-  **Let her go · quit** gives her a warm slow blink, a look toward the way out and
-  a gathered hop through the monitor's bottom edge, with her attached tail trailing
-  last. This 16-pose goodbye lasts 1.8s and moves the actual window, while preserving
+- **Hello and goodbye.** One graceful diagonal leap brings her into view, with
+  reaching forelegs, planted front paws, a folding spine and gathered hindquarters.
+  She recovers under support into a pleased tilt and smile, with no second bounce.
+  The 1.98s entrance uses 19 selected poses and ends at her actual idle and saved position.
+  **Let her go · quit** gives her lowered ears, soft sad eyes and a dipped head,
+  then a drawn turn into a loaded crouch and one diagonal
+  leap out, stretching then tucking/reaching with her attached tail following.
+  High perches use a nearer side boundary; low departures head diagonally down.
+  This 20-entry goodbye lasts 2.20s and moves the actual window, while preserving
   her resting position. Both clocks start on Qt's first animation tick so loading
   cannot spend the performance before it appears. Visible fullscreen launches also
   play the drop-in, silently; the fullscreen hiding preference still applies.
@@ -100,7 +103,7 @@ Soft sounds are optional and off until you enable them.
   window reactions midway through. Reduced motion skips the jumps; quitting
   while hidden or fullscreen is immediate. Sleeping, held or other incompatible
   poses close immediately rather than snapping into a seated goodbye. Hide/Show
-  remains immediate. [Preview and verification](docs/visitor-validation.md).
+  remains immediate. [Preview and verification](docs/lifecycle-v2-validation.md).
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual
@@ -239,7 +242,7 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
-Packaging prepares all 786 calibrated animation frames once with
+Packaging prepares all 839 calibrated animation frames once with
 `tools/bake_atlas.py`. The executable loads those finished frames directly,
 avoiding source-sheet silhouette analysis on every launch. Source launches keep
 the original importer; source artwork and custom asset overrides are retained.
@@ -253,7 +256,7 @@ The latest build includes Catch the Cursor, pickup, slightly faster petting, fro
 the supplied icon and startup repair; see [Catch verification](docs/catch-validation.md)
 and the [startup/icon record](docs/startup-icon-validation.md). The
 [quieter cursor-play v2](docs/cursor-play-v2-validation.md) and the
-[visitor entrance/goodbye](docs/visitor-validation.md) are implemented.
+[reference-led diagonal entrance/goodbye](docs/lifecycle-v2-validation.md) are implemented.
 Historical build paths
 in older reports describe their original delivery locations.
 
@@ -293,9 +296,12 @@ three rows of four drawings from an earlier petting pass; they too are historica
 `assets/neko-tailplay-v4.png` supplies the eleven-pose running cycle and five preparation/payoff poses.
 `assets/neko-tailsettle-v1.png` adds eight entry/recovery poses, calibrated separately
 and appended to the tail sequence without altering the accepted running artwork.
-`assets/neko-arrival-v1.png` supplies the graceful landing; the first two drawings in
-`assets/neko-farewell-v1.png` introduce sadness before the retained hop in
-`assets/neko-lifecycle-v2.png`. `assets/neko-tailswish-v1.png` supplies the lazy swish.
+`assets/neko-lifecycle-arrive-v2.png`, `assets/neko-lifecycle-depart-v2.png` and
+`assets/neko-lifecycle-bridge-v2.png` supply the current diagonal arrival/departure
+and corrective bridges. `assets/neko-lifecycle-sad-v2.png` adds the sad expression
+and supported turn into take-off. [Exact prompts and assembly](docs/lifecycle-v2-prompts.json).
+Earlier arrival/farewell/lifecycle/visitor sheets remain historical imported banks.
+`assets/neko-tailswish-v1.png` supplies the lazy swish.
 `assets/neko-idleplay-a-v1.png`, `assets/neko-idleplay-b-v1.png` and
 `assets/neko-idleplay-c-v1.png` provide the new idle stories. Replaced idle/activity/
 movement rows and the rejected swish candidates are not imported. New idle stories

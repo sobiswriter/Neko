@@ -1,0 +1,673 @@
+{
+  "date": "2026-10-23",
+  "mode": "built-in image_gen; transparent_background true",
+  "stage": "key silhouettes reviewed, followed by connected production drawings",
+  "sources": {
+    "arrive": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-22930539-2896-4f28-aa60-ca134b5e1b90.png",
+      "prompt": "Use case: illustration-story. FINAL CONNECTED pixel-art sprite sheet for Neko landing. EXACTLY TWENTY complete sprites, FOUR columns x FIVE rows, true transparent alpha, generous equal empty space between sprites. No text/numbers/labels/grid, floor, shadows, props, haze, matte or motion marks.\n\nReference1 defines the actual character proportions: VERY LARGE head, SHORT compact seated body and SHORT sturdy legs, white fur, grey chest/throat, pink nose and ears, dark eyes with square highlights and charcoal stepped pixel outlines. In a neutral sit, the head width is about THREE QUARTERS of the entire seated height, and head height about THREE FIFTHS of seated height. Do NOT make a small head on a long-legged neutral kitten. Reference2 is a KEY-MECHANICS study ONLY: preserve the strong long reach, rear-high first forepaw support, convex spine folding and gathered compression. Do not reproduce its undersized frontal heads. Reference3 is the actual native neutral to match at both endpoints. Constant physical head volume across EVERY pose; side view may narrow its visible width but not shrink the skull. Body volume stays consistent while the spine folds and unfolds. No per-pose zoom.\n\nCamera stays fixed; the ANIMAL TURNS. Slots1..13 are SIDE-BIASED THREE-QUARTER facing RIGHT, not facing the viewer. Clear chest and pelvis masses; exactly TWO forelegs and TWO hindlegs total, occluded far legs stay hidden, ONE attached tail. Never add grounded duplicate paws. Draw all silhouettes complete in their cells. Match the canonical face and pixel style precisely.\n\n0 exact actual front neutral sit, full reference head/body proportions, calibration.\n1 long descending diagonal: head/chest down-right, pelvis up-left, forelegs reach down-right, hindlegs and tail trail.\n2 steeper foreleg reach, pelvis still HIGH above shoulders, gathered hindlegs behind, long concave spine.\n3 forepaws just above contact, rear still high; attentive eyes. Negative spaces between both forelegs and body.\n4 FIRST forepaw contact, elbows just yielding, rear clearly high and hind feet airborne.\n5 SAME front paw contact positions, elbows bend, chest lowers between shoulders; pelvis starts swinging down/forward.\n6 more elbow/shoulder yield, spine begins ROUNDING convex, rear still following. A small effort eye squeeze begins.\n7 hindlegs swing underneath; chest remains supported by the planted forepaws, convex spine folding further; effort eye squeeze continues.\n8 DEEPEST compact compression, hind feet now join support, chest low/chin safely clear, all four legs accounted for, short rounded outline.\n9 forelegs begin lifting the chest, pelvis remains gathered, tail still catching up, eyes reopen.\n10 shoulders rise another small step, haunch moves underneath rather than sticking out behind.\n11 supported low half-sit, spine opening from compression, forepaws firmly planted, all weight grounded.\n12 half-sit with haunch settled and forelegs extending; side view still clear.\n13 upright SIDE sit, short torso/full-size head, planted forepaws, tail begins resting at side.\n14 shoulders turn toward viewer about20deg; forepaws STEP into the new support instead of sliding.\n15 chest turns toward viewer about45deg; head follows through drawn turn, head stays full size.\n16 almost front neutral supported sit at actual canonical physical height/proportions, open eyes.\n17 small proud head tilt, tiny pleased mouth; same fully sized seated body.\n18 same slight tilt with drawn contented squeezed-eye smile, no raised paws, head volume unchanged.\n19 exact same actual neutral as0, reopened eyes and level head, complete supported recovery.\n\nThe sequence should read in silhouette WITHOUT facial details: long reach -> high rear over planted front -> folded rounded gather -> supported unfolding -> drawn turn into sit. Do not turn the critical contact/fold frames into near-identical crouches. Keep strong extremes and connected breakdowns.",
+      "rows": 5
+    },
+    "depart": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-32cdc954-d0f7-4899-962d-4310c4b27108.png",
+      "prompt": "Use case: illustration-story. FINAL CONNECTED PIXEL ART sprite sheet for Neko's springy departure. EXACTLY SIXTEEN whole cat drawings, FOUR columns x FOUR rows, genuine transparent alpha. Generous empty margins; do not clip toes/tail at sheet edges. No text, labels, numbering, grids, floor, shadows, props, haze or motion marks.\nReference1 is exact Neko character proportions and palette. VERY LARGE head, short compact torso and short sturdy resting legs. Neutral head width is roughly THREE QUARTERS of total seated height, head height THREE FIFTHS. White fur, grey throat/chest, pink ears/nose, charcoal stepped outlines, dark eyes with square highlights. Reference2 is KEY-MOTION ONLY: a deep convex crouch visibly unfolds through planted hind toes into a long concave airborne silhouette, then gathers convex again. Reference3 is the actual native idle; match it at0. Same physical head volume and character scale for all16. Side-facing head may project narrower, but NEVER shrink it relative to the body.\n\nFixed camera; the ANIMAL TURNS. The motion slots use a SIDE-BIASED THREE-QUARTER view facing RIGHT. The head, chest and pelvis are connected masses with a flexible spine, not a rigid body. Exactly FOUR anatomical legs total with coherent far-leg occlusion, ONE attached tail, one head/neck/torso. Lifted paws replace grounded ones; no extra feet. All silhouettes fully contained in cells.\n\n0 exact canonical neutral front sit, full reference proportions/calibration.\n1 torso begins turning right, head looks toward exit, forepaws planted.\n2 body turns into right three-quarter, head looks BACK toward viewer over shoulder, warm soft blink, weight stays supported; NOT the same front-facing sit.\n3 shoulders lean forward, rear lowers, spine becomes convex; hind feet move under pelvis and plant.\n4 deepest compact loaded crouch, hocks/knees bent, chest and pelvis close; both hindfeet planted; forefeet light but still supported. Effort eye squeeze.\n5 early PUSH from SAME planted hind toes: hips rise, hind legs extend, forepaws leave ground and fold, chest drives right/up. Effort eye squeeze continues through different BODY action.\n6 final hind-toe push-off, rear legs nearly straight behind torso, forepaws reaching forward; chest/pelvis UNFOLD; last instant of toe contact.\n7 fully airborne LONG horizontal-diagonal rightward leap, concave back, forelegs extended ahead and hindlegs extended behind, tail trails after. Keep head LARGE.\n8 a second long extension breakdown with more open foreleg spacing and delayed tail; clear gap under belly; no generic standing pose.\n9 start GATHERING in midair, elbows and hocks fold under abdomen, spine curves from concave to convex.\n10 most compact airborne TUCK, chest/pelvis closer, back round, four legs accounted for beneath body; head physical size unchanged. Very different outline from7.\n11 UNFOLD into a downward reach: head/chest begin leading down-right, forelegs starting to extend, rear/tail still high behind.\n12 long foreleg reach down-right, pelvis follows high-left, spine opens; all airborne.\n13 steeper descending reach, changing foreleg/hindleg spacing and tail overlap.\n14 rear folds a little closer while forequarters still lead down-right, head attentive, all limbs connected; tail trails upward behind.\n15 continue the whole-body descent with attached tail curving UP behind as last part to leave. Draw complete paws and tail, no blank tile and no detached tail.\n\nUse open attentive eyes once airborne. The glance/effort expressions support the turn and force; they do not replace it. Strong silhouette changes, connected limb transitions, reference-faithful character, hard pixel clusters.",
+      "rows": 4
+    },
+    "bridge": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-82e457f4-20b3-47ed-aa42-51c1339fb339.png",
+      "prompt": "Generate a transparent production pixel-art sprite strip: exactly FOUR COMPLETE separated kittens in ONE horizontal row, enormous empty transparent gutters so no part of any neighbour can enter a crop. Reference 1 canonical Neko identity: white kitten gray chest shading pink ears/nose charcoal stepped outlines, big dark eyes, compact chunky volume. Reference 2 current departure animation: match its side-biased three-quarter view and body scale, genuine new body articulation. This strip corrects 3 contaminated airborne bridge drawings, NOT a new repeated jump. Reference 3 mechanics only: elongated then tucked spine and leading forelegs. Every full kitten complete, exactly one head, two ears, one attached tail, four anatomical legs with hidden far legs staying hidden. No detached paw/outline pieces. Four columns left to right: 0 canonical FRONT SEATED neutral calibration, eyes open, full sitting height comparable to reference 1. 1 fully airborne facing RIGHT/down on one graceful diagonal leap, long low stretched body, chest ahead of pelvis, forelegs reach forward/down, hind legs trail back, tail extends back/up in continuous connected curve; between reference2 indices7 and9. 2 unfolding from gathered airborne tuck into a downward reach, still no floor/contact, connected curved spine, forelegs opening forward/down, hind knees bent beneath pelvis, tail delayed high; between reference2 indices10 and12. 3 steeper diagonal foreleg-led downward reach, pelvis higher behind chest, two leading forelegs separated by small negative space, hindlegs still gathered behind, tail trails above; between reference2 indices11 and13. Keep all three airborne at exactly same physical scale as calibration head volume allowing narrower perspective. Readable long/gather/reach silhouette; warm attentive eyes, tiny cheerful mouth. Retain crisp square clusters and native pixel look, not vector/smooth outlines. No labels, text, grid, floor, shadow, glows, particles, extra marks, duplicate paws, neighbour fragments. Every complete silhouette must have its own large empty rectangle; no overlapping rows. True transparent alpha.",
+      "rows": 1
+    },
+    "sad": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-a15694d8-b107-44da-a2df-37ff44d19dda.png",
+      "prompt": "Use case illustration-story. Production pixel-art transition sheet for the provided canonical Neko: exactly EIGHT COMPLETE kittens in FOUR columns by TWO rows. True transparent alpha. Very large EMPTY gutters and margins, each entire connected silhouette fully inside its own clear rectangle. No extra fragments, floor, shadows, tears, symbols, lettering, grid or watermark. Reference1 is exact character identity and neutral proportions; reference2 is the existing departure body's turn/crouch/push, to connect into. Preserve LARGE head, short compact body and legs, white fur, gray throat/chest, pink inner ears/nose, dark eyes with tiny square highlights and charcoal stepped pixel outlines. Same physical size in every cell, fixed camera. Exactly four anatomical legs with far limbs naturally hidden, one attached tail, one head/two ears. The animal turns through drawn poses, never rigidly rotate a seated bitmap.\nThis is a gentle SAD GOODBYE when told 'let her go', then she gracefully gathers to leave. NO smiling cheerful blink; sadness must be legible via DROOPED EARS, gently lowered head and soft heavy upper eyelids. No guilt/crying theatrics, no angry eyebrows or cross-eyed face. Keep delicate kitten emotion and smooth small transitions, especially front to three-quarter view. All eight are GROUNDED: forepaws support chest, hind haunches support rear, tail lowers as she feels sad. Only a later existing animation will make ONE diagonal leap.\nChronological zero based cells: 0 exact FRONT seated neutral matching reference1 for calibration. 1 same supported body, ears lower a little, upper eyelids soften slightly, head dips just a little, tiny mouth goes quiet. 2 clear SAD front sit: lowered ears angled gently sideways, heavy soft eyelids, head dipped, tiny downturned mouth, tail lowered; physical head stays full volume. 3 same SAD body through a slow half-closed blink, eyelids nearly closed but not smiling arcs, ears still drooped; chest settles slightly, no shrinking. 4 eyes reopen softly, still sad; head looks toward RIGHT, shoulders begin 15 degree turn while paws remain supporting. 5 body turns 30 degrees right through an authored support change, near forepaw lifts and replaces, head still tilted gently down, sad eyes and ears sustained. 6 side-biased THREE-QUARTER facing RIGHT about45degrees: shoulders begin leaning forward, haunch starts lowering, forepaws planted ahead, hind feet come beneath pelvis, rounded spine begins; ears become focused but expression stays subdued. 7 low HALF-CROUCH facing right, shoulders/pelvis closer, head leads forward/down, hind feet ready under hips, tail beginning to lift in preparation. This MUST bridge into reference2 slot3 (first crouch), not jump directly from a sit into flight. Keep all limbs connected/complete, no spare paws. Connected subtle transitions rather than isolated cute poses. Crisp square clusters, nearest-pixel style, no smooth vector outlines.",
+      "rows": 2
+    }
+  },
+  "key_sources": {
+    "arrive": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-869975f2-594c-455c-8d7f-565cd811445e.png",
+      "prompt": "Use case: illustration-story. This is a KEY-POSE study for an expressive PIXEL ART desktop cat landing, not twelve variations of a sitting mascot. Produce EXACTLY TWELVE complete cat drawings in FOUR columns by THREE rows on genuine transparent alpha. No labels, numbers, grid, background, floor, props, shadows, haze, marks or watermark.\nReference1 gives Neko's actual identity: white compact kitten, large recognizable head, gray throat/chest, pink ears and nose, charcoal pixel outlines, dark eyes with white square highlights. Reference2 supplies MOTION ONLY: diagonal long foreleg reach, front contact with the pelvis HIGH, then spine folding, rear coming underneath, then recovery. Reference3 supplies spine flexion and leg support mechanics only. Do NOT copy these references' backgrounds or text.\n\nConstant physical head volume and body volume, fixed shot scale; KEEP NEKO'S HEAD LARGE. The animal can TURN: use a SIDE-BIASED THREE-QUARTER VIEW FACING RIGHT for action slots1..7, then a drawn turn to familiar front idle. DO NOT keep the action facing the viewer. Exactly FOUR anatomical legs total, two fore/two hind with natural occlusion; exactly ONE attached tail, head, neck and connected torso. No extra paws. Lifted paw replaces grounded version.\nLarge DISTINCT silhouettes and visible changes between the CHEST and PELVIS are essential. Concave stretched spine vs convex gathered spine. NOT a rigid torso sliding through space. Do not make all poses low crouches. Draw the complete silhouette with a generous clear cell margin.\n\nChronological zero-based slots:\n0 Exact neutral front seated reference, calibration, upright at full reference height.\n1 LONG diagonal descending shape: head and chest DOWN-RIGHT, pelvis UP-LEFT, forelegs reaching down-right, hindlegs trailing up-left, concave extended spine, attached tail trailing up-left. Clear negative spaces between limbs. Looks dramatically different from sitting.\n2 reach further DOWN: forelegs nearly vertical toward landing, chest still forward, pelvis markedly higher than chest. Hindlegs still airborne behind the body. Same head size.\n3 FIRST FOREPAW CONTACT: forepaws plant below/right of chest, one just ahead of other; elbows softly yielding. Pelvis remains HIGH above/behind the shoulders and hind feet still off the ground. The spine/hips must NOT already be level.\n4 shoulder-yield FOLD: SAME planted forepaw positions as3, elbows bend strongly, chest lowers over them, pelvis continues coming down/forward and spine rounds convex. Hindlegs swing under abdomen. Whole outline compresses through joints.\n5 DEEPEST gathered landing: all supporting paws accounted for beneath the mass, hocks bent, round spine, chest low but chin safely above paws, concentrated small eye squeeze. Body is short and rounded rather than the long shape in1.\n6 RELEASE out of compression: front legs extend supporting the chest, pelvis settles behind, spine opens, head begins lifting; tail still catching up. Side-biased view, not yet an upright front sit.\n7 half-sit with weight clearly on haunches and supporting forepaws, shoulders turn 30 degrees toward viewer; head follows, tail sweeps behind, complete recovery in progress.\n8 full front THREE-QUARTER seated recovery, physical height same as0, head/ears/nose same size, planted forepaws, open pleased eyes.\n9 same full-height seated kitten with a small proud head tilt; no shrinking and no raised paws.\n10 gently reopening/leveling after a pleased eye squeeze, supported FULL-HEIGHT sit.\n11 exact same neutral front seated calibration as0.\n\nThe main goal is believable full-body folding/unfolding in the reference sequence. Head stays recognizable while the chest/pelvis and leg spacing change substantially. Every paw contact and occlusion must make anatomical sense. Hard stepped pixel clusters rather than soft vector gradients.",
+      "rows": 3
+    },
+    "depart": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-ab1cb8a7-c754-476c-9ec7-1a09afe2a95a.png",
+      "prompt": "Use case: illustration-story. KEY POSES for Neko's confident, springy exit. EXACTLY TWELVE complete PIXEL ART cat sprites in FOUR columns by THREE rows, true transparent alpha, large clean spacing. Reference1: exact character identity. Reference2: accepted body-mechanics study for this same cat, showing long/short spine shapes and high pelvis at front contact. Reference3: spine mechanics ONLY, not its character design. Preserve white compact cat, LARGE physical head, grey chest/throat, pink ears/nose, charcoal stepped outlines, big dark eyes. Same shot scale, NO zoom changes or shrinking later drawings. Never force the body into a seated outline. The cat TURNS into a SIDE-BIASED THREE-QUARTER RIGHT-facing view, then pushes and leaps. Four anatomical legs total with hidden far limbs naturally occluded; one connected head/neck/chest/spine/pelvis; one attached tail. No extra paws, text, numbers, grid, floor, shadows, props, haze or watermarks.\n\nMain requirement: a round loaded spine shape must visibly UNFOLD into a long airborne shape, then FOLD again. Head/chest/pelvis do not move as a rigid block. The hind legs DRIVE the jump. Draw clear negative spaces between legs and belly. Tail lags after the torso instead of replacing torso motion. All whole cats fit fully in their cells.\n\n0 exact full-height canonical front neutral sit, calibration.\n1 shoulders turning into a right-facing three-quarter sit, head glancing toward the right; forepaws supported.\n2 body turned 45deg right, affectionate look BACK toward viewer over shoulder, half-closed soft eyes, chest/pelvis stay supported, tail counterbalances.\n3 rear sinking into a rounded crouch, hind feet planted beneath the pelvis, spine visibly convex, chest leans forward. Shift weight onto hind legs.\n4 DEEPEST loaded crouch: shoulders and hips close together, knees/hocks deeply bent, both planted hind feet clearly supporting, one forepaw just starting to lift, short gathered silhouette.\n5 PUSH: hind legs extending from the SAME hind toe contacts, chest drives forward/right and UP, forepaws lift with bent wrists, abdomen opening, tail still behind. A clear last toe-support frame, not yet all limbs flying.\n6 fully AIRBORNE LONG extension to the right: forelegs reach ahead, hind legs extend behind, head leads, back concave and chest/pelvis widely separated. Very different silhouette from4.\n7 continuing long diagonal airborne extension, stretched body but the LARGE head remains physically the same size as in0, tail flowing behind.\n8 GATHER in flight: back rounds convex, forelegs fold and hind feet tuck beneath the abdomen, chest and pelvis closer together. This is a drawn joint change, NOT a scaled-down copy of6.\n9 forelegs now reach DOWN-RIGHT as the arc turns down, hindquarters trail high LEFT, tail curves up-left. Same cat as the landing keys.\n10 steeper descending foreleg reach: elbows extend, pelvis still high, head attentive, spine opening from gather, hind legs start following underneath.\n11 entire connected cat continues beyond the edge: head/forepaws lead down-right, rear follows and attached tail arcs up-left as the last part to exit. Draw the FULL CAT, not a detached tail or blank tile.\n\nUse the relaxed blink only in2. Draw a cute effort squeeze through4 and5, but retain changing crouch/push body poses; open eyes again for6 onward. Preserve full physical head/body volume. Real articulated feline mechanics, not a front-facing mascot sliding through space.",
+      "rows": 3
+    }
+  },
+  "key_assembly": {
+    "arrive": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-869975f2-594c-455c-8d7f-565cd811445e.png",
+      "regions": [
+        [
+          101,
+          199,
+          263,
+          413,
+          24570
+        ],
+        [
+          364,
+          88,
+          676,
+          409,
+          29353
+        ],
+        [
+          766,
+          77,
+          1051,
+          439,
+          33850
+        ],
+        [
+          1116,
+          127,
+          1405,
+          434,
+          32766
+        ],
+        [
+          62,
+          498,
+          358,
+          738,
+          35033
+        ],
+        [
+          423,
+          527,
+          665,
+          736,
+          28792
+        ],
+        [
+          741,
+          483,
+          1081,
+          746,
+          38605
+        ],
+        [
+          1163,
+          520,
+          1393,
+          744,
+          28602
+        ],
+        [
+          76,
+          813,
+          281,
+          1039,
+          29154
+        ],
+        [
+          441,
+          806,
+          656,
+          1038,
+          27964
+        ],
+        [
+          821,
+          810,
+          1010,
+          1038,
+          28494
+        ],
+        [
+          1181,
+          817,
+          1344,
+          1038,
+          26903
+        ]
+      ],
+      "asset": "assets/neko-lifecycle-arrive-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete RGBA crops; no painting or alpha threshold cleanup"
+    },
+    "depart": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-ab1cb8a7-c754-476c-9ec7-1a09afe2a95a.png",
+      "regions": [
+        [
+          115,
+          171,
+          274,
+          382,
+          24483
+        ],
+        [
+          442,
+          168,
+          641,
+          383,
+          25769
+        ],
+        [
+          759,
+          152,
+          983,
+          381,
+          27595
+        ],
+        [
+          1077,
+          209,
+          1375,
+          385,
+          29367
+        ],
+        [
+          55,
+          507,
+          333,
+          689,
+          29662
+        ],
+        [
+          374,
+          472,
+          660,
+          689,
+          33308
+        ],
+        [
+          700,
+          464,
+          1067,
+          685,
+          32888
+        ],
+        [
+          1076,
+          481,
+          1433,
+          718,
+          32194
+        ],
+        [
+          52,
+          751,
+          333,
+          964,
+          29213
+        ],
+        [
+          396,
+          741,
+          690,
+          1016,
+          33074
+        ],
+        [
+          724,
+          751,
+          1078,
+          1038,
+          36524
+        ],
+        [
+          1102,
+          760,
+          1448,
+          1055,
+          35626
+        ]
+      ],
+      "asset": "assets/neko-lifecycle-depart-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete RGBA crops; no painting or alpha threshold cleanup"
+    }
+  },
+  "key_review": [
+    "Distinct extended, fore-supported rear-high, convex gathered and recovery outlines inspected without facial dependence.",
+    "Contact needs authored registration rather than per-crop centering.",
+    "Final recovery row needs its own neutral-based fixed calibration if source scale differs; per-pose fitting is not permitted."
+  ],
+  "assembly": {
+    "arrive": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-22930539-2896-4f28-aa60-ca134b5e1b90.png",
+      "regions": [
+        [
+          104,
+          67,
+          267,
+          275,
+          25340
+        ],
+        [
+          361,
+          52,
+          616,
+          284,
+          23403
+        ],
+        [
+          723,
+          46,
+          958,
+          301,
+          23575
+        ],
+        [
+          1023,
+          65,
+          1266,
+          295,
+          23480
+        ],
+        [
+          70,
+          309,
+          320,
+          529,
+          24288
+        ],
+        [
+          366,
+          315,
+          620,
+          530,
+          25766
+        ],
+        [
+          698,
+          321,
+          969,
+          525,
+          26658
+        ],
+        [
+          1036,
+          343,
+          1262,
+          520,
+          22737
+        ],
+        [
+          63,
+          579,
+          303,
+          753,
+          23904
+        ],
+        [
+          385,
+          573,
+          629,
+          753,
+          27968
+        ],
+        [
+          729,
+          557,
+          953,
+          753,
+          27304
+        ],
+        [
+          1052,
+          558,
+          1274,
+          753,
+          28330
+        ],
+        [
+          89,
+          793,
+          287,
+          974,
+          22163
+        ],
+        [
+          415,
+          790,
+          590,
+          976,
+          21213
+        ],
+        [
+          727,
+          782,
+          901,
+          976,
+          22046
+        ],
+        [
+          1052,
+          788,
+          1225,
+          976,
+          20489
+        ],
+        [
+          84,
+          991,
+          243,
+          1180,
+          22684
+        ],
+        [
+          395,
+          987,
+          573,
+          1180,
+          21326
+        ],
+        [
+          717,
+          989,
+          887,
+          1182,
+          20934
+        ],
+        [
+          1083,
+          989,
+          1238,
+          1180,
+          22315
+        ]
+      ],
+      "asset": "assets/neko-lifecycle-arrive-v2.png",
+      "packing": "4 columns; 512px cells; baseline500; complete RGBA crops; no painting or alpha threshold cleanup"
+    },
+    "depart": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-32cdc954-d0f7-4899-962d-4310c4b27108.png",
+      "regions": [
+        [
+          80,
+          56,
+          280,
+          314,
+          38547
+        ],
+        [
+          399,
+          55,
+          639,
+          313,
+          36462
+        ],
+        [
+          733,
+          56,
+          988,
+          310,
+          35699
+        ],
+        [
+          1043,
+          111,
+          1371,
+          315,
+          37820
+        ],
+        [
+          44,
+          381,
+          320,
+          576,
+          31279
+        ],
+        [
+          361,
+          375,
+          647,
+          582,
+          34736
+        ],
+        [
+          685,
+          366,
+          1016,
+          583,
+          33348
+        ],
+        [
+          1019,
+          362,
+          1392,
+          591,
+          35842
+        ],
+        [
+          44,
+          612,
+          406,
+          829,
+          36800
+        ],
+        [
+          443,
+          626,
+          694,
+          824,
+          27613
+        ],
+        [
+          755,
+          611,
+          1024,
+          820,
+          29261
+        ],
+        [
+          1087,
+          611,
+          1393,
+          865,
+          34816
+        ],
+        [
+          47,
+          817,
+          373,
+          1080,
+          35897
+        ],
+        [
+          416,
+          838,
+          702,
+          1073,
+          31160
+        ],
+        [
+          740,
+          838,
+          1029,
+          1074,
+          32232
+        ],
+        [
+          740,
+          838,
+          1029,
+          1074,
+          32232
+        ]
+      ],
+      "asset": "assets/neko-lifecycle-depart-v2.png",
+      "packing": "4 columns; 512px cells; baseline500; complete RGBA crops; no painting or alpha threshold cleanup"
+    },
+    "bridge": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-82e457f4-20b3-47ed-aa42-51c1339fb339.png",
+      "regions": [
+        [
+          110,
+          225,
+          357,
+          547,
+          59237
+        ],
+        [
+          568,
+          199,
+          1039,
+          548,
+          69602
+        ],
+        [
+          1256,
+          190,
+          1601,
+          552,
+          64241
+        ],
+        [
+          1806,
+          159,
+          2128,
+          620,
+          65410
+        ]
+      ],
+      "asset": "assets/neko-lifecycle-bridge-v2.png",
+      "packing": "4 columns; 512px cells; baseline500; complete RGBA crops; no painting or alpha threshold cleanup"
+    },
+    "sad": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-a15694d8-b107-44da-a2df-37ff44d19dda.png",
+      "regions": [
+        [
+          120,
+          124,
+          354,
+          432,
+          54933
+        ],
+        [
+          543,
+          147,
+          798,
+          432,
+          52659
+        ],
+        [
+          982,
+          157,
+          1245,
+          432,
+          50002
+        ],
+        [
+          1426,
+          157,
+          1683,
+          432,
+          49460
+        ],
+        [
+          70,
+          534,
+          311,
+          834,
+          48862
+        ],
+        [
+          499,
+          551,
+          784,
+          834,
+          49206
+        ],
+        [
+          932,
+          589,
+          1262,
+          837,
+          52165
+        ],
+        [
+          1400,
+          605,
+          1734,
+          837,
+          47951
+        ]
+      ],
+      "asset": "assets/neko-lifecycle-sad-v2.png",
+      "packing": "4 columns; 512px cells; baseline500; complete RGBA crops; no painting or alpha threshold cleanup"
+    }
+  },
+  "corrections": {
+    "departure": {
+      "rejected": [
+        8,
+        11,
+        12,
+        15
+      ],
+      "reason": "Neighbouring-row paw fragments survived the complete-silhouette bounding crop.",
+      "replacement": "Bridge1/2/3 replace depart8/11/12. Packed depart15 repeats complete source14 as a final follow-through hold."
+    },
+    "registration": "Fixed batch head62/height85, ground132 compensate sampled transparent edge; arrive recovery12..19 calibrates on neutral16. Leading foretoe anchored x130 for arrive1..11. Departure planted hindtoe uses x offsets3:-9,4:0,5:19.",
+    "request": "One graceful diagonal entry and one diagonal exit leap. Supported landing unfolds into a sit without any second airborne hop.",
+    "aborted_call": "An earlier four-pose bridge request was interrupted before returning an image. No output was used.",
+    "sad_goodbye": "User requested sadness before a graceful pose/drop. New sad1/2 replace depart1/2, sad3..7 append as depart16..20. Skip earlier cheerful blink and the redundant old half-crouch3. Neutral0 remains canonical; grounded expression/turn lasts1000ms, load/push200ms, one flight1000ms.",
+    "mirroring": "Front-facing depart0/1/2/16 remains unmirrored; mirror from drawn turn17 for a leftward exit, verified by actual-painter direction regression."
+  },
+  "assets_sha256": {
+    "assets/neko-lifecycle-arrive-v2.png": "28254eb5932fc05a638b86bb77abca309a4a13411fb18a09ba191a84b3568470",
+    "assets/neko-lifecycle-depart-v2.png": "ea65b585ea8f73a2ab85e5934f2a1c575c0fca1fde375a48c056af1d95cd341c",
+    "assets/neko-lifecycle-bridge-v2.png": "3522ed6c9788c69e58234588b79cad812d61f9565ca4cd2c775f562befed505d",
+    "assets/neko-lifecycle-sad-v2.png": "8c48d1034548b176168e15082d6d1f5b3c6f4c58b6c2a64010bf2290b232c965"
+  },
+  "timing": {
+    "arrive_ms": 1980,
+    "depart_ms": 2200,
+    "arrival_world_contact_ms": 500,
+    "departure_world_launch_ms": 1200
+  },
+  "final_order": {
+    "arrive": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "depart": [
+      0,
+      1,
+      2,
+      16,
+      17,
+      18,
+      19,
+      20,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "selected_references": [
+    "assets/neko_idle.png",
+    "references/motion/2026-10-23/video-pose-study.png",
+    "references/motion/2026-10-23/spine-flexion-study.jpg"
+  ]
+}
