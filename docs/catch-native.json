@@ -1,0 +1,129 @@
+{
+  "platform": "windows",
+  "dpr": 1.0,
+  "paint_count": 1166,
+  "median_ms": 20.02939999965747,
+  "coverage": {
+    "game_ready": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "game_run": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "game_prepare": [
+      16
+    ],
+    "game_jump": [
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "happy_hop": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28
+    ],
+    "walk": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "game_settle": [
+      13,
+      14,
+      15
+    ],
+    "game_miss": [
+      2,
+      14,
+      23
+    ],
+    "game_loss": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "game_curl": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "game_comfort": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ]
+  },
+  "captures": [
+    "light",
+    "dark"
+  ],
+  "foreground_unchanged": true,
+  "owned_windows_took_focus": false,
+  "guides_click_through": true,
+  "stop_receives_its_own_clicks": true,
+  "cursor": "scripted observations; real pointer never moved",
+  "pets": 1,
+  "naps": 0
+}

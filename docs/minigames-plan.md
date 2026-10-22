@@ -1,6 +1,6 @@
 # Neko mini-games — proposal, 2026-10-22
 
-Status: researched and planned; **not implemented or play-tested**. The user requested a plan for Catch the Cursor, Run Away and Dodge Clicks, plus additional ideas. This document does not authorize an implementation or change the delivered pickup build.
+Status: portfolio proposal; **Catch the Cursor is now implemented** under the later dedicated design and subsequent user authorization. See [delivery and verification](catch-validation.md). Run Away, Dodge Clicks and the additional ideas remain proposals, unimplemented and untested.
 
 Update, 2026-10-22: the [dedicated Catch the Cursor proposal](catch-the-cursor-plan.md) supersedes this document for that first game: default-on configurable automatic launches, horizontal running with jumps, one-contact victory, out-of-range protest, persistent disappointed curl/comfort and a bounded activity queue. Its rules replace the earlier opt-in-only/free-2D/three-catch design. The user's later approval of subtle frosted thoughts also supersedes the background-free text restriction below; other game ideas remain a portfolio proposal.
 

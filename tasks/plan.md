@@ -2,15 +2,15 @@
 
 ## Catch the Cursor — dedicated planning revision, 2026-10-22
 
-Status: dedicated design requested; game implementation not yet authorized. See [Catch the Cursor](../docs/catch-the-cursor-plan.md). It supersedes the first game's earlier opt-in-only, free-2D and three-catch assumptions: automatic play defaults on at a configurable 90s interval, running is horizontal only, jumps use measured reach, one genuine contact wins, unreachable play/timeouts lead to a disappointed curl until petted, and bounded/coalesced activity intents protect naps and complete transitions.
+Status: implementation subsequently authorized and delivered. See [verification](../docs/catch-validation.md) and [Catch the Cursor](../docs/catch-the-cursor-plan.md). Automatic play defaults on at a configurable 90s interval, running is horizontal only, jumps use measured reach, one genuine contact wins, unreachable play/timeouts lead to a disappointed curl until petted, and bounded/coalesced intents protect naps and complete transitions.
 
 Delivery order: lateral geometry/contact trial → one complete hunt art path → manual playable slice → native checkpoint → full win/loss/comfort art → bounded scheduler and settings → interruption/accessibility/release checks. Eight-direction locomotion and Dodge's click-interception trial are not dependencies of this revised first game. The user requested only this plan and the thought-backdrop implementation today.
 
-Thought backdrop: implemented as a compact rounded, click-through frosted label, keeping sharp text and existing timing/quiet rules. See its [verification](../docs/thought-backdrop-validation.md). Mini-game code/art remain unimplemented.
+Thought backdrop: implemented as a compact rounded, click-through frosted label, keeping sharp text and existing timing/quiet rules. See its [verification](../docs/thought-backdrop-validation.md). Catch the Cursor now has its own runtime and artwork; other games remain proposals.
 
 ## Mini-games — proposed, 2026-10-22
 
-Status: research and planning only; not approved for implementation. See the [complete mini-games design](../docs/minigames-plan.md) for the three requested games, five additional candidates, references, animation stories, input/ownership rules, reduced-motion variants and acceptance matrix. Previous completed work remains below.
+Status: Catch the Cursor subsequently implemented under its dedicated design; the remaining portfolio is research/planning only. See the [complete mini-games design](../docs/minigames-plan.md) for the other games and candidates. Previous completed work remains below.
 
 Recommendation: Catch the Cursor (Neko hunts), Run Away / Kitten Tag (player pursues) and Dodge Clicks (aim/timing), followed by Yarn Rally and then Peek-a-Box. Prototype native transparent click ownership and directional movement before producing full game art. Zero-alpha desktop regions normally pass clicks through; Dodge must not ship until in-area misses can be consumed and outside input/teardown are verified.
 

@@ -6,6 +6,8 @@ Baseline: the expressive petting revision completed on **2026-10-22**, artwork/r
 
 The later [pickup revision](docs/pickup-validation.md) implements held expressions and interruptible release. Its [approved design](docs/pickup-animation-plan.md), [exact provenance](docs/pickup-prompts.json) and [native measurements](docs/pickup-native.json) extend the method below. Historical reports retain their original dimensions/counts; current production values include the pickup extension.
 
+The [Catch the Cursor release](docs/catch-validation.md) adds 48 source slots for lateral hunting and disappointment/comfort. Its [prompts and assembly regions](docs/catch-prompts.json), [all imported slots](docs/neko-game-frames.png) and [native playback measurements](docs/catch-native.json) extend this guide. The 528 earlier frames and 42 earlier clip definitions remain unchanged; the current atlas contains 576 entries.
+
 ## 1. The design philosophy
 
 Neko is a small character performing an action, rather than a still image being moved around. A reaction needs a readable physical story:
@@ -68,7 +70,7 @@ Current pet production values in [animations.py](animations.py):
 | Near-idle final head center | Within 2 px of actual idle |
 | Final crown position | About y=48, ±2 px after top padding; held crown y=16 |
 | Pet/carry playback repaint interval | Precise Qt timer, 50 ms, nominal 20 FPS |
-| Total atlas entries | 528: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle |
+| Total atlas entries | 576: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle + 48 game slots |
 
 These are baseline measurements, not permission to force every posture into a seated shape. A lying kitten is lower and wider. Check continuity against appropriate anatomical landmarks throughout the action. If a new pose needs space, measure it at the retained character scale before changing the fixed canvas. Do not resize the desktop window on each pose.
 
@@ -156,6 +158,16 @@ The [tail/lifecycle notes](docs/tail-lifecycle-notes.md) and [exact revision pro
 - A later startup correction starts arrival timing on the first Qt animation tick so loading cannot consume the fall before the window appears. See [startup verification](docs/startup-thought-validation.md). Preserve the landing target through hiding, reduced motion, monitor changes and quit.
 
 ## 7. Carry artwork changes through the runtime
+
+### Cursor-game drawings and contact
+
+Verified in [Catch QA](docs/catch-validation.md): extract complete significant connected silhouettes before packing; nominal source-row cuts admitted preceding-row paws in a hunt drawing. Store exact crop regions in provenance. Source bounding crops retain original alpha; a generated transparency edit is not proof that every fringe was removed. Inspect the final native light/dark output and test significant imported components.
+
+Game source cells use the existing 128px nearest-neighbor sampling step before connected-silhouette extraction. Each bank keeps fixed neutral-head/height calibration (62px/82px), 192×144 canvas and ground130. Airborne poses remain registered in that canvas; the controller supplies the world arc once. The actual painter's y−1 offset must also be included in collision coordinates. The reviewed high-reach point is hunt19 (49,80); landing contact is hunt21 (59,124). Contact additionally needs the current pose's authored forepaw region and visible alpha, mirrored with the drawing. Never count head/tail/transparent padding or interpolate a fictitious pointer trail.
+
+The game runs a precise 20ms timer so its 40–80ms connecting poses can be observed; ordinary pet/carry/tail timings remain intact. Reuse the accepted three-hop clip unchanged for a game victory without entering a counted pet state. A disappointed curl is an explicit mood, distinct from a nap; hide/carry preserve it and a deliberate pet owns its get-up. Preserve the original resting position during pursuit/flight and return home after recovery; an actual user drag can choose a new resting origin.
+
+Native scripted cursor observations validate real Qt playback and drawing coverage, not human enjoyment or physical multi-monitor/DPI behavior. Keep those limits explicit.
 
 Read callers before changing a shared function. An animation change can reach:
 
@@ -272,6 +284,7 @@ Do not relax an anatomy, scale, timing or clipping check merely to accept a new 
 
 | Date | Finding and correction | Evidence / remaining limit |
 | --- | --- | --- |
+| 2026-10-22 | Nominal hunt source cells included the previous row's seated paws, reducing one imported run pose to a fragment. Extract complete significant silhouettes, pack fixed cells, sample to 128px before import and add bounds/component checks. Collision must include the painter's y−1 offset and mirror actual paw-alpha regions. | All 48 game slots pass bounds/significant-component checks; stationary high/low/distant contacts and both mirrored directions pass. All 528 earlier frames/42 clips compare unchanged. Native jump/loss/curl/comfort/three-hop entry coverage recorded in [Catch QA](docs/catch-validation.md). Source alpha fringe and attached anatomy still require visual review; physical mixed-DPI and human tuning remain unverified. |
 | 2026-10-22 | Independent typing/window/cursor/follow cooldowns allowed frequent alternating reactions; idle thoughts also bypassed the full configured speech interval. Use one configurable activity minimum (60s default, 15–600s) and the full automatic speech minimum, discarding activity events during cooldown. | 38 behavior/dialogue and 12 desktop checks pass, covering shared boundaries, preferences, quiet/AI guards and no event backlog. Idle animation cadence and deliberate pet replies remain independent. [Report](docs/activity-reaction-validation.md). |
 | 2026-10-22 | Native blur escaped the rounded window even though Qt/Win32 regions excluded the corners; the earlier mask-only test missed it. Replace private accent blur with a softly blurred per-thought background sample clipped in the painter, and test actual outside pixels. Reuse also exposed a stale fixed-height constraint; reset before remeasurement. | All 36 outside-corner samples across initial/resized/restored display are unchanged; seven focused source checks pass. The background sample is local/static until the thought closes and clears on hide. [Current report](docs/thought-rounded-clip-validation.md). |
 | 2026-10-22 | User requested rounder glass and less frosting. Match 20px corners across mask/paint/style and blend the whole overlay at 88% opacity. | Five focused source checks and native corner/click-through/focus checks pass; background stripe contrast increased 4→13, retaining more clear detail. This softens the composed effect, not Windows' fixed blur radius; glyphs share the overlay opacity. |

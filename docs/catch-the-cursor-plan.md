@@ -1,6 +1,6 @@
 # Catch the Cursor — dedicated proposal, 2026-10-22
 
-Status: **planning only**. The user requested this dedicated plan and implementation of the thought backdrop, not game implementation yet. This document supersedes the Catch portion of [the portfolio proposal](minigames-plan.md), including its opt-in-only launch, free two-dimensional movement and three-catch win condition. Other games remain future ideas.
+Status: **implemented, 2026-10-22**, following the user's subsequent authorization. See [delivery and verification](catch-validation.md) for tested behavior, previews and remaining limits. The design below preserves the original targets; measured implementation details in the report take precedence. This supersedes the Catch portion of [the portfolio proposal](minigames-plan.md). Other games remain future ideas.
 
 ## Requested experience
 
@@ -143,7 +143,7 @@ Preserve expression changes through drawn lids/ears/jaw; no expression glyph pas
 
 ## 7. Implementation slices and acceptance
 
-The task summary is also recorded in [tasks/todo.md](../tasks/todo.md). Only the thought backdrop is implemented in this update.
+The task summary is recorded in [tasks/todo.md](../tasks/todo.md). The following slices are now delivered; hardware limits and tuning differences are recorded in [verification](catch-validation.md).
 
 1. **C1 — geometry/contact trial:** prove lateral-only travel, three candidate arcs and solver/guide agreement at retained size. Focused files: proposed `games.py`, geometry tests, trial preview and QA record. Pass: no grounded y drift, no monitor clipping, targets in advertised immediate reach can be contacted.
 2. **C2 — one complete hunt art path:** ready → run/turn → one pounce → miss/catch → supported return. Separate accepted bank, `animations.py`, prompt/assembly record and actual-atlas preview. Pass native light/dark anatomy, scale, contact and cancellation before more outcomes.
