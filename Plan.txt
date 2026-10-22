@@ -11,8 +11,8 @@ Interaction rules
   Hover uses an open palm; holding uses a closed hand; a click adds a 630ms palm stroke.
   The cursor image moves, never the actual pointer; reduced motion skips the stroke.
   Pet sheets calibrate to idle's 62x50 head and starting height, rather than whole-body fit.
-  Window curiosity has an eight-second cooldown; cursor curiosity uses 18 seconds.
-  Typing bursts earn paw taps and local questions, throttled to 30 seconds.
+  Window/tab activity, typing, cursor curiosity and following share a configurable 60-second minimum reaction gap (15-600 seconds). Drop events during cooldown instead of queuing a delayed burst.
+  Typing bursts earn paw taps and local questions within that shared reaction limit.
   Never read key values or typed text. Local title hashes help notice app tab changes.
   Idle gestures default to about 14 seconds; configurable from five to 120 seconds.
   Sleep delay defaults to three minutes; configurable from one to 3600 seconds.
@@ -31,9 +31,9 @@ Interaction rules
   Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
   shows mild sadness then the accepted small hop before quitting. Arrival travels from the monitor top; only the landing position is saved.
   Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
-  298 offline lines use context shuffle bags, with personal questions and app rituals.
+  346 offline lines in dialogue.py use 33 context shuffle bags, with personal questions and app rituals. One phrase per line inside its named triple-quoted groups; source edits need restart and packaged edits need a rebuild.
   Local foreground app names and media title hints select lines and matching gestures.
-  Shared speech cooldown prevents spam. No recording or actual playback detection.
+  All automatic speech, including idle and optional AI, respects the full Thoughts every minimum. Deliberate pet replies may bypass it. No recording or actual playback detection.
   Ambient thoughts default to 75 seconds; configurable from 15 to 600. Quiet removes them.
   Cursor walks move only left/right at the same height, keep a gap, last at most 6.5 seconds and travel about 220 pixels maximum.
   Eligible moving cursors invite another walk after 25 seconds.

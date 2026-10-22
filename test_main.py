@@ -727,10 +727,42 @@ class DesktopTests(unittest.TestCase):
         self.neko.dismiss_bubble()
         self.assertFalse(self.neko.offline_line("cursor"))
 
+    def test_idle_and_activity_words_respect_the_full_thought_interval(self):
+        self.neko.companion.chatter_seconds = 75
+        with patch("main.time.monotonic", return_value=100):
+            self.assertTrue(self.neko.offline_line("typing"))
+        self.neko.dismiss_bubble()
+        with patch("main.time.monotonic", return_value=174.99):
+            self.assertFalse(self.neko.offline_line("tail_chase"))
+        with patch("main.time.monotonic", return_value=175):
+            self.assertTrue(self.neko.offline_line("tail_chase"))
+        self.neko.dismiss_bubble()
+        with patch("main.time.monotonic", return_value=176):
+            self.assertTrue(self.neko.offline_line("pet", prompted=True))
+
+    def test_ai_cannot_bypass_the_thought_cooldown(self):
+        self.neko.ai_enabled = True
+        self.neko.last_words = time.monotonic()
+        self.assertFalse(self.neko.trigger_ai_brain())
+        self.neko.request_generation = self.neko.ai_generation
+        self.neko.request_started = time.monotonic()
+        with patch.object(self.neko, "say") as say:
+            self.neko.on_brain_finished("too soon", True)
+        say.assert_not_called()
+
+    def test_following_shares_the_activity_reaction_cooldown(self):
+        self.neko.last_follow = -99999
+        self.neko.companion.last_activity_reaction = time.monotonic()
+        cursor = self.neko.geometry().center() - QPoint(220, 0)
+        self.neko.last_cursor = cursor - QPoint(30, 0)
+        with patch("main.QCursor.pos", return_value=cursor):
+            self.neko.tick()
+        self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
+
     def test_nook_timing_controls_apply_and_persist(self):
         with patch("main.autostart_enabled", return_value=False):
             self.neko.open_stats_window()
-        for key, value in (("sleep_seconds", 45), ("sleep_duration", 90), ("chatter_seconds", 30), ("idle_seconds", 8)):
+        for key, value in (("sleep_seconds", 45), ("sleep_duration", 90), ("chatter_seconds", 30), ("idle_seconds", 8), ("reaction_seconds", 90)):
             spin = self.neko.stats_window.timing[key]
             self.assertGreater(spin.lineEdit().width(), 35)
             spin.setValue(value)
@@ -850,11 +882,13 @@ class DesktopTests(unittest.TestCase):
         self.settings.setValue("sleep_seconds", "broken")
         self.settings.setValue("chatter_seconds", -100)
         self.settings.setValue("idle_seconds", 99999)
+        self.settings.setValue("reaction_seconds", "broken")
         other = NekoWidget(self.settings)
         try:
             self.assertEqual(other.companion.sleep_seconds, 180)
             self.assertEqual(other.companion.chatter_seconds, 15)
             self.assertEqual(other.companion.idle_seconds, 120)
+            self.assertEqual(other.companion.reaction_seconds, 60)
         finally:
             other.tray_icon.hide()
             other.bubble.deleteLater()

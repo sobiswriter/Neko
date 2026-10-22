@@ -6,6 +6,21 @@ from behavior import Companion, NekoState, PET_STATES, IDLE_STATES
 
 
 class CompanionTests(unittest.TestCase):
+    def test_activity_types_share_one_configurable_cooldown_without_backlog(self):
+        pet = Companion(0, idle_seconds=10000, chatter_seconds=10000)
+        self.assertEqual(pet.tick(10, 0, window_event="open"), "curious")
+        pet.tick(16, 0)
+        for now in (20, 40, 69.99):
+            self.assertIsNone(pet.tick(now, 0, keyboard_events=8, cursor_near=True, window_event="tab"))
+            self.assertIsNone(pet.pending_window)
+        self.assertEqual(pet.tick(70, 0, keyboard_events=8), "typing")
+        pet.tick(76, 0)
+        self.assertIsNone(pet.tick(80, 0, cursor_near=True))
+        pet.reaction_seconds = 15
+        self.assertEqual(pet.tick(85, 0, cursor_near=True), "curious")
+        pet.tick(91, 0)
+        self.assertIsNone(pet.tick(100, 0))
+
     def test_holding_owns_reactions_without_counting_pets_or_naps(self):
         self.pet.pet(1)
         self.pet.pet(1.1)

@@ -34,7 +34,8 @@ ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 TIMING_LIMITS = {"sleep_seconds": (180, 1, 3600),
                  "sleep_duration": (0, 0, 3600),
-                 "chatter_seconds": (75, 15, 600), "idle_seconds": (14, 5, 120)}
+                 "chatter_seconds": (75, 15, 600), "idle_seconds": (14, 5, 120),
+                 "reaction_seconds": (60, 15, 600)}
 
 
 def adjacent_position(anchor, size, area):
@@ -200,12 +201,17 @@ class StatsWindow(QDialog):
         for key, label in (("sleep_seconds", "Inactivity before nap"),
                            ("sleep_duration", "Nap duration"),
                            ("chatter_seconds", "Thoughts every"),
+                           ("reaction_seconds", "Activity reactions every"),
                            ("idle_seconds", "Idle gestures every")):
             _, minimum, maximum = TIMING_LIMITS[key]
             spin = QSpinBox()
             spin.setRange(minimum, maximum)
             spin.setKeyboardTracking(False)
             spin.setToolTip(f"{minimum}–{maximum} seconds. Type a number, then press Enter or click elsewhere.")
+            if key == "reaction_seconds":
+                spin.setToolTip("Minimum gap shared by typing, window/tab activity, cursor curiosity and following. Idle gestures have their own setting.")
+            elif key == "chatter_seconds":
+                spin.setToolTip("Minimum gap between automatic lines, including idle and activity thoughts. Deliberate pets can still get a reply.")
             spin.setMinimumWidth(100)
             spin.setSuffix(" sec")
             if key == "sleep_duration":
@@ -722,8 +728,9 @@ class NekoWidget(QWidget):
                 and not (self.stats_window is not None and self.stats_window.isVisible())
                 and not changed and not window_event and not self.bubble.isVisible()
                 and self.companion.state == NekoState.IDLE and moved and abs(delta.x()) > 200 and distance < 520
-                and now - self.last_follow >= 25):
+                and now - self.last_follow >= 25 and self.companion.activity_ready(now)):
             self.last_follow = now
+            self.companion.last_activity_reaction = now
             self.follow_origin = self.pos()
             self.companion.pose(NekoState.FOLLOWING, now, 6.5)
             self.pose_started = now
@@ -853,7 +860,7 @@ class NekoWidget(QWidget):
         return True
 
     def offline_line(self, kind, prompted=False):
-        pause = max(8, min(30, self.companion.chatter_seconds * 0.22))
+        pause = self.companion.chatter_seconds
         if not prompted and (self.bubble.isVisible() or time.monotonic() - self.last_words < pause):
             return False
         if self.say(self.dialogue.pick(kind), prompted=prompted):
@@ -885,6 +892,8 @@ class NekoWidget(QWidget):
     def trigger_ai_brain(self):
         if (self.brain_worker is not None or not self.ai_enabled or self.quiet
                 or self.fullscreen or self.is_manually_hidden
+                or self.bubble.isVisible()
+                or time.monotonic() - self.last_words < self.companion.chatter_seconds
                 or time.monotonic() - self.last_ai_attempt < 600):
             return False
         from llm_brain import AIBrainWorker
@@ -907,7 +916,9 @@ class NekoWidget(QWidget):
         self.ai_status = ("AI is connected. Window titles only." if success else
                           "AI is unavailable. Check your API key or connection; offline company continues.")
         if (self.request_generation != self.ai_generation or not self.ai_enabled
-                or self.quiet or time.monotonic() - self.request_started > 25):
+                or self.quiet or time.monotonic() - self.request_started > 25
+                or self.bubble.isVisible()
+                or time.monotonic() - self.last_words < self.companion.chatter_seconds):
             return
         # Recheck the foreground window: a game may have opened during the request.
         if desktop_activity()[2]:
@@ -1254,6 +1265,7 @@ class NekoWidget(QWidget):
                            "sleep_seconds": self.companion.sleep_seconds,
                            "sleep_duration": self.companion.sleep_duration,
                            "chatter_seconds": self.companion.chatter_seconds,
+                           "reaction_seconds": self.companion.reaction_seconds,
                            "idle_seconds": self.companion.idle_seconds,
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
                            "ai_enabled": self.ai_enabled,

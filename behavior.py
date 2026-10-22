@@ -58,7 +58,7 @@ APP_MOODS = {"music": NekoState.TAIL_SWISH, "video": NekoState.LOAFING,
 
 class Companion:
     def __init__(self, now, rng=None, sleep_seconds=180, chatter_seconds=75, idle_seconds=14,
-                 sleep_duration=0):
+                 sleep_duration=0, reaction_seconds=60):
         self.rng = rng if rng is not None else random.Random()
         self.sleep_seconds = sleep_seconds
         self.sleep_duration = sleep_duration
@@ -70,8 +70,8 @@ class Companion:
         self.next_nap = 0
         self.next_idle = now + self.idle_seconds
         self.next_comment = now + self.chatter_seconds
-        self.last_curiosity = now - 18
-        self.last_typing = now - 45
+        self.reaction_seconds = reaction_seconds
+        self.last_activity_reaction = float("-inf")
         self.drowsy = False
         self.last_interaction = now - 90
         self.last_idle = None
@@ -178,8 +178,11 @@ class Companion:
         self.nap_started = None
         self.next_nap = now + self.sleep_seconds
         self.next_comment = max(self.next_comment, now + 15)
-        self.last_curiosity = now
+        self.last_activity_reaction = now
         self.pose(NekoState.WAKING, now, 2.6)
+
+    def activity_ready(self, now):
+        return now - self.last_activity_reaction >= self.reaction_seconds
 
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
              window_changed=False, keyboard_events=0, window_event=None, app_kind=None):
@@ -193,7 +196,9 @@ class Companion:
             return None
         if idle_seconds < 10:
             self.drowsy = False
-        if window_event or window_changed:
+        if not self.activity_ready(now):
+            self.pending_window = None
+        elif window_event or window_changed:
             self.pending_window = (window_event or "switch", now, app_kind)
         if self.pending_window and now - self.pending_window[1] > 7:
             self.pending_window = None
@@ -227,24 +232,25 @@ class Companion:
                 return "idle"
             return None
 
-        if keyboard_events >= 6 and now - self.last_typing >= 30:
-            self.last_typing = now
+        if keyboard_events >= 6 and self.activity_ready(now):
+            self.last_activity_reaction = now
+            self.pending_window = None
             self.pose(NekoState.TYPING, now, 5.5)
             return "typing"
 
-        if self.pending_window and now - self.last_curiosity >= 8:
+        if self.pending_window and self.activity_ready(now):
             self.reaction_kind = self.pending_window[0]
             context = self.pending_window[2] if self.reaction_kind in ("open", "switch", "tab") else None
             self.reaction_kind = context or self.reaction_kind
             self.pending_window = None
-            self.last_curiosity = now
+            self.last_activity_reaction = now
             state = APP_MOODS.get(context, NekoState.PEEKING if self.reaction_kind == "close" else NekoState.CURIOUS)
             self.pose(state, now, 6)
             return "curious"
 
-        if cursor_near and now - self.last_curiosity >= 18:
+        if cursor_near and self.activity_ready(now):
             self.reaction_kind = "cursor"
-            self.last_curiosity = now
+            self.last_activity_reaction = now
             self.pose(NekoState.SNIFFING, now, 5.5)
             return "curious"
 

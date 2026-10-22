@@ -93,11 +93,12 @@ Soft sounds are optional and off until you enable them.
   and timed naps use the same gentle waking transition. After waking she stays
   awake for at least the inactivity delay before another nap.
   Ignoring her never creates chores or penalties.
-- **Offline personality.** 298 short lines, including more personal questions and
+- **Offline personality.** 346 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
-  All automatic words share an 8–30 second pause and never replace a visible bubble.
+  All automatic words—including idle, activity and optional AI comments—respect
+  the full **Thoughts every** minimum (default 75 seconds) and never replace a visible bubble.
   Every spontaneous idle attempts its own local thought, including “Look at meeee!”
   and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
   Thoughts use cream 16px semibold text with a small dark shadow and a compact,
@@ -113,6 +114,18 @@ Soft sounds are optional and off until you enable them.
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
   their own lines and matching gestures. These are app hints, not content analysis.
+  Typing, window/tab events, cursor curiosity and following share one minimum
+  reaction gap: **60 seconds** by default, adjustable from **15–600 seconds** through
+  **Neko's nook → Company → Activity reactions every**. Events during that gap
+  are discarded, so they cannot pile up. Idle gestures keep their separate timing;
+  deliberate pets and naps still work normally.
+
+  To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
+  contains all 346 phrases in 33 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  Edit or add one phrase per line inside the existing triple-quoted groups; keep the
+  section names/quotes and aim for at most 110 characters per phrase. Source launches
+  use your edits on restart; the packaged executable needs rebuilding. Optional AI
+  comments are generated separately and are not part of this file.
 - **Soft mews & purrs.** Enable them in the nook's Settings tab; Listen previews a
   small mew. These original synthesized cues are up to a second long, with low
   volume encoded into the WAV files. A deliberate pet can purr or mew; she can
