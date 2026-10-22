@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 from PySide6.QtCore import QEvent, QPoint, QSettings, Qt
 from PySide6.QtWidgets import QApplication
-from animations import SpriteAtlas, CLIPS, sprite_bounds
+from animations import GAME_ROWS, SpriteAtlas, CLIPS, sprite_bounds, pet_landmarks
 from behavior import NekoState
 from games import Runway
 from main import NekoWidget
@@ -27,11 +27,13 @@ class DesktopGameTests(unittest.TestCase):
         self.settings = QSettings(str(Path(self.folder.name) / "prefs.ini"), QSettings.IniFormat)
         self.patches = [patch("main.SpriteAtlas", return_value=self.atlas),
                         patch("main.ActivityMonitor.start"),
+                        patch("main.ctypes.windll.user32.GetAsyncKeyState", return_value=0),
                         patch("main.desktop_activity", return_value=(0, 0, False))]
         for p in self.patches:
             p.start()
         self.n = NekoWidget(self.settings)
         self.n.tick_timer.stop()
+        self.n.invitation_timer.stop()
         self.n.animation_timer.stop()
         self.n.show()
         self.n.move(250, 350)
@@ -45,9 +47,6 @@ class DesktopGameTests(unittest.TestCase):
         self.n.tray_icon.hide()
         self.n.activity.close()
         self.n.bubble.deleteLater()
-        if self.n.game_overlay:
-            self.n.game_overlay.stop.deleteLater()
-            self.n.game_overlay.deleteLater()
         if self.n.stats_window:
             self.n.stats_window.deleteLater()
         self.n.deleteLater()
@@ -65,7 +64,8 @@ class DesktopGameTests(unittest.TestCase):
                 self.n.animate()
 
     def start(self):
-        self.assertTrue(self.n.start_game(self.now, "manual"))
+        with patch("main.time.monotonic", return_value=self.now):
+            self.assertTrue(self.n.start_game(self.now, "manual"))
         self.n.animation_timer.stop()
         self.n.game.runway = Runway(0, 1000, 350, 110)
 
@@ -105,10 +105,11 @@ class DesktopGameTests(unittest.TestCase):
         self.n.hide_neko()
         self.assertIsNone(self.n.game)
         self.assertEqual(self.n.pos(), origin)
-        self.assertFalse(self.n.game_overlay.isVisible())
+        self.assertFalse(hasattr(self.n, "game_overlay"))
 
     def test_loss_survives_hide_carry_and_only_one_pet_comforts(self):
         self.start()
+        self.step(4.2, (650, 400))
         self.step(9, (2000, -100))
         self.assertEqual(self.n.game.phase, "curl")
         self.assertEqual(self.n.companion.state, NekoState.DISAPPOINTED)
@@ -156,6 +157,67 @@ class DesktopGameTests(unittest.TestCase):
             self.n.request_game()
         self.assertIsNone(self.n.game)
 
+    def test_button_held_in_another_app_discards_invitation_entry(self):
+        self.n.game_timer.due = self.now - 1
+        with patch("main.ctypes.windll.user32.GetAsyncKeyState", return_value=0x8000), \
+                patch("main.time.monotonic", return_value=self.now), \
+                patch("main.QCursor.pos", return_value=QPoint(346, 420)):
+            self.n.poll_game()
+        for dt in (.3, .7):
+            with patch("main.time.monotonic", return_value=self.now + dt), patch("main.QCursor.pos", return_value=QPoint(650, 420)):
+                self.n.poll_game()
+        self.assertIsNone(self.n.game)
+        for dt, point in ((1, QPoint(346, 420)), (1.2, QPoint(650, 420)), (1.5, QPoint(650, 420))):
+            with patch("main.time.monotonic", return_value=self.now + dt), patch("main.QCursor.pos", return_value=point):
+                self.n.poll_game()
+        self.assertEqual(self.n.game.source, "automatic")
+
+    def test_counters_persist_once_and_countdown_abort_is_not_a_play(self):
+        self.start()
+        self.step(1, (650, 400))
+        self.assertEqual(self.n.games_played, 0)
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.end_game()
+        self.step(3, (650, 400))
+        self.assertEqual(self.n.games_played, 0)
+        self.start()
+        self.step(15, (470, 355))
+        self.assertEqual((self.n.games_played, self.n.games_won), (1, 1))
+        self.assertEqual(self.settings.value("games_played", type=int), 1)
+        self.assertEqual(self.settings.value("games_won", type=int), 1)
+        self.assertIn("1 games played", self.n.game_stats_action.text())
+        self.n.prepare_menu()
+        self.assertEqual((self.n.games_played, self.n.games_won), (1, 1))
+
+    def test_outcome_bags_show_all_three_and_never_repeat_at_seam(self):
+        for outcome in ("win", "loss"):
+            selected = []
+            for _ in range(9):
+                self.start()
+                g = self.n.game
+                g.started = True
+                g.result = outcome
+                g.enter(outcome, self.now)
+                self.step(.02, (650, 400))
+                selected.append(g.variant)
+                self.n.end_game(immediate=True, clear_mood=True)
+            for index in range(0, 9, 3):
+                self.assertEqual(set(selected[index:index + 3]), {0, 1, 2})
+            self.assertTrue(all(a != b for a, b in zip(selected, selected[1:])))
+
+    def test_invalid_counters_migrate_without_exceeding_played(self):
+        for played, won, expected in (("bad", 4, (0, 0)), (-1, -8, (0, 0)), (3, 99, (3, 3))):
+            self.settings.setValue("games_played", played)
+            self.settings.setValue("games_won", won)
+            n = NekoWidget(self.settings)
+            try:
+                self.assertEqual((n.games_played, n.games_won), expected)
+            finally:
+                n.tray_icon.hide()
+                n.activity.close()
+                n.bubble.deleteLater()
+                n.deleteLater()
+
     def test_nook_refreshes_timer_preferences_and_sleeping_request_explains_wait(self):
         with patch("main.autostart_enabled", return_value=False):
             self.n.open_stats_window()
@@ -176,13 +238,13 @@ class DesktopGameTests(unittest.TestCase):
         self.n.motion = False
         self.start()
         origin = self.n.pos()
-        self.step(3, (299, 429))
+        self.step(7, (299, 429))
         self.assertEqual(self.n.game.result, "win")
         self.assertEqual(self.n.pos(), origin)
 
     def test_art_complete_bounds_endpoints_and_contact_landmarks(self):
-        for bank in ("hunt", "emotion"):
-            for i in range(24):
+        for bank, rows in GAME_ROWS.items():
+            for i in range(rows * 4):
                 frame = self.atlas.frames[f"game-{bank}", i // 4, i % 4]
                 bounds = sprite_bounds(frame.toImage())
                 self.assertGreater(bounds.width(), 45, (bank, i))
@@ -223,6 +285,18 @@ class DesktopGameTests(unittest.TestCase):
             self.assertIsNone(self.n.game)
             self.assertEqual(self.n.pos(), QPoint(250, 350))
 
+    def test_new_wins_and_walk_recover_to_the_actual_idle_at_retained_scale(self):
+        idle = self.atlas.frame("idle", 0).toImage()
+        for name, drawn in (("game_win_0", 22), ("game_win_1", 18), ("game_win_2", 18), ("game_settle", 15)):
+            clip = CLIPS[name]
+            self.assertEqual(self.atlas.frame(name, 100).toImage(), idle)
+            q = self.atlas.frames[clip.bank, drawn // 4, drawn % 4].toImage()
+            bounds = sprite_bounds(q)
+            head, center, *_ = pet_landmarks(q.copy(bounds))
+            self.assertAlmostEqual(head, 62, delta=4, msg=name)
+            self.assertAlmostEqual(bounds.left() + center, 90.5, delta=2, msg=name)
+            self.assertAlmostEqual(bounds.top(), 48, delta=2, msg=name)
+
     def test_pet_during_jump_waits_for_landing_and_counts_once(self):
         self.start()
         g = self.n.game
@@ -251,9 +325,15 @@ class DesktopGameTests(unittest.TestCase):
         self.n.companion.state = NekoState.IDLE
         with patch("main.time.monotonic", return_value=self.now + 2.1):
             self.n.tick()
+        self.assertIsNone(self.n.game)
+        # A fresh outside observation and stable side-zone entry are required.
+        self.n.companion.state = NekoState.IDLE
+        for moment, point in ((2.2, QPoint(346, 420)), (2.4, QPoint(650, 420)), (2.7, QPoint(650, 420))):
+            with patch("main.time.monotonic", return_value=self.now + moment), patch("main.QCursor.pos", return_value=point):
+                self.n.poll_game()
         self.assertIsNotNone(self.n.game)
         g = self.n.game
-        with patch("main.time.monotonic", return_value=self.now + 2.2), patch("main.desktop_activity", return_value=(0, 0, True)):
+        with patch("main.time.monotonic", return_value=self.now + 2.8), patch("main.desktop_activity", return_value=(0, 0, True)):
             self.n.tick()
         self.assertIsNone(self.n.game)
         self.assertEqual(self.n.pos(), QPoint(*g.origin))

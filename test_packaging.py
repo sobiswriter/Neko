@@ -69,9 +69,11 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("cursors", modules)
         self.assertIn("thoughts", modules)
         self.assertIn("games", modules)
-        self.assertIn("game_overlay", modules)
-        for bank in ("hunt", "emotion"):
-            asset = f"assets/neko-game-{bank}-v1.png"
+        self.assertNotIn("game_overlay", modules)
+        from animations import GAME_ROWS
+        for bank in GAME_ROWS:
+            version = 1 if bank == "emotion" else 2
+            asset = f"assets/neko-game-{bank}-v{version}.png"
             self.assertIn(asset, names)
             self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
                              hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest())

@@ -6,7 +6,9 @@ Baseline: the expressive petting revision completed on **2026-10-22**, artwork/r
 
 The later [pickup revision](docs/pickup-validation.md) implements held expressions and interruptible release. Its [approved design](docs/pickup-animation-plan.md), [exact provenance](docs/pickup-prompts.json) and [native measurements](docs/pickup-native.json) extend the method below. Historical reports retain their original dimensions/counts; current production values include the pickup extension.
 
-The [Catch the Cursor release](docs/catch-validation.md) adds 48 source slots for lateral hunting and disappointment/comfort. Its [prompts and assembly regions](docs/catch-prompts.json), [all imported slots](docs/neko-game-frames.png) and [native playback measurements](docs/catch-native.json) extend this guide. The 528 earlier frames and 42 earlier clip definitions remain unchanged; the current atlas contains 576 entries.
+The first [Catch the Cursor release](docs/catch-validation.md) added 48 source slots for lateral hunting and disappointment/comfort. Its [prompts and assembly regions](docs/catch-prompts.json), [all imported slots](docs/neko-game-frames.png) and [native playback measurements](docs/catch-native.json) describe that release's 576 entries.
+
+The approved [cursor-play v2 revision](docs/cursor-play-v2-validation.md) replaces hunting and walking, adds anticipation/countdown and six distinct outcomes, and connects losses to the retained curl through a drawn look-up. Current atlas: **729 entries**, including 200 game source slots and an appended canonical walk endpoint. [Exact provenance](docs/cursor-play-v2-prompts.json), [every new imported slot](docs/cursor-play-v2-frames.png) and [native timing/coverage](docs/cursor-play-v2-native.json) record the evidence. All 552 retained frames (528 earlier plus the 24 curl/comfort frames) and 41 non-game/non-walk clips compare unchanged.
 
 ## 1. The design philosophy
 
@@ -70,7 +72,7 @@ Current pet production values in [animations.py](animations.py):
 | Near-idle final head center | Within 2 px of actual idle |
 | Final crown position | About y=48, ±2 px after top padding; held crown y=16 |
 | Pet/carry playback repaint interval | Precise Qt timer, 50 ms, nominal 20 FPS |
-| Total atlas entries | 576: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle + 48 game slots |
+| Total atlas entries | 729: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle + 200 game source slots + one appended walk idle |
 
 These are baseline measurements, not permission to force every posture into a seated shape. A lying kitten is lower and wider. Check continuity against appropriate anatomical landmarks throughout the action. If a new pose needs space, measure it at the retained character scale before changing the fixed canvas. Do not resize the desktop window on each pose.
 
@@ -113,6 +115,18 @@ These are revision-specific recipes, with full output identities in the JSON; th
 - **Ear rub:** anticipation slot 1 selects near-neutral softened-lid source drawing 14, avoiding an oversized early tilted head.
 
 ## 6. Import at one scale; anchor the physical support
+
+### Cursor-play v2 evidence
+
+The game importer retains one neutral calibration per batch: head62/body82, baseline130 in the 192×144 canvas. Do not reuse a seated-width heuristic as a head-width measurement for a lying pose: the haunch can join the longest alpha run. Review the actual face, support and silhouette together. The first loss-c batch visibly grew through later rows and was redrawn against the actual new curl; per-pose fitting was rejected.
+
+Both ready drafts yielded fifteen drawings. Repeat the complete gathering crouch once (source11), then use the squeeze, reopen and final launch-ready drawing; this gives sixteen runtime slots without inventing anatomy. Its longest complete tail is 387px wide, requiring 448px packed cells/baseline436. Other v2 batches retain384/baseline372. Complete silhouette crops preserve original RGBA, including faint alpha; labels/matte are removed through ImageGen edits, not pixel painting.
+
+The grasp victory's final tall sit was rejected. Its complete supported recovery uses source14→13→2→1→generated neutral0→actual idle; packed18/19 select source0. Hop/grasp batches have a measured constant +2px x registration. The walk's final source sit was6px shorter than canonical: packed15 selects generated neutral0 after the completed supported sit/blink, before appended actual idle16; settle lasts720ms. Three hop arcs and a single hug bounce use explicit in-canvas offsets in `load_games`; proud-paw celebration remains grounded.
+
+New lowered-face curls cannot cut straight to the retained outward-looking curl: the crown changes by about18px. The eight-slot common look-up bridge supplies small drawn ear/head changes before the retained curl and comfort. Seven used entries last120ms each. All three seams must be reviewed; appending a canonical endpoint alone is insufficient.
+
+Count the notice and each numeral as independent controller phases. Start the phase clock after its actual thought label is presented, so backdrop preparation cannot shorten a beat. Native cue timestamps are stronger evidence than the first later polling observation of a phase. The warmed Windows probe measured each numeral near one second, all six outcome orders, all hunt/walk/countdown drawings, unchanged foreground and actual thought hit-through. This was DPR1.0 on one monitor; mixed-DPI behavior remains unverified on physical hardware.
 
 The current pet importer in `SpriteAtlas.load_pets` reads four columns and `PET_ROWS[name]` rows, overscans each cell vertically by one eighth, scales the cell to width 128 and finds its main sprite bounds. `pet_landmarks` measures the longest opaque head run in the upper three-fifths and extreme contact pixels in the bottom 14 rows. This heuristic suits the current drawings; validate it before applying it to a new hanging or turned pose.
 
@@ -284,6 +298,7 @@ Do not relax an anatomy, scale, timing or clipping check merely to accept a new 
 
 | Date | Finding and correction | Evidence / remaining limit |
 | --- | --- | --- |
+| 2026-10-22 | Cursor-play v2 needed connected playful run/walk and six outcomes. Reject label/matte drafts, a proportion-drifting loss-c and an over-tall grasp recovery. Use complete silhouette crops, one repeated ready hold, whole-batch registration and a drawn curl look-up; retain the real neutral before walk idle. Countdown clocks begin after label presentation. | 729 atlas entries; all 200 game source slots pass bounds/components; 552 retained frames/41 unaffected clips compare unchanged. Native full pose coverage, actual one-second cues, hit-through and no focus theft in [v2 QA](docs/cursor-play-v2-validation.md). No physical mixed-DPI/multi-monitor trial or guarantee of subjective fun; prompts and rejected selections remain recorded. |
 | 2026-10-22 | A bare zero-delay deferred play callback could enter the desktop tick after its widget was deleted during QA teardown. Supply the widget as the Qt single-shot context so its lifetime owns the callback. | The same 20 controller/desktop checks now pass without the teardown traceback. No artwork, clip timing or proposed v2 behavior changes. [Startup/icon maintenance record](docs/startup-icon-validation.md). |
 | 2026-10-22 | Nominal hunt source cells included the previous row's seated paws, reducing one imported run pose to a fragment. Extract complete significant silhouettes, pack fixed cells, sample to 128px before import and add bounds/component checks. Collision must include the painter's y−1 offset and mirror actual paw-alpha regions. | All 48 game slots pass bounds/significant-component checks; stationary high/low/distant contacts and both mirrored directions pass. All 528 earlier frames/42 clips compare unchanged. Native jump/loss/curl/comfort/three-hop entry coverage recorded in [Catch QA](docs/catch-validation.md). Source alpha fringe and attached anatomy still require visual review; physical mixed-DPI and human tuning remain unverified. |
 | 2026-10-22 | Independent typing/window/cursor/follow cooldowns allowed frequent alternating reactions; idle thoughts also bypassed the full configured speech interval. Use one configurable activity minimum (60s default, 15–600s) and the full automatic speech minimum, discarding activity events during cooldown. | 38 behavior/dialogue and 12 desktop checks pass, covering shared boundaries, preferences, quiet/AI guards and no event backlog. Idle animation cadence and deliberate pet replies remain independent. [Report](docs/activity-reaction-validation.md). |

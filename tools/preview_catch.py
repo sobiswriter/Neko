@@ -1,7 +1,7 @@
-"""Actual Catch controller previews and test-owned native playback measurements."""
+"""Production controller/art previews and a real Windows Qt playback probe."""
 import os
 import sys
-os.environ["QT_QPA_PLATFORM"] = "windows" if "--native" in sys.argv else "offscreen"
+os.environ['QT_QPA_PLATFORM'] = 'windows' if '--native' in sys.argv else 'offscreen'
 from pathlib import Path
 import json
 import statistics
@@ -12,10 +12,9 @@ from PIL import Image, ImageDraw, ImageOps
 from PySide6.QtCore import QPoint, QSettings, QTimer, Qt
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication, QWidget
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, SpriteAtlas
+from animations import CLIPS, GAME_ROWS
 from behavior import NekoState
 from games import Runway
 from main import NekoWidget
@@ -23,180 +22,203 @@ from main import NekoWidget
 
 def pixels(frame):
     q = frame.toImage().convertToFormat(QImage.Format_RGBA8888)
-    return Image.frombytes("RGBA", (q.width(), q.height()), bytes(q.constBits()))
+    return Image.frombytes('RGBA', (q.width(), q.height()), bytes(q.constBits()))
 
 
-def preview(neko):
-    output, coverage, logs = [], {}, {}
-    base = 100.0
-    for case, seconds in (("A little hunt", 14), ("Miss, sulk, cuddle", 13), ("Gentle play", 6)):
-        with patch("main.time.monotonic", return_value=base):
-            neko.end_game(immediate=True, clear_mood=True)
-            neko.motion = case != "Gentle play"
-            neko.move(400, 180)
-            neko.start_game(base, "manual")
-            neko.game.runway = Runway(0, 808, 180, 110 if neko.motion else 0)
+def save_gif(frames, path, milliseconds=40):
+    frames[0].save(path, save_all=True, append_images=frames[1:], duration=milliseconds,
+                   loop=0, optimize=False, disposal=2)
+
+
+def preview(n):
+    frames, coverage, logs = [], {}, {}
+    banks = [(bank, i) for bank, rows in GAME_ROWS.items() if bank != 'emotion' for i in range(rows * 4)]
+    for dark in (False, True):
+        sheet = Image.new('RGB', (1600, ((len(banks) + 7) // 8) * 170), '#28343f' if dark else '#faf7f2')
+        draw = ImageDraw.Draw(sheet)
+        for j, (bank, i) in enumerate(banks):
+            frame = pixels(n.atlas.frames[f'game-{bank}', i // 4, i % 4])
+            x, y = j % 8 * 200, j // 8 * 170
+            sheet.paste(frame, (x, y + 20), frame)
+            draw.text((x + 5, y + 4), f'{bank} {i}', fill='#fffaf0' if dark else '#65544f')
+        sheet.save(ROOT / ('docs/cursor-play-v2-frames-dark.png' if dark else 'docs/cursor-play-v2-frames.png'))
+    for case in ('A tempting arrow', 'A tiny sulk and a cuddle'):
+        base = 100.
+        with patch('main.time.monotonic', return_value=base):
+            n.end_game(immediate=True, clear_mood=True)
+            n.move(400, 180)
+            n.start_game(base, 'manual')
+            n.game.runway = Runway(0, 808, 180, 110)
         comforted = False
-        for i in range(seconds * 50):
+        for i in range(18 * 50):
             now = base + i * .02
-            if case == "A little hunt":
-                cursor = (660, 240) if i < 130 else (480, 215)
-            elif case == "Gentle play":
-                cursor = (449, 259)
-            else:
-                cursor = (650, 10)
-            with patch("main.time.monotonic", return_value=now), patch("main.QCursor.pos", return_value=QPoint(*cursor)):
-                neko.animate()
-                game = neko.game
-                if game and case == "Miss, sulk, cuddle" and i >= 430 and not comforted:
-                    assert game.phase == "curl"
-                    neko.pet_reaction()
+            cursor = (660, 240) if case == 'A tempting arrow' or i < 210 else (660, 10)
+            with patch('main.time.monotonic', return_value=now), patch('main.QCursor.pos', return_value=QPoint(*cursor)):
+                n.animate()
+                g = n.game
+                if g and g.phase == 'curl' and not comforted and i > 590:
+                    n.pet_reaction()
                     comforted = True
-                frame = pixels(neko.current_frame(now))
-                if game and game.direction > 0 and game.phase not in ("loss", "curl", "comfort", "win"):
-                    frame = ImageOps.mirror(frame)
-                if game:
-                    clip = neko.game_clip()
-                    coverage.setdefault(clip, set()).add(CLIPS[clip].frame_index(now - game.since))
-                    logs[case] = list(game.log)
+                sprite = pixels(n.current_frame(now))
+                if g:
+                    name = n.game_clip()
+                    coverage.setdefault(name, set()).add(CLIPS[name].frame_index(now - g.since))
+                    logs[case] = list(g.log)
+                    if g.direction > 0 and g.phase not in ('win', 'loss', 'loss_finish', 'curl', 'comfort'):
+                        sprite = ImageOps.mirror(sprite)
                 if i % 2:
                     continue
-                scene = Image.new("RGB", (1000, 380), "#faf7f2")
+                scene = Image.new('RGB', (1000, 340), '#faf7f2')
                 d = ImageDraw.Draw(scene)
-                d.rectangle((500, 0, 999, 379), fill="#282332")
-                d.text((16, 12), case + " · actual controller / retained character scale", fill="#705650")
-                d.text((516, 12), "Catch the Cursor", fill="#f4ded0")
-                if game and game.phase not in ("curl", "loss", "comfort"):
-                    for y in (180 + 80 - game.runway.lift, 304):
-                        d.line((49, y, 950, y), fill="#ba9584", width=1)
-                scene.paste(frame, (neko.x(), neko.y() - 1), frame)
-                if game and game.phase in ("ready", "run", "prepare", "jump", "miss", "turn"):
-                    x, y = cursor
-                    d.polygon(((x, y), (x, y + 15), (x + 4, y + 11), (x + 9, y + 17), (x + 12, y + 15), (x + 8, y + 9), (x + 15, y + 9)), fill="white", outline="#493744")
-                text = neko.bubble.text() if neko.bubble.isVisible() else ""
-                d.text((16, 346), text, fill="#705650")
-                d.text((516, 346), game.phase if game else "back to company", fill="#f4ded0")
-                output.append(scene.quantize(colors=96))
-        base += seconds + 1
-    assert {"game_ready", "game_run", "game_jump", "happy_hop", "game_loss", "game_curl", "game_comfort"} <= coverage.keys(), coverage
-    for clip in ("game_ready", "game_jump", "game_loss", "game_comfort", "happy_hop"):
-        assert set(CLIPS[clip].order) <= coverage[clip], (clip, coverage[clip])
-    for filename, duration in (("neko-catch-preview.gif", 40), ("neko-catch-preview-slow.gif", 80)):
-        path = ROOT / "docs" / filename
-        output[0].save(path, save_all=True, append_images=output[1:], duration=duration, loop=0, disposal=2, optimize=False)
-        with Image.open(path) as gif:
-            assert sum(gif.seek(i) or gif.info["duration"] for i in range(gif.n_frames)) == len(output) * duration
-    (ROOT / "build/catch/preview.json").write_text(json.dumps({"coverage": {k: sorted(v) for k, v in coverage.items()}, "log": logs}, indent=2))
+                d.text((24, 18), case + ' — production controller, normal speed', fill='#65544f')
+                scene.paste(sprite, (n.x(), n.y()), sprite)
+                if n.bubble.isVisible():
+                    d.text((max(20, min(730, n.x() - 20)), n.y() - 24), n.bubble.text(), fill='#443c38')
+                d.polygon([(cursor[0], cursor[1]), (cursor[0] + 4, cursor[1] + 15),
+                           (cursor[0] + 8, cursor[1] + 9), (cursor[0] + 15, cursor[1] + 7)], fill='#4c514f')
+                frames.append(scene)
+    required = {'game_ready', 'game_three', 'game_two', 'game_one', 'game_go', 'game_run',
+                'game_jump', 'game_loss_finish', 'game_curl', 'game_comfort', 'walk', 'game_settle'}
+    assert required <= coverage.keys(), required - coverage.keys()
+    save_gif(frames, ROOT / 'docs/cursor-play-v2.gif')
+    save_gif(frames, ROOT / 'docs/cursor-play-v2-slow.gif', 80)
+    # All six distinct outcome stories use their production clip timing.
+    frames = []
+    for i in range(160):
+        scene = Image.new('RGB', (600, 370), '#faf7f2')
+        d = ImageDraw.Draw(scene)
+        for j, name in enumerate(('game_win_0', 'game_win_1', 'game_win_2', 'game_loss_0', 'game_loss_1', 'game_loss_2')):
+            duration = sum(CLIPS[name].durations) / 1000
+            t = min(i * .04, duration - .001)
+            frame = pixels(n.atlas.frame(name, t))
+            x, y = j % 3 * 200, j // 3 * 185
+            d.text((x + 12, y + 8), ('three happy hops', 'a proud little hug', 'champion paws',
+                                     'empty paws', 'a tiny huff', 'the dramatic turn')[j], fill='#65544f')
+            scene.paste(frame, (x + 4, y + 34), frame)
+        frames.append(scene)
+    save_gif(frames, ROOT / 'docs/cursor-play-v2-outcomes.gif')
+    save_gif(frames, ROOT / 'docs/cursor-play-v2-outcomes-slow.gif', 80)
+    return {'controller_coverage': {k: sorted(v) for k, v in coverage.items()}, 'controller_logs': logs}
 
 
-def native(neko, app):
+def native(app, n):
     import win32gui
-    paints, coverage, captures = [], {}, []
-    owned_focus_seen = False
-    guides_through = None
-    stop_hit = None
-    original = neko.paintEvent
-    scripted_cursor = QPoint(660, 390)
-    foreground = win32gui.GetForegroundWindow()
     backdrop = QWidget()
-    backdrop.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus)
-    backdrop.setAttribute(Qt.WA_ShowWithoutActivating)
-    backdrop.setGeometry(180, 240, 900, 470)
-    backdrop.setStyleSheet("background: #faf7f2")
+    backdrop.setWindowTitle('Neko v2 verification — test-owned surface')
+    backdrop.setStyleSheet('background:#28343f')
+    backdrop.resize(1000, 610)
     backdrop.show()
-    neko.raise_()
-
-    def paint(event):
-        original(event)
-        game = neko.game
-        if game:
-            now = time.monotonic()
-            paints.append(now)
-            clip = neko.game_clip()
-            coverage.setdefault(clip, set()).add(CLIPS[clip].frame_index(now - game.since))
-    neko.paintEvent = paint
-    started = time.monotonic()
-    flags = set()
-    cursor_patch = patch("main.QCursor.pos", side_effect=lambda: scripted_cursor)
-    cursor_patch.start()
-
-    def drive():
-        nonlocal scripted_cursor, owned_focus_seen, guides_through, stop_hit
-        owned = {int(neko.winId()), int(backdrop.winId())}
-        if neko.game_overlay:
-            owned.update((int(neko.game_overlay.winId()), int(neko.game_overlay.stop.winId())))
-        owned_focus_seen |= win32gui.GetForegroundWindow() in owned
-        elapsed = time.monotonic() - started
-        if elapsed > .8 and "start" not in flags:
-            flags.add("start")
-            neko.move(400, 350)
-            neko.play_action.trigger()
-        if 3.5 < elapsed < 11:
-            scripted_cursor = QPoint(480, 385)
-        if 5 < elapsed < 7 and "light" not in flags:
-            flags.add("light")
-            assert neko.game_overlay.isVisible()
-            point = (round(neko.game.runway.left + 200), round(neko.game.runway.y + 124))
-            guides_through = win32gui.WindowFromPoint(point) != int(neko.game_overlay.winId())
-            stop_point = neko.game_overlay.stop.geometry().center()
-            stop_hit = win32gui.WindowFromPoint((stop_point.x(), stop_point.y())) == int(neko.game_overlay.stop.winId())
-            QApplication.primaryScreen().grabWindow(0, 180, 240, 900, 470).save(str(ROOT / "docs/neko-catch-native-light.png"))
-            captures.append("light")
-        if elapsed > 11 and "loss" not in flags:
-            flags.add("loss")
-            neko.end_game(immediate=True, clear_mood=True)
-            neko.move(400, 350)
-            scripted_cursor = QPoint(650, 10)
-            backdrop.setStyleSheet("background: #282332")
-            neko.start_game(time.monotonic(), "manual")
-        if elapsed > 23 and "dark" not in flags:
-            flags.add("dark")
-            QApplication.primaryScreen().grabWindow(0, 180, 240, 900, 470).save(str(ROOT / "docs/neko-catch-native-dark.png"))
-            captures.append("dark")
-            assert neko.game.phase == "curl", neko.game.phase
-            neko.pet_reaction()
-        if elapsed > 26:
-            timer.stop()
-            cursor_patch.stop()
-            intervals = [(b - a) * 1000 for a, b in zip(paints, paints[1:]) if b - a < .15]
-            report = {"platform": QApplication.platformName(), "dpr": neko.devicePixelRatioF(),
-                      "paint_count": len(paints), "median_ms": statistics.median(intervals),
-                      "coverage": {k: sorted(v) for k, v in coverage.items()}, "captures": captures,
-                      "foreground_unchanged": foreground == win32gui.GetForegroundWindow(),
-                      "owned_windows_took_focus": owned_focus_seen,
-                      "guides_click_through": guides_through, "stop_receives_its_own_clicks": stop_hit,
-                      "cursor": "scripted observations; real pointer never moved", "pets": neko.companion.pets,
-                      "naps": neko.companion.naps}
-            for clip in ("game_ready", "game_jump", "game_loss", "game_curl", "game_comfort", "happy_hop"):
-                assert set(CLIPS[clip].order) <= coverage.get(clip, set()), (clip, coverage.get(clip))
-            assert not owned_focus_seen
-            assert guides_through and stop_hit
-            (ROOT / "docs/catch-native.json").write_text(json.dumps(report, indent=2))
-            neko.end_game(immediate=True, clear_mood=True)
-            neko.hide()
-            neko.tray_icon.hide()
-            backdrop.close()
-            app.quit()
+    backdrop.activateWindow()
+    app.processEvents()
+    area = n.screen().availableGeometry()
+    origin = QPoint(area.center().x() - 100, area.bottom() - 230)
+    n.move(origin)
+    pointer = QPoint(origin.x() + 500, origin.y() + 5)
+    n.companion.next_idle = n.companion.next_nap = float('inf')
+    n.game_timer.enabled = False
+    n.show()
+    n.animation_timer.stop()
+    n.tick_timer.stop()
+    n.invitation_timer.stop()
+    n.dismiss_bubble()
+    app.processEvents()
+    foreground = win32gui.GetForegroundWindow()
+    cue_times = {}
+    original_say = n.say
+    def observe_cue(text, **kwargs):
+        shown = original_say(text, **kwargs)
+        if shown and text in ('3…', '2…', '1…'):
+            cue_times.setdefault(text, time.monotonic())
+        elif shown and text.startswith('Here I come!'):
+            cue_times.setdefault('go', time.monotonic())
+        return shown
+    n.say = observe_cue
+    with patch('main.QCursor.pos', side_effect=lambda: pointer):
+        n.request_game()
+        n.poll_game()
+    assert n.game is not None
+    begin = time.monotonic()
+    phase_starts, gaps, coverage, captures = {}, [], {}, []
+    last, case = begin, -1
+    errors = []
+    result = {}
     timer = QTimer()
-    timer.timeout.connect(drive)
-    timer.start(20)
-    app.exec()
+    timer.setTimerType(Qt.PreciseTimer)
+    def sample():
+        nonlocal last, case, begin, pointer
+        try:
+            now = time.monotonic()
+            gaps.append(now - last)
+            last = now
+            n.animate()
+            g = n.game
+            if g:
+                name = n.game_clip()
+                coverage.setdefault(name, set()).add(CLIPS[name].frame_index(now - g.since))
+                if case == -1:
+                    phase_starts.setdefault(g.phase, now)
+                if name not in captures:
+                    captures.append(name)
+                    n.grab().save(str(ROOT / 'build/cursor-v2' / (name + '-native.png')))
+            if (case == -1 and not n.game) or (case >= 0 and now - begin > 4.4):
+                n.end_game(immediate=True, clear_mood=True)
+                case += 1
+                if case == 6:
+                    result.update(countdown_seconds={a: cue_times[b] - cue_times[a]
+                                  for a, b in (('3…', '2…'), ('2…', '1…'), ('1…', 'go'))},
+                                  median_interval=statistics.median(gaps), maximum_gap=max(gaps),
+                                  foreground_preserved=win32gui.GetForegroundWindow() == foreground,
+                                  no_game_overlay=not hasattr(n, 'game_overlay'),
+                                  thought_click_through=bool(n.bubble.windowFlags() & Qt.WindowTransparentForInput),
+                                  native_thought_click_through=win32gui.WindowFromPoint((n.bubble.geometry().center().x(), n.bubble.geometry().center().y())) != int(n.bubble.winId()),
+                                  platform=QApplication.platformName(), dpr=n.devicePixelRatioF(), monitors=len(app.screens()),
+                                  pointer='scripted observations; real cursor never moved or captured',
+                                  coverage={k: sorted(v) for k, v in coverage.items()},
+                                  plays=n.games_played, wins=n.games_won)
+                    assert all(v >= .99 for v in result['countdown_seconds'].values()), result
+                    assert result['foreground_preserved'] and result['thought_click_through'] and result['native_thought_click_through']
+                    assert result['no_game_overlay'] and result['maximum_gap'] < .5
+                    for kind in ('win', 'loss'):
+                        for i in range(3):
+                            name = f'game_{kind}_{i}'
+                            assert set(CLIPS[name].order) <= coverage[name], (name, coverage[name])
+                    for name in ('game_ready', 'game_three', 'game_two', 'game_one', 'game_run', 'game_jump', 'walk', 'game_settle', 'game_loss_finish'):
+                        assert set(CLIPS[name].order) <= coverage[name], (name, coverage[name])
+                    timer.stop()
+                    app.exit()
+                    return
+                n.move(origin)
+                n.start_game(now, 'manual')
+                g = n.game
+                g.started = True
+                kind = 'win' if case < 3 else 'loss'
+                n.outcome_bags[kind] = [case % 3]
+                g.result = kind
+                g.enter(kind, now, kind)
+                begin = now
+            if case == -1 and now - begin > 20:
+                raise AssertionError('native genuine paw catch did not finish')
+        except Exception as e:
+            errors.append(repr(e));timer.stop();app.exit()
+    with patch('main.QCursor.pos', side_effect=lambda: pointer):
+        timer.timeout.connect(sample)
+        timer.start(20)
+        app.exec()
+    assert not errors, (errors, phase_starts, max(gaps), coverage)
+    backdrop.close()
+    return result
 
 
-if __name__ == "__main__":
-    app = QApplication([])
+if __name__ == '__main__':
+    app = QApplication.instance() or QApplication([])
     app.setQuitOnLastWindowClosed(False)
-    with tempfile.TemporaryDirectory() as folder, patch("main.ActivityMonitor.start"), patch("main.desktop_activity", return_value=(0, 0, False)):
-        settings = QSettings(str(Path(folder) / "preview.ini"), QSettings.IniFormat)
-        settings.setValue("auto_games", False)
-        neko = NekoWidget(settings)
-        neko.tick_timer.stop()
-        neko.show()
-        app.processEvents()
-        if "--native" in sys.argv:
-            native(neko, app)
-        else:
-            neko.animation_timer.stop()
-            preview(neko)
-        neko.activity.close()
-        neko.tray_icon.hide()
+    with tempfile.TemporaryDirectory() as folder, patch('main.ActivityMonitor.start'), \
+            patch('main.desktop_activity', return_value=(0, 0, False)):
+        n = NekoWidget(QSettings(str(Path(folder) / 'prefs.ini'), QSettings.IniFormat))
+        n.tick_timer.stop();n.invitation_timer.stop();n.animation_timer.stop()
+        n.show();app.processEvents()
+        result = native(app, n) if '--native' in sys.argv else preview(n)
+        target = ROOT / 'docs' / ('cursor-play-v2-native.json' if '--native' in sys.argv else 'cursor-play-v2-preview.json')
+        target.write_text(json.dumps(result, indent=2), encoding='utf-8')
+        n.tray_icon.hide();n.activity.close();n.bubble.close();n.close()
+        print(target)

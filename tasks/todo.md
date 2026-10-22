@@ -1,18 +1,18 @@
 # Animation rebuild checklist
 
-## Cursor play v2 — proposal awaiting user approval, 2026-10-22
+## Cursor play v2 — approved implementation, 2026-10-22
 
 [Complete design, exact invitation/countdown rules and acceptance matrix](../docs/cursor-play-v2-plan.md).
 
 - [x] Read current animation guidance/validation, runtime/timer/menu ownership and supplied visual references; record revised philosophy and plan.
-- [ ] User approves/amends this proposal before v2 animation, gameplay or dialogue implementation.
-- [ ] V0: remove the game-overlay module/windows/status/guides/floating button; retain ordinary menu controls and independent QA previews.
-- [ ] V1: invisible side-zone fresh-entry/cooldown/sleep gates and actual timed countdown, with deterministic/native phase evidence.
-- [ ] V2: replace walking and remove idle-follow behavior/UI/callers; preserve supported game recovery and update coverage.
-- [ ] V3: playful drawn run/jump expressions, accurate new paw contacts and reviewed turns/misses.
-- [ ] Checkpoint: native complete no-overlay invitation/countdown/hunt/return plus pet/hold and cooldown-entry checks.
-- [ ] V4: three distinct victory and three loss stories with common compatible comfort; sparse context-specific shuffled lines.
-- [ ] V5: add exact-once local played/won keepsakes to normal menu/nook and persistence; keep menu explanation quiet and brief.
+- [x] User approved implementation: “GO for it, Good luck.”
+- [x] V0: remove the game-overlay module/windows/status/guides/floating button; retain ordinary menu controls and independent QA previews.
+- [x] V1: invisible side-zone fresh-entry/cooldown/sleep gates and actual timed countdown, with deterministic/native phase evidence.
+- [x] V2: replace walking and remove idle-follow behavior/UI/callers; preserve supported game recovery and update coverage.
+- [x] V3: playful drawn run/jump expressions, accurate new paw contacts and reviewed turns/misses.
+- [x] Checkpoint: native complete no-overlay invitation/countdown/hunt/return plus pet/hold and cooldown-entry checks.
+- [x] V4: three distinct victory and three loss stories with common compatible comfort; sparse context-specific shuffled lines.
+- [x] V5: add exact-once local played/won keepsakes to normal menu/nook and persistence; keep menu explanation quiet and brief.
 - [ ] V6: actual-controller previews, full/targeted/native/package verification, provenance and verified Frame Master findings; flat two-executable release.
 
 Separately authorized now: diagnose/fix Windows startup and adopt root `neko_sleep.ico`; record their checks independently. Older open work below is preserved.

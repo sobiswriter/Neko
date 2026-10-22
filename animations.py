@@ -101,7 +101,7 @@ CLIPS = {
     "fall_asleep": Clip("transitions", 0, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
     "wake": Clip("transitions", 2, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
     "sleep": Clip("transitions", 1, (1400, 1400), (2, 3), loop=True),
-    "walk": Clip("movement", 0, (240, 240, 240, 240), loop=True),
+    "walk": Clip("game-walk", 0, (120,) * 8, tuple(range(4, 12)), loop=True),
     "stretch": Clip("idleplay-a", 2, (300, 250, 400, 650, 450, 300, 400, 650), tuple(range(8))),
     "look_left": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 1, 2, 3, 7)),
     "look_right": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 4, 5, 6, 7)),
@@ -137,15 +137,28 @@ for mood in ("excited", "calm", "unimpressed", "sleepy"):
     order = tuple(range(4, 12)) if mood == "sleepy" else tuple(range(12))
     CLIPS[f"held_{mood}"] = Clip(f"carry-{mood}", 0, (2400 // len(order),) * len(order), order, loop=True)
 
+GAME_ROWS = {"emotion": 6, "hunt": 6, "walk": 4, "ready": 4, "win-hop": 6,
+             "win-grasp": 5, "win-proud": 5, "loss-a": 4, "loss-b": 4, "loss-c": 4, "loss-bridge": 2}
 CLIPS.update({
-    "game_ready": Clip("game-hunt", 0, (300, 350, 350, 400), (0, 1, 2, 3)),
+    "game_ready": Clip("game-ready", 0, (200,) * 4),
+    "game_three": Clip("game-ready", 0, (250,) * 4, (4, 5, 6, 7)),
+    "game_two": Clip("game-ready", 0, (250,) * 4, (8, 9, 10, 11)),
+    "game_one": Clip("game-ready", 0, (250,) * 4, (12, 13, 14, 15)),
+    "game_go": Clip("game-ready", 0, (350,), (15,)),
+    "game_ready_cancel": Clip("game-ready", 0, (60,) * 16, tuple(reversed(range(16)))),
     "game_run": Clip("game-hunt", 0, (70,) * 8, tuple(range(4, 12)), loop=True),
     "game_turn": Clip("game-hunt", 0, (100, 100, 150), (12, 13, 14)),
     "game_prepare": Clip("game-hunt", 0, (200,), (16,)),
     "game_jump": Clip("game-hunt", 0, (40, 80, 80, 240, 40, 60, 50, 50), tuple(range(16, 24))),
     "game_miss": Clip("game-hunt", 0, (150, 150, 150), (23, 14, 2)),
-    "game_settle": Clip("game-hunt", 0, (150, 150, 200), (13, 14, 15)),
-    "game_loss": Clip("game-emotion", 0, (150,) * 12, tuple(range(12))),
+    "game_settle": Clip("game-walk", 0, (120, 150, 150, 150, 150), (12, 13, 14, 15, 16)),
+    "game_win_0": Clip("game-win-hop", 0, (100,) * 18 + (220, 180, 160, 150, 300), tuple(range(1, 24))),
+    "game_win_1": Clip("game-win-grasp", 0, (150,) * 19, tuple(range(1, 15)) + (13, 2, 1, 18, 19)),
+    "game_win_2": Clip("game-win-proud", 0, (150,) * 19, tuple(range(1, 20))),
+    "game_loss_0": Clip("game-loss-a", 0, (170,) * 15, tuple(range(1, 16))),
+    "game_loss_1": Clip("game-loss-b", 0, (170,) * 15, tuple(range(1, 16))),
+    "game_loss_2": Clip("game-loss-c", 0, (170,) * 15, tuple(range(1, 16))),
+    "game_loss_finish": Clip("game-loss-bridge", 0, (120,) * 7, tuple(range(1, 8))),
     "game_curl": Clip("game-emotion", 0, (900, 900, 900, 900), (8, 9, 10, 11), loop=True),
     "game_comfort": Clip("game-emotion", 0, (150,) * 10 + (250, 250), tuple(range(12, 24))),
     "game_gentle_rest": Clip("game-hunt", 0, (1000,), (2,)),
@@ -329,13 +342,14 @@ class SpriteAtlas:
         """All-or-nothing game art; constant calibration from each bank's neutral."""
         imported = {}
         idle = self.frames["idle", 0, 0]
-        for name in ("hunt", "emotion"):
-            image = QImage(str(Path(path) / f"neko-game-{name}-v1.png"))
-            if image.isNull() or image.width() % 4 or image.height() % 6:
+        for name, rows in GAME_ROWS.items():
+            version = 1 if name == "emotion" else 2
+            image = QImage(str(Path(path) / f"neko-game-{name}-v{version}.png"))
+            if image.isNull() or image.width() % 4 or image.height() % rows:
                 return
-            width, height = image.width() // 4, image.height() // 6
+            width, height = image.width() // 4, image.height() // rows
             poses = []
-            for index in range(24):
+            for index in range(rows * 4):
                 cell = image.copy(index % 4 * width, index // 4 * height, width, height).scaledToWidth(128, Qt.FastTransformation)
                 bounds = sprite_bounds(cell)
                 if bounds.isEmpty():
@@ -351,12 +365,22 @@ class SpriteAtlas:
                 frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
                 frame.fill(Qt.transparent)
                 painter = QPainter(frame)
-                painter.drawPixmap((CANVAS_WIDTH - sprite.width()) // 2, 130 - sprite.height(), sprite)
+                hop = 0
+                if name == "win-hop":
+                    hop = (0, 0, 0, 0, 3, 9, 4, 0, 0, 5, 13, 5, 0, 0, 3, 8, 4, 0, 0, 0, 0, 0, 0, 0)[index]
+                elif name == "win-grasp":
+                    hop = {9: 4, 10: 10, 11: 4}.get(index, 0)
+                left = (CANVAS_WIDTH - sprite.width()) // 2 + (2 if name in ("win-hop", "win-grasp") else 0)
+                painter.drawPixmap(left, 130 - hop - sprite.height(), sprite)
                 painter.end()
                 imported[f"game-{name}", index // 4, index % 4] = frame
-        for name, indices in (("hunt", (0, 15)), ("emotion", (0, 23))):
+        for name, indices in (("hunt", (0, 15)), ("emotion", (0, 23)), ("walk", (0,)),
+                              ("ready", (0,)), ("win-hop", (0, 23)), ("win-grasp", (0, 19)),
+                              ("win-proud", (0, 19)), ("loss-a", (0,)), ("loss-b", (0,)), ("loss-c", (0,))):
             for index in indices:
                 imported[f"game-{name}", index // 4, index % 4] = idle
+        imported["game-walk", 4, 0] = idle
+        imported["game-loss-bridge", 1, 3] = imported["game-emotion", 2, 0]
         self.frames.update(imported)
 
     def load_carry(self, path):

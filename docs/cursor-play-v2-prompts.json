@@ -1,0 +1,2089 @@
+{
+  "date": "2026-10-22",
+  "tool": "built-in ImageGen",
+  "common": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking. ",
+  "prompts": {
+    "loss-c-redraw": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking.  EXACTLY sixteen separate kitten drawings, four columns and four rows, no labels or numerals. All kittens have the SAME physical head size as reference one in every drawing, including lying down, and the same compact torso as both references. First kitten is reference one's neutral seated calibration; then ONE connected chronological story: she notices she missed, turns to the left, takes one little sideways step, turns a little away, glances back over her shoulder with soft disappointed ears, sits, leans on forepaws, bends elbows, lowers chest, folds hindlegs, wraps tail, lowers chin. The final three kittens MUST match the actual small down-looking curled kitten in reference two EXACTLY in head/body proportions, tail compactness and viewing angle. No growth in later rows. Reference two's broad lowered ears are from head tilt, not larger anatomy. Frame-to-frame changes must remain small, connected and supported. Draw consistent pixel clusters at a larger scale than the native references. True transparent alpha directly against clean charcoal outlines, no glow, shadows, haze or matte. Each complete kitten sits inside a broad transparent moat.",
+    "loss-bridge": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking.  Make exactly EIGHT isolated kittens in FOUR columns and TWO rows with wide transparent gutters. First drawing is the front seated neutral of reference one, solely scale calibration. The remaining seven form ONE small connected performance: she is already curled like reference two, face tilted DOWN, ears flattened; she slowly raises her ears, tilts her head to look outward, raises her chin a little, and settles into the EXACT outward-looking curled posture of reference three. Last two drawings match reference three. Her head has constant physical volume; change the viewing angle through actual drawings as she looks up. Body remains curled on the ground, both forepaws supporting the chin, hindlegs tucked, single tail wrapping right haunch. No extra paws. Not a get-up or sit. References two and three are actual desktop sprites: preserve their proportions at larger drawing size. The head must finish taller in silhouette as her downward-looking face tilts outward and ears lift. No numbers, labels, grid, matte, fog or shadow. True transparent alpha directly outside crisp charcoal pixels.",
+    "hunt": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking. EXACTLY 4 columns x 6 rows, 24 drawings. Row1:0 front seated neutral as reference;1 attentive head turns left, ears perk;2 supported side stand;3 eager low crouch. Rows2-3 (4..11): eight connected playful side RUN phases: hind push/forepaw reach, long extension, forepaw weight contact, passing support, gathered legs, opposite hind contact, push with a BRIEF excited squeezed eye like >_< drawn in the profile eyelid, reopening as reaching again. Tail trails momentum naturally. Run should read lively and mischievous, not stiff. Row4 (12..15): shorten stride, plant supporting paw/brake, half-sit facing front, canonical neutral seated matching0. Row5-6 (16..23): jump:16 deep supported crouch focused eyes;17 rear-paw launch, forepaws lifting;18 long airborne forepaw reach to left/up;19 maximum two-forepaw reach with excited squeezed eyes, hindlegs naturally tucked (one far foreleg may be occluded);20 eyes reopen into descent;21 forepaw landing with hindquarters following;22 four-paw compression;23 supported side-ready stand matching2. Airborne poses in same cell registration: engine supplies world arc, do not place airborne drawing higher as a second arc. Make highest reach and landing anatomy especially clear.",
+    "walk": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking. EXACTLY 4 columns x 4 rows, 16 drawings. Gentle light-footed SIDE WALK and complete entry/recovery, distinct from running.0 canonical front seated neutral;1 head leads left while forepaws plant to rise;2 supported side stand;3 first forward paw lift.4..11 eight connected light-footed walking cycle poses: diagonal support pair/rear push, forepaw swings low, forepaw plants, body passes over support, opposite pair releases, opposite forepaw swings, opposite contact, gather connecting back to4. Curious soft eyes and small ear changes; tail relaxed and follows each step, not rigid upright. Keep head/body volume stable and clear planted contacts.12 shorter braking step;13 supporting hindquarters lower;14 near-front completed sit with soft blink;15 canonical front seated neutral matching0. No airborne running leaps in walking cycle. All drawings share baseline within their cells.",
+    "ready": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking. EXACTLY 4 columns x 4 rows, 16 drawings. A real four-stage anticipation story for a 3..2..1 countdown, WITHOUT drawing any numbers/text. 0 front seated neutral;1 notice arrow to left, ears orient;2 head turns attentive;3 shift onto planted forepaws.4 begin supported rise;5 half-rise;6 side stand, interested eyes;7 side stand with little eager tail flick.8 bend hindquarters slightly;9 one tiny planted forepaw adjustment;10 shoulders lean forward;11 settled run-ready gaze.12 lower into eager crouch;13 brief delighted squeezed-eye expression with paws firmly supporting body;14 reopen eyes and gather hindquarter push;15 low launch-ready crouch with clear rear support. Small connected changes, sustained physical volume. These are four chronological groups of four poses, so every countdown stage has its own acting.",
+    "win-hop": "undefinedEXACTLY 4 columns x 6 rows =24 drawings for a complete THREE-HOP victory.0 neutral seated calibration.1 supported side half-sit after landing;2 front eager crouch;3 deep grounded compression.4 hop1 launch;5 hop1 apex delighted squeezed eyes;6 eyes reopen descending;7 forepaw contact.8 grounded compression;9 hop2 launch;10 hop2 higher apex squeezed eyes;11 descending open eyes;12 grounded four-paw compression.13 tiny gathering crouch;14 hop3 launch;15 hop3 small apex happy squeeze;16 eyes open descending;17 supported four-paw landing.18 rise into supported half-sit;19 front proud sit;20 contented blink;21 eyes reopen;22 completed drawn neutral sit;23 same neutral as0. Draw air poses with naturally tucked hindlegs, NEVER extra grounded feet. Engine supplies the three small height offsets; every landing/compression must visibly support her. No props or effects.",
+    "win-grasp": "undefinedEXACTLY 4 columns x 5 rows =20 drawings for a distinct MY PRIZE victory.0 neutral seated calibration.1 supported side half-sit after catch;2 connected turn into front half-sit;3 weight on hindquarters as BOTH forepaws lift together;4 forepaws clasp imaginary prize at chest;5 proud bright eyes;6 gentle delighted squeezed-eye hug with both lifted forepaws together (no duplicate front feet on ground);7 eyes reopen;8 hindquarter crouch while paws release;9 tiny spring launch;10 delighted airborne bounce apex;11 forepaw landing open eyes;12 four-paw compression.13 sit up while looking at empty lifted paw;14 curious head tilt;15 put that forepaw down with support accounted for;16 pleased upright sit;17 soft blink;18 completed drawn neutral;19 neutral identical to0. Small chronological changes. Imaginary prize is NOT a visible object, arrow, heart or mouse. No decorative marks.",
+    "win-proud": "undefinedEXACTLY 4 columns x 5 rows =20 drawings for a distinct quiet CHEEKY PROFESSIONAL victory.0 neutral seated calibration.1 supported side half-sit after catch;2 connected turn into front half-sit;3 straighten chest into proud sit;4 small chin lift with attached neck;5 warm pleased eyes;6 transfer onto one supporting forepaw and lift the OTHER forepaw;7 tiny wrist flick;8 wink one eye while lifted paw curls (no extra grounded paw);9 eye reopens;10 paw lowers;11 both forepaws planted.12 one relaxed attached-tail sweep;13 tail eases back;14 slightly bashful sideways glance;15 head centers;16 soft slow blink;17 eyes reopen;18 completed drawn neutral sit;19 neutral identical to0. No whole-body hops in this story, contrast with the other victories through paw, chest, wink and tail acting. Keep limb support and head volume stable.",
+    "loss-a": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking.  Create exactly sixteen complete isolated kittens in FOUR columns and FOUR rows. No numerals anywhere. First cell neutral front seated kitten to calibrate scale; next two rows and first half of final row tell this chronological physical story: She checks her empty paws, droops her ears, bows her head, bends forelegs, settles her chest, tucks hindquarters, wraps her tail and lowers chin to forepaws. Last two cells complete the small quiet curled position shown in reference three, eyes lowered but awake, tiny head tucked between forepaws, tail encircling right hip. Curl is lower and wider than seated, same physical anatomy volume. Connect every step; small changes and supported joints. Leave a broad transparent moat around each individual kitten. No grid or decorative marks. Source neutral and curl are references to actual desktop size: draw larger while preserving their proportions.",
+    "loss-b": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking.  Create exactly sixteen complete isolated kittens in FOUR columns and FOUR rows. No numerals anywhere. First cell neutral front seated kitten to calibrate scale; next two rows and first half of final row tell this chronological physical story: She sits, crosses her two forepaws over her chest in a little supported huff, draws deadpan level eyelids, relaxes, uncrosses paws to the ground, lowers shoulders, tucks hindquarters and tail, lowers chin to forepaws. Last two cells complete the small quiet curled position shown in reference three, eyes lowered but awake, tiny head tucked between forepaws, tail encircling right hip. Curl is lower and wider than seated, same physical anatomy volume. Connect every step; small changes and supported joints. Leave a broad transparent moat around each individual kitten. No grid or decorative marks. Source neutral and curl are references to actual desktop size: draw larger while preserving their proportions.",
+    "loss-c": "Use case: illustration-story. Production pixel-art animation source sheet for the SAME white kitten Neko in the reference: white fur, gray underchin/chest, charcoal stepped outlines, pink nose/inner ears, large dark eyes with square highlights; compact body and large head. True transparent alpha, clean cutout right up to charcoal outlines; no gray haze, floor, shadow, props, labels, numbers, grid, motion glyphs or watermark. Fixed camera, same physical head volume in EVERY cell, hard pixel clusters not smooth painting. Exactly four anatomical legs (two forelegs, two hindlegs), one head connected to neck/torso, two ears, one attached tail; hidden legs remain occluded, lifted paws replace grounded versions, never duplicate paws. Equal isolated cell spacing with generous completely transparent gutters and complete ears, paws, tail inside each cell. Chronological row-major order; every cell has ONE full kitten, no contact between cells. Expressions are physically drawn eyelids/ears/jaw, NEVER text on the face. All side poses face LEFT. Same anatomical scale across poses; crouching changes joints, not whole-body shrinking.  Create exactly sixteen complete isolated kittens in FOUR columns and FOUR rows. No numerals anywhere. First cell neutral front seated kitten to calibrate scale; next two rows and first half of final row tell this chronological physical story: She turns three-quarters away with one small step, glances back sadly, softens ears, settles her hips, folds forelegs, wraps her tail and lowers chin to forepaws. Last two cells complete the small quiet curled position shown in reference three, eyes lowered but awake, tiny head tucked between forepaws, tail encircling right hip. Curl is lower and wider than seated, same physical anatomy volume. Connect every step; small changes and supported joints. Leave a broad transparent moat around each individual kitten. No grid or decorative marks. Source neutral and curl are references to actual desktop size: draw larger while preserving their proportions."
+  },
+  "cleanup": {
+    "win-hop": "Clean this production animation sheet preserving EVERY kitten drawing, pose, chronological order, head proportions and original four-column layout. Remove ALL labels, numbers, grid lines, red pixels, stray white fragments, white page patches, and motion marks. Remove the matte and all glow/halo outside the charcoal outline. Final image true transparent alpha, empty transparent gutters around each isolated complete kitten, hard charcoal stepped outline immediately against transparency; no gray fog, no shadows, no background. Preserve white fur INSIDE each kitten outline, all connected paws, ears and tail. This is an asset clean-up, not a chart: no labels at all. Preserve six rows of four kittens (24 drawings).",
+    "win-grasp": "Clean this production animation sheet preserving EVERY kitten drawing, pose, chronological order, head proportions and original four-column layout. Remove ALL labels, numbers, grid lines, red pixels, stray white fragments, white page patches, and motion marks. Remove the matte and all glow/halo outside the charcoal outline. Final image true transparent alpha, empty transparent gutters around each isolated complete kitten, hard charcoal stepped outline immediately against transparency; no gray fog, no shadows, no background. Preserve white fur INSIDE each kitten outline, all connected paws, ears and tail. This is an asset clean-up, not a chart: no labels at all. Preserve five rows of four kittens (20 drawings).",
+    "win-proud": "Clean this production animation sheet preserving EVERY kitten drawing, pose, chronological order, head proportions and original four-column layout. Remove ALL labels, numbers, grid lines, red pixels, stray white fragments, white page patches, and motion marks. Remove the matte and all glow/halo outside the charcoal outline. Final image true transparent alpha, empty transparent gutters around each isolated complete kitten, hard charcoal stepped outline immediately against transparency; no gray fog, no shadows, no background. Preserve white fur INSIDE each kitten outline, all connected paws, ears and tail. This is an asset clean-up, not a chart: no labels at all. Preserve five rows of four kittens (20 drawings)."
+  },
+  "sources": {
+    "loss-bridge": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-d918b3cf-0439-405b-be1d-11e5ae90e1ab.png"
+    },
+    "hunt": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-3c6db9b7-5961-44b1-8bd4-bf15afb529c2.png"
+    },
+    "walk": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-81863deb-210d-4709-b0de-b2e7f7d0eb09.png"
+    },
+    "ready": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-2c76e476-7d7b-49d4-b95c-31a0dc3e19a0.png",
+      "clean": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-4621cfea-287b-4eb3-a47d-0f1dc92eac53.png"
+    },
+    "win-hop": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-87457c1e-fecd-4ce7-850e-e91980d7aec1.png",
+      "clean": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-98161ccd-630d-4a42-be0a-7523c35f9940.png"
+    },
+    "win-grasp": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-77250d45-042b-4a27-ab8d-42ebbce3289f.png",
+      "clean": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-e02dbb60-aaa4-4475-bc68-b9aafdcb76a9.png"
+    },
+    "win-proud": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-2a2de6c9-8fbb-49bf-84c0-7747499cd3e8.png",
+      "clean": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-394bbf21-d68b-4d01-9e08-b16bab5aabc5.png"
+    },
+    "loss-a": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-4ec4486c-0ea4-4f7a-8f38-ed43c7910075.png",
+      "clean": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-2506fd26-ee6a-437c-87ae-814e3c5a9cac.png"
+    },
+    "loss-b": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-13676905-e8f8-413d-818a-a91f12762142.png"
+    },
+    "loss-c": {
+      "selected": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-650d23c9-c2bf-47d4-a853-d27a952489e8.png",
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-02f51224-85b7-4570-94ec-43dbdede2a95.png",
+      "clean": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-3ceaa8dd-d235-483a-b3e7-06d3568620f7.png"
+    }
+  },
+  "assembly": {
+    "loss-bridge": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-d918b3cf-0439-405b-be1d-11e5ae90e1ab.png",
+      "regions": [
+        [
+          128,
+          70,
+          405,
+          379,
+          61328
+        ],
+        [
+          591,
+          214,
+          918,
+          380,
+          44444
+        ],
+        [
+          1106,
+          207,
+          1434,
+          381,
+          44757
+        ],
+        [
+          1632,
+          186,
+          1964,
+          381,
+          49177
+        ],
+        [
+          92,
+          505,
+          428,
+          717,
+          53282
+        ],
+        [
+          627,
+          505,
+          945,
+          717,
+          52225
+        ],
+        [
+          1141,
+          498,
+          1463,
+          717,
+          54872
+        ],
+        [
+          1661,
+          498,
+          1982,
+          717,
+          55197
+        ]
+      ],
+      "asset": "assets/neko-game-loss-bridge-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "c4a7dd6d1d29757444ebfb7f1bf0acb4e5e6db1dc663706a0bd2898c27c4db3b"
+    },
+    "hunt": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-3c6db9b7-5961-44b1-8bd4-bf15afb529c2.png",
+      "regions": [
+        [
+          182,
+          8,
+          327,
+          174,
+          18148
+        ],
+        [
+          502,
+          8,
+          646,
+          176,
+          17031
+        ],
+        [
+          776,
+          12,
+          995,
+          175,
+          18877
+        ],
+        [
+          1098,
+          42,
+          1304,
+          173,
+          18677
+        ],
+        [
+          127,
+          192,
+          384,
+          349,
+          20638
+        ],
+        [
+          446,
+          192,
+          701,
+          332,
+          20801
+        ],
+        [
+          767,
+          193,
+          1024,
+          343,
+          20889
+        ],
+        [
+          1079,
+          191,
+          1333,
+          345,
+          19140
+        ],
+        [
+          127,
+          368,
+          386,
+          521,
+          19542
+        ],
+        [
+          443,
+          375,
+          691,
+          526,
+          19769
+        ],
+        [
+          757,
+          372,
+          1021,
+          520,
+          22156
+        ],
+        [
+          1074,
+          369,
+          1328,
+          515,
+          21209
+        ],
+        [
+          140,
+          552,
+          388,
+          703,
+          21143
+        ],
+        [
+          447,
+          548,
+          708,
+          704,
+          21852
+        ],
+        [
+          816,
+          542,
+          972,
+          706,
+          17438
+        ],
+        [
+          1124,
+          546,
+          1271,
+          710,
+          18258
+        ],
+        [
+          150,
+          748,
+          381,
+          889,
+          19388
+        ],
+        [
+          451,
+          730,
+          683,
+          900,
+          20048
+        ],
+        [
+          759,
+          713,
+          1010,
+          899,
+          21281
+        ],
+        [
+          1073,
+          719,
+          1301,
+          900,
+          20026
+        ],
+        [
+          147,
+          909,
+          384,
+          1056,
+          21196
+        ],
+        [
+          458,
+          917,
+          711,
+          1066,
+          20062
+        ],
+        [
+          779,
+          926,
+          1024,
+          1066,
+          20852
+        ],
+        [
+          1078,
+          912,
+          1322,
+          1068,
+          21870
+        ]
+      ],
+      "asset": "assets/neko-game-hunt-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "85b29b7bab3979adb4b36b38dbc5cff8befc0ac085e8f570e95ff98c07e185ea"
+    },
+    "walk": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-81863deb-210d-4709-b0de-b2e7f7d0eb09.png",
+      "regions": [
+        [
+          116,
+          35,
+          337,
+          286,
+          42640
+        ],
+        [
+          429,
+          37,
+          696,
+          287,
+          37971
+        ],
+        [
+          733,
+          36,
+          1039,
+          287,
+          37928
+        ],
+        [
+          1079,
+          36,
+          1384,
+          287,
+          39175
+        ],
+        [
+          64,
+          307,
+          373,
+          546,
+          39229
+        ],
+        [
+          405,
+          307,
+          723,
+          546,
+          38466
+        ],
+        [
+          750,
+          310,
+          1064,
+          547,
+          39731
+        ],
+        [
+          1080,
+          310,
+          1385,
+          545,
+          36871
+        ],
+        [
+          67,
+          568,
+          374,
+          797,
+          36226
+        ],
+        [
+          406,
+          569,
+          727,
+          800,
+          37480
+        ],
+        [
+          756,
+          568,
+          1070,
+          800,
+          37586
+        ],
+        [
+          1100,
+          568,
+          1397,
+          800,
+          35939
+        ],
+        [
+          66,
+          824,
+          379,
+          1054,
+          37587
+        ],
+        [
+          420,
+          826,
+          716,
+          1055,
+          34969
+        ],
+        [
+          777,
+          827,
+          1017,
+          1057,
+          36568
+        ],
+        [
+          116,
+          35,
+          337,
+          286,
+          42640
+        ]
+      ],
+      "asset": "assets/neko-game-walk-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "7e0289cb46bd9348226917578a5f5f03e462a55ae92853e11563b5fa38e3cd82"
+    },
+    "ready": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-4621cfea-287b-4eb3-a47d-0f1dc92eac53.png",
+      "regions": [
+        [
+          90,
+          36,
+          295,
+          274,
+          37223
+        ],
+        [
+          451,
+          35,
+          654,
+          275,
+          36685
+        ],
+        [
+          798,
+          36,
+          1003,
+          275,
+          35291
+        ],
+        [
+          1138,
+          36,
+          1365,
+          275,
+          35789
+        ],
+        [
+          73,
+          309,
+          334,
+          547,
+          36044
+        ],
+        [
+          424,
+          300,
+          702,
+          547,
+          36883
+        ],
+        [
+          749,
+          301,
+          1052,
+          547,
+          38192
+        ],
+        [
+          1110,
+          303,
+          1402,
+          547,
+          38734
+        ],
+        [
+          61,
+          582,
+          350,
+          808,
+          37793
+        ],
+        [
+          415,
+          589,
+          702,
+          808,
+          39308
+        ],
+        [
+          760,
+          598,
+          1060,
+          808,
+          40163
+        ],
+        [
+          1133,
+          619,
+          1410,
+          808,
+          36805
+        ],
+        [
+          1133,
+          619,
+          1410,
+          808,
+          36805
+        ],
+        [
+          86,
+          872,
+          368,
+          1049,
+          37791
+        ],
+        [
+          476,
+          865,
+          772,
+          1049,
+          38834
+        ],
+        [
+          928,
+          864,
+          1315,
+          1049,
+          43673
+        ]
+      ],
+      "asset": "assets/neko-game-ready-v2.png",
+      "packing": "4 columns; 448px cells; baseline436; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "92ac6140fcb781d0fb36953759d3b669abb6f8d8fb4eb40c747e972ac217dfc1"
+    },
+    "win-hop": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-98161ccd-630d-4a42-be0a-7523c35f9940.png",
+      "regions": [
+        [
+          141,
+          24,
+          300,
+          182,
+          18783
+        ],
+        [
+          498,
+          31,
+          653,
+          184,
+          16221
+        ],
+        [
+          826,
+          58,
+          972,
+          181,
+          13951
+        ],
+        [
+          1177,
+          75,
+          1363,
+          182,
+          15613
+        ],
+        [
+          134,
+          202,
+          295,
+          374,
+          16625
+        ],
+        [
+          481,
+          193,
+          643,
+          344,
+          16025
+        ],
+        [
+          815,
+          211,
+          982,
+          352,
+          15198
+        ],
+        [
+          1169,
+          245,
+          1357,
+          359,
+          15200
+        ],
+        [
+          133,
+          442,
+          323,
+          541,
+          15455
+        ],
+        [
+          488,
+          367,
+          655,
+          537,
+          16245
+        ],
+        [
+          828,
+          368,
+          988,
+          508,
+          15331
+        ],
+        [
+          1186,
+          397,
+          1359,
+          534,
+          15128
+        ],
+        [
+          137,
+          611,
+          323,
+          713,
+          15132
+        ],
+        [
+          485,
+          599,
+          656,
+          715,
+          14101
+        ],
+        [
+          836,
+          545,
+          1003,
+          706,
+          16364
+        ],
+        [
+          1193,
+          554,
+          1349,
+          690,
+          14560
+        ],
+        [
+          143,
+          734,
+          310,
+          876,
+          14814
+        ],
+        [
+          485,
+          770,
+          663,
+          883,
+          15007
+        ],
+        [
+          848,
+          726,
+          1007,
+          884,
+          17032
+        ],
+        [
+          1200,
+          723,
+          1360,
+          885,
+          18697
+        ],
+        [
+          148,
+          900,
+          311,
+          1064,
+          19135
+        ],
+        [
+          506,
+          901,
+          669,
+          1064,
+          18590
+        ],
+        [
+          852,
+          903,
+          1013,
+          1064,
+          18847
+        ],
+        [
+          1204,
+          903,
+          1364,
+          1065,
+          18651
+        ]
+      ],
+      "asset": "assets/neko-game-win-hop-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "dfabd8f8d6d8e07409473bd68611ebfb98fb4c4a9a2923955d2aeb77282737f5"
+    },
+    "win-grasp": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-e02dbb60-aaa4-4475-bc68-b9aafdcb76a9.png",
+      "regions": [
+        [
+          73,
+          54,
+          239,
+          252,
+          23354
+        ],
+        [
+          346,
+          51,
+          528,
+          251,
+          24394
+        ],
+        [
+          634,
+          53,
+          802,
+          251,
+          23783
+        ],
+        [
+          921,
+          31,
+          1080,
+          249,
+          25130
+        ],
+        [
+          75,
+          308,
+          238,
+          523,
+          25438
+        ],
+        [
+          351,
+          307,
+          516,
+          523,
+          26284
+        ],
+        [
+          627,
+          306,
+          792,
+          523,
+          26156
+        ],
+        [
+          918,
+          307,
+          1086,
+          523,
+          26196
+        ],
+        [
+          47,
+          620,
+          251,
+          781,
+          24264
+        ],
+        [
+          337,
+          590,
+          538,
+          774,
+          25468
+        ],
+        [
+          613,
+          563,
+          797,
+          781,
+          25988
+        ],
+        [
+          901,
+          614,
+          1096,
+          781,
+          23884
+        ],
+        [
+          47,
+          878,
+          251,
+          1036,
+          23137
+        ],
+        [
+          340,
+          826,
+          528,
+          1048,
+          27901
+        ],
+        [
+          618,
+          830,
+          802,
+          1051,
+          25681
+        ],
+        [
+          917,
+          846,
+          1086,
+          1049,
+          24762
+        ],
+        [
+          71,
+          1111,
+          244,
+          1333,
+          27362
+        ],
+        [
+          348,
+          1115,
+          524,
+          1334,
+          27107
+        ],
+        [
+          73,
+          54,
+          239,
+          252,
+          23354
+        ],
+        [
+          73,
+          54,
+          239,
+          252,
+          23354
+        ]
+      ],
+      "asset": "assets/neko-game-win-grasp-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "dfd5d3485a7c1d8b666f71740e2a72c08e816b8a00987e7341c9a62cbf07de16"
+    },
+    "win-proud": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-394bbf21-d68b-4d01-9e08-b16bab5aabc5.png",
+      "regions": [
+        [
+          172,
+          16,
+          370,
+          222,
+          29236
+        ],
+        [
+          485,
+          17,
+          671,
+          221,
+          26367
+        ],
+        [
+          818,
+          17,
+          1000,
+          222,
+          28121
+        ],
+        [
+          1127,
+          17,
+          1325,
+          224,
+          28373
+        ],
+        [
+          165,
+          234,
+          372,
+          446,
+          30399
+        ],
+        [
+          498,
+          234,
+          707,
+          447,
+          30446
+        ],
+        [
+          828,
+          236,
+          1022,
+          447,
+          29380
+        ],
+        [
+          1129,
+          237,
+          1330,
+          448,
+          30118
+        ],
+        [
+          165,
+          456,
+          332,
+          669,
+          28402
+        ],
+        [
+          500,
+          457,
+          697,
+          670,
+          30003
+        ],
+        [
+          827,
+          459,
+          1034,
+          669,
+          30427
+        ],
+        [
+          1145,
+          459,
+          1342,
+          669,
+          29244
+        ],
+        [
+          166,
+          681,
+          374,
+          884,
+          29441
+        ],
+        [
+          506,
+          682,
+          706,
+          885,
+          29265
+        ],
+        [
+          833,
+          681,
+          1017,
+          886,
+          28079
+        ],
+        [
+          1150,
+          682,
+          1314,
+          887,
+          26380
+        ],
+        [
+          167,
+          891,
+          369,
+          1100,
+          30003
+        ],
+        [
+          504,
+          892,
+          708,
+          1101,
+          29838
+        ],
+        [
+          826,
+          893,
+          1026,
+          1101,
+          29616
+        ],
+        [
+          1151,
+          893,
+          1360,
+          1102,
+          31110
+        ]
+      ],
+      "asset": "assets/neko-game-win-proud-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "88fe025c4885eff4bda0dd3c76175f1ed614e56b76581485d95c03019cfa7f2a"
+    },
+    "loss-a": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-2506fd26-ee6a-437c-87ae-814e3c5a9cac.png",
+      "regions": [
+        [
+          96,
+          17,
+          328,
+          291,
+          46806
+        ],
+        [
+          459,
+          17,
+          722,
+          290,
+          44810
+        ],
+        [
+          820,
+          32,
+          1089,
+          291,
+          45204
+        ],
+        [
+          1194,
+          50,
+          1460,
+          291,
+          40840
+        ],
+        [
+          66,
+          326,
+          333,
+          567,
+          41563
+        ],
+        [
+          440,
+          335,
+          732,
+          562,
+          41627
+        ],
+        [
+          807,
+          357,
+          1110,
+          557,
+          43018
+        ],
+        [
+          1187,
+          373,
+          1477,
+          555,
+          39555
+        ],
+        [
+          51,
+          630,
+          340,
+          805,
+          37938
+        ],
+        [
+          435,
+          638,
+          724,
+          807,
+          37727
+        ],
+        [
+          816,
+          642,
+          1110,
+          807,
+          37432
+        ],
+        [
+          1192,
+          652,
+          1478,
+          807,
+          34171
+        ],
+        [
+          50,
+          852,
+          334,
+          1001,
+          32964
+        ],
+        [
+          443,
+          852,
+          718,
+          1001,
+          32146
+        ],
+        [
+          824,
+          860,
+          1095,
+          1001,
+          30553
+        ],
+        [
+          1213,
+          851,
+          1487,
+          1001,
+          32074
+        ]
+      ],
+      "asset": "assets/neko-game-loss-a-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "2760f7165b0c7d05b602a6ed24be23c7f617de57893e80a4d29d94ade79487bf"
+    },
+    "loss-b": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-13676905-e8f8-413d-818a-a91f12762142.png",
+      "regions": [
+        [
+          98,
+          45,
+          313,
+          291,
+          37998
+        ],
+        [
+          438,
+          43,
+          650,
+          291,
+          38874
+        ],
+        [
+          776,
+          45,
+          989,
+          292,
+          38345
+        ],
+        [
+          1127,
+          60,
+          1334,
+          295,
+          37721
+        ],
+        [
+          98,
+          332,
+          315,
+          578,
+          38643
+        ],
+        [
+          435,
+          329,
+          660,
+          584,
+          40678
+        ],
+        [
+          779,
+          329,
+          999,
+          593,
+          41235
+        ],
+        [
+          1126,
+          330,
+          1351,
+          586,
+          41426
+        ],
+        [
+          87,
+          629,
+          316,
+          852,
+          36843
+        ],
+        [
+          423,
+          635,
+          671,
+          852,
+          38695
+        ],
+        [
+          760,
+          672,
+          1029,
+          847,
+          35140
+        ],
+        [
+          1114,
+          688,
+          1368,
+          851,
+          33386
+        ],
+        [
+          79,
+          931,
+          337,
+          1092,
+          34479
+        ],
+        [
+          417,
+          939,
+          675,
+          1089,
+          31459
+        ],
+        [
+          753,
+          949,
+          1020,
+          1092,
+          29898
+        ],
+        [
+          1110,
+          950,
+          1361,
+          1091,
+          26622
+        ]
+      ],
+      "asset": "assets/neko-game-loss-b-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "20e02ed8c40d874c115e083d59f4de0098a7cda150dfdf74bd307e0ea64b9036"
+    },
+    "loss-c": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-650d23c9-c2bf-47d4-a853-d27a952489e8.png",
+      "regions": [
+        [
+          86,
+          46,
+          301,
+          285,
+          37534
+        ],
+        [
+          445,
+          46,
+          673,
+          285,
+          36018
+        ],
+        [
+          789,
+          46,
+          1013,
+          285,
+          32639
+        ],
+        [
+          1140,
+          53,
+          1402,
+          294,
+          35437
+        ],
+        [
+          79,
+          327,
+          348,
+          569,
+          37384
+        ],
+        [
+          450,
+          328,
+          682,
+          571,
+          35783
+        ],
+        [
+          790,
+          344,
+          1013,
+          572,
+          34731
+        ],
+        [
+          1133,
+          345,
+          1356,
+          568,
+          33506
+        ],
+        [
+          56,
+          621,
+          289,
+          838,
+          34494
+        ],
+        [
+          410,
+          643,
+          668,
+          837,
+          34883
+        ],
+        [
+          762,
+          665,
+          1032,
+          837,
+          34135
+        ],
+        [
+          1110,
+          673,
+          1397,
+          833,
+          34746
+        ],
+        [
+          55,
+          915,
+          330,
+          1067,
+          32534
+        ],
+        [
+          423,
+          927,
+          682,
+          1057,
+          28010
+        ],
+        [
+          779,
+          927,
+          1040,
+          1057,
+          28246
+        ],
+        [
+          1135,
+          927,
+          1396,
+          1057,
+          28305
+        ]
+      ],
+      "asset": "assets/neko-game-loss-c-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete original RGBA crops; no alpha threshold cleanup or anatomy painting",
+      "sha256": "eb073de6e882eea6a9cb294737186e40001f19f6b8cfe66303da72264d768c7e"
+    }
+  },
+  "references": [
+    "assets/neko_idle.png",
+    "build/cursor-v2/idle-reference.png (actual atlas idle)",
+    "build/cursor-v2/curl-reference.png (retained curl)",
+    "build/cursor-v2/new-curl-reference.png (new down-looking curl; bridge and loss-c redraw)"
+  ],
+  "rejections": [
+    "Original victory sheets contained labels/grid/matte artifacts: replaced by ImageGen transparency edits.",
+    "Ready original and edit both yielded 15 drawings: repeat the complete last gathering crouch (source11) as the first beat of one; keep squeeze, reopen and final crouch. No anatomy painted.",
+    "Ready final tail is 387px wide: use 448px cells/baseline436 instead of clipping at 384px. Other sheets use384/baseline372.",
+    "Win-grasp source15..18 have an overly tall final sit: finish via14,13,2,1,drawn source0,canonical idle. Packed18 and19 select source0.",
+    "Initial loss-c curled proportions drifted relative to its seated calibration: reject entire batch and edit, use separately referenced redraw.",
+    "Direct loss to retained curl raises the head about18px: add eight-slot authored look-up bridge; never fit or stretch individual poses.",
+    "Walk source15 final sit was6px shorter than canonical. After the completed supported sit/blink14, packed15 selects original generated neutral0, then appended actual idle16. Final endpoint landmarks pass without per-pose fitting."
+  ],
+  "runtime": {
+    "atlas_entries": 729,
+    "game_source_slots": 200,
+    "preserved_frame_entries": 552,
+    "preserved_non_game_non_walk_clips": 41,
+    "canvas": [
+      192,
+      144
+    ],
+    "reference_head": 62,
+    "reference_body": 82,
+    "ground": 130,
+    "draw_offset_y": -1,
+    "batch_dx": {
+      "win-hop": 2,
+      "win-grasp": 2
+    },
+    "walk_endpoint": "packed15 selects original generated neutral0; appended actual idle16",
+    "loss_endpoint": "complete new curl; game_loss_finish source1..7; last actual retained curl",
+    "paw_regions": {
+      "18": [
+        41,
+        87,
+        61,
+        100
+      ],
+      "19": [
+        42,
+        78,
+        58,
+        94
+      ],
+      "20": [
+        52,
+        114,
+        70,
+        128
+      ],
+      "21": [
+        52,
+        114,
+        70,
+        130
+      ]
+    }
+  },
+  "clip_definitions": {
+    "walk": {
+      "bank": "game-walk",
+      "row": 0,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "order": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": true
+    },
+    "game_ready": {
+      "bank": "game-ready",
+      "row": 0,
+      "durations": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false
+    },
+    "game_three": {
+      "bank": "game-ready",
+      "row": 0,
+      "durations": [
+        250,
+        250,
+        250,
+        250
+      ],
+      "order": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false
+    },
+    "game_two": {
+      "bank": "game-ready",
+      "row": 0,
+      "durations": [
+        250,
+        250,
+        250,
+        250
+      ],
+      "order": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": false
+    },
+    "game_one": {
+      "bank": "game-ready",
+      "row": 0,
+      "durations": [
+        250,
+        250,
+        250,
+        250
+      ],
+      "order": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "loop": false
+    },
+    "game_go": {
+      "bank": "game-ready",
+      "row": 0,
+      "durations": [
+        350
+      ],
+      "order": [
+        15
+      ],
+      "loop": false
+    },
+    "game_ready_cancel": {
+      "bank": "game-ready",
+      "row": 0,
+      "durations": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "order": [
+        15,
+        14,
+        13,
+        12,
+        11,
+        10,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      "loop": false
+    },
+    "game_run": {
+      "bank": "game-hunt",
+      "row": 0,
+      "durations": [
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "order": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": true
+    },
+    "game_turn": {
+      "bank": "game-hunt",
+      "row": 0,
+      "durations": [
+        100,
+        100,
+        150
+      ],
+      "order": [
+        12,
+        13,
+        14
+      ],
+      "loop": false
+    },
+    "game_prepare": {
+      "bank": "game-hunt",
+      "row": 0,
+      "durations": [
+        200
+      ],
+      "order": [
+        16
+      ],
+      "loop": false
+    },
+    "game_jump": {
+      "bank": "game-hunt",
+      "row": 0,
+      "durations": [
+        40,
+        80,
+        80,
+        240,
+        40,
+        60,
+        50,
+        50
+      ],
+      "order": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "loop": false
+    },
+    "game_miss": {
+      "bank": "game-hunt",
+      "row": 0,
+      "durations": [
+        150,
+        150,
+        150
+      ],
+      "order": [
+        23,
+        14,
+        2
+      ],
+      "loop": false
+    },
+    "game_settle": {
+      "bank": "game-walk",
+      "row": 0,
+      "durations": [
+        120,
+        150,
+        150,
+        150,
+        150
+      ],
+      "order": [
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "loop": false
+    },
+    "game_win_0": {
+      "bank": "game-win-hop",
+      "row": 0,
+      "durations": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        220,
+        180,
+        160,
+        150,
+        300
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "loop": false
+    },
+    "game_win_1": {
+      "bank": "game-win-grasp",
+      "row": 0,
+      "durations": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        13,
+        2,
+        1,
+        18,
+        19
+      ],
+      "loop": false
+    },
+    "game_win_2": {
+      "bank": "game-win-proud",
+      "row": 0,
+      "durations": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "loop": false
+    },
+    "game_loss_0": {
+      "bank": "game-loss-a",
+      "row": 0,
+      "durations": [
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "loop": false
+    },
+    "game_loss_1": {
+      "bank": "game-loss-b",
+      "row": 0,
+      "durations": [
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "loop": false
+    },
+    "game_loss_2": {
+      "bank": "game-loss-c",
+      "row": 0,
+      "durations": [
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170,
+        170
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "loop": false
+    },
+    "game_loss_finish": {
+      "bank": "game-loss-bridge",
+      "row": 0,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false
+    },
+    "game_curl": {
+      "bank": "game-emotion",
+      "row": 0,
+      "durations": [
+        900,
+        900,
+        900,
+        900
+      ],
+      "order": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": true
+    },
+    "game_comfort": {
+      "bank": "game-emotion",
+      "row": 0,
+      "durations": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        250,
+        250
+      ],
+      "order": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "loop": false
+    },
+    "game_gentle_rest": {
+      "bank": "game-hunt",
+      "row": 0,
+      "durations": [
+        1000
+      ],
+      "order": [
+        2
+      ],
+      "loop": false
+    },
+    "game_gentle_reach": {
+      "bank": "game-hunt",
+      "row": 0,
+      "durations": [
+        1000
+      ],
+      "order": [
+        19
+      ],
+      "loop": false
+    }
+  },
+  "decoded_previews": {
+    "cursor-play-v2-outcomes-slow.gif": {
+      "milliseconds": 12800,
+      "frames": 42,
+      "size": [
+        600,
+        370
+      ]
+    },
+    "cursor-play-v2-outcomes.gif": {
+      "milliseconds": 6400,
+      "frames": 42,
+      "size": [
+        600,
+        370
+      ]
+    },
+    "cursor-play-v2-slow.gif": {
+      "milliseconds": 72000,
+      "frames": 241,
+      "size": [
+        1000,
+        340
+      ]
+    },
+    "cursor-play-v2.gif": {
+      "milliseconds": 36000,
+      "frames": 241,
+      "size": [
+        1000,
+        340
+      ]
+    }
+  }
+}

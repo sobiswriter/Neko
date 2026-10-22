@@ -22,7 +22,6 @@ class NekoState(Enum):
     CHEEK_RUB = auto()
     KNEADING = auto()
     LOAFING = auto()
-    FOLLOWING = auto()
     CHIN_SCRITCH = auto()
     ROLLING = auto()
     PAW_OFFER = auto()

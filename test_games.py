@@ -26,6 +26,45 @@ class GameTests(unittest.TestCase):
         timer.configure(94, False, 90)
         self.assertEqual(timer.tick(95, True), "manual")
 
+    def test_countdown_has_real_separate_beats_and_starts_clock_at_go(self):
+        game = self.game()
+        self.assertEqual(game.take_line(), "announce")
+        self.step(game, .78)
+        self.assertEqual(game.phase, "ready")
+        self.step(game, .82)
+        self.assertEqual(game.phase, "three")
+        self.assertEqual(game.take_line(), "3…")
+        self.assertFalse(game.started)
+        self.step(game, 1.84)
+        self.assertEqual(game.phase, "two")
+        self.assertEqual(game.take_line(), "2…")
+        self.step(game, 2.86)
+        self.assertEqual(game.phase, "one")
+        self.assertEqual(game.take_line(), "1…")
+        self.assertFalse(game.started)
+        self.step(game, 3.88)
+        self.assertEqual(game.phase, "go")
+        self.assertTrue(game.started)
+        self.assertAlmostEqual(game.deadline - game.since, 45)
+        starts = dict((phase, moment) for moment, phase in game.log)
+        for before, after in (("three", "two"), ("two", "one"), ("one", "go")):
+            self.assertGreaterEqual(starts[after] - starts[before], 1)
+
+    def test_every_countdown_cancel_reverses_without_play_or_loss(self):
+        for moment in (.1, 1.1, 2.1, 3.1):
+            game = self.game()
+            self.step(game, moment)
+            game.cancel(moment)
+            self.assertEqual(game.phase, "ready_cancel")
+            self.assertFalse(game.started)
+            self.step(game, moment + 3)
+            self.assertEqual(game.phase, "done")
+            self.assertEqual(game.result, "cancel")
+        game = self.game()
+        self.step(game, 2, (2000, -100))
+        self.assertFalse(game.started)
+        self.assertEqual(game.result, "cancel")
+
     def game(self):
         return CursorGame(0, (400, 300), Runway(0, 1000, 300, 110))
 
@@ -62,7 +101,8 @@ class GameTests(unittest.TestCase):
 
     def test_loss_curl_is_persistent_and_pet_comfort_is_single(self):
         game = self.game()
-        self.step(game, 8, (2000, -100))
+        self.step(game, 4.2)
+        self.step(game, 14, (2000, -100))
         self.assertEqual(game.phase, "curl")
         self.step(game, 60, (2000, -100))
         self.assertEqual(game.phase, "curl")
@@ -73,10 +113,11 @@ class GameTests(unittest.TestCase):
 
     def test_reentry_resets_continuous_outside_timer(self):
         game = self.game()
-        self.step(game, 3, (2000, -100))
-        self.step(game, 3.5, (450, 330))
+        self.step(game, 4.2)
+        self.step(game, 6.2, (2000, -100))
+        self.step(game, 6.7, (450, 330))
         self.assertIsNone(game.outside)
-        self.step(game, 5, (2000, -100))
+        self.step(game, 8, (2000, -100))
         self.assertIsNone(game.result)
 
     def test_stall_cancels_instead_of_scoring_or_punishing(self):
