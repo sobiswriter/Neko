@@ -58,7 +58,7 @@ Small home
   Held expressions progress excited (0-3s), calm (3-10s), mildly unimpressed (10-20s), sleepy (20s+); yawn once, then loop.
   Release from every pose into supported placement. Early release retraces lift; re-grab retraces release and finishes the remaining lift, preserving expression time. Real naps remain distinct.
   Read framemaster.md before animation work and add verified discoveries with evidence; pickup provenance/verification lives in docs/pickup-validation.md.
-  Every idle attempts a matching local thought. Text is 16px semibold cream with a small dark shadow and a nearly clear rounded glass backdrop with a faint rim, visible for 5.5-10 seconds. Native blur keeps letters sharp; unsupported systems use the light tint. Thoughts remain click-through and do not take focus.
+  Every idle attempts a matching local thought. Text is 16px semibold with a nearly clear rounded glass backdrop and a faint rim, visible for 5.5-10 seconds. A local per-thought backdrop sample is softly blurred and clipped inside the rounded shape, then cleared on hide; unavailable samples use the light tint. Text adapts to light/dark samples. Thoughts remain click-through and do not take focus; no sample is saved or uploaded.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

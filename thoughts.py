@@ -1,35 +1,27 @@
-"""Small, click-through thoughts with a native Windows frosted backdrop."""
+"""Click-through glass thoughts with a softly blurred, rounded backdrop sample."""
 
 import ctypes
-from ctypes import wintypes
 
 from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen, QRegion
-from PySide6.QtWidgets import QApplication, QLabel
+from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPalette, QPen, QPixmap, QRegion
+from PySide6.QtWidgets import QApplication, QGraphicsBlurEffect, QGraphicsScene, QLabel
 
 
-class AccentPolicy(ctypes.Structure):
-    _fields_ = [("state", ctypes.c_int), ("flags", ctypes.c_int),
-                ("color", ctypes.c_uint), ("animation", ctypes.c_int)]
-
-
-class CompositionData(ctypes.Structure):
-    _fields_ = [("attribute", ctypes.c_int), ("data", ctypes.c_void_p), ("size", ctypes.c_size_t)]
-
-
-def enable_backdrop(hwnd):
-    if QApplication.platformName() != "windows":
-        return False
-    try:
-        apply = ctypes.WinDLL("user32", use_last_error=True).SetWindowCompositionAttribute
-        apply.argtypes = [wintypes.HWND, ctypes.POINTER(CompositionData)]
-        apply.restype = wintypes.BOOL
-        # shortcut: private accent policy; keep the tinted fallback if Windows removes it.
-        policy = AccentPolicy(3, 0, 0, 0)  # ACCENT_ENABLE_BLURBEHIND
-        data = CompositionData(19, ctypes.addressof(policy), ctypes.sizeof(policy))
-        return bool(apply(hwnd, ctypes.byref(data)))
-    except (OSError, AttributeError):
-        return False
+def soften(source):
+    scene = QGraphicsScene()
+    item = scene.addPixmap(source)
+    blur = QGraphicsBlurEffect()
+    blur.setBlurRadius(3 * source.devicePixelRatio())
+    item.setGraphicsEffect(blur)
+    result = QPixmap(source.size())
+    result.setDevicePixelRatio(source.devicePixelRatio())
+    result.fill(Qt.transparent)
+    painter = QPainter(result)
+    bounds = QRectF(0, 0, source.width() / source.devicePixelRatio(),
+                    source.height() / source.devicePixelRatio())
+    scene.render(painter, bounds, bounds)
+    painter.end()
+    return result
 
 
 class ThoughtLabel(QLabel):
@@ -42,14 +34,19 @@ class ThoughtLabel(QLabel):
         self.setWindowOpacity(0.88)
         self.setTextFormat(Qt.PlainText)
         self.setWordWrap(True)
-        self.setStyleSheet("background: transparent; color: #fffaf0; border: 0;"
+        self.setStyleSheet("background: transparent; border: 0;"
                           "border-radius: 20px; padding: 8px 10px; font: 600 16px 'Segoe UI';")
         self.ensurePolished()
-        self.native_backdrop = False
+        self.backdrop = QPixmap()
+        palette = self.palette()
+        palette.setColor(QPalette.WindowText, QColor("#fffaf0"))
+        self.setPalette(palette)
 
     def setText(self, text):
         super().setText(text)
         self.setFixedWidth(min(270, max(96, self.fontMetrics().horizontalAdvance(text) + 24)))
+        self.setMinimumHeight(0)
+        self.setMaximumHeight(16777215)
         self.setFixedHeight(self.heightForWidth(self.width()))
 
     def resizeEvent(self, event):
@@ -61,6 +58,11 @@ class ThoughtLabel(QLabel):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
+        shape = QPainterPath()
+        shape.addRoundedRect(QRectF(self.rect()), 20, 20)
+        painter.setClipPath(shape)
+        if not self.backdrop.isNull():
+            painter.drawPixmap(0, 0, self.backdrop)
         glass = QLinearGradient(0, 0, 0, self.height())
         glass.setColorAt(0, QColor(255, 250, 243, 32))
         glass.setColorAt(0.45, QColor(255, 255, 255, 10))
@@ -71,6 +73,33 @@ class ThoughtLabel(QLabel):
         painter.end()
         super().paintEvent(event)
 
+    def prepare_backdrop(self):
+        self.backdrop = QPixmap()
+        palette = self.palette()
+        palette.setColor(QPalette.WindowText, QColor("#fffaf0"))
+        self.setPalette(palette)
+        if QApplication.platformName() == "windows" and self.screen() is not None:
+            # A per-thought sample avoids native blur spilling beyond rounded regions.
+            try:
+                ctypes.windll.dwmapi.DwmFlush()
+            except (OSError, AttributeError):
+                pass
+            source = self.screen().grabWindow(0, self.x() - 6, self.y() - 6,
+                                              self.width() + 12, self.height() + 12)
+            if not source.isNull():
+                ratio = source.devicePixelRatio()
+                self.backdrop = soften(source).copy(round(6 * ratio), round(6 * ratio),
+                                                    round(self.width() * ratio), round(self.height() * ratio))
+                palette = self.palette()
+                brightness = self.backdrop.scaled(1, 1, Qt.IgnoreAspectRatio, Qt.SmoothTransformation).toImage().pixelColor(0, 0).lightness()
+                palette.setColor(QPalette.WindowText, QColor("#29272e" if brightness > 145 else "#fffaf0"))
+                self.setPalette(palette)
+
     def showEvent(self, event):
+        if self.backdrop.isNull():
+            self.prepare_backdrop()
         super().showEvent(event)
-        self.native_backdrop = enable_backdrop(int(self.winId()))
+
+    def hideEvent(self, event):
+        self.backdrop = QPixmap()
+        super().hideEvent(event)

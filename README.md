@@ -105,8 +105,10 @@ Soft sounds are optional and off until you enable them.
   The desktop behind it blurs while the lettering stays
   sharp; unsupported systems retain a light translucent tint. It stays click-through,
   takes no focus, fits short lines and wraps within 270px for 5.5–10 seconds.
-  No desktop capture or new runtime dependency is used. See the
-  [native preview and verification](docs/thought-backdrop-validation.md).
+  A tiny backdrop sample is softened inside the rounded edges when each thought
+  appears; it stays still until the thought closes. The sample stays in memory,
+  is cleared on hide and is never saved or uploaded. No new runtime dependency is used.
+  See the [rounded blur fix and verification](docs/thought-rounded-clip-validation.md).
 - **Little app rituals.** VLC gets a watch-buddy loaf and questions about what
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
@@ -201,7 +203,7 @@ The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
 release subfolders. Quit the existing Neko before launching the new build;
 the single-instance lock prevents two kittens running together.
 The latest build includes pickup, slightly faster petting and frosted thoughts; see the
-[thought backdrop verification](docs/thought-backdrop-validation.md). Historical build paths
+[thought backdrop verification](docs/thought-rounded-clip-validation.md). Historical build paths
 in older reports describe their original delivery locations.
 
 ## Check the behavior

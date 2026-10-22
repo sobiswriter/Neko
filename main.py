@@ -833,6 +833,7 @@ class NekoWidget(QWidget):
         text = " ".join(str(text).split())[:140]
         if not text:
             return False
+        self.bubble.hide()
         self.bubble.setText(text)
         self.bubble.adjustSize()
         screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
@@ -844,6 +845,7 @@ class NekoWidget(QWidget):
             y = self.geometry().bottom() + 4
         y = max(area.top(), min(y, area.bottom() - self.bubble.height()))
         self.bubble.move(x, y)
+        self.bubble.prepare_backdrop()
         self.bubble.show()
         self.bubble_timer.start(max(5500, min(10000, len(text) * 75)))
         self.companion.comments += 1

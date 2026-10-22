@@ -1,5 +1,7 @@
 # Compact frosted thoughts — 2026-10-22
 
+Historical native implementation: superseded by the [rounded clipping fix](thought-rounded-clip-validation.md). Its mask-only corner check missed native compositor spill. The report below records the earlier method and its original capture/privacy behavior; use the new report for current behavior and release metadata.
+
 ![Native light/dark backdrop preview](neko-thoughts-native.png)
 
 The user approved a small blur behind Neko's lines to improve readability. The earlier background-free requirement is superseded for the thought label, not for kitten sprite art. The [dedicated Catch the Cursor design](catch-the-cursor-plan.md) is planning only; no game logic, artwork, queue or automatic-game preference is implemented here.

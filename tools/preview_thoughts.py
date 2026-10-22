@@ -14,6 +14,7 @@ import win32gui
 from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtGui import QColor, QFont, QPainter
 from PySide6.QtWidgets import QApplication, QGraphicsDropShadowEffect, QWidget
+from PySide6.QtTest import QTest
 from thoughts import ThoughtLabel
 
 
@@ -38,6 +39,8 @@ area = app.primaryScreen().availableGeometry()
 host.move(area.left() + 20, area.top() + 20)
 host.setFixedSize(840, 210)
 host.show()
+QTest.qWait(150)
+baseline = app.primaryScreen().grabWindow(0, host.x(), host.y(), 840, 210).toImage()
 labels = []
 for text, x in (("Look at meeee!", 60),
                 ("A little thought, with just enough frost to keep it readable.", 470)):
@@ -50,18 +53,34 @@ for text, x in (("Look at meeee!", 60),
     label.setText(text)
     label.adjustSize()
     label.move(host.x() + x, host.y() + 75)
+    label.prepare_backdrop()
     label.show()
     labels.append(label)
 result = {}
+cases = []
 
 
 def capture():
+    again = False
     try:
         image = app.primaryScreen().grabWindow(0, host.x(), host.y(), 840, 210)
         image.save(str(ROOT / "docs/neko-thoughts-native.png"))
         pixels = image.toImage()
-        stripe = [pixels.pixelColor(x, 81).lightness() for x in range(90, 170)]
-        result.update(native_backdrop=all(label.native_backdrop for label in labels),
+        left = labels[0].x() - host.x()
+        top = labels[0].y() - host.y()
+        stripe = [pixels.pixelColor(x, top + 6).lightness()
+                  for x in range(left + 20, left + labels[0].width() - 20)]
+        corner_changes = []
+        for label in labels:
+            ox, oy = label.x() - host.x(), label.y() - host.y()
+            for x, y in ((2, 2), (5, 2), (2, 5), (label.width() - 3, 2),
+                         (2, label.height() - 3), (label.width() - 3, label.height() - 3)):
+                assert not label.mask().contains(QPoint(x, y))
+                before, after = baseline.pixelColor(ox + x, oy + y), pixels.pixelColor(ox + x, oy + y)
+                corner_changes.append(max(abs(before.red() - after.red()),
+                                          abs(before.green() - after.green()),
+                                          abs(before.blue() - after.blue())))
+        result.update(sampled_backdrop=all(not label.backdrop.isNull() for label in labels),
                       click_through_to_test_window=all(win32gui.WindowFromPoint(
                           (label.x() + label.width() // 2, label.y() + label.height() // 2))
                           == int(host.winId()) for label in labels),
@@ -69,16 +88,37 @@ def capture():
                       sizes=[[label.width(), label.height()] for label in labels],
                       window_opacities=[label.windowOpacity() for label in labels],
                       rounded_corners=all(not label.mask().contains(QPoint(3, 3)) for label in labels),
+                      outside_corner_pixel_changes=corner_changes,
                       frosted_stripe_contrast=max(stripe) - min(stripe),
                       background_stripe_contrast=246 - 176,
                       dpr=app.primaryScreen().devicePixelRatio())
-        result["passed"] = (result["native_backdrop"] and result["click_through_to_test_window"]
+        result["passed"] = (result["sampled_backdrop"] and result["click_through_to_test_window"]
                             and result["foreground_unchanged"] and result["rounded_corners"]
-                            and result["frosted_stripe_contrast"] < 35)
+                            and max(corner_changes) <= 2
+                            and result["frosted_stripe_contrast"] < 0.95 * result["background_stripe_contrast"])
+        cases.append({"sizes": result["sizes"], "outside_corner_pixel_changes": corner_changes,
+                      "passed": result["passed"]})
+        result["lifecycle_cases"] = cases
+        result["passed"] = all(case["passed"] for case in cases)
+        if len(cases) < 3:
+            for label in labels:
+                label.hide()
+            texts = (("Now a longer little thought, softly rounded even when it wraps across several lines.", "Gotcha!")
+                     if len(cases) == 1 else ("Look at meeee!", "A little thought, with just enough frost to keep it readable."))
+            for index, (label, text) in enumerate(zip(labels, texts)):
+                label.setText(text)
+                label.adjustSize()
+                label.move(host.x() + (100 if index == 0 else 470), host.y() + 75)
+                label.prepare_backdrop()
+                label.show()
+            again = True
+            QTimer.singleShot(350, capture)
+            return
         (ROOT / "docs/thoughts-native.json").write_text(json.dumps(result, indent=2) + "\n")
         print(json.dumps(result))
     finally:
-        app.quit()
+        if not again:
+            app.quit()
 
 
 QTimer.singleShot(900, capture)
