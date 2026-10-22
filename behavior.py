@@ -126,8 +126,6 @@ class Companion:
             return "settled"
         if self.state == NekoState.FALLING_ASLEEP:
             return "sleep"
-        if self.state == NekoState.WAKING and now < deadline:
-            return "wake"
         self.state = NekoState.IDLE
         self.next_nap = now + self.sleep_seconds
         return "idle"

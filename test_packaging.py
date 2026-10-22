@@ -33,6 +33,11 @@ class PackagingTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
                              hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest(), asset)
         self.assertNotIn("assets/neko-pet-blep-v1.png", names)
+        for bank in ("lift", "calm", "excited", "unimpressed", "sleepy", "bridges", "side", "low", "roll"):
+            asset = f"assets/neko-carry-{bank}-v1.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest(), asset)
         self.assertIn("assets/neko-tailplay-v4.png", names)
         self.assertIn("assets/neko-tailsettle-v1.png", names)
         self.assertNotIn("assets/neko-tailplay-v3.png", names)

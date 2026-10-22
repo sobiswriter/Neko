@@ -23,6 +23,193 @@ APP.setQuitOnLastWindowClosed(False)
 
 
 class DesktopTests(unittest.TestCase):
+    def test_stationary_hold_is_not_a_pet_and_keeps_the_drag_offset(self):
+        start = time.monotonic()
+        point = QPoint(96, 70)
+        with patch("main.time.monotonic", return_value=start):
+            QTest.mousePress(self.neko, Qt.LeftButton, pos=point)
+        origin = self.neko.pos()
+        with patch("main.time.monotonic", return_value=start + 0.249):
+            self.neko.check_hold()
+        self.assertNotEqual(self.neko.companion.state, NekoState.HELD)
+        with patch("main.time.monotonic", return_value=start + 0.251):
+            self.neko.check_hold()
+        self.assertEqual(self.neko.companion.state, NekoState.HELD)
+        self.assertEqual(self.neko.pos(), origin)
+        self.assertEqual(self.neko.animation_timer.interval(), 50)
+        with patch("main.time.monotonic", return_value=start + 1):
+            QTest.mouseRelease(self.neko, Qt.LeftButton, pos=point)
+        self.assertEqual(self.neko.companion.state, NekoState.SETTING_DOWN)
+        self.assertEqual(self.neko.companion.pets, 0)
+        with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+            self.neko.animate()
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+        self.assertEqual(self.neko.pos(), origin)
+
+    def test_release_starts_with_the_actual_visible_pose_in_every_mood(self):
+        samples = [i * 0.05 + 0.025 for i in range(8)]
+        samples += [phase if phase >= 0.4 else phase + 2.4 for phase in (i * 0.2 + 0.1 for i in range(12))]
+        samples += [base + i * 0.2 + 0.1 for base in (4.8, 12) for i in range(12)]
+        samples += [24 + i * 0.3 + 0.15 for i in range(8)]
+        samples += [base + i * 0.1 + 0.05 for base in (3, 10) for i in range(4)]
+        samples += [20 + phase for phase in (0.075, 0.225, 0.4, 0.575)]
+        samples += [boundary + delta for boundary in (0.4, 3, 3.4, 10, 10.4, 20, 20.65)
+                    for delta in (-0.001, 0, 0.001)] + [1000]
+        for elapsed in samples:
+            self.neko.cancel_pickup()
+            self.neko.companion.state = NekoState.IDLE
+            start = time.monotonic()
+            with patch("main.time.monotonic", return_value=start):
+                self.neko.begin_pickup()
+            now = start + elapsed
+            before = self.neko.current_frame(now).toImage()
+            with patch("main.time.monotonic", return_value=now):
+                self.neko.release_pickup()
+            self.assertEqual(self.neko.current_frame(now).toImage(), before, elapsed)
+            self.assertEqual(self.neko.companion.state, NekoState.SETTING_DOWN)
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "idle")
+            self.assertEqual(self.neko.companion.pets, 0)
+
+    def test_regrab_and_hide_do_not_leave_a_stale_carry_or_change_saved_origin(self):
+        origin = self.neko.pos()
+        start = time.monotonic()
+        with patch("main.time.monotonic", return_value=start):
+            self.neko.begin_pickup()
+        with patch("main.time.monotonic", return_value=start + 4):
+            self.neko.release_pickup()
+        now = start + 4.2
+        before = self.neko.current_frame(now).toImage()
+        with patch("main.time.monotonic", return_value=now):
+            self.neko.begin_pickup()
+        self.assertEqual(self.neko.current_frame(now).toImage(), before)
+        self.neko.save_preferences()
+        self.assertEqual(self.settings.value("position", type=QPoint), origin + QPoint(CANVAS_PADDING, CANVAS_TOP))
+        self.neko.hide_neko()
+        self.assertIsNone(self.neko.companion.carry_rest)
+        self.assertIsNone(self.neko.drag_origin)
+        self.assertFalse(self.neko.hold_timer.isActive())
+        self.assertEqual(self.neko.cursor().shape(), Qt.OpenHandCursor)
+
+    def test_sleeping_carry_lands_curled_and_defers_timed_wake(self):
+        start = time.monotonic()
+        self.neko.companion.state = NekoState.SLEEPING
+        self.neko.companion.nap_started = start - 10
+        self.neko.pose_started = start - 10
+        self.neko.refresh_asset()
+        with patch("main.time.monotonic", return_value=start):
+            self.neko.begin_pickup()
+        self.assertEqual(len(self.neko.carry_path), 8)
+        with patch("main.time.monotonic", return_value=start + 3):
+            self.neko.release_pickup()
+        idle = self.neko.atlas.frame("idle", 0).toImage()
+        self.assertTrue(all(frame.toImage() != idle for frame in self.neko.carry_path))
+        with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.001):
+            self.neko.animate()
+        self.assertEqual(self.neko.companion.state, NekoState.SLEEPING)
+        self.assertEqual(self.neko.companion.nap_started, start - 10)
+        self.neko.companion.sleep_duration = 1
+        with patch("main.time.monotonic", return_value=start + 4):
+            self.neko.begin_pickup()
+        with patch("main.time.monotonic", return_value=start + 5):
+            self.neko.release_pickup()
+        with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.001):
+            self.neko.animate()
+        self.assertEqual(self.neko.companion.state, NekoState.WAKING)
+        self.assertEqual((self.neko.companion.pets, self.neko.companion.naps), (0, 0))
+
+    def test_reduced_motion_carry_is_stable_and_places_immediately(self):
+        self.neko.set_motion(False)
+        self.neko.begin_pickup()
+        now = time.monotonic()
+        self.assertEqual(self.neko.current_frame(now).toImage(), self.neko.current_frame(now + 100).toImage())
+        self.assertFalse(self.neko.animation_timer.isActive())
+        self.neko.release_pickup()
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+        self.assertEqual(self.neko.companion.pets, 0)
+        self.neko.set_motion(True)
+        self.neko.begin_pickup()
+        self.neko.set_motion(False)
+        self.assertEqual(self.neko.companion.state, NekoState.HELD)
+        self.neko.release_pickup()
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+        self.neko.set_motion(True)
+        self.neko.begin_pickup()
+        self.neko.release_pickup()
+        self.neko.set_motion(False)
+        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+
+    def test_every_pet_posture_starts_pickup_from_its_visible_frame(self):
+        from animations import CLIPS, PET_ROWS, sprite_bounds
+        from behavior import PET_STATES
+        for clip, state in zip(PET_ROWS, PET_STATES):
+            for fraction in (0.25, 0.5, 0.8):
+                self.neko.cancel_pickup()
+                now = time.monotonic()
+                self.neko.companion.state = state
+                self.neko.pose_started = now - sum(CLIPS[clip].durations) / 1000 * fraction
+                self.neko.refresh_asset()
+                source = self.neko.current_frame(now).toImage()
+                with patch("main.time.monotonic", return_value=now):
+                    self.neko.begin_pickup()
+                self.assertEqual(self.neko.current_frame(now).toImage(), source, (clip, fraction))
+                self.assertTrue(all(not frame.isNull() for frame in self.neko.carry_path), (clip, fraction))
+                for frame in self.neko.carry_path:
+                    bounds = sprite_bounds(frame.toImage())
+                    self.assertGreater(bounds.top(), 0, (clip, fraction))
+                    self.assertLess(bounds.bottom(), self.neko.height() - 1, (clip, fraction))
+
+    def test_lost_capture_fullscreen_and_screen_change_clear_pickup(self):
+        for cancel in (lambda: APP.sendEvent(self.neko, QEvent(QEvent.UngrabMouse)),
+                       self.neko.screen_changed,
+                       lambda: self.neko.set_hide_fullscreen(True)):
+            self.neko.show_neko()
+            self.neko.fullscreen = False
+            self.neko.begin_pickup()
+            self.neko.drag_origin = QPoint(100, 100)
+            self.neko.fullscreen = True
+            cancel()
+            self.assertNotIn(self.neko.companion.state, (NekoState.HELD, NekoState.SETTING_DOWN))
+            self.assertIsNone(self.neko.drag_origin)
+
+    def test_regrabbing_an_early_release_completes_the_remaining_lift(self):
+        from animations import sprite_bounds
+        start = time.monotonic()
+        with patch("main.time.monotonic", return_value=start):
+            self.neko.begin_pickup()
+        with patch("main.time.monotonic", return_value=start + 0.12):
+            self.neko.release_pickup()
+        with patch("main.time.monotonic", return_value=start + 0.18):
+            self.neko.begin_pickup()
+        end = self.neko.carry_path_started + sum(self.neko.carry_path_clip.durations) / 1000
+        last = sprite_bounds(self.neko.carry_path[-1].toImage()).top()
+        after = sprite_bounds(self.neko.current_frame(end + 0.001).toImage()).top()
+        self.assertLessEqual(abs(last - after), 2)
+
+    def test_regrab_resumes_the_expression_instead_of_skipping_a_mood_bridge(self):
+        from animations import held_clip
+        start = time.monotonic()
+        with patch("main.time.monotonic", return_value=start):
+            self.neko.begin_pickup()
+        with patch("main.time.monotonic", return_value=start + 2.95):
+            self.neko.release_pickup()
+        with patch("main.time.monotonic", return_value=start + 3.2):
+            self.neko.begin_pickup()
+        end = self.neko.carry_path_started + sum(self.neko.carry_path_clip.durations) / 1000
+        self.assertAlmostEqual(self.neko.carry_elapsed(end), 2.95, places=5)
+        self.assertEqual(held_clip(self.neko.carry_elapsed(end))[0], "held_excited")
+        self.assertEqual(held_clip(self.neko.carry_elapsed(end + 0.1))[0], "carry_to_calm")
+
+    def test_a_carry_state_without_live_input_has_a_safe_render_and_cancel(self):
+        for state in (NekoState.HELD, NekoState.SETTING_DOWN):
+            self.neko.companion.state = state
+            self.neko.refresh_asset()
+            self.assertFalse(self.neko.current_frame(time.monotonic()).isNull())
+            self.neko.cancel_pickup()
+            self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+
+
     def test_sleepy_flop_finishes_its_story_before_a_queued_pet_or_nap(self):
         self.neko.companion.pet_bag = [NekoState.CHEEK_RUB, NekoState.SIDE_FLOP]
         self.neko.pet_reaction()
@@ -553,6 +740,7 @@ class DesktopTests(unittest.TestCase):
         area = QRect(-1920, 0, 1920, 1080)
         for anchor in (QRect(-1920, 0, 112, 112), QRect(-112, 0, 112, 112),
                        QRect(-1920, 968, 192, 112), QRect(-192, 0, 192, 112),
+                       QRect(-1920, 936, 192, 144), QRect(-192, 0, 192, 144),
                        QRect(-1920, 968, 112, 112), QRect(-112, 968, 112, 112),
                        QRect(-1000, 500, 112, 112)):
             for size in (QSize(220, 160), QSize(340, 640)):

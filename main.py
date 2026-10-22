@@ -14,17 +14,17 @@ import winsound
 
 import win32gui
 import win32con
-from PySide6.QtCore import QLockFile, QPoint, QRect, QRectF, QSettings, QStandardPaths, Qt, QTimer
+from PySide6.QtCore import QEvent, QLockFile, QPoint, QRect, QRectF, QSettings, QStandardPaths, Qt, QTimer
 from PySide6.QtGui import QColor, QCursor, QFont, QIcon, QMovie, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QDialog, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QMenu, QMessageBox,
     QPushButton, QSpinBox, QFormLayout, QTabWidget, QSystemTrayIcon, QVBoxLayout, QWidget,
 )
 
-from behavior import Companion, NekoState, PET_STATES
+from behavior import Companion, NekoState, PET_STATES, CARRY_STATES
 from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
-from animations import SpriteAtlas, CLIPS, drop_progress, CANVAS_WIDTH, CANVAS_PADDING, CANVAS_TOP, CANVAS_HEIGHT
+from animations import SpriteAtlas, Clip, CLIPS, drop_progress, held_clip, sprite_bounds, CANVAS_WIDTH, CANVAS_PADDING, CANVAS_TOP, CANVAS_HEIGHT
 from dialogue import OfflineDialogue
 from cursors import petting_cursors
 
@@ -52,6 +52,15 @@ def adjacent_position(anchor, size, area):
 
 def legacy_shortcut():
     return Path(os.environ["APPDATA"]) / "Microsoft/Windows/Start Menu/Programs/Startup/DesktopNeko.lnk"
+
+
+def offset_frame(source, offset):
+    frame = QPixmap(source.size())
+    frame.fill(Qt.transparent)
+    painter = QPainter(frame)
+    painter.drawPixmap(offset, source)
+    painter.end()
+    return frame
 
 
 def autostart_enabled():
@@ -340,6 +349,14 @@ class NekoWidget(QWidget):
         self.last_pet_words = -math.inf
         self.drag_origin = None
         self.dragged = False
+        self.press_started = 0
+        self.carry_path = []
+        self.carry_path_clip = None
+        self.carry_path_started = 0
+        self.carry_return = []
+        self.carry_resume = []
+        self.carry_clock_offset = 0
+        self.carry_released_elapsed = None
         self.closing = False
         self.started = time.monotonic()
         self.pose_started = self.started
@@ -393,6 +410,10 @@ class NekoWidget(QWidget):
         self.pet_cursor_step = 0
         self.pet_cursor_timer = QTimer(self)
         self.pet_cursor_timer.timeout.connect(self.advance_pet_cursor)
+        self.hold_timer = QTimer(self)
+        self.hold_timer.setSingleShot(True)
+        self.hold_timer.setTimerType(Qt.PreciseTimer)
+        self.hold_timer.timeout.connect(self.check_hold)
         self.setCursor(Qt.OpenHandCursor)
         self.save_timer = QTimer(self)
         self.save_timer.timeout.connect(self.save_preferences)
@@ -404,8 +425,8 @@ class NekoWidget(QWidget):
             self.move(saved - QPoint(CANVAS_PADDING, CANVAS_TOP))
             self.clamp_position()
         app = QApplication.instance()
-        app.primaryScreenChanged.connect(self.clamp_position)
-        app.screenRemoved.connect(self.clamp_position)
+        app.primaryScreenChanged.connect(self.screen_changed)
+        app.screenRemoved.connect(self.screen_changed)
         self.activity = ActivityMonitor()
         self.activity.enabled = self.reactive
         self.activity.start(int(self.winId()))
@@ -438,6 +459,7 @@ class NekoWidget(QWidget):
         self.tray_icon.show()
 
     def prepare_menu(self):
+        self.cancel_pickup()
         self.stop_following()
         self.dismiss_bubble()
         self.overlay_timer.start(0)
@@ -470,6 +492,10 @@ class NekoWidget(QWidget):
             self.stop_following()
             if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
                 self.finish_transition()
+            if self.companion.state == NekoState.SETTING_DOWN:
+                self.finish_pickup()
+            if self.drag_origin is not None:
+                self.setCursor(Qt.ClosedHandCursor)
         self.sync_animation()
         self.save_preferences()
 
@@ -526,6 +552,15 @@ class NekoWidget(QWidget):
 
     def animate(self):
         now = time.monotonic()
+        if self.drag_origin is not None and not self.dragged:
+            self.update()
+            return
+        if self.companion.state == NekoState.SETTING_DOWN and now >= self.companion.pose_until:
+            self.finish_pickup()
+        if (self.companion.state == NekoState.HELD and self.companion.carry_rest is not None and self.carry_path_clip
+                and now - self.carry_path_started >= sum(self.carry_path_clip.durations) / 1000):
+            sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+            self.current_clip = held_clip(self.carry_elapsed(now), sleeping)[0]
         if self.companion.state in PET_STATES and now >= self.companion.pose_until:
             self.companion.finish_pet(now)
             self.pose_started = now
@@ -542,7 +577,7 @@ class NekoWidget(QWidget):
             self.move(self.arrival_target.x(), round(y))
         elif self.companion.state == NekoState.FOLLOWING:
             cursor = QCursor.pos()
-            delta = cursor - self.geometry().center()
+            delta = cursor - (self.geometry().adjusted(0, CANVAS_TOP, 0, 0).center())
             distance = math.hypot(delta.x(), delta.y())
             excursion = (self.pos() - self.follow_origin).manhattanLength() if self.follow_origin else 0
             if (self.drag_origin is not None or self.fullscreen or distance > 650
@@ -603,14 +638,14 @@ class NekoWidget(QWidget):
         active = self.isVisible() and not self.is_manually_hidden and not self.closing
         if active and self.motion:
             interval = (33 if self.current_clip in ("arrive", "depart") else
-                        50 if self.companion.state in PET_STATES
+                        50 if self.companion.state in PET_STATES + CARRY_STATES
                         or self.current_clip in ("tail_chase", "tail_catch") else 100)
-            self.animation_timer.setTimerType(Qt.PreciseTimer if self.companion.state in PET_STATES else Qt.CoarseTimer)
+            self.animation_timer.setTimerType(Qt.PreciseTimer if self.companion.state in PET_STATES + CARRY_STATES else Qt.CoarseTimer)
             self.animation_timer.start(interval)
         else:
             self.animation_timer.stop()
         for name, movie in self.movies.items():
-            if active and self.motion and name == self.current_asset:
+            if active and self.motion and name == self.current_asset and self.companion.state not in CARRY_STATES:
                 movie.start()
             else:
                 movie.stop()
@@ -626,7 +661,7 @@ class NekoWidget(QWidget):
         self.bubble.hide()
 
     def tick(self):
-        if (self.closing or self.is_manually_hidden or self.drag_origin is not None
+        if (self.closing or self.is_manually_hidden
                 or self.companion.state == NekoState.LEAVING):
             return
         now = time.monotonic()
@@ -671,10 +706,20 @@ class NekoWidget(QWidget):
         if fullscreen and self.hide_fullscreen:
             self.last_window = window
             return
+        if self.drag_origin is not None or self.companion.state in CARRY_STATES:
+            if self.companion.state == NekoState.HELD and not QApplication.mouseButtons() & Qt.LeftButton:
+                self.hold_timer.stop()
+                self.drag_origin = None
+                self.release_pickup()
+                self.clamp_position()
+                self.save_preferences()
+                self.reset_pet_cursor()
+            self.last_window = window
+            return
         changed = bool(self.last_window and window != self.last_window)
         self.pin_to_top(force=changed)
         cursor = QCursor.pos()
-        delta = cursor - self.geometry().center()
+        delta = cursor - (self.geometry().adjusted(0, CANVAS_TOP, 0, 0).center())
         distance = math.hypot(delta.x(), delta.y())
         moved = (cursor - self.last_cursor).manhattanLength() >= 20
         self.last_cursor = cursor
@@ -738,6 +783,7 @@ class NekoWidget(QWidget):
             NekoState.SHOULDER_PEEK: "shoulder_peek",
             NekoState.TAIL_CHASE: "tail_chase", NekoState.TAIL_CATCH: "tail_catch",
             NekoState.ARRIVING: "arrive", NekoState.LEAVING: "depart",
+            NekoState.HELD: "pickup", NekoState.SETTING_DOWN: "set_down",
         }.get(self.companion.state, "idle")
         if self.companion.state in PET_STATES:
             self.companion.pose_until = self.pose_started + sum(CLIPS[self.current_clip].durations) / 1000
@@ -760,12 +806,12 @@ class NekoWidget(QWidget):
         state = self.companion.state
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(75, 55, 48, 18))
-        if state not in (NekoState.ARRIVING, NekoState.LEAVING):
+        if state not in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
             painter.drawEllipse(QRectF(28 + CANVAS_PADDING, 99 + CANVAS_TOP, 56, 5))
         painter.save()
         painter.translate(self.width() // 2, 99 + CANVAS_TOP)
-        movie = None if state in (NekoState.ARRIVING, NekoState.LEAVING) else self.movies.get(self.current_asset)
-        pixmap = self.atlas.frame(self.current_clip, elapsed, self.motion)
+        movie = None if state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES else self.movies.get(self.current_asset)
+        pixmap = self.current_frame(now)
         # Keep the visible origin stable when transparent top padding is added.
         top = -100 - CANVAS_TOP
         if movie and not movie.currentPixmap().isNull():
@@ -791,7 +837,7 @@ class NekoWidget(QWidget):
         if (self.closing or self.is_manually_hidden or self.fullscreen
                 or not self.isVisible() or (self.quiet and not prompted)
                 or self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP,
-                                            NekoState.ARRIVING, NekoState.LEAVING)):
+                                            NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES):
             return False
         text = " ".join(str(text).split())[:140]
         if not text:
@@ -802,7 +848,7 @@ class NekoWidget(QWidget):
         area = screen.availableGeometry()
         x = max(area.left() + 6, min(self.x() + self.width() // 2 - self.bubble.width() // 2,
                                     area.right() - self.bubble.width() - 6))
-        y = self.y() - self.bubble.height() - 4
+        y = self.y() + CANVAS_TOP - self.bubble.height() - 4
         if y < area.top():
             y = self.geometry().bottom() + 4
         y = max(area.top(), min(y, area.bottom() - self.bubble.height()))
@@ -828,7 +874,7 @@ class NekoWidget(QWidget):
         self.offline_line("idle")
 
     def pet_reaction(self):
-        if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
+        if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
             return
         now = time.monotonic()
         was_sleeping = self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
@@ -888,6 +934,178 @@ class NekoWidget(QWidget):
         self.pet_cursor_timer.stop()
         self.setCursor(Qt.OpenHandCursor)
 
+    def current_frame(self, now):
+        if self.companion.state not in CARRY_STATES:
+            if self.drag_origin is not None and not self.dragged:
+                now = self.press_started
+            return self.atlas.frame(self.current_clip, now - self.pose_started, self.motion)
+        if self.companion.carry_rest is None:
+            return self.atlas.frame("idle", 0, self.motion)
+        if not self.motion:
+            sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+            return self.atlas.frame("held_sleepy" if sleeping else "held_calm", 0)
+        elapsed = max(0, now - self.carry_path_started)
+        if self.carry_path and (elapsed < sum(self.carry_path_clip.durations) / 1000
+                                or self.companion.state == NekoState.SETTING_DOWN):
+            return self.carry_path[self.carry_path_clip.frame_index(elapsed)]
+        sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+        clip, elapsed = held_clip(self.carry_elapsed(now), sleeping)
+        return self.atlas.frame(clip, elapsed)
+
+    def set_carry_path(self, frames, now, durations=None):
+        self.carry_path = frames
+        self.carry_path_clip = Clip("", 0, tuple(durations or [50] * len(frames)), tuple(range(len(frames))))
+        self.carry_path_started = now
+
+    def carry_elapsed(self, now):
+        return max(0, now - self.companion.carry_started - self.carry_clock_offset)
+
+    def check_hold(self):
+        if self.drag_origin is not None:
+            if not QApplication.mouseButtons() & Qt.LeftButton:
+                self.cancel_pickup()
+                return
+            remaining = self.press_started + 0.25 - time.monotonic()
+            if remaining > 0:
+                self.hold_timer.start(max(1, math.ceil(remaining * 1000)))
+            else:
+                self.begin_pickup()
+
+    def begin_pickup(self):
+        if self.companion.state == NekoState.HELD:
+            return
+        if ("carry-lift", 0, 0) not in self.atlas.frames:
+            self.dragged = True
+            return
+        now = time.monotonic()
+        source = self.current_frame(now)
+        resuming = self.companion.state == NekoState.SETTING_DOWN and bool(self.carry_path)
+        if resuming:
+            index = self.carry_path_clip.frame_index(now - self.carry_path_started)
+            frames = list(reversed(self.carry_path[:index + 1])) + self.carry_resume
+            self.carry_return = self.carry_path[index + 1:]
+        else:
+            self.carry_clock_offset = 0
+            self.carry_released_elapsed = None
+            old_clip, old_elapsed = self.current_clip, now - self.pose_started
+            clip = CLIPS[old_clip]
+            index = clip.frame_index(old_elapsed)
+            last = max(i for i, value in enumerate(clip.order) if value == index)
+            self.carry_return = ([self.atlas.frames[clip.bank, clip.row + i // 4, i % 4]
+                                  for i in clip.order[last + 1:]] if not clip.loop else [])
+            if not self.carry_return:
+                self.carry_return = [self.atlas.frame("sleep" if self.companion.state == NekoState.SLEEPING else "idle", 0)]
+            bounds = sprite_bounds(source.toImage())
+            state = self.companion.state
+            if state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
+                family = "side"
+            elif state in (NekoState.SIDE_FLOP, NekoState.ROLLING) and bounds.height() < 75:
+                family = "side" if state == NekoState.SIDE_FLOP else "roll"
+            elif state == NekoState.LOAFING and bounds.height() < 70:
+                family = "side"
+            elif bounds.width() > 87 and state in (NekoState.PET_STRETCH, NekoState.STRETCHING):
+                family = "low"
+            else:
+                family = "lift"
+            bank = f"carry-{family}"
+            frames = [self.atlas.frames.get((bank, i // 4, i % 4), source) for i in range(8)]
+            shift = bounds.center() - sprite_bounds(frames[0].toImage()).center()
+            frames = [offset_frame(frame, QPoint(round(shift.x() * (1 - i / 7)),
+                                                  round(shift.y() * (1 - i / 7))))
+                      for i, frame in enumerate(frames)]
+            frames[0] = source
+            if family == "side" and state not in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
+                frames += [self.atlas.frames["carry-bridges", 2, i] for i in (1, 2, 3)]
+        if not self.companion.begin_carry(now):
+            return
+        self.hold_timer.stop()
+        self.dragged = True
+        self.ai_generation += 1
+        self.dismiss_bubble()
+        self.stop_following()
+        self.set_carry_path(frames, now)
+        if resuming:
+            # Preserve the displayed expression while retracing the release back into the hold.
+            self.carry_clock_offset = (now + sum(self.carry_path_clip.durations) / 1000
+                                       - self.companion.carry_started - max(0.4, self.carry_released_elapsed))
+        self.pose_started = now
+        self.refresh_asset()
+
+    def release_pickup(self):
+        if self.companion.state != NekoState.HELD:
+            return
+        if self.companion.carry_rest is None:
+            self.finish_pickup()
+            return
+        now = time.monotonic()
+        elapsed = max(0, now - self.carry_path_started)
+        source = self.current_frame(now)
+        durations = None
+        self.carry_resume = []
+        if self.carry_path and elapsed < sum(self.carry_path_clip.durations) / 1000:
+            if self.carry_released_elapsed is None:
+                self.carry_released_elapsed = self.carry_elapsed(now)
+            index = self.carry_path_clip.frame_index(elapsed)
+            self.carry_resume = self.carry_path[index + 1:]
+            frames = list(reversed(self.carry_path[:index + 1])) + self.carry_return
+        else:
+            self.carry_released_elapsed = self.carry_elapsed(now)
+            frames = [source]
+            sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+            if sleeping and ("carry-side", 0, 0) in self.atlas.frames:
+                frames += [self.atlas.frames["carry-side", i // 4, i % 4] for i in range(7, -1, -1)]
+                previous, deadline = self.companion.carry_rest
+                landing = now + (len(frames) + 1) * 0.05
+                if previous == NekoState.FALLING_ASLEEP and landing < deadline:
+                    frames.append(self.atlas.frame("fall_asleep", landing - (deadline - 2.6)))
+                else:
+                    nap_started = deadline if previous == NekoState.FALLING_ASLEEP else self.companion.nap_started
+                    frames.append(self.atlas.frame("sleep", landing - (nap_started or landing)))
+            else:
+                name, phase = held_clip(self.carry_elapsed(now))
+                if name == "carry_yawn":
+                    index = CLIPS[name].frame_index(phase)
+                    frames += [self.atlas.frames["carry-sleepy", 0, i] for i in range(index, -1, -1)]
+                if name != "held_excited" or CLIPS[name].frame_index(phase) in (2, 3):
+                    frames += [self.atlas.frames["carry-bridges", 2, i] for i in (1, 2, 3)]
+                frames = [frames[0]] + [offset_frame(frame, QPoint(0, min(3, i)))
+                                        for i, frame in enumerate(frames[1:], 1)]
+                durations = [50] * len(frames) + list(CLIPS["set_down"].durations)
+                frames += [offset_frame(self.atlas.frames["carry-lift", i // 4, i % 4],
+                                        QPoint(0, max(0, 11 - i))) for i in range(8, 17)]
+        self.set_carry_path(frames, now, durations)
+        self.companion.release_carry(now, sum(self.carry_path_clip.durations) / 1000)
+        self.pose_started = now
+        self.refresh_asset()
+        if not self.motion:
+            self.finish_pickup()
+
+    def finish_pickup(self):
+        now = time.monotonic()
+        self.companion.finish_carry(now)
+        if self.companion.state in CARRY_STATES:
+            self.companion.state = NekoState.IDLE
+        self.carry_path = []
+        self.carry_return = []
+        self.carry_resume = []
+        self.carry_clock_offset = 0
+        self.carry_released_elapsed = None
+        self.pose_started = now
+        if self.companion.state in (NekoState.WAKING, NekoState.FALLING_ASLEEP):
+            self.pose_started = self.companion.pose_until - 2.6
+        elif self.companion.state == NekoState.SLEEPING:
+            self.pose_started = self.companion.nap_started if self.companion.nap_started is not None else now
+        self.refresh_asset()
+
+    def cancel_pickup(self):
+        self.hold_timer.stop()
+        self.drag_origin = None
+        if self.companion.state in CARRY_STATES:
+            self.finish_pickup()
+        if QWidget.mouseGrabber() is self:
+            self.releaseMouse()
+        self.reset_pet_cursor()
+
     def advance_pet_cursor(self):
         if self.pet_cursor_step >= len(self.pet_cursors):
             self.reset_pet_cursor()
@@ -908,12 +1126,17 @@ class NekoWidget(QWidget):
         if event.button() == Qt.LeftButton:
             self.reset_pet_cursor()
             self.setCursor(Qt.ClosedHandCursor)
-            self.stop_following()
             self.drag_origin = event.globalPosition().toPoint()
             self.drag_offset = self.drag_origin - self.pos()
             self.dragged = False
+            self.press_started = time.monotonic()
+            if self.companion.state == NekoState.SETTING_DOWN:
+                self.begin_pickup()
+            else:
+                self.hold_timer.start(250)
             event.accept()
         elif event.button() == Qt.RightButton:
+            self.cancel_pickup()
             screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
             self.menu.exec(adjacent_position(self.frameGeometry(), self.menu.sizeHint(), screen.availableGeometry()))
 
@@ -921,27 +1144,16 @@ class NekoWidget(QWidget):
         if event.buttons() & Qt.LeftButton and self.drag_origin is not None:
             point = event.globalPosition().toPoint()
             if (point - self.drag_origin).manhattanLength() >= QApplication.startDragDistance():
-                self.dragged = True
+                self.begin_pickup()
             if self.dragged:
                 self.dismiss_bubble()
-                if self.companion.state not in (NekoState.CURIOUS, NekoState.SLEEPING,
-                                                NekoState.FALLING_ASLEEP, NekoState.WAKING):
-                    now = time.monotonic()
-                    self.companion.pose(NekoState.CURIOUS, now, 3)
-                    self.pose_started = now
-                    self.refresh_asset()
                 self.move(point - self.drag_offset)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton and self.drag_origin is not None:
+            self.hold_timer.stop()
             if self.dragged:
-                self.ai_generation += 1
-                now = time.monotonic()
-                if self.companion.state not in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING):
-                    self.companion.pose(NekoState.PEEKING, now, 5)
-                    self.pose_started = now
-                self.companion.last_interaction = now
-                self.refresh_asset()
+                self.release_pickup()
                 self.clamp_position()
                 self.save_preferences()
             else:
@@ -952,6 +1164,21 @@ class NekoWidget(QWidget):
                 self.advance_pet_cursor()
                 self.pet_cursor_timer.start(70)
             self.drag_origin = None
+
+    def event(self, event):
+        if (event.type() == QEvent.UngrabMouse and hasattr(self, "hold_timer")
+                and self.drag_origin is not None):
+            self.cancel_pickup()
+        return super().event(event)
+
+    def hideEvent(self, event):
+        if hasattr(self, "hold_timer"):
+            self.cancel_pickup()
+        super().hideEvent(event)
+
+    def screen_changed(self, *args):
+        self.cancel_pickup()
+        self.clamp_position()
 
     def position_to_bottom_right(self):
         area = QApplication.primaryScreen().availableGeometry()
@@ -974,6 +1201,7 @@ class NekoWidget(QWidget):
             self.hide_neko()
 
     def hide_neko(self):
+        self.cancel_pickup()
         self.companion.pet_pending = False
         self.reset_pet_cursor()
         self.restore_arrival_position()
@@ -1046,6 +1274,7 @@ class NekoWidget(QWidget):
     def quit_neko(self):
         if self.closing or self.companion.state == NekoState.LEAVING:
             return
+        self.cancel_pickup()
         self.restore_arrival_position()
         if (self.motion and self.isVisible() and not self.fullscreen and not self.is_manually_hidden
                 and not self.atlas.frame("depart", 0).isNull()):

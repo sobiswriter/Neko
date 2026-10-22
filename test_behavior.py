@@ -52,6 +52,14 @@ class CompanionTests(unittest.TestCase):
             self.assertFalse(self.pet.begin_carry(10))
             self.assertEqual(self.pet.state, state)
 
+    def test_waking_carry_finishes_upright_without_replaying_a_partial_wake(self):
+        self.pet.wake(10)
+        self.pet.begin_carry(10.2)
+        self.pet.release_carry(10.6, 0.7)
+        self.assertEqual(self.pet.tick(11.3, 0), "idle")
+        self.assertEqual(self.pet.state, NekoState.IDLE)
+        self.assertGreaterEqual(self.pet.next_nap, 11.3 + self.pet.sleep_seconds)
+
     def test_repeated_pets_wait_for_recovery_and_coalesce_without_losing_click_counts(self):
         pet = Companion(0, random.Random(4))
         pet.pet(10)
