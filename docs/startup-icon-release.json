@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-22",
+  "source_commit": "f2fc9a125b33fdc86e13c132e32d79e6490563c3",
+  "current": {
+    "path": "dist\\DesktopNeko.exe",
+    "bytes": 102553575,
+    "sha256": "0237d5d01723ff19c9e64b84885505b63c765373eb607b6783f7ffa19e5058d3"
+  },
+  "previous": {
+    "path": "dist\\DesktopNeko-previous.exe",
+    "bytes": 102341889,
+    "sha256": "de09d071198c4aaecffe50c075aa4064778a755546aa843a7f906f563e61eec9"
+  },
+  "icon": {
+    "path": "neko_sleep.ico",
+    "bytes": 192283,
+    "sha256": "de69930171e4d1887e0e3ab1a2351cd5abc3d22d607a3496e680d1c8b1ed5bfd"
+  },
+  "startup": {
+    "command": "\"C:\\Users\\soura\\OneDrive\\Desktop\\Wroking Right now\\Neko\\dist\\DesktopNeko.exe\"",
+    "compatibility_before": "~ RUNASADMIN",
+    "compatibility_after": null,
+    "before_direct_launch_winerror": 740,
+    "repaired_direct_launch": "passed",
+    "actual_next_logon": "not exercised"
+  },
+  "checks": {
+    "focused_source": 7,
+    "unchanged_game_regressions": 20,
+    "exact_package": 3,
+    "package_path": "actual dist/DesktopNeko.exe; no renamed copy or elevation",
+    "icon_payloads": "all 9 supplied image payloads verified in PE resources"
+  },
+  "game_v2": "proposal only; waiting for user approval"
+}

@@ -186,6 +186,11 @@ Preferences and lifetime counts use per-user Windows settings
 existing startup registrations from the old version remain in place until changed.
 Turning startup off also removes the old `DesktopNeko.lnk` shortcut. Keep the
 executable/source folder in a stable location if using startup.
+Neko runs with normal user permissions. Enabling startup clears only its executable's
+`RUNASADMIN` compatibility flag, which otherwise prevents a normal logon launch;
+other compatibility flags remain intact. The supplied root `neko_sleep.ico` is the
+shared executable, application-window, nook and tray icon. See the
+[startup/icon repair record](docs/startup-icon-validation.md).
 
 ## Optional AI observations
 
@@ -230,8 +235,11 @@ The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
 `dist\DesktopNeko-previous.exe`. Keep these two files directly in `dist`, without
 release subfolders. Quit the existing Neko before launching the new build;
 the single-instance lock prevents two kittens running together.
-The latest build includes pickup, slightly faster petting and frosted thoughts; see the
-[thought backdrop verification](docs/thought-rounded-clip-validation.md). Historical build paths
+The latest build includes Catch the Cursor, pickup, slightly faster petting, frosted thoughts,
+the supplied icon and startup repair; see [Catch verification](docs/catch-validation.md)
+and the [startup/icon record](docs/startup-icon-validation.md). The
+[quieter cursor-play v2 proposal](docs/cursor-play-v2-plan.md) awaits approval and is not implemented.
+Historical build paths
 in older reports describe their original delivery locations.
 
 ## Check the behavior
