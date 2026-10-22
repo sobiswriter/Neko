@@ -1,6 +1,6 @@
-# Catch the Cursor v2: playful idle company — approval proposal, 2026-10-22
+# Catch the Cursor v2: playful idle company — approved design, 2026-10-22
 
-Status: **approved by the user on 2026-10-22; implementation and verification in progress**. Startup repair and adoption of the supplied `neko_sleep.ico` are separately authorized maintenance work, reported independently. This proposal supersedes the corresponding rules of the first Catch design only after approval. Historical validation reports remain evidence of their own releases.
+Status: **approved by the user and implemented on 2026-10-22**. [Final verification and previews](cursor-play-v2-validation.md). Startup repair and adoption of the supplied `neko_sleep.ico` remain included and separately documented. This approved design supersedes the corresponding first Catch rules. Historical validation reports remain evidence of their own releases.
 
 ## The experience we are aiming for
 

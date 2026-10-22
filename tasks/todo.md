@@ -13,7 +13,7 @@
 - [x] Checkpoint: native complete no-overlay invitation/countdown/hunt/return plus pet/hold and cooldown-entry checks.
 - [x] V4: three distinct victory and three loss stories with common compatible comfort; sparse context-specific shuffled lines.
 - [x] V5: add exact-once local played/won keepsakes to normal menu/nook and persistence; keep menu explanation quiet and brief.
-- [ ] V6: actual-controller previews, full/targeted/native/package verification, provenance and verified Frame Master findings; flat two-executable release.
+- [x] V6: actual-controller normal/slow previews, 212 source checks plus all three exact-package checks, native actual-paint coverage, provenance and verified Frame Master findings; flat two-executable release. [Final report](../docs/cursor-play-v2-validation.md).
 
 Separately authorized now: diagnose/fix Windows startup and adopt root `neko_sleep.ico`; record their checks independently. Older open work below is preserved.
 

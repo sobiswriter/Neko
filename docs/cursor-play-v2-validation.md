@@ -1,6 +1,6 @@
 # Cursor play v2 verification — 2026-10-22
 
-The user approved the [v2 plan](cursor-play-v2-plan.md). Source/art and visible Windows playback are verified; final executable packaging checks are in progress. Earlier reports remain historical evidence of their releases.
+The approved [v2 plan](cursor-play-v2-plan.md) is implemented and verified in `dist/DesktopNeko.exe`. Source/art, visible Windows playback and all three exact-executable checks pass. Earlier reports remain historical evidence of their releases.
 
 ## Delivered behavior
 
@@ -29,7 +29,7 @@ Rejected approaches: keeping generated labels/grid/matte; clipping the ready tai
 
 Full discovery: 215 tests, 212 passed and three opt-in executable checks skipped. Coverage includes all new phase boundaries, short outside flicker, inside-at-expiry, sleep/care qualification, interval edits during cancelled countdown, cross-app button holds, manual promotion, counts/reload/invalid settings, all outcome bag refills, drawn recovery landmarks, actual contacts, all jump cancellation samples, curl carrying/comfort, fullscreen/hiding and existing companion behavior. Immutable atlas fixtures are shared in rendering tests; each test still gets a fresh widget, controller and preferences.
 
-[Visible Windows Qt measurements](cursor-play-v2-native.json) record real cue presentation, every countdown/hunt/walk/recovery drawing and every used drawing of all six outcomes. The native run includes one real controller/alpha-contact chase and six explicitly staged outcome performances. Median observation interval 19.9995ms, maximum 65.75ms; numeral durations 1.0314s, 1.0331s, 1.0511s. Foreground remains unchanged, no game overlay exists, and native hit testing passes through the thought window. Scripted pointer observations never move/capture the real pointer. Physical hardware: one monitor, DPR 1.0. Deterministic invitation geometry tests cover both sides and narrow areas; physical mixed-DPI/multi-monitor behavior was not exercised.
+[Visible Windows Qt measurements](cursor-play-v2-native.json) record real cue presentation and actual Qt-painted coverage of every countdown/hunt/walk/recovery drawing and every used drawing of all six outcomes. Production's own animation timer drives playback; the probe observes and stages scenes. The native run includes one real controller/alpha-contact chase and six explicitly staged outcome performances. Median paint interval 20.004ms, maximum 71.12ms within a scene; numeral durations 1.0322s, 1.0494s, 1.0520s. Foreground remains unchanged, no game overlay exists, and native hit testing passes through the thought window. Scripted pointer observations never move/capture the real pointer. Physical hardware: one monitor, DPR 1.0. Deterministic invitation geometry tests cover both sides and narrow areas; physical mixed-DPI/multi-monitor behavior was not exercised.
 
 Reproduce previews/native checks with:
 
@@ -43,7 +43,16 @@ The source diff was reviewed for the approved scope, interruption/counter correc
 
 ## Release
 
-Final packaging record will be added after the exact `dist/DesktopNeko.exe` passes resource/icon/manifest and native startup/tray/single-instance checks. The verified pre-v2 current executable is preserved outside `dist` before replacement; the prior rollback file stays untouched until those checks pass. Release files remain flat.
+All three packaged checks pass on the actual `dist/DesktopNeko.exe`: bundled resource/art/icon hashes and absence of the retired overlay module; native Qt startup/tray/topmost and second-instance rejection; exact supplied ICO resources and ordinary-user manifest. The app was launched directly at its delivered path. The verified pre-v2 executable was saved outside `dist` before replacement, then copied to `dist/DesktopNeko-previous.exe` only after the new package passed. `dist` contains exactly those two files.
+
+Runtime/art source commit: `08f27f37414e8a186bbb96d1332eee98f9da8db9`. Subsequent changes record QA tooling/results and documentation only. [Release identities and exact runtime/asset hashes](cursor-play-v2-release.json):
+
+| File | Bytes | SHA256 |
+| --- | ---: | --- |
+| `dist/DesktopNeko.exe` |111857913|`b968569ac7ea611e1587e593ce4499446809e0ed834a5bd7f707a81a98b9ec3f`|
+| `dist/DesktopNeko-previous.exe` |102553575|`0237d5d01723ff19c9e64b84885505b63c765373eb607b6783f7ffa19e5058d3`|
+
+The existing Windows Run command still quotes this exact current path; its compatibility-layer value is absent, so no `RUNASADMIN` flag remains. No unrelated registry entries were modified during v2 delivery.
 
 The earlier [startup/icon repair](startup-icon-validation.md) remains included: supplied `neko_sleep.ico`, correctly quoted startup registration, targeted removal of Neko's `RUNASADMIN` compatibility flag, and ordinary-user manifest. No sign-out/reboot/next-logon trial was performed.
 

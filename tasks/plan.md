@@ -2,9 +2,9 @@
 
 ## Cursor play v2 — approved, 2026-10-22
 
-The user approved the [complete v2 design](../docs/cursor-play-v2-plan.md). Delivery is in progress in the order recorded in `todo.md`; unrelated open work below is preserved.
+The user approved the [complete v2 design](../docs/cursor-play-v2-plan.md). Delivery and verification are complete: [final report, previews and release](../docs/cursor-play-v2-validation.md). Unrelated open work below is preserved.
 
-Native-size source review found the new loss endpoints look down, whereas the retained curl/comfort looks outward. Prototype an eight-slot common bridge: neutral calibration; lowered curled hold; ears lift; head tilts outward; chin rises; settle into the actual curl; two compatible quiet holds. Seven used drawings at about 120ms each, finite, after each complete loss and before the retained curl loop. Ground/support stays fixed; no stretching a pose to fit. Hidden legs remain tucked, forepaws support the chin, one tail wraps the haunch. Verify all three entry seams, actual curl endpoint and existing comfort/carry before accepting. This is a proposed correction until playback verifies it.
+Native-size source review found the new loss endpoints look down, whereas the retained curl/comfort looks outward. The implemented eight-slot common bridge uses neutral calibration; lowered curled hold; ears lifting; head tilting outward; chin rising; and settling into the actual curl. Seven used drawings at 120ms each play after each complete loss and before the retained curl loop. Ground/support stays fixed, hidden legs remain tucked, forepaws support the chin and one tail wraps the haunch. All three entry seams, actual curl endpoint, existing comfort/carry and actual native-painted entries are verified in the final report. The prototype is now tested practice recorded in Frame Master.
 
 ## Catch the Cursor — dedicated planning revision, 2026-10-22
 

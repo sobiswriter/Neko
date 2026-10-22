@@ -139,6 +139,16 @@ def native(app, n):
     assert n.game is not None
     begin = time.monotonic()
     phase_starts, gaps, coverage, captures = {}, [], {}, []
+    painted, paint_times = {}, []
+    original_frame = n.current_frame
+    def observe_painted_frame(now):
+        frame = original_frame(now)
+        if n.game:
+            name = n.game_clip()
+            painted.setdefault(name, set()).add(CLIPS[name].frame_index(now - n.game.since))
+            paint_times.append((case, time.monotonic()))
+        return frame
+    n.current_frame = observe_painted_frame
     last, case = begin, -1
     errors = []
     result = {}
@@ -150,7 +160,7 @@ def native(app, n):
             now = time.monotonic()
             gaps.append(now - last)
             last = now
-            n.animate()
+            # Production's animation timer owns advancement; this timer only observes/stages.
             g = n.game
             if g:
                 name = n.game_clip()
@@ -173,6 +183,9 @@ def native(app, n):
                                   native_thought_click_through=win32gui.WindowFromPoint((n.bubble.geometry().center().x(), n.bubble.geometry().center().y())) != int(n.bubble.winId()),
                                   platform=QApplication.platformName(), dpr=n.devicePixelRatioF(), monitors=len(app.screens()),
                                   pointer='scripted observations; real cursor never moved or captured',
+                                  painted_coverage={k: sorted(v) for k, v in painted.items()},
+                                  painted_median_interval=statistics.median(b[1] - a[1] for a, b in zip(paint_times, paint_times[1:]) if a[0] == b[0]),
+                                  painted_maximum_gap=max(b[1] - a[1] for a, b in zip(paint_times, paint_times[1:]) if a[0] == b[0]),
                                   coverage={k: sorted(v) for k, v in coverage.items()},
                                   plays=n.games_played, wins=n.games_won)
                     assert all(v >= .99 for v in result['countdown_seconds'].values()), result
@@ -181,20 +194,22 @@ def native(app, n):
                     for kind in ('win', 'loss'):
                         for i in range(3):
                             name = f'game_{kind}_{i}'
-                            assert set(CLIPS[name].order) <= coverage[name], (name, coverage[name])
+                            assert set(CLIPS[name].order) <= painted[name], (name, painted[name])
                     for name in ('game_ready', 'game_three', 'game_two', 'game_one', 'game_run', 'game_jump', 'walk', 'game_settle', 'game_loss_finish'):
-                        assert set(CLIPS[name].order) <= coverage[name], (name, coverage[name])
+                        assert set(CLIPS[name].order) <= painted[name], (name, painted[name])
                     timer.stop()
                     app.exit()
                     return
                 n.move(origin)
                 n.start_game(now, 'manual')
                 g = n.game
+                now = time.monotonic()
                 g.started = True
                 kind = 'win' if case < 3 else 'loss'
                 n.outcome_bags[kind] = [case % 3]
                 g.result = kind
                 g.enter(kind, now, kind)
+                n.advance_game(now)
                 begin = now
             if case == -1 and now - begin > 20:
                 raise AssertionError('native genuine paw catch did not finish')
