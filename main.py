@@ -32,8 +32,11 @@ from cursors import petting_cursors
 from thoughts import ThoughtLabel
 
 
-ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "assets"
+RESOURCE_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+ASSET_ROOT = RESOURCE_ROOT / "assets"
+ICON_PATH = RESOURCE_ROOT / "neko_sleep.ico"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+COMPATIBILITY_KEY = r"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"
 TIMING_LIMITS = {"sleep_seconds": (180, 1, 3600),
                  "sleep_duration": (0, 0, 3600),
                  "chatter_seconds": (75, 15, 600), "idle_seconds": (14, 5, 120),
@@ -76,6 +79,27 @@ def autostart_enabled():
         return legacy_shortcut().exists()
 
 
+def clear_startup_elevation(executable):
+    """Logon startup cannot answer an elevation prompt; preserve other app flags."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, COMPATIBILITY_KEY, 0,
+                            winreg.KEY_QUERY_VALUE | winreg.KEY_SET_VALUE) as key:
+            name = str(Path(executable).resolve())
+            value, kind = winreg.QueryValueEx(key, name)
+            if not isinstance(value, str):
+                raise OSError("Neko's compatibility setting is not text; it was left unchanged.")
+            flags = value.split()
+            if not any(flag.upper() == "RUNASADMIN" for flag in flags):
+                return
+            flags = [flag for flag in flags if flag.upper() != "RUNASADMIN"]
+            if flags and flags != ["~"]:
+                winreg.SetValueEx(key, name, 0, kind, " ".join(flags))
+            else:
+                winreg.DeleteValue(key, name)
+    except FileNotFoundError:
+        pass
+
+
 def set_autostart(enabled):
     with winreg.CreateKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as key:
         if enabled:
@@ -86,6 +110,7 @@ def set_autostart(enabled):
             args = [str(executable)]
             if not getattr(sys, "frozen", False):
                 args.append(str(Path(__file__).resolve()))
+            clear_startup_elevation(executable)
             winreg.SetValueEx(key, "DesktopNeko", 0, winreg.REG_SZ, subprocess.list2cmdline(args))
         else:
             try:
@@ -131,6 +156,7 @@ class StatsWindow(QDialog):
         self.neko = neko
         self.startup_error = ""
         self.setWindowTitle("Neko's nook")
+        self.setWindowIcon(QIcon(str(ICON_PATH)))
         self.setFixedWidth(340)
         self.setStyleSheet("""
             QWidget { background: #faf7f2; color: #504b48; }
@@ -420,6 +446,7 @@ class NekoWidget(QWidget):
         self.last_pin = 0
         self.stats_window = None
         self.setWindowTitle("Desktop Neko")
+        self.setWindowIcon(QIcon(str(ICON_PATH)))
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
                             | Qt.Tool | Qt.WindowDoesNotAcceptFocus)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -483,8 +510,7 @@ class NekoWidget(QWidget):
         self.transition_timer.timeout.connect(self.finish_transition)
 
     def init_tray(self):
-        icon = self.atlas.frame("idle", 0).copy(CANVAS_PADDING, CANVAS_TOP, 112, 112)
-        self.tray_icon = QSystemTrayIcon(QIcon(icon if not icon.isNull() else self.assets["idle"]), self)
+        self.tray_icon = QSystemTrayIcon(QIcon(str(ICON_PATH)), self)
         self.tray_icon.setToolTip("Neko · a little company")
         self.menu = QMenu()
         self.overlay_timer = QTimer(self)
@@ -1656,6 +1682,7 @@ if __name__ == "__main__":
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName("Desktop Neko")
     app.setOrganizationName("DesktopNeko")
+    app.setWindowIcon(QIcon(str(ICON_PATH)))
     data_dir = Path(QStandardPaths.writableLocation(QStandardPaths.AppLocalDataLocation))
     data_dir.mkdir(parents=True, exist_ok=True)
     instance_lock = QLockFile(str(data_dir / "neko.lock"))

@@ -23,6 +23,17 @@ APP.setQuitOnLastWindowClosed(False)
 
 
 class DesktopTests(unittest.TestCase):
+    def test_supplied_icon_is_used_for_pet_tray_and_nook(self):
+        from PySide6.QtGui import QIcon
+        from main import ICON_PATH
+        expected = QIcon(str(ICON_PATH)).pixmap(32, 32).toImage()
+        self.assertFalse(expected.isNull())
+        self.assertEqual(self.neko.windowIcon().pixmap(32, 32).toImage(), expected)
+        self.assertEqual(self.neko.tray_icon.icon().pixmap(32, 32).toImage(), expected)
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        self.assertEqual(self.neko.stats_window.windowIcon().pixmap(32, 32).toImage(), expected)
+
     def test_stationary_hold_is_not_a_pet_and_keeps_the_drag_offset(self):
         start = time.monotonic()
         point = QPoint(96, 70)
@@ -1070,6 +1081,7 @@ class DesktopTests(unittest.TestCase):
         shortcut = Path(self.folder.name) / "DesktopNeko.lnk"
         shortcut.touch()
         with patch("main.legacy_shortcut", return_value=shortcut), \
+                patch("main.clear_startup_elevation") as clear_elevation, \
                 patch("main.winreg.CreateKey"), patch("main.winreg.SetValueEx") as write:
             set_autostart(True)
         command = write.call_args.args[-1]
@@ -1077,6 +1089,7 @@ class DesktopTests(unittest.TestCase):
         self.assertIn('"', command)
         self.assertIn("main.py", command)
         self.assertFalse(shortcut.exists())
+        clear_elevation.assert_called_once()
 
     def test_startup_failure_preserves_the_old_shortcut(self):
         shortcut = Path(self.folder.name) / "DesktopNeko.lnk"

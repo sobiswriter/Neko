@@ -19,6 +19,9 @@ class PackagingTests(unittest.TestCase):
         archive = CArchiveReader(str(self.exe))
         names = {name.replace("\\", "/"): name for name in archive.toc}
         self.assertIn("assets/neko_idle.png", names)
+        self.assertIn("neko_sleep.ico", names)
+        self.assertEqual(hashlib.sha256(archive.extract(names["neko_sleep.ico"])).hexdigest(),
+                         hashlib.sha256((Path(__file__).parent / "neko_sleep.ico").read_bytes()).hexdigest())
         for bank in ("idle", "pets", "activity", "movement"):
             self.assertIn(f"assets/neko-{bank}-v3.png", names)
         self.assertIn("assets/neko-transitions-v1.png", names)
@@ -72,6 +75,32 @@ class PackagingTests(unittest.TestCase):
             self.assertIn(asset, names)
             self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
                              hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest())
+
+    def test_supplied_icon_resources_and_normal_user_manifest(self):
+        import struct
+        import xml.etree.ElementTree as ET
+        import pefile
+        icon = (Path(__file__).parent / "neko_sleep.ico").read_bytes()
+        _, kind, count = struct.unpack_from("<HHH", icon)
+        self.assertEqual(kind, 1)
+        source_images = set()
+        for i in range(count):
+            size, offset = struct.unpack_from("<II", icon, 6 + i * 16 + 8)
+            source_images.add(hashlib.sha256(icon[offset:offset + size]).hexdigest())
+        with pefile.PE(str(self.exe)) as pe:
+            resources = {entry.id: entry.directory.entries for entry in pe.DIRECTORY_ENTRY_RESOURCE.entries}
+            self.assertIn(14, resources)  # RT_GROUP_ICON
+            embedded_images = set()
+            for entry in resources[3]:
+                for language in entry.directory.entries:
+                    data = language.data.struct
+                    embedded_images.add(hashlib.sha256(pe.get_data(data.OffsetToData, data.Size)).hexdigest())
+            self.assertTrue(source_images <= embedded_images)
+            data = resources[24][0].directory.entries[0].data.struct
+            manifest = ET.fromstring(pe.get_data(data.OffsetToData, data.Size).rstrip(b"\0"))
+            level = manifest.find(".//{urn:schemas-microsoft-com:asm.v3}requestedExecutionLevel")
+            self.assertIsNotNone(level)
+            self.assertEqual(level.attrib["level"], "asInvoker")
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui
