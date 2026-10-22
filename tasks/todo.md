@@ -1,5 +1,94 @@
 # Animation rebuild checklist
 
+## Catch the Cursor — dedicated proposal, not implemented
+
+- [x] Record the revised automatic/horizontal/jumping/win/loss/comfort/queue requirements and supersede conflicting portfolio assumptions in [the dedicated plan](../docs/catch-the-cursor-plan.md).
+- [ ] C1: prototype lateral geometry, measured jump/contact envelopes and unobtrusive reference-inspired guides; verify clipping and baseline invariance.
+- [ ] C2: author one complete ready/run/turn/pounce/contact/miss/recovery art path at canonical scale; review native/slow/light/dark transitions.
+- [ ] C3: implement the manual menu-to-round-to-result slice, with single-contact victory and neutral cancellation; prove input, nap/count and saved-origin compatibility.
+- [ ] Checkpoint: native moving/stationary/high/edge target cases, actual paw contacts and arbitrary-phase cancellation pass before expanding art.
+- [ ] C4: author/import frustrated attempts, three victory hops, disappointed curl/breathing and pet comfort; verify all outcome/carry/comfort seams and no automatic nap takeover.
+- [ ] C5: implement bounded, coalesced priority intents and default-on configurable 90s scheduling; fake-clock tests cover naps, busy activities, settings edits, cancellation and no backlog. Detailed dependencies and acceptance are in the design.
+- [ ] C6: reduced-motion alternatives, complete native/source/art/package checks and updated provenance/docs; keep the two-file flat release layout.
+
+The older G1/G2 portfolio tasks below remain for future games where needed; click interception and eight-direction art are specifically not required for this first game.
+
+## Mini-games — proposed; implementation not started
+
+Design: [Mini-games plan](../docs/minigames-plan.md). The research/plan request is complete; the open items below are future implementation work, not a claim of authorization. All previous completed records remain below.
+
+- [x] Study current movement, input, state ownership, animation guide and latest pickup verification; research primary behavior/product/platform sources.
+- [x] Plan all three requested games and rank five additional candidates; document stories, transitions, controls, fairness, reduced motion, scope and verification.
+
+### G1. Native transparent input trial
+
+Description: establish whether click games can absorb misses inside a marked transparent field while preserving normal desktop use elsewhere.
+
+- [ ] Acceptance: scoped interception handles in-area press/release/miss, outside input, focus loss and held-button teardown without duplication or stuck input; it is removed between rounds.
+- [ ] Acceptance: if the trial fails, disable/defer click games; do not add an assumed filled/click-catching background.
+- [ ] Verification: native test-owned underlying-window probe, Escape/Stop, callback loss, fullscreen/hide and repeated start/stop checks; record mechanism/limits.
+- Dependencies: implementation approval. Likely files: temporary trial, `game_input.py` if accepted, `test_game_input.py`, QA note (medium).
+
+### G2. Directional movement and art trial
+
+Description: prove native-scale diagonal running, reversal, pounce/contact and supported recovery before a full sheet.
+
+- [ ] Acceptance: correct front/rear/diagonal views, planted turns, retained scale and unclipped support/contact at corners and minimum field size.
+- [ ] Verification: native-size light/dark and normal/slow previews; elapsed-time tests at varied update intervals/delayed frames; record final art budget and field dimensions.
+- Dependencies: implementation approval; independent of G1. Likely files: trial art, `animations.py`, trial preview, provenance/QA record (medium).
+
+### G3. Catch the Cursor vertical slice
+
+Description: deliver one complete opt-in hunt, visible catch/miss, finite outcome and return home, then tune the full round.
+
+- [ ] Acceptance: committed pounce/contact scoring, no repeated overlap rewards, pause outside, complete recovery and reduced-motion reach variant.
+- [ ] Acceptance: gameplay owns behavior without pet/nap count changes, home-coordinate writes or ordinary pet/hold ambiguity.
+- [ ] Verification: seeded `test_games` checks, focused behavior/Qt integration and native contact/cancel playback.
+- Dependencies: G2. Likely files: `games.py`, `behavior.py`, `main.py`, `test_games.py`, `test_main.py` (medium); accepted G2 art imported separately.
+
+### Checkpoint A — first complete game
+
+- [ ] Verify Catch's ready/pursuit/contact/miss/recovery at native size, all cancellation routes, original pet/pickup/nap/lifecycle behavior and no pointer warp.
+
+### G4. Run Away / Kitten Tag slice
+
+Description: add teasing invitation, readable escape bursts, corner turns, deliberate dwell tag and contented recovery.
+
+- [ ] Acceptance: committed bounded escape routes, reaction/rest opportunities, anti-repeat tag separation and reduced-motion target dwell variant.
+- [ ] Verification: seeded corner/routing/dwell tests and native tag/recovery/directional-seam playback.
+- Dependencies: Checkpoint A. Likely files: `games.py`, `animations.py`, `assets/` game bank, `test_games.py`, `test_main.py` (medium).
+
+### G5. Dodge Clicks slice
+
+Description: add telegraphed evasion and timestamped accurate clicks in an eight-attempt round after the input trial succeeds.
+
+- [ ] Acceptance: visible silhouette hit scoring, finite committed dodges/cooldown, clear attempt readiness, no duplicate attempts and no desktop click leakage.
+- [ ] Verification: native in-area misses/outside use, duplicate press/release and held-cancel regressions; reduced-motion boop/rest windows; all dodge/cancel drawings reviewed.
+- Dependencies: passing G1 and Checkpoint A. Likely files: `games.py`, `main.py`, `game_input.py`, `test_games.py`, `test_game_input.py` (medium); dodge art is a separate reviewed batch.
+
+### Checkpoint B — quality and distinction
+
+- [ ] Each requested game has different agency/rhythm/acting, supported transitions, readable outcomes and a usable reduced-motion version. Score, rendered contact and input timestamps agree.
+
+### G6. Game cues and complete previews
+
+Description: integrate sparse background-free lines and generate actual-controller frame/transition evidence for the completed games.
+
+- [ ] Acceptance: local start/outcome cues obey quiet/visibility/cooldown rules; complete previews cover direction, loops, contact, miss and interruption.
+- [ ] Verification: decoded preview timing/pose coverage, source/imported frame review, native light/dark observations and bounded repeated-session resource probe.
+- Dependencies: Checkpoint B. Likely files: `dialogue.py`, `tools/preview_games.py`, provenance, native QA record, preview artifacts (medium).
+
+### G7. Release verification and documentation
+
+Description: verify unchanged companion behavior and package the exact reviewed assets/code into a separate deliverable.
+
+- [ ] Acceptance: no regression to retained tail/pet/carry clips/pixels, saved positions/counts or ordinary input; corrupt/missing game art disables only affected games safely.
+- [ ] Verification: full discovery, fresh distinct build and exact executable packaging checks; record source/art/build hash, native/display coverage and remaining limits.
+- [ ] Documentation: update README, Frame Master only for verified discoveries, prompt/assembly evidence and the game design's delivered status.
+- Dependencies: G6. Likely files: `test_packaging.py`, `README.md`, `framemaster.md`, validation report, build metadata (medium).
+
+Later candidates, outside the proposed first three-game release: Yarn Rally first, Peek-a-Box next; Copycat Paws, Butterfly Patrol and Find the Bell remain design options.
+
 ## Pickup animation — approved and completed
 
 - [x] Create `framemaster.md` from the verified animation method, link it from README and require future animation agents to consult/update it through `AGENTS.md`.

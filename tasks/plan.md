@@ -1,5 +1,23 @@
 # Animation rebuild
 
+## Catch the Cursor — dedicated planning revision, 2026-10-22
+
+Status: dedicated design requested; game implementation not yet authorized. See [Catch the Cursor](../docs/catch-the-cursor-plan.md). It supersedes the first game's earlier opt-in-only, free-2D and three-catch assumptions: automatic play defaults on at a configurable 90s interval, running is horizontal only, jumps use measured reach, one genuine contact wins, unreachable play/timeouts lead to a disappointed curl until petted, and bounded/coalesced activity intents protect naps and complete transitions.
+
+Delivery order: lateral geometry/contact trial → one complete hunt art path → manual playable slice → native checkpoint → full win/loss/comfort art → bounded scheduler and settings → interruption/accessibility/release checks. Eight-direction locomotion and Dodge's click-interception trial are not dependencies of this revised first game. The user requested only this plan and the thought-backdrop implementation today.
+
+Thought backdrop: implemented as a compact rounded, click-through frosted label, keeping sharp text and existing timing/quiet rules. See its [verification](../docs/thought-backdrop-validation.md). Mini-game code/art remain unimplemented.
+
+## Mini-games — proposed, 2026-10-22
+
+Status: research and planning only; not approved for implementation. See the [complete mini-games design](../docs/minigames-plan.md) for the three requested games, five additional candidates, references, animation stories, input/ownership rules, reduced-motion variants and acceptance matrix. Previous completed work remains below.
+
+Recommendation: Catch the Cursor (Neko hunts), Run Away / Kitten Tag (player pursues) and Dodge Clicks (aim/timing), followed by Yarn Rally and then Peek-a-Box. Prototype native transparent click ownership and directional movement before producing full game art. Zero-alpha desktop regions normally pass clicks through; Dodge must not ship until in-area misses can be consumed and outside input/teardown are verified.
+
+Dependency order: input feasibility trial → directional run/turn/contact trial → complete Catch slice → compatibility checkpoint → Run Away slice → gated Dodge slice → distinctness/accessibility checkpoint → native/source/packaged release proof. Pointer-only games can proceed if the click-input trial fails; click games remain deferred. See the new section in [the task list](todo.md) for concrete acceptance checks.
+
+Preserve current 192 × 144 canvas/character scale, accepted tail/pet/pickup sequences, nap/pet counts, saved home and background-free thoughts. Use explicit finite opt-in sessions; no new dependency, permanent mouse recorder or progression economy. All proposed timings/frame budgets require prototype/play-test validation. This plan makes no new claim about verified animation practice.
+
 ## Pickup animation — approved, 2026-10-22
 
 Status: approved and implemented. Final source, native and packaged checks pass; see [verification](../docs/pickup-validation.md). The delivered build is `dist/pickup-qol/DesktopNeko.exe`. Previous completed plans are preserved below.
