@@ -38,6 +38,9 @@ class NekoState(Enum):
     LEAVING = auto()
     HELD = auto()
     SETTING_DOWN = auto()
+    PLAYING = auto()
+    DISAPPOINTED = auto()
+    COMFORTING = auto()
 
 
 PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
@@ -45,6 +48,7 @@ PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
               NekoState.PET_STRETCH, NekoState.BACK_ARCH, NekoState.HAPPY_HOP,
               NekoState.SIDE_FLOP, NekoState.SHOULDER_PEEK)
 CARRY_STATES = (NekoState.HELD, NekoState.SETTING_DOWN)
+GAME_STATES = (NekoState.PLAYING, NekoState.DISAPPOINTED, NekoState.COMFORTING)
 IDLE_STATES = (NekoState.STRETCHING, NekoState.GROOMING, NekoState.PEEKING,
                NekoState.YAWNING, NekoState.TAIL_SWISH, NekoState.EAR_FLICK,
                NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS,
@@ -126,6 +130,9 @@ class Companion:
             return "settled"
         if self.state == NekoState.FALLING_ASLEEP:
             return "sleep"
+        if previous == NekoState.DISAPPOINTED:
+            self.pose_until = float("inf")
+            return "settled"
         self.state = NekoState.IDLE
         self.next_nap = now + self.sleep_seconds
         return "idle"
@@ -186,6 +193,9 @@ class Companion:
 
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
              window_changed=False, keyboard_events=0, window_event=None, app_kind=None):
+        if self.state in GAME_STATES:
+            self.pending_window = None
+            return None
         if self.state in CARRY_STATES:
             self.pending_window = None
             if self.state == NekoState.SETTING_DOWN and now >= self.pose_until:

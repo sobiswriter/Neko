@@ -229,3 +229,13 @@ Generated art can drift anatomically; use simple silhouettes and targeted regene
 `.venv/Scripts/python.exe -m PyInstaller --noconfirm --clean main.spec`
 
 `NEKO_TEST_EXE=dist/DesktopNeko.exe .venv/Scripts/python.exe -m unittest test_packaging -v`
+
+## Catch the Cursor — implementation authorized, 2026-10-22
+
+Deliver the dedicated proposal: manual menu/nook play, automatic games enabled at a persisted 90-second default (30–600 seconds), lateral runway, committed paw-contact jumps, three-hop win, protest/loss curl and deliberate-pet comfort. Use a bounded game intent and coalesced existing activity categories; revalidate eligibility rather than replay stale poses.
+
+Scope: games.py controller/geometry; behavior.py ownership; animations.py and new authored assets; main.py menu/settings/input/lifecycle; focused game/integration/package tests; actual-controller previews; provenance, verification, README and Frame Master. Existing nap/pet/carry counts, saved origin, accepted tail artwork and animation scale are compatibility gates.
+
+Storyboard: idle → attentive ready (1.4s) → supported side run/turn → crouch (0.2s) → committed reach/landing (0.6s) → puzzled miss/retry or proud grasp → retained reviewed three-hop celebration → walk home/sit. Continuous unreachable play gets one protest and safe attempt, then ears/head lower → supported curl/breathe until comfort. Pet: acknowledge → eyes reopen → uncurl/rise → canonical idle. Curl pickup uses the existing quiet side-entry bridge and returns to disappointed curl without creating a nap. Four anatomical limbs with occlusion, stable head volume, a single attached tail. New source banks use constant batch calibration; review all selected poses on light/dark and native playback.
+
+Verify geometry/contact and scheduler first, one full manual path next, then outcomes/automatic scheduling/interruption and exact executable. Do not substitute rotating tail-chase art for a lateral run. No pointer warp/capture, global input hook, new runtime dependency or other mini-games.

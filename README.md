@@ -1,13 +1,28 @@
 # Desktop Neko 🐾
 
 A little company for your Windows desktop. Neko stretches, settles down, notices
-your cursor, and naps when you step away. No chores, guilt, or attention meter.
+your cursor, and naps when you step away. No chores or attention meter.
 Soft sounds are optional and off until you enable them.
 
 ![Neko's petting animations](docs/neko-pet-catalog.gif)
 
 ## Living with Neko
 
+- **Catch the Cursor.** Right-click Neko or use her tray menu → **Play · Catch the Cursor**.
+  The nook's **Play** tab has the same control and **Automatic cursor games**, enabled
+  by default, with **90 seconds** between opportunities (adjustable from 30–600 seconds).
+  Automatic play waits for naps, carrying, reactions, open menus, typing and fullscreen;
+  Quiet company pauses it. A single pending request prevents a backlog.
+  Keep the arrow between the guides: she accelerates sideways, brakes/turns, gathers herself
+  and commits to a jump. Move during the jump to dodge; let her forepaw touch the arrow
+  to win her three happy hops. Each hunt lasts up to 45 seconds. Out-of-range play earns
+  a protest and a determined reach; four continuous seconds outside ends the round.
+  After a loss she curls up, a little disappointed, until a quick pet comforts her through
+  a drawn get-up. Moving her preserves that mood and never counts as a nap.
+  **End game**, right-click/tray, hide and fullscreen can cancel neutrally.
+  Gentle motion off uses a stationary paw target. The real pointer is never moved,
+  hidden or captured, and the transparent guides leave your desktop usable.
+  [Preview and verification](docs/catch-validation.md) · [design](docs/catch-the-cursor-plan.md).
 - **Click to pet.** Twelve individually paced reactions with 16–28 source pose slots: head pats, cheek nuzzles,
   kneading, chin scritches, a playful roll, offering a paw, relaxed ear rubs,
   a front stretch, back arch, tiny hop, side flop, and shoulder peek.
@@ -40,11 +55,11 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 528 entries, including eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 576 entries, including 48 game slots and eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
-  Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS.
+  Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS; cursor games use a precise 50 FPS timer.
   Petting/carrying use a precise Qt timer so short connecting poses get screen time.
   Arrival/departure briefly use 30 FPS for smooth travel,
   keeping walking speed unchanged.

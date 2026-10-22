@@ -65,6 +65,13 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("app_context", modules)
         self.assertIn("cursors", modules)
         self.assertIn("thoughts", modules)
+        self.assertIn("games", modules)
+        self.assertIn("game_overlay", modules)
+        for bank in ("hunt", "emotion"):
+            asset = f"assets/neko-game-{bank}-v1.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest())
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui

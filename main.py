@@ -21,7 +21,9 @@ from PySide6.QtWidgets import (
     QPushButton, QSpinBox, QFormLayout, QTabWidget, QSystemTrayIcon, QVBoxLayout, QWidget,
 )
 
-from behavior import Companion, NekoState, PET_STATES, CARRY_STATES
+from behavior import Companion, NekoState, PET_STATES, CARRY_STATES, GAME_STATES
+from games import CursorGame, GameTimer, Runway
+from game_overlay import GameOverlay
 from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
 from animations import SpriteAtlas, Clip, CLIPS, drop_progress, held_clip, sprite_bounds, CANVAS_WIDTH, CANVAS_PADDING, CANVAS_TOP, CANVAS_HEIGHT
@@ -164,10 +166,12 @@ class StatsWindow(QDialog):
         layout.addWidget(self.mood)
         tabs = QTabWidget()
         layout.addWidget(tabs)
-        company, settings = QWidget(), QWidget()
+        company, settings, play_tab = QWidget(), QWidget(), QWidget()
         tabs.addTab(company, "Company")
+        tabs.addTab(play_tab, "Play")
         tabs.addTab(settings, "Settings")
         company_layout, settings_layout = QVBoxLayout(company), QVBoxLayout(settings)
+        play_layout = QVBoxLayout(play_tab)
         self.focus = QCheckBox("Quiet company · no unprompted words")
         self.focus.setChecked(neko.quiet)
         self.focus.toggled.connect(neko.set_quiet)
@@ -196,6 +200,32 @@ class StatsWindow(QDialog):
         self.follow.setChecked(neko.follow_mouse)
         self.follow.toggled.connect(neko.set_follow_mouse)
         company_layout.addWidget(self.follow)
+        self.play = QPushButton("Play · Catch the Cursor")
+        self.play.clicked.connect(neko.request_game)
+        play_layout.addWidget(self.play)
+        self.auto_games = QCheckBox("Automatic cursor games")
+        self.auto_games.setChecked(neko.game_timer.enabled)
+        self.auto_games.setToolTip("A little hunt after she is free and you have stopped typing. Quiet company pauses automatic play.")
+        self.auto_games.toggled.connect(neko.set_auto_games)
+        play_layout.addWidget(self.auto_games)
+        game_timing = QFormLayout()
+        self.game_interval = QSpinBox()
+        self.game_interval.setRange(30, 600)
+        self.game_interval.setSuffix(" sec")
+        self.game_interval.setKeyboardTracking(False)
+        self.game_interval.setValue(neko.game_timer.interval)
+        self.game_interval.setAccessibleName("Time between cursor games")
+        self.game_interval.valueChanged.connect(neko.set_game_interval)
+        game_timing.addRow("Time between games", self.game_interval)
+        play_layout.addLayout(game_timing)
+        instructions = QLabel("Keep the arrow between the guides. One paw touch wins her three happy hops.\n\n"
+                              "She runs left and right, then commits to her jump — you can dodge it! "
+                              "Keep the arrow out of reach and she gets a little dramatic. A pet comforts her afterward.\n\n"
+                              "Automatic play waits for naps, cuddles and typing. Quiet company pauses it. "
+                              "Turn off Gentle motion for a stationary paw game.")
+        instructions.setWordWrap(True)
+        play_layout.addWidget(instructions)
+        play_layout.addStretch()
         timing = QFormLayout()
         self.timing = {}
         for key, label in (("sleep_seconds", "Inactivity before nap"),
@@ -280,6 +310,7 @@ class StatsWindow(QDialog):
 
     def update_stats(self):
         n = self.neko
+        self.play.setText("End game" if n.game and n.game.phase not in ("curl", "comfort") else "Play · Catch the Cursor")
         self.keepsakes.setText(f"{n.total_pets + n.companion.pets} little pets   ·   "
                                f"{n.total_naps + n.companion.naps} cozy naps")
         self.status.setText(self.startup_error or n.ai_status)
@@ -299,6 +330,9 @@ class StatsWindow(QDialog):
             NekoState.ROLLING: "a happy little roll, just for you.",
             NekoState.PAW_OFFER: "one little paw. for your company.",
             NekoState.EAR_RUB: "these very small ears approve.",
+            NekoState.PLAYING: "that little arrow is mine!",
+            NekoState.DISAPPOINTED: "a little disappointed. a pet would help.",
+            NekoState.COMFORTING: "one more cuddle. feeling better already.",
         }.get(n.companion.state, "a little cat, doing little cat things."))
 
     def change_startup(self, enabled):
@@ -318,6 +352,15 @@ class NekoWidget(QWidget):
         super().__init__()
         self.settings = settings if settings is not None else QSettings("DesktopNeko", "Neko")
         self.companion = Companion(time.monotonic())
+        try:
+            interval = max(30, min(600, int(self.settings.value("game_interval", 90))))
+        except (ValueError, TypeError, OverflowError):
+            interval = 90
+        self.game_timer = GameTimer(time.monotonic(), self.settings.value("auto_games", True, type=bool), interval)
+        self.game = None
+        self.game_overlay = None
+        self.game_interaction = None
+        self.last_keyboard = -math.inf
         for key, (default, minimum, maximum) in TIMING_LIMITS.items():
             try:
                 value = int(self.settings.value(key, default))
@@ -444,6 +487,11 @@ class NekoWidget(QWidget):
         self.menu.aboutToShow.connect(self.prepare_menu)
         self.menu.aboutToHide.connect(self.overlay_timer.stop)
         self.menu.addAction("Neko's nook…", self.open_stats_window)
+        self.play_action = self.menu.addAction("Play · Catch the Cursor", self.request_game)
+        self.auto_game_action = self.menu.addAction("Automatic cursor games")
+        self.auto_game_action.setCheckable(True)
+        self.auto_game_action.setChecked(self.game_timer.enabled)
+        self.auto_game_action.toggled.connect(self.set_auto_games)
         self.quiet_action = self.menu.addAction("Quiet company")
         self.quiet_action.setCheckable(True)
         self.quiet_action.setChecked(self.quiet)
@@ -459,6 +507,7 @@ class NekoWidget(QWidget):
         self.cancel_pickup()
         self.stop_following()
         self.dismiss_bubble()
+        self.play_action.setText("End game" if self.game and self.game.phase not in ("curl", "comfort") else "Play · Catch the Cursor")
         self.overlay_timer.start(0)
 
     def place_menu(self):
@@ -482,6 +531,8 @@ class NekoWidget(QWidget):
         self.save_preferences()
 
     def set_motion(self, enabled):
+        if self.game and self.game.phase not in ("curl", "comfort"):
+            self.end_game(immediate=True)
         self.motion = enabled
         if not enabled:
             self.companion.pet_pending = False
@@ -540,6 +591,163 @@ class NekoWidget(QWidget):
             self.stop_following()
         self.save_preferences()
 
+    def set_auto_games(self, enabled):
+        self.game_timer.configure(time.monotonic(), enabled, self.game_timer.interval)
+        self.auto_game_action.setChecked(enabled)
+        self.save_preferences()
+
+    def set_game_interval(self, value):
+        self.game_timer.configure(time.monotonic(), self.game_timer.enabled, value)
+        self.save_preferences()
+
+    def request_game(self):
+        if self.game:
+            if self.game.phase not in ("curl", "comfort"):
+                self.end_game()
+            elif self.game.phase == "curl":
+                self.say("A little cuddle first?", prompted=True)
+            return
+        if not self.game_art_ready():
+            self.say("My play drawings are missing. I can still keep you company.", prompted=True)
+            return
+        self.game_timer.request(time.monotonic(), manual=True)
+        if self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
+            if self.stats_window:
+                self.stats_window.mood.setText("Play is waiting. Pet her to wake, or let her nap.")
+        self.stop_following()
+        # Menu callbacks complete before eligibility is checked; the nook may stay open for manual play.
+        if self.stats_window:
+            self.stats_window.close()
+        QTimer.singleShot(0, self.tick)
+
+    def game_art_ready(self):
+        return all((f"game-{bank}", i // 4, i % 4) in self.atlas.frames
+                   for bank in ("hunt", "emotion") for i in range(24))
+
+    def start_game(self, now, source):
+        if not self.game_art_ready():
+            self.game_timer.reset(now)
+            return False
+        area = (QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()).availableGeometry()
+        lift = min(110, self.y() - area.top()) if self.motion else 0
+        if area.width() < 560 or (self.motion and lift < 16):
+            self.game_timer.reset(now)
+            if source == "manual":
+                self.say("I need a little more room above me to jump. Move me lower?", prompted=True)
+            return False
+        self.stop_following()
+        self.dismiss_bubble()
+        self.reset_pet_cursor()
+        self.ai_generation += 1
+        self.companion.pet_pending = False
+        self.companion.pending_window = None
+        runway = Runway(area.left(), area.right() - self.width() + 1, self.y(), lift)
+        self.game = CursorGame(now, (self.x(), self.y()), runway, self.motion, source)
+        self.companion.pose(NekoState.PLAYING, now, math.inf)
+        if self.game_overlay is None:
+            self.game_overlay = GameOverlay(self)
+        self.game_overlay.setGeometry(area)
+        self.game_overlay.show()
+        self.game_overlay.stop.adjustSize()
+        self.game_overlay.stop.move(area.right() - self.game_overlay.stop.width() - 12,
+                                    max(area.top() + 4, round(runway.y + runway.paw[1] - lift - 32)))
+        self.game_overlay.stop.show()
+        self.play_action.setText("End game")
+        self.refresh_asset()
+        self.advance_game(now)
+        return True
+
+    def game_clip(self):
+        if self.game is None:
+            return "idle"
+        phase = self.game.phase
+        if not self.game.motion and phase in ("run", "turn", "prepare", "jump", "miss", "home"):
+            return "game_gentle_reach" if phase == "jump" else "game_gentle_rest"
+        if phase == "win":
+            return "happy_hop" if self.game.motion else "game_ready"
+        if phase == "home":
+            return "walk"
+        if phase == "done":
+            return "idle"
+        return "game_" + phase
+
+    def game_contact(self, now, cursor):
+        game = self.game
+        if game.phase != "jump" or game.result is not None:
+            return False
+        index = CLIPS["game_jump"].frame_index(now - game.since) if game.motion else 19
+        # Author-reviewed forepaw boxes, then alpha-test the actual drawing (never head/tail/margins).
+        regions = {18: (40, 83, 62, 103), 19: (43, 69, 59, 89),
+                   20: (39, 101, 62, 118), 21: (52, 116, 68, 129)}
+        if index not in regions:
+            return False
+        x, y = game.position_at(now)
+        px, py = round(cursor[0] - round(x)), round(cursor[1] - round(y) + 1)
+        if game.direction > 0:
+            px = 191 - px
+        left, top, right, bottom = regions[index]
+        if not (left <= px <= right and top <= py <= bottom):
+            return False
+        frame = self.atlas.frame("game_jump" if game.motion else "game_gentle_reach", now - game.since).toImage()
+        return frame.pixelColor(px, py).alpha() >= 128
+
+    def advance_game(self, now):
+        game = self.game
+        cursor = QCursor.pos()
+        point = (cursor.x(), cursor.y())
+        game.update(now, point, self.game_contact(now, point))
+        self.move(round(game.x), round(game.y))
+        if game.phase == "done":
+            interaction, self.game_interaction = self.game_interaction, None
+            self.game = None
+            self.game_overlay.hide()
+            self.play_action.setText("Play · Catch the Cursor")
+            self.companion.state = NekoState.IDLE
+            self.companion.last_interaction = now
+            self.companion.next_nap = now + self.companion.sleep_seconds
+            self.companion.next_idle = now + self.companion.idle_seconds
+            self.companion.next_comment = now + self.companion.chatter_seconds
+            self.game_timer.reset(now)
+            self.pose_started = now
+            self.dismiss_bubble()
+            self.refresh_asset()
+            if interaction == "pet":
+                self.pet_reaction()
+            elif interaction == "pickup" and self.drag_origin is not None and QApplication.mouseButtons() & Qt.LeftButton:
+                self.drag_offset = self.drag_origin - self.pos()
+                self.begin_pickup()
+            self.save_preferences()
+            return
+        self.companion.state = (NekoState.DISAPPOINTED if game.phase == "curl" else
+                                NekoState.COMFORTING if game.phase == "comfort" else NekoState.PLAYING)
+        self.current_clip = self.game_clip()
+        self.pose_started = game.since
+        if game.phase in ("loss", "curl", "comfort"):
+            self.game_overlay.hide()
+        else:
+            self.game_overlay.update()
+        line = game.take_line()
+        if line:
+            self.say(line, prompted=game.source == "manual" or not self.quiet)
+
+    def end_game(self, checked=False, immediate=False, clear_mood=False):
+        if self.game is None:
+            return
+        game = self.game
+        if game.phase in ("curl", "comfort") and not clear_mood:
+            return
+        now = time.monotonic()
+        if immediate:
+            game.x, game.y = game.origin
+            game.enter("done", now)
+            game.last = now
+        else:
+            self.dismiss_bubble()
+            if self.game_interaction:
+                game.origin = (game.end_x if game.phase == "jump" else game.x, game.runway.y)
+            game.cancel(now)
+        self.advance_game(now)
+
     def stop_following(self):
         if self.companion.state == NekoState.FOLLOWING:
             self.companion.state = NekoState.IDLE
@@ -549,6 +757,10 @@ class NekoWidget(QWidget):
 
     def animate(self):
         now = time.monotonic()
+        if self.game and self.companion.state in GAME_STATES:
+            self.advance_game(now)
+            self.update()
+            return
         if self.drag_origin is not None and not self.dragged:
             self.update()
             return
@@ -633,11 +845,12 @@ class NekoWidget(QWidget):
 
     def sync_animation(self):
         active = self.isVisible() and not self.is_manually_hidden and not self.closing
-        if active and self.motion:
-            interval = (33 if self.current_clip in ("arrive", "depart") else
+        if active and (self.motion or self.game is not None):
+            interval = (20 if self.companion.state in GAME_STATES else
+                        33 if self.current_clip in ("arrive", "depart") else
                         50 if self.companion.state in PET_STATES + CARRY_STATES
                         or self.current_clip in ("tail_chase", "tail_catch") else 100)
-            self.animation_timer.setTimerType(Qt.PreciseTimer if self.companion.state in PET_STATES + CARRY_STATES else Qt.CoarseTimer)
+            self.animation_timer.setTimerType(Qt.PreciseTimer if self.companion.state in PET_STATES + CARRY_STATES + GAME_STATES else Qt.CoarseTimer)
             self.animation_timer.start(interval)
         else:
             self.animation_timer.stop()
@@ -650,6 +863,10 @@ class NekoWidget(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
+        if self.game and self.game.phase == "comfort":
+            now = time.monotonic()
+            self.game.since += max(0, now - self.game.last)
+            self.game.last = now
         if hasattr(self, "animation_timer"):
             self.sync_animation()
 
@@ -663,8 +880,14 @@ class NekoWidget(QWidget):
             return
         now = time.monotonic()
         idle, window, fullscreen = desktop_activity()
-        self.activity.enabled = self.reactive and not fullscreen
+        self.activity.enabled = (self.reactive or self.game_timer.enabled or self.game is not None) and not fullscreen
         keyboard_events, window_event = self.activity.consume(now)
+        if keyboard_events:
+            self.last_keyboard = now
+            if self.game and self.game.source == "automatic" and self.game.phase not in ("curl", "comfort"):
+                self.end_game()
+        if fullscreen and self.game and self.game.phase not in ("curl", "comfort"):
+            self.end_game(immediate=True)
         fullscreen_changed = fullscreen != self.fullscreen
         if self.reactive and not fullscreen and window:
             try:
@@ -713,6 +936,23 @@ class NekoWidget(QWidget):
                 self.reset_pet_cursor()
             self.last_window = window
             return
+        if self.game is not None:
+            if self.reactive and window_event and self.companion.activity_ready(now):
+                self.companion.pending_window = (window_event, now, self.app_context)
+                self.game_timer.log.append((now, "coalesced", "window reaction"))
+            self.last_window = window
+            return
+        manual_pending = self.game_timer.pending == "manual"
+        eligible = (self.companion.state == NekoState.IDLE and not fullscreen and self.isVisible()
+                    and not self.menu.isVisible()
+                    and not (self.stats_window and self.stats_window.isVisible())
+                    and now - self.last_keyboard >= 2
+                    and (manual_pending or not self.quiet)
+                    and (manual_pending or idle < self.companion.sleep_seconds or now < self.companion.next_nap))
+        source = self.game_timer.tick(now, eligible)
+        if source and self.start_game(now, source):
+            self.last_window = window
+            return
         changed = bool(self.last_window and window != self.last_window)
         self.pin_to_top(force=changed)
         cursor = QCursor.pos()
@@ -738,7 +978,7 @@ class NekoWidget(QWidget):
         action = self.companion.tick(now, idle, self.quiet or fullscreen,
                                      cursor_near=moved and distance < 150 and not fullscreen,
                                      window_changed=changed and self.reactive and not fullscreen and not fullscreen_changed,
-                                     keyboard_events=keyboard_events, window_event=window_event,
+                                     keyboard_events=keyboard_events if self.reactive else 0, window_event=window_event if self.reactive else None,
                                      app_kind=self.app_context)
         self.last_window = window
         if action == "comment":
@@ -763,6 +1003,11 @@ class NekoWidget(QWidget):
                 self.offline_line(self.current_clip)
 
     def refresh_asset(self):
+        if self.game and self.companion.state in GAME_STATES:
+            self.current_clip = self.game_clip()
+            self.current_asset = "idle"
+            self.sync_animation()
+            return
         self.current_clip = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",
             NekoState.FALLING_ASLEEP: "fall_asleep",
@@ -804,11 +1049,12 @@ class NekoWidget(QWidget):
         state = self.companion.state
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(75, 55, 48, 18))
-        if state not in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
+        if (state not in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES
+                and not (self.game and self.game.phase == "jump")):
             painter.drawEllipse(QRectF(28 + CANVAS_PADDING, 99 + CANVAS_TOP, 56, 5))
         painter.save()
         painter.translate(self.width() // 2, 99 + CANVAS_TOP)
-        movie = None if state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES else self.movies.get(self.current_asset)
+        movie = None if state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES + GAME_STATES else self.movies.get(self.current_asset)
         pixmap = self.current_frame(now)
         # Keep the visible origin stable when transparent top padding is added.
         top = -100 - CANVAS_TOP
@@ -822,7 +1068,9 @@ class NekoWidget(QWidget):
             painter.setPen(QColor("#a67671"))
             painter.drawText(QRectF(-45, -85, 90, 85), Qt.AlignCenter, "=^·ω·^=")
         else:
-            if state == NekoState.FOLLOWING and self.look_direction > 0:
+            if ((state == NekoState.FOLLOWING and self.look_direction > 0)
+                    or (self.game and state in GAME_STATES and self.game.direction > 0
+                        and self.game.phase not in ("loss", "curl", "comfort", "win"))):
                 painter.scale(-1, 1)
             painter.drawPixmap(-pixmap.width() // 2, top, pixmap)
         painter.restore()
@@ -874,6 +1122,18 @@ class NekoWidget(QWidget):
         self.offline_line("idle")
 
     def pet_reaction(self):
+        if self.game:
+            if self.game.phase == "curl":
+                if self.game.comfort(time.monotonic()):
+                    self.companion.pets += 1
+                    self.companion.state = NekoState.COMFORTING
+                    self.advance_game(time.monotonic())
+                return
+            if self.game.phase == "comfort":
+                return
+            self.game_interaction = "pet"
+            self.end_game()
+            return
         if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
             return
         now = time.monotonic()
@@ -890,7 +1150,7 @@ class NekoWidget(QWidget):
             self.last_pet_words = now
 
     def trigger_ai_brain(self):
-        if (self.brain_worker is not None or not self.ai_enabled or self.quiet
+        if (self.game is not None or self.brain_worker is not None or not self.ai_enabled or self.quiet
                 or self.fullscreen or self.is_manually_hidden
                 or self.bubble.isVisible()
                 or time.monotonic() - self.last_words < self.companion.chatter_seconds
@@ -939,6 +1199,8 @@ class NekoWidget(QWidget):
         self.setCursor(Qt.OpenHandCursor)
 
     def current_frame(self, now):
+        if self.game and self.companion.state in GAME_STATES:
+            return self.atlas.frame(self.game_clip(), now - self.game.since, True)
         if self.companion.state not in CARRY_STATES:
             if self.drag_origin is not None and not self.dragged:
                 now = self.press_started
@@ -946,13 +1208,13 @@ class NekoWidget(QWidget):
         if self.companion.carry_rest is None:
             return self.atlas.frame("idle", 0, self.motion)
         if not self.motion:
-            sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+            sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.DISAPPOINTED)
             return self.atlas.frame("held_sleepy" if sleeping else "held_calm", 0)
         elapsed = max(0, now - self.carry_path_started)
         if self.carry_path and (elapsed < sum(self.carry_path_clip.durations) / 1000
                                 or self.companion.state == NekoState.SETTING_DOWN):
             return self.carry_path[self.carry_path_clip.frame_index(elapsed)]
-        sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+        sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.DISAPPOINTED)
         clip, elapsed = held_clip(self.carry_elapsed(now), sleeping)
         return self.atlas.frame(clip, elapsed)
 
@@ -976,6 +1238,13 @@ class NekoWidget(QWidget):
                 self.begin_pickup()
 
     def begin_pickup(self):
+        if self.game and self.game.phase != "curl":
+            if self.game.phase != "comfort":
+                self.game_interaction = "pickup"
+                self.dragged = True
+                self.hold_timer.stop()
+                self.end_game()
+            return
         if self.companion.state == NekoState.HELD:
             return
         if ("carry-lift", 0, 0) not in self.atlas.frames:
@@ -1001,7 +1270,7 @@ class NekoWidget(QWidget):
                 self.carry_return = [self.atlas.frame("sleep" if self.companion.state == NekoState.SLEEPING else "idle", 0)]
             bounds = sprite_bounds(source.toImage())
             state = self.companion.state
-            if state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
+            if state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.DISAPPOINTED):
                 family = "side"
             elif state in (NekoState.SIDE_FLOP, NekoState.ROLLING) and bounds.height() < 75:
                 family = "side" if state == NekoState.SIDE_FLOP else "roll"
@@ -1018,7 +1287,7 @@ class NekoWidget(QWidget):
                                                   round(shift.y() * (1 - i / 7))))
                       for i, frame in enumerate(frames)]
             frames[0] = source
-            if family == "side" and state not in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
+            if family == "side" and state not in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.DISAPPOINTED):
                 frames += [self.atlas.frames["carry-bridges", 2, i] for i in (1, 2, 3)]
         if not self.companion.begin_carry(now):
             return
@@ -1055,12 +1324,14 @@ class NekoWidget(QWidget):
         else:
             self.carry_released_elapsed = self.carry_elapsed(now)
             frames = [source]
-            sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
+            sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.DISAPPOINTED)
             if sleeping and ("carry-side", 0, 0) in self.atlas.frames:
                 frames += [self.atlas.frames["carry-side", i // 4, i % 4] for i in range(7, -1, -1)]
                 previous, deadline = self.companion.carry_rest
                 landing = now + (len(frames) + 1) * 0.05
-                if previous == NekoState.FALLING_ASLEEP and landing < deadline:
+                if previous == NekoState.DISAPPOINTED:
+                    frames.append(self.atlas.frame("game_curl", 0))
+                elif previous == NekoState.FALLING_ASLEEP and landing < deadline:
                     frames.append(self.atlas.frame("fall_asleep", landing - (deadline - 2.6)))
                 else:
                     nap_started = deadline if previous == NekoState.FALLING_ASLEEP else self.companion.nap_started
@@ -1100,6 +1371,12 @@ class NekoWidget(QWidget):
         elif self.companion.state == NekoState.SLEEPING:
             self.pose_started = self.companion.nap_started if self.companion.nap_started is not None else now
         self.refresh_asset()
+        if self.game and self.companion.state == NekoState.DISAPPOINTED:
+            if (self.x(), self.y()) != (round(self.game.x), round(self.game.y)):
+                self.game.origin = (self.x(), self.y())
+            self.game.x, self.game.y = self.x(), self.y()
+            self.game.runway = Runway(self.game.runway.left, self.game.runway.right, self.y(), self.game.runway.lift, self.game.runway.paw)
+            self.game.last = now
 
     def cancel_pickup(self):
         self.hold_timer.stop()
@@ -1176,15 +1453,19 @@ class NekoWidget(QWidget):
         return super().event(event)
 
     def hideEvent(self, event):
+        if self.game and self.game.phase not in ("curl", "comfort"):
+            self.end_game(immediate=True)
         if hasattr(self, "hold_timer"):
             self.cancel_pickup()
         super().hideEvent(event)
 
     def screen_changed(self, *args):
+        self.end_game(immediate=True)
         self.cancel_pickup()
         self.clamp_position()
 
     def position_to_bottom_right(self):
+        self.end_game(immediate=True)
         area = QApplication.primaryScreen().availableGeometry()
         self.move(area.right() - self.width() - 24, area.bottom() - self.height() - 12)
         self.dismiss_bubble()
@@ -1262,6 +1543,7 @@ class NekoWidget(QWidget):
         for key, value in {"quiet": self.quiet, "motion": self.motion,
                            "sounds_enabled": self.sounds_enabled,
                            "follow_mouse": self.follow_mouse,
+                           "auto_games": self.game_timer.enabled, "game_interval": self.game_timer.interval,
                            "sleep_seconds": self.companion.sleep_seconds,
                            "sleep_duration": self.companion.sleep_duration,
                            "chatter_seconds": self.companion.chatter_seconds,
@@ -1269,7 +1551,8 @@ class NekoWidget(QWidget):
                            "idle_seconds": self.companion.idle_seconds,
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
                            "ai_enabled": self.ai_enabled,
-                           "position": (self.arrival_target if self.arrival_target is not None else self.pos())
+                           "position": (QPoint(round(self.game.origin[0]), round(self.game.origin[1])) if self.game else
+                                        self.arrival_target if self.arrival_target is not None else self.pos())
                                        + QPoint(CANVAS_PADDING, CANVAS_TOP),
                            "pets": self.total_pets + self.companion.pets,
                            "naps": self.total_naps + self.companion.naps}.items():
@@ -1280,6 +1563,7 @@ class NekoWidget(QWidget):
         if self.closing or self.companion.state == NekoState.LEAVING:
             return
         self.cancel_pickup()
+        self.end_game(immediate=True, clear_mood=True)
         self.restore_arrival_position()
         if (self.motion and self.isVisible() and not self.fullscreen and not self.is_manually_hidden
                 and not self.atlas.frame("depart", 0).isNull()):
@@ -1325,6 +1609,7 @@ class NekoWidget(QWidget):
             self.restore_arrival_position()
             now = time.monotonic()
             self.companion.state = NekoState.IDLE
+            self.game_timer.reset(now)
             self.companion.next_nap = now + self.companion.sleep_seconds
             self.companion.next_idle = now + self.companion.idle_seconds
             self.companion.next_comment = now + self.companion.chatter_seconds

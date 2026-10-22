@@ -99,6 +99,9 @@ class CursorGame:
         self.line = None
         if self.phase == "jump":
             self.after_landing = "home"
+        elif self.phase in ("win", "loss"):
+            # Finish supported hops/folding before a queued deliberate interaction.
+            return
         elif self.phase not in ("curl", "comfort", "done"):
             self.enter("home", now)
 
@@ -202,7 +205,6 @@ class CursorGame:
         elif self.phase == "settle" and elapsed >= .5:
             self.enter("done", now)
         elif self.phase == "loss" and elapsed >= 1.8:
-            self.enter("curl", now)
+            self.enter("comfort" if self.result == "cancel" else "curl", now)
         elif self.phase == "comfort" and elapsed >= 2:
-            self.origin = (self.x, self.runway.y)
-            self.enter("done", now)
+            self.enter("home", now)

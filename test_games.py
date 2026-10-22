@@ -68,7 +68,7 @@ class GameTests(unittest.TestCase):
         self.assertEqual(game.phase, "curl")
         self.assertTrue(game.comfort(60))
         self.assertFalse(game.comfort(60.1))
-        self.step(game, 62.1)
+        self.step(game, 70)
         self.assertEqual(game.phase, "done")
 
     def test_reentry_resets_continuous_outside_timer(self):
