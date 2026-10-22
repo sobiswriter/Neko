@@ -143,7 +143,7 @@ Source pose zero becomes the actual canonical idle. Keep the final generated neu
 
 Connecting poses currently have at least 50 ms, commonly 100–250 ms; contact/expression holds can be 250–500 ms or longer where the story warrants it. These are observations and planning guidance. Judge rhythm in normal-speed playback, not by maximizing frame count.
 
-Current reaction totals/source slots: head pats 2.80s/16, nuzzle 3.70s/20, knead 5.80s/24, chin 3.00s/16, roll 5.80s/24, paw offer 3.60s/20, ear rub 2.95s/16, stretch 5.20s/24, arch 4.90s/24, three hops 5.00s/28, side flop 6.80s/28 and shoulder peek 6.40s/28. See the verification report for each story.
+Current reaction totals/source slots after the requested speed adjustment: head pats 2.432s/16, nuzzle 3.214s/20, knead 5.173s/24, chin 2.606s/16, roll 5.039s/24, paw offer 3.125s/20, ear rub 2.562s/16, stretch 4.516s/24, arch 4.253s/24, three hops 4.342s/28, side flop 5.910s/28 and shoulder peek 5.561s/28. Pet durations are divided by 1.15 and rounded to integer milliseconds, with a 50ms floor so no drawing becomes shorter than one nominal repaint. All orders, artwork and complete recoveries remain unchanged; other clips retain their timings. See the [speed verification](docs/petting-speed-validation.md).
 
 ### Retained tail and lifecycle recipes
 
@@ -235,12 +235,12 @@ Exercise repeated clicks through the longest clip, nap during a reaction, hide/s
 
 ### E. Build and inspect the actual deliverable
 
-After source/art checks pass, build to a distinct output folder and test that exact executable. Never overwrite a user's running build or kill unrelated app processes to make a test pass.
+After source/art checks pass, preserve the current verified release as `dist/DesktopNeko-previous.exe`, then build directly to `dist/DesktopNeko.exe` and test that exact executable. Keep only these two files in `dist`, with no release subfolders. Never overwrite a user's running build or kill unrelated app processes to make a test pass.
 
 ```powershell
 .venv\Scripts\python.exe -m unittest discover -v
-.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --distpath dist\animation-review main.spec
-$env:NEKO_TEST_EXE = 'dist\animation-review\DesktopNeko.exe'
+.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --distpath dist main.spec
+$env:NEKO_TEST_EXE = 'dist\DesktopNeko.exe'
 .venv\Scripts\python.exe -m unittest test_packaging -v
 Remove-Item Env:NEKO_TEST_EXE
 ```
@@ -272,6 +272,7 @@ Do not relax an anatomy, scale, timing or clipping check merely to accept a new 
 
 | Date | Finding and correction | Evidence / remaining limit |
 | --- | --- | --- |
+| 2026-10-22 | User found petting slightly slow. Divide pet-only durations by 1.15, retain a 50ms minimum and every pose/recovery. Update the queued-flop regression to sample relative to the clip deadline rather than the obsolete six-second timestamp. | All twelve sequences retain every drawing at nominal 20 FPS; all non-pet clip timings unchanged; refreshed eight-second catalog, 41 focused source checks and both packaged checks pass. See [speed verification](docs/petting-speed-validation.md). Full discovery/native animation timing were not repeated. |
 | 2026-10-22 | Tail/haunch-based registration shifted five pet endpoints, including a 6px arch shift. Reference support targets to the canonical head axis. | Endpoint checks now within 2px; reversed-sign mutation fails. See [revision report](docs/petting-revision-validation.md). |
 | 2026-10-22 | Uneven generated layout and separately drawn knead/stretch batches caused pose drift. Extract complete silhouettes, compare neutral landmarks, use fixed batch calibration and redraw unsuitable mechanics. | Exact selections/ratios in [assembly record](docs/petting-revision-prompts.json); heuristics still need checking for new postures. |
 | 2026-10-22 | A detached 16px line survived bounding-box cropping beside stretch pose 14. Reject the drawing, select a clean neighboring hold and add a connected-fragment regression. | Final light/dark review, focused checks and native stretch replay passed. Connected extra limbs still require visual review. |

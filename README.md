@@ -21,6 +21,8 @@ Soft sounds are optional and off until you enable them.
   rotation repeats. Repeated clicks count immediately and coalesce into one
   next reaction, which waits for the current landing/get-up to finish.
   If she's asleep, a pet plays her waking sequence instead.
+  Petting now runs about 15% faster, keeping every pose and complete recovery;
+  the shortest 50ms poses retain their original duration.
 - **Pick her up.** Dragging starts a lift immediately; a stationary click-hold starts
   after 250ms. She dangles with little paw/tail movements, going from excited to
   calm after three seconds, mildly unimpressed after ten, then sleepy after twenty.
@@ -190,14 +192,13 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
-The startup/thought correction build is `dist\updated\DesktopNeko.exe` while the
-previous executable is running. Quit the existing Neko from her tray menu before
-launching it; the single-instance lock prevents two kittens running together.
-
-The current pickup build is `dist\pickup-qol\DesktopNeko.exe`. It includes the expressive
-twelve-reaction petting revision and supersedes `dist\expressive-petting\DesktopNeko.exe`
-and `dist\petting-qol\DesktopNeko.exe`. Quit the existing Neko first.
-See the [pickup verification](docs/pickup-validation.md) for its artwork and native checks.
+The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
+`dist\DesktopNeko-previous.exe`. Keep these two files directly in `dist`, without
+release subfolders. Quit the existing Neko before launching the new build;
+the single-instance lock prevents two kittens running together.
+The latest build includes pickup and slightly faster petting; see the
+[speed update verification](docs/petting-speed-validation.md). Historical build paths
+in older reports describe their original delivery locations.
 
 ## Check the behavior
 

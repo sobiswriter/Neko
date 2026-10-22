@@ -216,9 +216,10 @@ class DesktopTests(unittest.TestCase):
         started = self.neko.pose_started
         with patch("main.time.monotonic", return_value=started + 0.2):
             self.neko.pet_reaction()
-        with patch("main.time.monotonic", return_value=started + 6.0):
+        before_end = self.neko.companion.pose_until - 0.2
+        with patch("main.time.monotonic", return_value=before_end):
             self.neko.animate()
-        self.assertIsNone(self.neko.companion.tick(started + 6.0, idle_seconds=1000))
+        self.assertIsNone(self.neko.companion.tick(before_end, idle_seconds=1000))
         self.assertEqual(self.neko.current_clip, "side_flop")
         self.assertTrue(self.neko.companion.pet_pending)
         with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):

@@ -117,7 +117,9 @@ PET_ROWS = {"happy": 4, "nuzzle": 5, "knead": 6, "chin_scritch": 4, "roll": 6, "
 # Preserve the last drawn recovery before handing off to the actual seated idle.
 for name, rows in PET_ROWS.items():
     clip = CLIPS[name]
-    CLIPS[name] = Clip(clip.bank, clip.row, clip.durations[:-1] + (150, clip.durations[-1] - 150),
+    durations = clip.durations[:-1] + (150, clip.durations[-1] - 150)
+    # Slightly brisker petting; retain at least one 50ms repaint per drawing.
+    CLIPS[name] = Clip(clip.bank, clip.row, tuple(max(50, round(ms / 1.15)) for ms in durations),
                        clip.order + (rows * 4,))
 
 # Held mood variants share a 2.4-second body phase clock.

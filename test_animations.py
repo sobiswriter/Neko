@@ -56,17 +56,17 @@ class AnimationTests(unittest.TestCase):
                 head = bounds.left() + pet_landmarks(image.copy(bounds))[1]
                 self.assertAlmostEqual(head, idle_head, delta=2)
 
-    def test_pet_stories_have_time_for_contact_expression_and_recovery(self):
-        budgets = {"happy": (2600, 3200), "nuzzle": (3500, 4000), "knead": (5500, 6200),
-                   "chin_scritch": (2800, 3300), "roll": (5500, 6200), "paw_offer": (3400, 3900),
-                   "ear_rub": (2800, 3300), "pet_stretch": (4900, 5600), "back_arch": (4600, 5300),
-                   "happy_hop": (4700, 5400), "side_flop": (6500, 7200), "shoulder_peek": (6100, 6800)}
+    def test_pet_stories_are_slightly_faster_without_losing_readable_pose_holds(self):
+        previous = {"happy": 2800, "nuzzle": 3700, "knead": 5800, "chin_scritch": 3000,
+                    "roll": 5800, "paw_offer": 3600, "ear_rub": 2950, "pet_stretch": 5200,
+                    "back_arch": 4900, "happy_hop": 5000, "side_flop": 6800, "shoulder_peek": 6400}
         self.assertNotIn("blep", CLIPS)
-        for name, (minimum, maximum) in budgets.items():
+        for name, old_duration in previous.items():
             with self.subTest(reaction=name):
-                duration = sum(CLIPS[name].durations)
-                self.assertGreaterEqual(duration, minimum)
-                self.assertLessEqual(duration, maximum)
+                clip = CLIPS[name]
+                self.assertGreaterEqual(sum(clip.durations), old_duration * 0.86)
+                self.assertLessEqual(sum(clip.durations), old_duration * 0.90)
+                self.assertGreaterEqual(min(clip.durations), 50)
 
     def test_all_pet_sequences_have_real_transitions_and_shared_idle_endpoints(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
