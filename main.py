@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
 from behavior import Companion, NekoState, PET_STATES
 from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
-from animations import SpriteAtlas, CLIPS, drop_progress, CANVAS_WIDTH, CANVAS_PADDING
+from animations import SpriteAtlas, CLIPS, drop_progress, CANVAS_WIDTH, CANVAS_PADDING, CANVAS_TOP, CANVAS_HEIGHT
 from dialogue import OfflineDialogue
 from cursors import petting_cursors
 
@@ -351,7 +351,7 @@ class NekoWidget(QWidget):
                             | Qt.Tool | Qt.WindowDoesNotAcceptFocus)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
-        self.setFixedSize(CANVAS_WIDTH, 112)
+        self.setFixedSize(CANVAS_WIDTH, CANVAS_HEIGHT)
         self.setAccessibleName("Neko, your desktop companion")
         self.setAccessibleDescription("Click to pet, drag to move, or right-click for Neko's nook.")
         self.assets = {}
@@ -401,7 +401,7 @@ class NekoWidget(QWidget):
         saved = self.settings.value("position", None)
         self.position_to_bottom_right()
         if isinstance(saved, QPoint):
-            self.move(saved - QPoint(CANVAS_PADDING, 0))
+            self.move(saved - QPoint(CANVAS_PADDING, CANVAS_TOP))
             self.clamp_position()
         app = QApplication.instance()
         app.primaryScreenChanged.connect(self.clamp_position)
@@ -416,7 +416,7 @@ class NekoWidget(QWidget):
         self.transition_timer.timeout.connect(self.finish_transition)
 
     def init_tray(self):
-        icon = self.atlas.frame("idle", 0).copy(CANVAS_PADDING, 0, 112, 112)
+        icon = self.atlas.frame("idle", 0).copy(CANVAS_PADDING, CANVAS_TOP, 112, 112)
         self.tray_icon = QSystemTrayIcon(QIcon(icon if not icon.isNull() else self.assets["idle"]), self)
         self.tray_icon.setToolTip("Neko · a little company")
         self.menu = QMenu()
@@ -761,13 +761,13 @@ class NekoWidget(QWidget):
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(75, 55, 48, 18))
         if state not in (NekoState.ARRIVING, NekoState.LEAVING):
-            painter.drawEllipse(QRectF(28 + CANVAS_PADDING, 99, 56, 5))
+            painter.drawEllipse(QRectF(28 + CANVAS_PADDING, 99 + CANVAS_TOP, 56, 5))
         painter.save()
-        painter.translate(self.width() // 2, 99)
+        painter.translate(self.width() // 2, 99 + CANVAS_TOP)
         movie = None if state in (NekoState.ARRIVING, NekoState.LEAVING) else self.movies.get(self.current_asset)
         pixmap = self.atlas.frame(self.current_clip, elapsed, self.motion)
-        # Keep the original atlas origin; extra canvas space extends below it.
-        top = -100
+        # Keep the visible origin stable when transparent top padding is added.
+        top = -100 - CANVAS_TOP
         if movie and not movie.currentPixmap().isNull():
             pixmap = movie.currentPixmap().scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
             top = -pixmap.height()
@@ -785,7 +785,7 @@ class NekoWidget(QWidget):
         if state in PET_STATES:
             painter.setPen(QColor("#cf9699"))
             painter.setFont(QFont("Segoe UI Symbol", 12))
-            painter.drawText(QRectF(78 + CANVAS_PADDING, 12 - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
+            painter.drawText(QRectF(78 + CANVAS_PADDING, 12 + CANVAS_TOP - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
 
     def say(self, text, prompted=False):
         if (self.closing or self.is_manually_hidden or self.fullscreen
@@ -1037,7 +1037,7 @@ class NekoWidget(QWidget):
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
                            "ai_enabled": self.ai_enabled,
                            "position": (self.arrival_target if self.arrival_target is not None else self.pos())
-                                       + QPoint(CANVAS_PADDING, 0),
+                                       + QPoint(CANVAS_PADDING, CANVAS_TOP),
                            "pets": self.total_pets + self.companion.pets,
                            "naps": self.total_naps + self.companion.naps}.items():
             self.settings.setValue(key, value)

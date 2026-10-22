@@ -6,13 +6,21 @@ import unittest
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QColor, QImage
 
-from animations import CLIPS, PET_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, CANVAS_WIDTH
+from animations import CLIPS, PET_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
 
 
 APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
+    def test_tall_canvas_preserves_the_old_visible_footprint_below_top_padding(self):
+        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        idle = atlas.frame("idle", 0)
+        self.assertEqual((idle.width(), idle.height()), (192, 144))
+        self.assertAlmostEqual(sprite_bounds(idle.toImage()).top(), 48, delta=2)
+        self.assertTrue(all(idle.toImage().pixelColor(x, y).alpha() == 0
+                            for x in range(192) for y in range(32)))
+
     def test_pet_drawings_have_no_detached_sheet_fragments(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         for name, rows in PET_ROWS.items():
@@ -98,7 +106,7 @@ class AnimationTests(unittest.TestCase):
         self.assertTrue(all(not frame.isNull() for frame in atlas.frames.values()))
         self.assertNotEqual(atlas.frame("tail", 0.8).toImage(), atlas.frame("tail", 1.2).toImage())
         self.assertNotEqual(atlas.frames["activity", 0, 0].toImage(), atlas.frames["activity", 0, 1].toImage())
-        self.assertTrue(all(frame.width() == CANVAS_WIDTH and frame.height() == 112 for frame in atlas.frames.values()))
+        self.assertTrue(all(frame.width() == CANVAS_WIDTH and frame.height() == CANVAS_HEIGHT for frame in atlas.frames.values()))
 
     def test_petting_reference_heads_match_idle_width_and_vertical_anchor(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
@@ -106,13 +114,13 @@ class AnimationTests(unittest.TestCase):
                      "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
             image = atlas.frame(name, 0).toImage()
             widest = 0
-            for y in range(20, 50):
+            for y in range(20 + CANVAS_TOP, 50 + CANVAS_TOP):
                 run = 0
                 for x in range(image.width()):
                     run = run + 1 if image.pixelColor(x, y).alpha() >= 128 else 0
                     widest = max(widest, run)
             self.assertAlmostEqual(widest, 62, delta=2, msg=name)
-            self.assertAlmostEqual(sprite_bounds(image).top(), 16, delta=2, msg=name)
+            self.assertAlmostEqual(sprite_bounds(image).top(), 16 + CANVAS_TOP, delta=2, msg=name)
 
     def test_calibrated_pet_poses_are_not_clipped_by_the_canvas(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
@@ -122,9 +130,9 @@ class AnimationTests(unittest.TestCase):
             for index in set(clip.order):
                 image = atlas.frames[clip.bank, clip.row + index // 4, index % 4].toImage()
                 self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
-                                    for x in range(CANVAS_WIDTH) for y in (0, 111)), (name, index))
+                                    for x in range(CANVAS_WIDTH) for y in (0, CANVAS_HEIGHT - 1)), (name, index))
                 self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
-                                    for x in (0, CANVAS_WIDTH - 1) for y in range(112)), (name, index))
+                                    for x in (0, CANVAS_WIDTH - 1) for y in range(CANVAS_HEIGHT)), (name, index))
 
     def test_idle_and_activity_frames_keep_their_seated_scale(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
@@ -157,7 +165,7 @@ class AnimationTests(unittest.TestCase):
                 frame = atlas.frame(name, (elapsed + duration / 2) / 1000)
                 self.assertFalse(frame.isNull())
                 self.assertEqual(frame.toImage(), atlas.frames[clip.bank, col // 4, col % 4].toImage())
-                self.assertLessEqual(sprite_bounds(frame.toImage()).bottom(), 110)
+                self.assertLessEqual(sprite_bounds(frame.toImage()).bottom(), 110 + CANVAS_TOP)
                 elapsed += duration
             self.assertEqual(clip.frame_index(sum(clip.durations) / 1000), clip.order[-1])
 
@@ -175,7 +183,7 @@ class AnimationTests(unittest.TestCase):
     def test_hops_have_three_airborne_arcs_with_grounded_contacts_between_them(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
         clip = CLIPS["happy_hop"]
-        grounded = [sprite_bounds(atlas.frames[clip.bank, index // 4, index % 4].toImage()).bottom() >= 96
+        grounded = [sprite_bounds(atlas.frames[clip.bank, index // 4, index % 4].toImage()).bottom() >= 96 + CANVAS_TOP
                     for index in clip.order]
         starts = [index for index, on_ground in enumerate(grounded)
                   if not on_ground and (index == 0 or grounded[index - 1])]
@@ -200,14 +208,14 @@ class AnimationTests(unittest.TestCase):
             for index in (1, PET_ROWS[name] * 4 - 1):
                 image = atlas.frames[clip.bank, index // 4, index % 4].toImage()
                 widest = 0
-                for y in range(20, 55):
+                for y in range(20 + CANVAS_TOP, 55 + CANVAS_TOP):
                     run = 0
                     for x in range(CANVAS_WIDTH):
                         run = run + 1 if image.pixelColor(x, y).alpha() >= 128 else 0
                         widest = max(widest, run)
                 self.assertAlmostEqual(widest, 62, delta=4, msg=(name, index))
                 if index == PET_ROWS[name] * 4 - 1:
-                    self.assertAlmostEqual(sprite_bounds(image).top(), 16, delta=2, msg=(name, index))
+                    self.assertAlmostEqual(sprite_bounds(image).top(), 16 + CANVAS_TOP, delta=2, msg=(name, index))
 
     def test_tail_play_and_lifecycle_load_all_their_drawings(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
@@ -254,9 +262,9 @@ class AnimationTests(unittest.TestCase):
                 continue
             image = frame.toImage()
             self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
-                                for x in range(CANVAS_WIDTH) for y in (0, 111)), key)
+                                for x in range(CANVAS_WIDTH) for y in (0, CANVAS_HEIGHT - 1)), key)
             self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
-                                for x in (0, CANVAS_WIDTH - 1) for y in range(112)), key)
+                                for x in (0, CANVAS_WIDTH - 1) for y in range(CANVAS_HEIGHT)), key)
 
     def test_tail_swishing_does_not_pull_the_head_sideways(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
@@ -264,7 +272,7 @@ class AnimationTests(unittest.TestCase):
         for index in range(8):
             clip = CLIPS["tail"]
             image = atlas.frames[clip.bank, clip.row + index // 4, index % 4].toImage()
-            opaque = [x for x in range(CANVAS_WIDTH) if image.pixelColor(x, 36).alpha() > 128]
+            opaque = [x for x in range(CANVAS_WIDTH) if image.pixelColor(x, 36 + CANVAS_TOP).alpha() > 128]
             centers.append((min(opaque) + max(opaque)) / 2)
         self.assertLessEqual(max(centers) - min(centers), 1)
         self.assertIn(8, CLIPS["tail"].order)

@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, PET_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING
+from animations import CLIPS, PET_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
 from cursors import petting_cursors
 
 
@@ -36,7 +36,9 @@ BACKGROUND = (248, 246, 241)
 def pixels(pixmap):
     assert not pixmap.isNull(), "Missing runtime sprite"
     image = pixmap.toImage().convertToFormat(QImage.Format_RGBA8888)
-    return Image.frombytes("RGBA", (image.width(), image.height()), bytes(image.constBits()))
+    # Existing catalogs omit empty top padding to retain their original layout.
+    return Image.frombytes("RGBA", (image.width(), image.height()), bytes(image.constBits())).crop(
+        (0, CANVAS_TOP, image.width(), CANVAS_TOP + 112))
 
 
 def displayed(atlas, name, elapsed):

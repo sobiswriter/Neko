@@ -14,7 +14,7 @@ from PySide6.QtWidgets import QApplication
 
 from behavior import NekoState, IDLE_STATES
 from dialogue import LINES
-from animations import CANVAS_PADDING
+from animations import CANVAS_PADDING, CANVAS_TOP
 from main import NekoWidget, set_autostart, adjacent_position
 
 
@@ -156,7 +156,7 @@ class DesktopTests(unittest.TestCase):
             self.neko.animate()
         self.assertLess(self.neko.y(), target.y())
         self.neko.save_preferences()
-        self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, 0))
+        self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, CANVAS_TOP))
         with patch("main.time.monotonic", return_value=start + 0.75):
             self.neko.animate()
         self.assertEqual(self.neko.pos(), target)
@@ -216,7 +216,7 @@ class DesktopTests(unittest.TestCase):
             interrupt()
             self.assertEqual(self.neko.pos(), target)
             self.neko.save_preferences()
-            self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, 0))
+            self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, CANVAS_TOP))
 
     def test_screen_change_before_the_first_animation_tick_does_not_leave_arrival_stuck(self):
         target = self.neko.pos()
@@ -262,7 +262,7 @@ class DesktopTests(unittest.TestCase):
         self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
                             for x in range(self.neko.width()) for y in range(hidden_rows)))
         self.assertTrue(any(image.pixelColor(x, y).alpha() > 0
-                            for x in range(self.neko.width()) for y in range(hidden_rows, 112)))
+                            for x in range(self.neko.width()) for y in range(hidden_rows, self.neko.height())))
 
     def test_quit_plays_goodbye_once_then_cleans_up_without_moving_saved_position(self):
         origin = self.neko.pos()
@@ -283,7 +283,7 @@ class DesktopTests(unittest.TestCase):
         self.assertFalse(self.neko.isVisible())
         self.assertFalse(self.neko.transition_timer.isActive())
         self.assertFalse(self.neko.animation_timer.isActive())
-        self.assertEqual(self.settings.value("position", type=QPoint), origin + QPoint(CANVAS_PADDING, 0))
+        self.assertEqual(self.settings.value("position", type=QPoint), origin + QPoint(CANVAS_PADDING, CANVAS_TOP))
 
     def test_reduced_motion_or_hidden_quit_skips_jump_and_hidden_arrival_never_greets(self):
         with patch.object(self.neko, "offline_line") as words:
@@ -757,7 +757,7 @@ class DesktopTests(unittest.TestCase):
         self.settings.setValue("position", point)
         other = NekoWidget(self.settings)
         try:
-            self.assertEqual(other.pos() + QPoint(CANVAS_PADDING, 0), point)
+            self.assertEqual(other.pos() + QPoint(CANVAS_PADDING, CANVAS_TOP), point)
             other.save_preferences()
             self.assertEqual(self.settings.value("position", type=QPoint), point)
         finally:

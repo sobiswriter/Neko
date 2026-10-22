@@ -8,6 +8,8 @@ from PySide6.QtGui import QImage, QPixmap, QPainter
 
 CANVAS_WIDTH = 192
 CANVAS_PADDING = (CANVAS_WIDTH - 112) // 2
+CANVAS_TOP = 32
+CANVAS_HEIGHT = 112 + CANVAS_TOP
 
 
 def sprite_bounds(cell):
@@ -253,6 +255,13 @@ class SpriteAtlas:
         self.frames["lifecycle", 2, 0] = self.frames["farewell", 0, 0]
         self.frames["lifecycle", 2, 1] = self.frames["farewell", 0, 1]
         self.load_pets(path, idle)
+        for key, source in self.frames.items():
+            frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+            frame.fill(Qt.transparent)
+            painter = QPainter(frame)
+            painter.drawPixmap(0, CANVAS_TOP, source)
+            painter.end()
+            self.frames[key] = frame
 
     def load_pets(self, path, idle):
         idle_bounds = sprite_bounds(idle.toImage())
@@ -318,7 +327,7 @@ class SpriteAtlas:
         launch = sum(clip.durations[:3]) / 1000
         progress = max(0, min(1, (elapsed - launch) / 0.75))
         offset = round(-96 * progress + 208 * progress * progress)
-        frame = QPixmap(CANVAS_WIDTH, 112)
+        frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
         frame.fill(Qt.transparent)
         painter = QPainter(frame)
         painter.drawPixmap(0, offset, source)
