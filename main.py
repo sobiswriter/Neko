@@ -650,7 +650,7 @@ class NekoWidget(QWidget):
         # Menu callbacks complete before eligibility is checked; the nook may stay open for manual play.
         if self.stats_window:
             self.stats_window.close()
-        QTimer.singleShot(0, self.tick)
+        QTimer.singleShot(0, self, self.tick)
 
     def game_art_ready(self):
         return all((f"game-{bank}", i // 4, i % 4) in self.atlas.frames
