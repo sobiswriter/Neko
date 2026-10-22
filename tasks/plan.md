@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Entrance and goodbye research — proposed, 2026-10-23
+
+User requested research and creative improvement ideas, not a new build. [Evidence, alternatives, timed storyboards and implementation proposal](../docs/arrival-goodbye-research.md). Recommend a curious top-edge peek → deliberate release → yielding forepaw landing → affectionate recognition, paired with a slow blink → look toward exit → gathered hop → attached tail crossing the monitor edge last. Prototype edge support and high/low exit travel before full art. Preserve fixed character scale, first-visible timing, saved origin, bounded close and the build-time atlas. All new acting, timings and routes remain proposed; existing animation/release stays unchanged. Older open tasks below are preserved.
+
 ## Startup correction — 2026-10-22
 
 Profile before changing behavior; move proven source-sheet preprocessing into the release build, retain source fallback and compare every final frame exactly. Measure actual executable UI readiness before/after, check packaged contents/icon/instance handling and preserve the verified immediate predecessor. [Evidence and limits](../docs/startup-performance-validation.md).
