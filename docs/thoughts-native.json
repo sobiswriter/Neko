@@ -12,7 +12,12 @@
       58
     ]
   ],
-  "frosted_stripe_contrast": 4,
+  "window_opacities": [
+    0.8784313725490196,
+    0.8784313725490196
+  ],
+  "rounded_corners": true,
+  "frosted_stripe_contrast": 13,
   "background_stripe_contrast": 70,
   "dpr": 1.0,
   "passed": true

@@ -573,6 +573,8 @@ class DesktopTests(unittest.TestCase):
         self.assertGreaterEqual(self.neko.bubble.width(), 96)
         self.assertTrue(self.neko.bubble.testAttribute(Qt.WA_TransparentForMouseEvents))
         self.assertTrue(self.neko.bubble.windowFlags() & Qt.WindowTransparentForInput)
+        self.assertFalse(self.neko.bubble.mask().contains(QPoint(3, 3)))
+        self.assertAlmostEqual(self.neko.bubble.windowOpacity(), 0.88, delta=0.01)
         self.assertGreaterEqual(self.neko.bubble_timer.interval(), 5500)
         image = self.neko.bubble.grab().toImage()
         background = image.pixelColor(6, image.height() // 2)

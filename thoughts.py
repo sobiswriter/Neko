@@ -39,10 +39,11 @@ class ThoughtLabel(QLabel):
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setWindowOpacity(0.88)
         self.setTextFormat(Qt.PlainText)
         self.setWordWrap(True)
         self.setStyleSheet("background: transparent; color: #fffaf0; border: 0;"
-                          "border-radius: 10px; padding: 8px 10px; font: 600 16px 'Segoe UI';")
+                          "border-radius: 20px; padding: 8px 10px; font: 600 16px 'Segoe UI';")
         self.ensurePolished()
         self.native_backdrop = False
 
@@ -54,7 +55,7 @@ class ThoughtLabel(QLabel):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         shape = QPainterPath()
-        shape.addRoundedRect(QRectF(self.rect()), 10, 10)
+        shape.addRoundedRect(QRectF(self.rect()), 20, 20)
         self.setMask(QRegion(shape.toFillPolygon().toPolygon()))
 
     def paintEvent(self, event):
@@ -66,7 +67,7 @@ class ThoughtLabel(QLabel):
         glass.setColorAt(1, QColor(30, 28, 36, 28))
         painter.setPen(QPen(QColor(255, 255, 255, 64), 0.8))
         painter.setBrush(glass)
-        painter.drawRoundedRect(QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5), 10, 10)
+        painter.drawRoundedRect(QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5), 20, 20)
         painter.end()
         super().paintEvent(event)
 

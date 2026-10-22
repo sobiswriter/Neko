@@ -101,7 +101,8 @@ Soft sounds are optional and off until you enable them.
   Every spontaneous idle attempts its own local thought, including “Look at meeee!”
   and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
   Thoughts use cream 16px semibold text with a small dark shadow and a compact,
-  rounded glass backdrop with a faint rim and a nearly clear tint. The desktop behind it blurs while the lettering stays
+  rounded glass backdrop with a faint rim, a nearly clear tint and gentler frosting.
+  The desktop behind it blurs while the lettering stays
   sharp; unsupported systems retain a light translucent tint. It stays click-through,
   takes no focus, fits short lines and wraps within 270px for 5.5–10 seconds.
   No desktop capture or new runtime dependency is used. See the

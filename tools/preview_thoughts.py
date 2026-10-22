@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import win32gui
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtGui import QColor, QFont, QPainter
 from PySide6.QtWidgets import QApplication, QGraphicsDropShadowEffect, QWidget
 from thoughts import ThoughtLabel
@@ -67,11 +67,14 @@ def capture():
                           == int(host.winId()) for label in labels),
                       foreground_unchanged=win32gui.GetForegroundWindow() == foreground,
                       sizes=[[label.width(), label.height()] for label in labels],
+                      window_opacities=[label.windowOpacity() for label in labels],
+                      rounded_corners=all(not label.mask().contains(QPoint(3, 3)) for label in labels),
                       frosted_stripe_contrast=max(stripe) - min(stripe),
                       background_stripe_contrast=246 - 176,
                       dpr=app.primaryScreen().devicePixelRatio())
         result["passed"] = (result["native_backdrop"] and result["click_through_to_test_window"]
-                            and result["foreground_unchanged"] and result["frosted_stripe_contrast"] < 35)
+                            and result["foreground_unchanged"] and result["rounded_corners"]
+                            and result["frosted_stripe_contrast"] < 35)
         (ROOT / "docs/thoughts-native.json").write_text(json.dumps(result, indent=2) + "\n")
         print(json.dumps(result))
     finally:
