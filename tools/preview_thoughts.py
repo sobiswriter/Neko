@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 import win32gui
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QColor, QFont, QPainter
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QApplication, QGraphicsDropShadowEffect, QWidget
 from thoughts import ThoughtLabel
 
 
@@ -42,6 +42,11 @@ labels = []
 for text, x in (("Look at meeee!", 60),
                 ("A little thought, with just enough frost to keep it readable.", 470)):
     label = ThoughtLabel()
+    shadow = QGraphicsDropShadowEffect(label)
+    shadow.setBlurRadius(4)
+    shadow.setOffset(0, 1)
+    shadow.setColor(QColor("#33261f"))
+    label.setGraphicsEffect(shadow)
     label.setText(text)
     label.adjustSize()
     label.move(host.x() + x, host.y() + 75)

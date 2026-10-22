@@ -577,7 +577,7 @@ class DesktopTests(unittest.TestCase):
         image = self.neko.bubble.grab().toImage()
         background = image.pixelColor(6, image.height() // 2)
         self.assertGreater(background.alpha(), 0)
-        self.assertLess(background.alpha(), 200)
+        self.assertLess(background.alpha(), 60)
         self.assertEqual(image.pixelColor(0, 0).alpha(), 0)
         ink = [image.pixelColor(x, y) for x in range(image.width())
                for y in range(image.height()) if image.pixelColor(x, y).alpha() > 0]

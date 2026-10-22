@@ -4,7 +4,7 @@ import ctypes
 from ctypes import wintypes
 
 from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QRegion
+from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen, QRegion
 from PySide6.QtWidgets import QApplication, QLabel
 
 
@@ -60,9 +60,13 @@ class ThoughtLabel(QLabel):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor(40, 35, 47, 110))
-        painter.drawRoundedRect(QRectF(self.rect()), 10, 10)
+        glass = QLinearGradient(0, 0, 0, self.height())
+        glass.setColorAt(0, QColor(255, 250, 243, 32))
+        glass.setColorAt(0.45, QColor(255, 255, 255, 10))
+        glass.setColorAt(1, QColor(30, 28, 36, 28))
+        painter.setPen(QPen(QColor(255, 255, 255, 64), 0.8))
+        painter.setBrush(glass)
+        painter.drawRoundedRect(QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5), 10, 10)
         painter.end()
         super().paintEvent(event)
 

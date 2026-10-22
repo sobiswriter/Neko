@@ -6,7 +6,7 @@ The user approved a small blur behind Neko's lines to improve readability. The e
 
 ## Implemented
 
-`ThoughtLabel` keeps cream 16px semibold text sharp, paints a rounded translucent tint and requests native blur behind the window. Short thoughts use their measured width rather than a permanent 270px panel; longer thoughts wrap within that maximum. Existing dark shadow, 5.5–10s reading time, visibility/quiet rules, plain-text handling and screen clamping remain. Native input-transparent/no-focus flags preserve desktop interaction.
+`ThoughtLabel` keeps cream 16px semibold text sharp, paints a rounded translucent tint and requests native blur behind the window. The subsequent glass refinement replaces the original alpha-110 dark fill with an alpha-10–32 highlight/shade gradient (about 4–13% opacity) and a faint alpha-64 rim. The desktop colors show through much more clearly. Short thoughts use their measured width rather than a permanent 270px panel; longer thoughts wrap within that maximum. Existing dark shadow, 5.5–10s reading time, visibility/quiet rules, plain-text handling and screen clamping remain. Native input-transparent/no-focus flags preserve desktop interaction.
 
 The runtime does not capture the screen or transmit background pixels. Blur is a compositor effect; the native preview tool captures only its own deliberately drawn test window. No new runtime package or sprite changes were introduced.
 
@@ -22,13 +22,13 @@ Do not replace this with a blur effect on the label's text: that would soften th
 
 - Five focused source checks passed: compact/wrapped sizing, unavailable/failed-native-call fallback, translucent rounded rendering/read time/input flags, changing words, and quiet/visible-thought behavior. The rendered-tint regression first failed because QLabel styling did not paint the translucent surface; explicit rounded background painting corrected it and the focused cases were rerun.
 - `tools/preview_thoughts.py` ran against actual Windows Qt at DPR 1.0. Both labels reported native blur, native hit testing went through to the test-owned underlying window, and the foreground window remained unchanged.
-- Background stripe contrast fell from 70 to 3 lightness units under the short label. Native review also checked that broad background colors remain visible, unlike the rejected opaque acrylic treatment. The [measurements](thoughts-native.json) and image above record the final accepted class.
+- Background stripe contrast fell from 70 to 4 lightness units under the refined glass label. The preview now includes the same glyph shadow used by the real companion. Native review also checked that broad background colors remain visible, unlike the rejected opaque acrylic treatment. The [measurements](thoughts-native.json) and image above record the accepted glass style.
 - Both packaging checks passed on the exact fresh executable: bundled resources and the new `thoughts` module, native startup/tray/topmost and single-instance rejection. Only test-owned processes were stopped. The user quit their prior running build before replacement.
 - `dist` contains exactly the current and immediately preceding executables; no release subdirectories were created.
 
 ## Delivered files
 
-- Current: `dist/DesktopNeko.exe`, 100,254,729 bytes; SHA-256 `6cc632717134b3a9489ecc916dfe8a1f2f0d0d448e4fd26e34a57a4e74875a66`.
-- Previous: `dist/DesktopNeko-previous.exe`, 100,250,724 bytes; SHA-256 `f79ff6adf911d053d3defc268af9dbcbe26119c62cb568766f34177c597d8277`.
+- Current: `dist/DesktopNeko.exe`, 100,253,984 bytes; SHA-256 `82fdf5fd139830c34f8a2b669b1567d180fd21420c82fd16908b4c84a9dd3caa`.
+- Previous: `dist/DesktopNeko-previous.exe`, 100,254,729 bytes; SHA-256 `6cc632717134b3a9489ecc916dfe8a1f2f0d0d448e4fd26e34a57a4e74875a66`.
 
 Full discovery, physical mixed-DPI hardware, Windows 10 and long-session resource testing were not repeated. The OS can disable or alter blur; the tint is the deliberate fallback, not a guarantee of native blur on every machine.
