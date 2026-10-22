@@ -66,8 +66,12 @@ CLIPS = {
                        (16, 17, 18, 19) + tuple(range(11)) * 5 + (20, 21, 22, 23)),
     "tail_catch": Clip("tailplay", 0, (300, 180, 180, 100) + (50,) * 22 + (120, 350, 120, 150, 180, 300, 600),
                        (16, 17, 18, 19) + tuple(range(11)) * 2 + (13, 14, 13, 12, 21, 22, 23)),
-    "arrive": Clip("arrival", 0, (200, 200, 300, 120, 180, 160, 220, 520), tuple(range(8))),
-    "depart": Clip("lifecycle", 2, (650, 350, 200, 150, 200, 200, 200, 200), tuple(range(8))),
+    "arrive": Clip("visitor-arrive", 0,
+                   (120, 120, 160, 100, 100, 100, 120, 120, 110, 80, 90, 100,
+                    80, 90, 90, 110, 160, 100, 100, 100), tuple(range(1, 21))),
+    "depart": Clip("visitor-depart", 0,
+                   (100, 100, 100, 150, 100, 120, 130, 100, 150, 100, 100, 100,
+                    100, 100, 100, 150), tuple(range(16))),
     "happy": Clip("pet-happy", 0, (100, 100, 100, 150, 150, 200, 250, 150,
                                  200, 200, 150, 150, 200, 200, 150, 350), tuple(range(16))),
     "nuzzle": Clip("pet-nuzzle", 0, (100, 100, 150, 150, 150, 200, 200, 200, 200, 200,
@@ -187,8 +191,21 @@ IDLE_HEADS = {("idleplay-a", 0): (67, 56), ("idleplay-a", 2): (68, 54), ("idlepl
 
 
 def drop_progress(elapsed):
-    duration = sum(CLIPS["arrive"].durations[:3]) / 1000
-    return max(0, min(1, elapsed / duration)) ** 2
+    release = sum(CLIPS["arrive"].durations[:4]) / 1000
+    duration = sum(CLIPS["arrive"].durations[4:9]) / 1000
+    return max(0, min(1, (elapsed - release) / duration)) ** 2
+
+
+def departure_progress(elapsed):
+    launch = sum(CLIPS["depart"].durations[:9]) / 1000
+    duration = sum(CLIPS["depart"].durations[9:]) / 1000
+    return max(0, min(1, (elapsed - launch) / duration))
+
+
+def departure_drop(progress, distance):
+    if progress <= 0.25:
+        return -18 * (1 - (1 - progress * 4) ** 2)
+    return -18 + (distance + 18) * ((progress - 0.25) / 0.75) ** 2
 
 
 def pet_landmarks(image):
@@ -340,6 +357,40 @@ class SpriteAtlas:
             self.frames[key] = frame
         self.load_carry(path)
         self.load_games(path)
+        self.load_lifecycle(path)
+
+    def load_lifecycle(self, path):
+        imported = {}
+        for name, rows in (("arrive", 5), ("depart", 4), ("recover", 2)):
+            image = QImage(str(Path(path) / f"neko-visitor-{name}-v1.png"))
+            if image.isNull() or image.width() % 4 or image.height() % rows:
+                return
+            width, height = image.width() // 4, image.height() // rows
+            poses = []
+            for i in range(rows * 4):
+                cell = image.copy(i % 4 * width, i // 4 * height, width, height).scaledToWidth(128, Qt.FastTransformation)
+                bounds = sprite_bounds(cell)
+                if bounds.isEmpty():
+                    return
+                poses.append(cell.copy(bounds))
+            sx, sy = 62 / pet_landmarks(poses[0])[0], 82 / poses[0].height()
+            for i, pose in enumerate(poses):
+                sprite = QPixmap.fromImage(pose).scaled(round(pose.width() * sx), round(pose.height() * sy),
+                                                       Qt.IgnoreAspectRatio, Qt.FastTransformation)
+                if sprite.width() > CANVAS_WIDTH - 4 or sprite.height() > CANVAS_HEIGHT - 4:
+                    return
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawPixmap((CANVAS_WIDTH - sprite.width()) // 2, 130 - sprite.height(), sprite)
+                painter.end()
+                imported[f"visitor-{name}", i // 4, i % 4] = frame
+        idle = self.frames["idle", 0, 0]
+        for i, source in enumerate(range(1, 7), 14):
+            imported["visitor-arrive", i // 4, i % 4] = imported["visitor-recover", source // 4, source % 4]
+        for key in (("visitor-arrive", 0, 0), ("visitor-arrive", 5, 0), ("visitor-depart", 0, 0)):
+            imported[key] = idle
+        self.frames.update(imported)
 
     def load_runtime(self, path):
         """Release builds contain the exact calibrated frames, prepared at build time."""
@@ -512,15 +563,4 @@ class SpriteAtlas:
         clip = CLIPS[name]
         index = clip.frame_index(elapsed if motion else 0)
         source = self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())
-        if source.isNull() or name != "depart":
-            return source
-        # Preserve the accepted hop arc after the longer sad pause and crouch.
-        launch = sum(clip.durations[:3]) / 1000
-        progress = max(0, min(1, (elapsed - launch) / 0.75))
-        offset = round(-96 * progress + 208 * progress * progress)
-        frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
-        frame.fill(Qt.transparent)
-        painter = QPainter(frame)
-        painter.drawPixmap(0, offset, source)
-        painter.end()
-        return frame
+        return source

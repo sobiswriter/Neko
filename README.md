@@ -60,7 +60,7 @@ Soft sounds are optional and off until you enable them.
 - **Come close.** She can notice a nearby cursor while keeping her place.
   Cursor chasing belongs to Catch the Cursor; ordinary idle following has been removed.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 741 entries, including 212 game source slots and a shared walk endpoint, with eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 786 entries, including 212 game source slots and 45 lifecycle entries, with eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
@@ -87,17 +87,20 @@ Soft sounds are optional and off until you enable them.
   catch 3.68 seconds. Each gets three times an ordinary idle's selection weight,
   with no consecutive repeats and the same rest between gestures.
   These do not change the twelve pet reactions.
-- **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
-  sit-up before her greeting. She enters from her monitor's top edge and lands at
-  her saved position. **Let her go · quit** gives her a little sad look and lowered
-  ears, then the existing crouch and graceful hop. These eight-drawing
-  transitions last 1.9 and 2.15 seconds, use continuous travel between poses,
-  and start the arrival clock on Qt's first animation tick so a slow launch
-  cannot spend the fall before it appears. Visible fullscreen launches also
+- **Hello and goodbye.** She leans curiously into view from the top, gathers into
+  a drop, yields through her forepaws and settles into a pleased head tilt and smile.
+  The 2.15s entrance uses 20 poses and ends at her actual idle and saved position.
+  **Let her go · quit** gives her a warm slow blink, a look toward the way out and
+  a gathered hop through the monitor's bottom edge, with her attached tail trailing
+  last. This 16-pose goodbye lasts 1.8s and moves the actual window, while preserving
+  her resting position. Both clocks start on Qt's first animation tick so loading
+  cannot spend the performance before it appears. Visible fullscreen launches also
   play the drop-in, silently; the fullscreen hiding preference still applies.
   They keep her saved desktop position, and do not accept pets or
   window reactions midway through. Reduced motion skips the jumps; quitting
-  while hidden or fullscreen is immediate. Hide/Show remains immediate.
+  while hidden or fullscreen is immediate. Sleeping, held or other incompatible
+  poses close immediately rather than snapping into a seated goodbye. Hide/Show
+  remains immediate. [Preview and verification](docs/visitor-validation.md).
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual
@@ -236,7 +239,7 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
-Packaging prepares all 741 calibrated animation frames once with
+Packaging prepares all 786 calibrated animation frames once with
 `tools/bake_atlas.py`. The executable loads those finished frames directly,
 avoiding source-sheet silhouette analysis on every launch. Source launches keep
 the original importer; source artwork and custom asset overrides are retained.
@@ -249,7 +252,8 @@ the single-instance lock prevents two kittens running together.
 The latest build includes Catch the Cursor, pickup, slightly faster petting, frosted thoughts,
 the supplied icon and startup repair; see [Catch verification](docs/catch-validation.md)
 and the [startup/icon record](docs/startup-icon-validation.md). The
-[quieter cursor-play v2 proposal](docs/cursor-play-v2-plan.md) awaits approval and is not implemented.
+[quieter cursor-play v2](docs/cursor-play-v2-validation.md) and the
+[visitor entrance/goodbye](docs/visitor-validation.md) are implemented.
 Historical build paths
 in older reports describe their original delivery locations.
 

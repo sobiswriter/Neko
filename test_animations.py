@@ -100,7 +100,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
         atlas = self.atlas
-        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4)
+        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4 + 45)
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
@@ -226,15 +226,14 @@ class AnimationTests(unittest.TestCase):
         for name in ("tail_chase", "tail_catch", "arrive", "depart"):
             clip = CLIPS[name]
             indices = set(clip.order)
-            self.assertTrue(set(range(8)) <= indices)
+            self.assertTrue(set(range(1 if name == "arrive" else 0, 8)) <= indices)
             self.assertFalse(clip.loop)
             self.assertLess(sum(clip.durations), 6000)
             images = [atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage() for i in indices]
             expected = len(indices) - (1 if name in ("tail_chase", "tail_catch") else 0)
             self.assertEqual(len({bytes(image.constBits()) for image in images}), expected, name)
         departed = atlas.frame("depart", 999).toImage()
-        self.assertEqual(departed.pixelColor(56, 50).alpha(), 0)
-        self.assertTrue(all(byte == 0 for byte in bytes(departed.constBits())))
+        self.assertTrue(any(bytes(departed.constBits())), "Screen travel, not local erasure, owns exit")
         self.assertNotEqual(atlas.frame("arrive", 0).toImage(), atlas.frame("arrive", 999).toImage())
 
     def test_tail_actions_share_idle_endpoints_and_finish_before_the_idle_slot(self):
@@ -262,7 +261,7 @@ class AnimationTests(unittest.TestCase):
     def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
         atlas = self.atlas
         for key, frame in atlas.frames.items():
-            if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith("idleplay-"):
+            if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith(("idleplay-", "visitor-")):
                 continue
             image = frame.toImage()
             self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
@@ -286,15 +285,24 @@ class AnimationTests(unittest.TestCase):
         atlas = self.atlas
         idle = atlas.frame("idle", 0).toImage()
         self.assertEqual(atlas.frame("arrive", 999).toImage(), idle)
-        self.assertNotEqual(atlas.frame("depart", 0).toImage(), idle)
-        self.assertNotEqual(atlas.frame("depart", 1.77).toImage(),
+        self.assertEqual(atlas.frame("depart", 0).toImage(), idle)
+        self.assertEqual(atlas.frame("depart", 1.77).toImage(),
                             atlas.frame("depart", 1.79).toImage())
         self.assertEqual(CLIPS["depart"].frame_index(1.77), CLIPS["depart"].frame_index(1.79))
         self.assertTrue(any(bytes(atlas.frame("arrive", 0).toImage().constBits())))
         for name in ("arrive", "depart"):
             self.assertEqual(atlas.frame(name, 0.2, motion=False).toImage(), idle)
         image = atlas.frame("depart", 999).toImage()
-        self.assertFalse(any(bytes(image.constBits())))
+        self.assertTrue(any(bytes(image.constBits())))
+
+    def test_arrival_recovery_keeps_the_canonical_seated_size(self):
+        idle = sprite_bounds(self.atlas.frame("idle", 0).toImage())
+        for i in (19, 20):
+            image = self.atlas.frames["visitor-arrive", i // 4, i % 4].toImage()
+            bounds = sprite_bounds(image)
+            self.assertAlmostEqual(bounds.top(), idle.top(), delta=3)
+            self.assertAlmostEqual(pet_landmarks(image.copy(bounds))[0], 62, delta=4)
+            self.assertAlmostEqual(bounds.bottom(), idle.bottom(), delta=1)
 
     def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
         atlas = self.atlas

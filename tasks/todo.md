@@ -1,13 +1,13 @@
 # Animation rebuild checklist
 
-## Entrance and goodbye — research delivered, implementation proposed, 2026-10-23
+## Entrance and goodbye — delivered, 2026-10-23
 
 - [x] Inspect current lifecycle art, timing, travel, interruption rules and earlier validation; research primary animation and feline references.
 - [x] Record alternatives, recommended paired storyboards, support/scale constraints and acceptance gates in [the research proposal](../docs/arrival-goodbye-research.md).
-- [ ] After implementation is requested: prototype edge support, landing compression and high/low exit paths at native size.
-- [ ] Author and integrate the complete entrance, then review its full recovery to actual idle.
-- [ ] Author and integrate the complete goodbye with actual window travel and persistent resting origin.
-- [ ] Verify lifecycle interruptions, native painting, source/packed equality and startup; update provenance/previews/README and preserve the flat release.
+- [x] User approved implementation; prototype supported lean, landing compression and high/low exit paths at native size.
+- [x] Author and integrate the complete entrance; reject the undersized seated endpoint and redraw its supported recovery.
+- [x] Author and integrate the complete goodbye with actual window travel and persistent resting origin.
+- [x] Verify lifecycle interruptions, native painting, source/packed equality and startup; 115 focused/four package checks pass. Update provenance/previews/README and preserve the flat release. [Final report](../docs/visitor-validation.md).
 
 ## Startup correction — 2026-10-22
 

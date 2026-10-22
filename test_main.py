@@ -357,7 +357,8 @@ class DesktopTests(unittest.TestCase):
         target = self.neko.pos()
         self.neko.show_neko(greet=True)
         screen = QApplication.screenAt(target + QPoint(56, 56)) or QApplication.primaryScreen()
-        self.assertLessEqual(self.neko.geometry().bottom(), screen.geometry().top())
+        self.assertLess(self.neko.y(), screen.geometry().top())
+        self.assertGreater(self.neko.geometry().bottom(), screen.geometry().top())
         self.neko.animate()
         start = self.neko.pose_started
         with patch("main.time.monotonic", return_value=start + 0.35):
@@ -365,7 +366,7 @@ class DesktopTests(unittest.TestCase):
         self.assertLess(self.neko.y(), target.y())
         self.neko.save_preferences()
         self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, CANVAS_TOP))
-        with patch("main.time.monotonic", return_value=start + 0.75):
+        with patch("main.time.monotonic", return_value=start + 1.06):
             self.neko.animate()
         self.assertEqual(self.neko.pos(), target)
         self.neko.finish_transition()
@@ -381,11 +382,11 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.y(), top)
         self.assertEqual(self.neko.current_clip, "arrive")
         self.assertGreater(self.neko.companion.pose_until, ready + 1.8)
-        with patch("main.time.monotonic", return_value=ready + 0.35):
+        with patch("main.time.monotonic", return_value=ready + 0.65):
             self.neko.animate()
         self.assertGreater(self.neko.y(), top)
         self.assertLess(self.neko.y(), target.y())
-        with patch("main.time.monotonic", return_value=ready + 0.75):
+        with patch("main.time.monotonic", return_value=ready + 1.06):
             self.neko.animate()
         self.assertEqual(self.neko.pos(), target)
 
@@ -434,7 +435,7 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.companion.state, NekoState.IDLE)
         self.assertIsNone(self.neko.arrival_target)
 
-    def test_quitting_mid_arrival_starts_sad_goodbye_at_the_landing_position(self):
+    def test_quitting_mid_arrival_starts_goodbye_at_the_landing_position(self):
         target = self.neko.pos()
         self.neko.show_neko(greet=True)
         self.neko.quit_neko()
@@ -442,7 +443,7 @@ class DesktopTests(unittest.TestCase):
         self.assertIsNone(self.neko.arrival_target)
         self.assertEqual(self.neko.current_clip, "depart")
         self.assertEqual(self.neko.atlas.frame("depart", 0).toImage(),
-                         self.neko.atlas.frames["farewell", 0, 0].toImage())
+                         self.neko.atlas.frames["idle", 0, 0].toImage())
 
     def test_fullscreen_hiding_interrupts_arrival_without_greeting_or_losing_position(self):
         target = self.neko.pos()
@@ -471,6 +472,55 @@ class DesktopTests(unittest.TestCase):
                             for x in range(self.neko.width()) for y in range(hidden_rows)))
         self.assertTrue(any(image.pixelColor(x, y).alpha() > 0
                             for x in range(self.neko.width()) for y in range(hidden_rows, self.neko.height())))
+
+    def test_goodbye_travels_to_the_monitor_edge_without_saving_flight(self):
+        origin = self.neko.pos()
+        with patch("main.QApplication.quit"):
+            self.neko.quit_neko()
+            self.neko.animate()
+            start = self.neko.pose_started
+            with patch("main.time.monotonic", return_value=start + 1.6):
+                self.neko.animate()
+            self.assertNotEqual(self.neko.pos(), origin)
+            self.neko.save_preferences()
+            self.assertEqual(self.settings.value("position", type=QPoint), origin + QPoint(CANVAS_PADDING, CANVAS_TOP))
+            self.neko.finish_transition()
+            self.assertEqual(self.neko.pos(), origin)
+
+    def test_sleeping_quit_does_not_wake_her_for_a_performance(self):
+        self.neko.companion.state = NekoState.SLEEPING
+        self.neko.refresh_asset()
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            quit_app.assert_called_once()
+        self.assertTrue(self.neko.closing)
+
+    def test_departure_is_clipped_at_its_monitor_not_a_neighbour_below(self):
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        self.neko.lifecycle_area = QRect(0, 0, 800, 800)
+        self.neko.move(100, 760)
+        with patch("main.time.monotonic", return_value=self.neko.pose_started + 1.7):
+            image = self.neko.grab().toImage()
+        self.assertTrue(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(40)))
+        self.assertFalse(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(40, 144)))
+
+    def test_monitor_change_during_goodbye_restores_home_and_closes(self):
+        origin = self.neko.pos()
+        self.neko.quit_neko()
+        self.neko.move(origin + QPoint(10, 80))
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.screen_changed()
+            quit_app.assert_called_once()
+        self.assertEqual(self.neko.pos(), origin)
+
+    def test_delayed_first_tick_keeps_the_whole_goodbye(self):
+        with patch("main.QApplication.quit"):
+            self.neko.quit_neko()
+            self.assertFalse(self.neko.transition_timer.isActive())
+            ready = self.neko.pose_started + 2.5
+            with patch("main.time.monotonic", return_value=ready):
+                self.neko.animate()
+            self.assertGreater(self.neko.companion.pose_until, ready + 1.7)
 
     def test_quit_plays_goodbye_once_then_cleans_up_without_moving_saved_position(self):
         origin = self.neko.pos()
@@ -526,10 +576,10 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.current_clip, "idle")
         self.assertFalse(self.neko.transition_timer.isActive())
 
-    def test_arrival_moves_the_window_and_departure_repaints_its_hop_in_place(self):
+    def test_both_lifecycle_trajectories_move_between_drawn_poses(self):
         origin = self.neko.pos()
-        for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.20, 0.22)),
-                                     (NekoState.LEAVING, "depart", (1.77, 1.79))):
+        for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.65, 0.67)),
+                                     (NekoState.LEAVING, "depart", (1.4, 1.42))):
             self.neko.start_transition(state, clip)
             self.neko.animate()
             start = self.neko.pose_started
@@ -540,11 +590,7 @@ class DesktopTests(unittest.TestCase):
                     self.neko.animate()
                     frames.append(self.neko.grab().toImage())
                     positions.append(self.neko.pos())
-            if state == NekoState.ARRIVING:
-                self.assertNotEqual(positions[0], positions[1])
-            else:
-                self.assertEqual(positions, [origin, origin])
-                self.assertNotEqual(frames[0], frames[1], clip)
+            self.assertNotEqual(positions[0], positions[1], clip)
 
     def test_tail_run_uses_the_reference_cadence_without_speeding_up_walking(self):
         for state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):

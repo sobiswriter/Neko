@@ -25,7 +25,7 @@ from behavior import Companion, NekoState, PET_STATES, CARRY_STATES, GAME_STATES
 from games import CursorGame, GameTimer, Runway
 from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
-from animations import GAME_ROWS, SpriteAtlas, Clip, CLIPS, drop_progress, held_clip, sprite_bounds, CANVAS_WIDTH, CANVAS_PADDING, CANVAS_TOP, CANVAS_HEIGHT
+from animations import GAME_ROWS, SpriteAtlas, Clip, CLIPS, drop_progress, departure_progress, departure_drop, held_clip, sprite_bounds, CANVAS_WIDTH, CANVAS_PADDING, CANVAS_TOP, CANVAS_HEIGHT
 from dialogue import OfflineDialogue
 from cursors import petting_cursors
 from thoughts import ThoughtLabel
@@ -411,6 +411,9 @@ class NekoWidget(QWidget):
         self.last_cursor = QCursor.pos()
         self.arrival_target = None
         self.arrival_top = 0
+        self.departure_origin = None
+        self.lifecycle_area = None
+        self.departure_direction = 1
         self.last_title_stamp = None
         self.quiet = self.settings.value("quiet", False, type=bool)
         self.motion = self.settings.value("motion", True, type=bool)
@@ -858,16 +861,25 @@ class NekoWidget(QWidget):
             self.companion.finish_pet(now)
             self.pose_started = now
             self.refresh_asset()
-        if self.arrival_target is not None:
+        if self.arrival_target is not None or self.departure_origin is not None:
             # Startup work must not consume the fall before Qt can animate it.
             if not self.transition_timer.isActive():
                 self.pose_started = time.monotonic()
-                duration = sum(CLIPS["arrive"].durations)
+                duration = sum(CLIPS[self.current_clip].durations)
                 self.companion.pose_until = self.pose_started + duration / 1000
                 self.transition_timer.start(duration)
-            progress = drop_progress(time.monotonic() - self.pose_started)
-            y = self.arrival_top + (self.arrival_target.y() - self.arrival_top) * progress
-            self.move(self.arrival_target.x(), round(y))
+            elapsed = time.monotonic() - self.pose_started
+            if self.arrival_target is not None:
+                progress = drop_progress(elapsed)
+                y = self.arrival_top + (self.arrival_target.y() - self.arrival_top) * progress
+                self.move(self.arrival_target.x(), round(y))
+            else:
+                progress = departure_progress(elapsed)
+                distance = self.lifecycle_area.bottom() + 1 - self.departure_origin.y()
+                y = self.departure_origin.y() + departure_drop(progress, distance)
+                x = self.departure_origin.x() + self.departure_direction * 40 * progress
+                x = max(self.lifecycle_area.left(), min(x, self.lifecycle_area.right() - self.width() + 1))
+                self.move(round(x), round(y))
         self.update()
 
     def set_reactivity(self, enabled):
@@ -879,7 +891,7 @@ class NekoWidget(QWidget):
 
     def set_hide_fullscreen(self, enabled):
         self.hide_fullscreen = enabled
-        if enabled and self.fullscreen and self.companion.state == NekoState.ARRIVING:
+        if enabled and self.fullscreen and self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
             self.finish_transition()
         self.dismiss_bubble()
         self.setVisible(not self.is_manually_hidden and not self.closing
@@ -1088,9 +1100,8 @@ class NekoWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        if self.arrival_target is not None:
-            top = max(0, self.arrival_top + self.height() - self.y())
-            painter.setClipRect(0, top, self.width(), max(0, self.height() - top))
+        if self.lifecycle_area is not None:
+            painter.setClipRect(self.lifecycle_area.translated(-self.x(), -self.y()))
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform, False)
         now = time.monotonic()
@@ -1119,6 +1130,8 @@ class NekoWidget(QWidget):
         else:
             if (self.game and state in GAME_STATES and self.game.direction > 0
                     and self.game.phase not in ("loss", "loss_finish", "curl", "comfort", "win")):
+                painter.scale(-1, 1)
+            elif state == NekoState.LEAVING and self.departure_direction < 0:
                 painter.scale(-1, 1)
             painter.drawPixmap(-pixmap.width() // 2, top, pixmap)
         painter.restore()
@@ -1532,6 +1545,9 @@ class NekoWidget(QWidget):
         self.dismiss_bubble()
 
     def clamp_position(self, *args):
+        if self.companion.state == NekoState.LEAVING:
+            self.finish_quit()
+            return
         if self.companion.state == NekoState.ARRIVING:
             self.finish_transition()
         self.restore_arrival_position()
@@ -1576,12 +1592,13 @@ class NekoWidget(QWidget):
         self.companion.next_comment = time.monotonic() + self.companion.chatter_seconds
         self.fullscreen = desktop_activity()[2]
         self.activity.enabled = self.reactive and not self.fullscreen
-        self.setVisible(not (self.fullscreen and self.hide_fullscreen))
-        if greet and self.isVisible():
+        visible = not (self.fullscreen and self.hide_fullscreen)
+        if greet and visible:
             if self.motion and not self.atlas.frame("arrive", 0).isNull():
                 self.start_transition(NekoState.ARRIVING, "arrive")
-            else:
-                self.offline_line("hello")
+        self.setVisible(visible)
+        if greet and visible and self.companion.state != NekoState.ARRIVING:
+            self.offline_line("hello")
         self.sync_animation()
         self.pin_to_top(force=True)
 
@@ -1612,7 +1629,8 @@ class NekoWidget(QWidget):
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
                            "ai_enabled": self.ai_enabled,
                            "position": (QPoint(round(self.game.origin[0]), round(self.game.origin[1])) if self.game else
-                                        self.arrival_target if self.arrival_target is not None else self.pos())
+                                        self.arrival_target if self.arrival_target is not None else
+                                        self.departure_origin if self.departure_origin is not None else self.pos())
                                        + QPoint(CANVAS_PADDING, CANVAS_TOP),
                            "pets": self.total_pets + self.companion.pets,
                            "naps": self.total_naps + self.companion.naps}.items():
@@ -1622,10 +1640,11 @@ class NekoWidget(QWidget):
     def quit_neko(self):
         if self.closing or self.companion.state == NekoState.LEAVING:
             return
+        compatible = self.companion.state in (NekoState.IDLE, NekoState.ARRIVING)
         self.cancel_pickup()
         self.end_game(immediate=True, clear_mood=True)
         self.restore_arrival_position()
-        if (self.motion and self.isVisible() and not self.fullscreen and not self.is_manually_hidden
+        if (compatible and self.motion and self.isVisible() and not self.fullscreen and not self.is_manually_hidden
                 and not self.atlas.frame("depart", 0).isNull()):
             self.drag_origin = None
             self.ai_generation += 1
@@ -1642,6 +1661,10 @@ class NekoWidget(QWidget):
         if self.arrival_target is not None:
             self.move(self.arrival_target)
             self.arrival_target = None
+        if self.departure_origin is not None:
+            self.move(self.departure_origin)
+            self.departure_origin = None
+        self.lifecycle_area = None
 
     def start_transition(self, state, clip):
         self.reset_pet_cursor()
@@ -1651,14 +1674,16 @@ class NekoWidget(QWidget):
         duration = sum(CLIPS[clip].durations)
         self.companion.pose(state, now, duration / 1000)
         self.pose_started = now
+        screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
+        self.lifecycle_area = screen.geometry()
         if state == NekoState.ARRIVING:
             self.arrival_target = self.pos()
-            screen = QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()
-            self.arrival_top = screen.geometry().top() - self.height()
+            self.arrival_top = screen.geometry().top() - 64
             self.move(self.arrival_target.x(), self.arrival_top)
+        else:
+            self.departure_origin = self.pos()
+            self.departure_direction = -1 if self.geometry().center().x() > screen.geometry().center().x() else 1
         self.refresh_asset()
-        if state != NekoState.ARRIVING:
-            self.transition_timer.start(duration)
 
     def finish_transition(self):
         self.transition_timer.stop()

@@ -1,8 +1,8 @@
 # Animation rebuild
 
-## Entrance and goodbye research — proposed, 2026-10-23
+## Entrance and goodbye — delivered, 2026-10-23
 
-User requested research and creative improvement ideas, not a new build. [Evidence, alternatives, timed storyboards and implementation proposal](../docs/arrival-goodbye-research.md). Recommend a curious top-edge peek → deliberate release → yielding forepaw landing → affectionate recognition, paired with a slow blink → look toward exit → gathered hop → attached tail crossing the monitor edge last. Prototype edge support and high/low exit travel before full art. Preserve fixed character scale, first-visible timing, saved origin, bounded close and the build-time atlas. All new acting, timings and routes remain proposed; existing animation/release stays unchanged. Older open tasks below are preserved.
+User approved the research with “DO me proud.” [Original research/storyboards](../docs/arrival-goodbye-research.md) and [delivery, previews, correction and verification](../docs/visitor-validation.md). A curious supported lean replaces an uncomfortable hanging grip; entrance lands and recovers through 20 poses/2.15s. Goodbye uses a drawn slow blink and actual window travel through 16 poses/1.8s. The original undersized recovery was redrawn and calibrated as a separate batch. First-tick timing, resting origin, prompt close and build-time baking are preserved. All 741 previous frames/63 unrelated clips remain identical. Older open work below is preserved.
 
 ## Startup correction — 2026-10-22
 

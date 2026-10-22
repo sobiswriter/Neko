@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, PET_ROWS, CARRY_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
 from cursors import petting_cursors
 
 
@@ -84,30 +84,8 @@ def frame_sheet(atlas, entries, destination, source=False):
 
 
 def lifecycle_scene(atlas, destination):
-    frames = []
-    durations = [30, 30, 40] * 60
-    elapsed_ms = 0
-    for duration in durations:
-        canvas = Image.new("RGB", (480, 360), BACKGROUND)
-        draw = ImageDraw.Draw(canvas)
-        draw.text((12, 10), "Monitor top", fill="#514a43")
-        draw.line((0, 30, 240, 30), fill="#bcb4a7")
-        draw.text((252, 10), "Sad pause, then hop", fill="#514a43")
-        draw.line((0, 299, 480, 299), fill="#bcb4a7")
-        elapsed = elapsed_ms / 1000
-        y = round(-82 + 270 * drop_progress(elapsed))
-        arrival = displayed(atlas, "arrive", elapsed).crop((CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
-        # Crop horizontal transparent padding; retain the native top-edge clip/trajectory.
-        canvas.paste(arrival, (64, y), arrival)
-        draw.rectangle((0, 0, 239, 29), fill=BACKGROUND)
-        draw.text((12, 10), "Monitor top", fill="#514a43")
-        departure = pixels(atlas.frame("depart", max(0, elapsed - 0.5))).crop(
-            (CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
-        canvas.paste(departure, (304, 188), departure)
-        frames.append(canvas)
-        elapsed_ms += duration
-    frames[0].save(destination, save_all=True, append_images=frames[1:],
-                   duration=durations, loop=0, disposal=2)
+    from tools.preview_lifecycle import scene
+    scene(atlas, destination)
 
 
 def flight_sheet(atlas, destination):
@@ -177,7 +155,7 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 1
+    assert len(atlas.frames) == 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4 + 45
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)

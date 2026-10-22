@@ -1,0 +1,422 @@
+{
+  "date": "2026-10-23",
+  "tool": "built-in image_gen; three calls; genuine transparency",
+  "references": [
+    "assets/neko_idle.png",
+    "build/visitor/idle.png"
+  ],
+  "sources": {
+    "arrive": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-d65469ad-11da-4857-a893-ba2549fddf79.png",
+      "prompt": "Use case: illustration-story. Production pixel-art sprite sheet for the existing Windows desktop kitten Neko. Input image 1 is the canonical character; image 2 is the exact imported seated sprite. Preserve her identity, 3/4 front camera, white fur, gray chest, pink ears/nose, charcoal stepped outlines, big dark eyes and compact body. Create ONE transparent sheet of EXACTLY TWENTY complete sprites, FOUR columns by FIVE rows, read left to right then down. Generous clear spacing, same physical head size throughout. No labels, text, floor, ledge graphics, background, shadow, haze, hearts, props or motion marks. True transparent alpha. All complete silhouettes fit inside each cell. FOUR anatomical legs total, with hidden legs staying hidden, one connected head/neck/torso and ONE attached tail. No extra paw beneath a lifted paw. Source zero and nineteen must match the reference neutral sit, with identical proportions.\n\nStory: a curious little visitor peers down into the desktop, decides to come in, drops confidently, absorbs a soft landing, then looks at the viewer with a pleased little smile. Anatomical joint changes rather than stretching the bitmap. Tail follows torso motion with small delayed changes.\n\nChronological 0-based slots:\n0 neutral seated reference, calibration only.\n1 low forward-leaning curious crouch, head slightly below shoulders, both forepaws reaching forward/down as if supported at an unseen upper edge, hindquarters raised behind, whole connected cat included.\n2 head leans a little further down between the reaching forelegs; curious open eyes, hind support retained.\n3 a tiny head tilt with ears forward, same support.\n4 weight shifts into forepaws and hind legs gather to release.\n5 forepaws release, body gathers into a compact confident airborne shape, eyes attentive.\n6 descending gathered body, hind legs tucked, forelegs starting to reach down.\n7 forelegs extend slightly further toward contact, tail curves upward from momentum.\n8 forelegs now reach, hind legs remain gathered; brief focused squeezed eyes, cute not frightened.\n9 open eyes again, forepaws just about to touch, shoulders higher than paws.\n10 first forepaw contact, elbows starting to yield, hind feet still approaching ground.\n11 both forepaws support her, elbows bend more, hind feet join, spine yielding downward.\n12 deepest soft landing compression, all grounded supporting paws accounted for, head never touches ground, relaxed eye squeeze.\n13 shoulders rise a little, rear settles with planted hind paws.\n14 a supported half-sit with straightening forelegs, tail still catching up.\n15 almost upright seated, face turning gently toward viewer, small pleased mouth.\n16 proud tiny head tilt, open eyes, fully supported sit.\n17 contented squeezed-eye smile held in a subtle seated tilt, no paw raised.\n18 gently reopening eyes and leveling head into the exact reference sit, complete recovery.\n19 exact neutral seated calibration drawing, same as zero.\n\nThe peek must look curious and physically supported rather than a distressed dangling cat. Do not crop the torso out to fake a peek: runtime monitor occlusion will do that. Prioritize connected poses and expressive legible acting, no random alternate designs.",
+      "rows": 5
+    },
+    "depart": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-b36fe620-949a-4c93-b43e-919236c5b9fd.png",
+      "prompt": "Use case: illustration-story. Create ONE pixel-art animation sprite sheet with EXACTLY SIXTEEN complete cat drawings, FOUR columns by FOUR rows, transparent background. Reference 1 is the exact Neko character, reference 2 the actual runtime neutral, reference 3 the accepted new entrance acting and identity. Match face/head volume, white compact body, grey throat, pink ears/nose, big charcoal eyes with square highlights, stepped charcoal outlines. Fixed 3/4 front camera. Every drawing has the SAME physical head size, generous transparent padding, all complete silhouettes inside their cells. Exactly four anatomical legs total (two fore/two hind with natural hidden legs), one connected head/neck/torso, two ears and ONE attached tail. No detached pieces, extra paws, text, numbers, labels, props, floor, shadows, haze, sparkle or watermark.\n\nA warm, confident 'see you soon' goodbye. Not frightened, pleading or sad. A slow blink, small look toward the way out, a weight-bearing crouch, then a small confident hop down. The body will travel via the desktop window, so draw complete on-the-spot poses without cropping or translating cells to simulate screen travel. No body size changes. Tail finishes high so its attached tip naturally leaves the screen last.\n\n0 exact reference neutral sit (calibration).\n1 seated tiny affectionate head tilt with soft open eyes, supported forepaws.\n2 half-closed relaxed lids and small mouth, same head tilt and support.\n3 fully closed relaxed eyes, warm slow blink, same seated body.\n4 gently reopening eyes, head leveling to reference, body still supported.\n5 eyes glance down and toward viewer-right, ears subtly follow, all paws supported.\n6 head turns to viewer-right about 20 degrees and shoulders start following, not profile yet.\n7 shift weight into forepaws, hindquarters gather below torso, tail curls behind to counterbalance.\n8 a deeper crouch with bent hocks and elbows, all support contacts clear.\n9 hindquarters push upward/forward, forepaws lift, abdomen connected, small confident eye squeeze.\n10 early airborne gathered shape, both forelegs forward/down and both hind legs tucked, tail following.\n11 airborne forelegs extend down slightly, hind legs start following, eyes open and attentive.\n12 downward-reaching forelegs, body tilted diagonally down right, tail trailing up behind.\n13 same descending pose with tail higher and a subtle graceful change in forelegs.\n14 body a little lower and narrower in the air through limb gathering, head volume unchanged, all visible anatomy connected, tail still high.\n15 continue the same descent, forepaws reaching, attached tail arcing UP behind the head and body as the last thing to leave. This is a complete cat drawing, NOT a floating tail and NOT a blank frame.\n\nMake small anatomically connected chronological changes. Slow blink must have actual half-lid, closed, reopen drawings. Crouch must visibly store energy before the hind push. Preserve physical head size and reference identity in every slot.",
+      "rows": 4
+    },
+    "recover": {
+      "original": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-0fc7ac5a-7d9d-418d-ac68-ffd6f74e020a.png",
+      "prompt": "Use case: illustration-story. Corrective pixel-art sheet for Neko's landing recovery. EXACTLY EIGHT complete sprites, FOUR columns and TWO rows, true transparent alpha and generous empty cell padding. Reference 1 is the canonical exact seated runtime sprite. Reference 2 is her current half-standing landing recovery, which must connect into the sit. Preserve reference 1's head size, face construction, ears, white fur, grey throat, pink nose and charcoal stepped outlines. The previous draft wrongly shrank the seated body to about 67px versus the true 82px. This sheet MUST retain full seated physical height and physical head volume throughout. Do NOT draw a miniature kitten in later slots. Fixed camera, no zoom, no perspective-size drift. Exact same complete neutral sit in slots0 and7 for batch calibration.\n\nAll eight cats have ONE head, ONE connected torso/neck, TWO forelegs and TWO hindlegs total with natural occlusion, two ears, ONE attached tail. No extra grounded paw when a paw is lifted. No text/numbers/grid, shadows, floor, scenery, matte, haze, props or decorations. Same palette and pixel clusters. No bitmap stretching.\n\n0 exact canonical upright seated reference, open eyes, calibration.\n1 supported half-standing recovery like reference2: all feet supporting, forelegs nearly straight, haunch beginning to settle, head remains same physical size as calibration0.\n2 haunch lowers behind supporting forepaws, shoulders gently rise, chest opens. In-place physically connected settling.\n3 complete upright seated kitten, full82px reference proportions, head level, open eyes; planted forepaws and tail at side.\n4 tiny proud head tilt towards viewer, SAME seated height and head volume, a subtle pleased mouth.\n5 same small tilt, drawn contented squeezed-eye smile with a soft mouth, no raised paw, full seated body stays exactly sized.\n6 reopening eyes and leveling the head through a connected intermediate; full height, both forepaws planted.\n7 exact neutral seated reference identical to0, completed physical recovery.",
+      "rows": 2
+    }
+  },
+  "notes": [
+    "Initial curious crouch/lean accepted instead of an unsupported hanging grip; actual monitor clipping supplies entry occlusion.",
+    "All anatomy authored by ImageGen. Extraction only retains complete RGBA crops; no painted replacement anatomy or alpha cleanup.",
+    "Original arrival recovery source15..18 was rejected: seated height67px instead of83px caused a16px endpoint pop. Replace it with a separately calibrated drawn recovery; no per-pose fitting."
+  ],
+  "assembly": {
+    "arrive": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-d65469ad-11da-4857-a893-ba2549fddf79.png",
+      "regions": [
+        [
+          165,
+          30,
+          361,
+          243,
+          29587
+        ],
+        [
+          438,
+          39,
+          650,
+          243,
+          27394
+        ],
+        [
+          748,
+          58,
+          960,
+          244,
+          25804
+        ],
+        [
+          1064,
+          54,
+          1271,
+          244,
+          25343
+        ],
+        [
+          158,
+          282,
+          349,
+          477,
+          24301
+        ],
+        [
+          444,
+          275,
+          635,
+          463,
+          22627
+        ],
+        [
+          768,
+          275,
+          951,
+          476,
+          22864
+        ],
+        [
+          1069,
+          275,
+          1251,
+          483,
+          23662
+        ],
+        [
+          162,
+          501,
+          342,
+          707,
+          22466
+        ],
+        [
+          444,
+          501,
+          629,
+          704,
+          23041
+        ],
+        [
+          754,
+          498,
+          942,
+          705,
+          23785
+        ],
+        [
+          1075,
+          507,
+          1272,
+          706,
+          26019
+        ],
+        [
+          158,
+          748,
+          348,
+          910,
+          22551
+        ],
+        [
+          450,
+          731,
+          642,
+          909,
+          24169
+        ],
+        [
+          757,
+          717,
+          939,
+          909,
+          25328
+        ],
+        [
+          1083,
+          737,
+          1259,
+          910,
+          21373
+        ],
+        [
+          158,
+          925,
+          348,
+          1105,
+          20777
+        ],
+        [
+          449,
+          927,
+          631,
+          1106,
+          21049
+        ],
+        [
+          771,
+          933,
+          948,
+          1106,
+          21507
+        ],
+        [
+          1086,
+          933,
+          1263,
+          1106,
+          21524
+        ]
+      ],
+      "asset": "assets/neko-visitor-arrive-v1.png",
+      "packing": "4 columns; 384px cells; baseline372; complete RGBA crops; no painting or alpha threshold cleanup",
+      "sha256": "d7138689db6fd97d8e3d0793ee818c13f8e8948632453a094efcc525d557115a"
+    },
+    "depart": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-b36fe620-949a-4c93-b43e-919236c5b9fd.png",
+      "regions": [
+        [
+          159,
+          71,
+          368,
+          293,
+          32761
+        ],
+        [
+          467,
+          69,
+          663,
+          294,
+          30210
+        ],
+        [
+          783,
+          70,
+          980,
+          293,
+          30143
+        ],
+        [
+          1094,
+          70,
+          1289,
+          293,
+          29207
+        ],
+        [
+          150,
+          333,
+          360,
+          554,
+          32681
+        ],
+        [
+          473,
+          333,
+          688,
+          554,
+          31318
+        ],
+        [
+          786,
+          337,
+          1006,
+          554,
+          31976
+        ],
+        [
+          1083,
+          345,
+          1321,
+          555,
+          36093
+        ],
+        [
+          142,
+          613,
+          364,
+          821,
+          29888
+        ],
+        [
+          476,
+          574,
+          693,
+          804,
+          30914
+        ],
+        [
+          786,
+          577,
+          984,
+          789,
+          29059
+        ],
+        [
+          1084,
+          578,
+          1313,
+          815,
+          32442
+        ],
+        [
+          164,
+          829,
+          375,
+          1094,
+          31882
+        ],
+        [
+          479,
+          828,
+          678,
+          1084,
+          29912
+        ],
+        [
+          794,
+          816,
+          994,
+          1092,
+          29863
+        ],
+        [
+          1098,
+          816,
+          1332,
+          1098,
+          34530
+        ]
+      ],
+      "asset": "assets/neko-visitor-depart-v1.png",
+      "packing": "4 columns; 384px cells; baseline372; complete RGBA crops; no painting or alpha threshold cleanup",
+      "sha256": "2100c748e5970d4e236f7309b1c43372e5a3ca36ad7042ea540677f1eea20484"
+    },
+    "recover": {
+      "source": "C:/Users/soura/.codex/generated_images/01a162fa-0456-7d31-b435-3947ee3e555c/exec-0fc7ac5a-7d9d-418d-ac68-ffd6f74e020a.png",
+      "regions": [
+        [
+          116,
+          150,
+          369,
+          428,
+          49109
+        ],
+        [
+          540,
+          173,
+          807,
+          428,
+          49384
+        ],
+        [
+          968,
+          191,
+          1239,
+          431,
+          48295
+        ],
+        [
+          1418,
+          150,
+          1670,
+          428,
+          49307
+        ],
+        [
+          127,
+          570,
+          372,
+          854,
+          47652
+        ],
+        [
+          569,
+          569,
+          812,
+          854,
+          46727
+        ],
+        [
+          980,
+          575,
+          1234,
+          854,
+          49334
+        ],
+        [
+          1422,
+          575,
+          1673,
+          854,
+          50115
+        ]
+      ],
+      "asset": "assets/neko-visitor-recover-v1.png",
+      "packing": "4 columns; 384px cells; baseline372; complete RGBA crops; no painting or alpha threshold cleanup",
+      "sha256": "0288e7a9d195f7d578feeff576b4f9b4eba10920d0fe035ca909c7cafe1b9a1c"
+    }
+  },
+  "runtime": {
+    "arrive": {
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "duration_ms": 2150,
+      "recover_replacement": "arrive14..19 select recover1..6; arrive20 is actual idle"
+    },
+    "depart": {
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "duration_ms": 1800,
+      "travel": "actual window; shallow18px rise then accelerated fall to monitor bottom; mirrored inward on right half"
+    },
+    "atlas_entries": 786,
+    "retained_prior_frames": 741,
+    "retained_other_clips": 63
+  },
+  "preserved_references": {
+    "docs\\visitor-idle-reference.png": "e1adcdbdce42fd5dc3dbf02f6fdd7e9623010d4eb91f2c232d21f42d27635f04",
+    "docs\\visitor-recovery-start-reference.png": "c17bb8f590094fa5294749370483cac74c235905c413644772b286ddf9055341",
+    "assets\\neko_idle.png": "68121269d4011061a4cf7941b007f06dba7761a7c39e7f3e1755a4f8a762b4ea"
+  }
+}
