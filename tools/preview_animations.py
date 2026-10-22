@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, PET_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
 from cursors import petting_cursors
 
 
@@ -177,7 +177,7 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS)
+    assert len(atlas.frames) == 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 1
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)

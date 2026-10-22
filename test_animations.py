@@ -6,7 +6,7 @@ import unittest
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QColor, QImage
 
-from animations import CLIPS, PET_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
 
 
 APP = QApplication.instance() or QApplication([])
@@ -96,7 +96,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
         atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS))
+        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 1)
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))

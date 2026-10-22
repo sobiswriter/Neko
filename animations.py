@@ -120,6 +120,35 @@ for name, rows in PET_ROWS.items():
     CLIPS[name] = Clip(clip.bank, clip.row, clip.durations[:-1] + (150, clip.durations[-1] - 150),
                        clip.order + (rows * 4,))
 
+# Held mood variants share a 2.4-second body phase clock.
+CARRY_ROWS = {"lift": 4, "calm": 3, "excited": 3, "unimpressed": 3, "sleepy": 3, "bridges": 3,
+              "side": 2, "low": 2, "roll": 2}
+CLIPS.update({
+    "pickup": Clip("carry-lift", 0, (50,) * 8, tuple(range(8))),
+    "set_down": Clip("carry-lift", 0, (50, 70, 70, 80, 80, 80, 80, 90, 100), tuple(range(8, 17))),
+    "carry_to_calm": Clip("carry-bridges", 0, (100,) * 4),
+    "carry_to_unimpressed": Clip("carry-bridges", 1, (100,) * 4),
+    "carry_open_eyes": Clip("carry-bridges", 2, (50,) * 4),
+    "carry_yawn": Clip("carry-sleepy", 0, (150, 150, 200, 150)),
+})
+for mood in ("excited", "calm", "unimpressed", "sleepy"):
+    order = tuple(range(4, 12)) if mood == "sleepy" else tuple(range(12))
+    CLIPS[f"held_{mood}"] = Clip(f"carry-{mood}", 0, (2400 // len(order),) * len(order), order, loop=True)
+
+
+def held_clip(elapsed, sleeping=False):
+    if sleeping:
+        return "held_sleepy", elapsed
+    if elapsed < 0.4:
+        return "pickup", elapsed
+    for start, duration, name in ((3, 0.4, "carry_to_calm"), (10, 0.4, "carry_to_unimpressed"),
+                                  (20, 0.65, "carry_yawn")):
+        if start <= elapsed < start + duration:
+            return name, elapsed - start
+    mood = "excited" if elapsed < 3 else "calm" if elapsed < 10 else "unimpressed" if elapsed < 20 else "sleepy"
+    return f"held_{mood}", elapsed
+
+
 # Seated head landmarks in each eight-pose idle story's imported source cells.
 IDLE_HEADS = {("idleplay-a", 0): (67, 56), ("idleplay-a", 2): (68, 54), ("idleplay-a", 4): (66, 51),
               ("idleplay-b", 0): (71, 55), ("idleplay-b", 2): (71, 57),
@@ -146,6 +175,20 @@ def pet_landmarks(image):
     contacts = [x for y in range(max(0, height - 14), height) for x in range(width)
                 if pixels[y * stride + x] >= 128]
     return longest, head_center, min(contacts), max(contacts)
+
+
+def carry_head(image):
+    alpha = image.convertToFormat(QImage.Format_Alpha8)
+    data, stride = bytes(alpha.constBits()), alpha.bytesPerLine()
+    longest, center = 0, image.width() / 2
+    # Lower rows can join the high tail to the cheek; measure only the upper head.
+    for y in range(image.height() * 2 // 5):
+        run = 0
+        for x in range(image.width()):
+            run = run + 1 if data[y * stride + x] >= 128 else 0
+            if run > longest:
+                longest, center = run, x - (run - 1) / 2
+    return longest, center
 
 
 class SpriteAtlas:
@@ -262,6 +305,52 @@ class SpriteAtlas:
             painter.drawPixmap(0, CANVAS_TOP, source)
             painter.end()
             self.frames[key] = frame
+        self.load_carry(path)
+
+    def load_carry(self, path):
+        idle = self.frames["idle", 0, 0]
+        carry_frames = {}
+        bounds = sprite_bounds(idle.toImage())
+        idle_head = bounds.left() + pet_landmarks(idle.toImage().copy(bounds))[1]
+        for name, rows in CARRY_ROWS.items():
+            image = QImage(str(Path(path) / f"neko-carry-{name}-v1.png"))
+            if image.isNull() or image.width() % 4 or image.height() % rows:
+                return
+            poses = []
+            for index in range(rows * 4):
+                row, col = divmod(index, 4)
+                cell = image.copy(col * image.width() // 4, row * image.height() // rows,
+                                  image.width() // 4, image.height() // rows)
+                cell = cell.scaledToWidth(128, Qt.FastTransformation)
+                bounds = sprite_bounds(cell)
+                if bounds.isEmpty():
+                    return
+                poses.append(cell.copy(bounds))
+            family = name in ("side", "low", "roll")
+            reference = poses[-1] if family else poses[0]
+            head_width, reference_head = carry_head(reference)
+            sx = 62 / head_width
+            sy = 82 / poses[0].height() if name == "lift" else sx
+            for index, pose in enumerate(poses):
+                _, head_center = carry_head(pose)
+                sprite = QPixmap.fromImage(pose).scaled(round(pose.width() * sx), round(pose.height() * sy),
+                                                       Qt.IgnoreAspectRatio, Qt.FastTransformation)
+                crown = (48, 48, 46, 42, 34, 24, 18, 16, 18, 24, 34, 48, 48, 51, 48, 48)[index] if name == "lift" else 16
+                left = round(idle_head - head_center * sx)
+                if family:
+                    progress = index / (len(poses) - 1)
+                    crown = round((98 + CANVAS_TOP - sprite.height()) * (1 - progress) + 16 * progress)
+                    target = idle_head + (reference.width() / 2 - reference_head) * sx
+                    left = round(target - sprite.width() / 2)
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawPixmap(left, crown, sprite)
+                painter.end()
+                carry_frames[f"carry-{name}", index // 4, index % 4] = frame
+        carry_frames["carry-lift", 0, 0] = idle
+        carry_frames["carry-lift", 4, 0] = idle
+        self.frames.update(carry_frames)
 
     def load_pets(self, path, idle):
         idle_bounds = sprite_bounds(idle.toImage())
