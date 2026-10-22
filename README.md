@@ -1,13 +1,34 @@
 # Desktop Neko 🐾
 
 A little company for your Windows desktop. Neko stretches, settles down, notices
-your cursor, and naps when you step away. No chores, guilt, or attention meter.
+your cursor, and naps when you step away. No chores or attention meter.
 Soft sounds are optional and off until you enable them.
 
 ![Neko's petting animations](docs/neko-pet-catalog.gif)
 
 ## Living with Neko
 
+- **Catch the Cursor.** Right-click Neko or use her tray menu → **Play · Catch the Cursor**.
+  The nook's **Play** tab has the same control and **Automatic cursor games**, enabled
+  by default, with **90 seconds** between opportunities (adjustable from 30–600 seconds).
+  The cooldown arms play; she waits for a fresh approach into the invisible reachable area
+  beside her, outside her petting space. A stationary cursor cannot trigger it at expiry.
+  Naps, carrying, care, menus, typing and fullscreen take priority; Quiet company pauses it.
+  A fresh side approach during an idle gesture waits for that gesture to finish.
+  She notices the arrow, gives a real **3… 2… 1… Here I come!**, then runs and pounces.
+  There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
+  wins one of three celebrations: happy hops, a proud hug or champion paws.
+  Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
+  sulks give her more life. Each chase lasts up to 45 seconds; four continuous seconds
+  outside her reachable band ends it, with a little protest first.
+  After a loss she curls up, a little disappointed. A pet comforts her through a drawn get-up;
+  if left unattended, she can settle for her configured nap instead of sulking forever.
+  Moving her preserves that mood and never counts as a nap.
+  **End game** lives in her ordinary menu/nook; petting, holding, hide and fullscreen can cancel neutrally.
+  Gentle motion off uses a stationary paw target. The real pointer is never moved,
+  hidden or captured. **Games played** and **Neko wins** are saved locally in her menu and nook.
+  Abandoned countdowns do not count as games.
+  [Preview and verification](docs/cursor-play-v2-validation.md) · [approved design](docs/cursor-play-v2-plan.md).
 - **Click to pet.** Twelve individually paced reactions with 16–28 source pose slots: head pats, cheek nuzzles,
   kneading, chin scritches, a playful roll, offering a paw, relaxed ear rubs,
   a front stretch, back arch, tiny hop, side flop, and shoulder peek.
@@ -36,18 +57,17 @@ Soft sounds are optional and off until you enable them.
 - **A little helping hand.** Hovering shows an open palm; holding uses a closed hand
   for dragging. A pet click plays a short palm stroke without moving the actual pointer.
   Leaving, hiding, entering fullscreen or reduced motion stops the stroke.
-- **Come close.** She sniffs at a moving cursor and sometimes takes a small walk
-  left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
-  and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
+- **Come close.** She can notice a nearby cursor while keeping her place.
+  Cursor chasing belongs to Catch the Cursor; ordinary idle following has been removed.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 528 entries, including eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 741 entries, including 212 game source slots and a shared walk endpoint, with eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
-  Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS.
+  Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS; cursor games use a precise 50 FPS timer.
   Petting/carrying use a precise Qt timer so short connecting poses get screen time.
   Arrival/departure briefly use 30 FPS for smooth travel,
-  keeping walking speed unchanged.
+  while the new supported walk uses eight poses in a 960ms cycle.
   Every frame has a 192 × 144 transparent canvas, with extra horizontal room for
   rolls/deeper reaches and 32 transparent pixels above the original footprint for lifting.
   Idle remains about 82 pixels tall;
@@ -132,8 +152,8 @@ Soft sounds are optional and off until you enable them.
   chirp on arrival. Automatic cues have a 45-second pause and are suppressed during media apps,
   quiet company and fullscreen. Turning sounds off or hiding stops playback.
 - **Right-click for her nook.** Quiet company, reduced motion, startup, optional
-  AI, mouse following, sleep delay and duration, chatter and idle gesture frequency, and lifetime
-  pet/nap counts live in one small window. Double-click the tray
+  AI, cursor-play timing, sleep delay and duration, chatter and idle gesture frequency, and lifetime
+  pet/nap and played/won counts live in one small window. Double-click the tray
   icon to find her again.
   Menus and the nook open beside her, with no periodic re-pinning over the controls.
 
@@ -171,6 +191,11 @@ Preferences and lifetime counts use per-user Windows settings
 existing startup registrations from the old version remain in place until changed.
 Turning startup off also removes the old `DesktopNeko.lnk` shortcut. Keep the
 executable/source folder in a stable location if using startup.
+Neko runs with normal user permissions. Enabling startup clears only its executable's
+`RUNASADMIN` compatibility flag, which otherwise prevents a normal logon launch;
+other compatibility flags remain intact. The supplied root `neko_sleep.ico` is the
+shared executable, application-window, nook and tray icon. See the
+[startup/icon repair record](docs/startup-icon-validation.md).
 
 ## Optional AI observations
 
@@ -215,8 +240,11 @@ The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
 `dist\DesktopNeko-previous.exe`. Keep these two files directly in `dist`, without
 release subfolders. Quit the existing Neko before launching the new build;
 the single-instance lock prevents two kittens running together.
-The latest build includes pickup, slightly faster petting and frosted thoughts; see the
-[thought backdrop verification](docs/thought-rounded-clip-validation.md). Historical build paths
+The latest build includes Catch the Cursor, pickup, slightly faster petting, frosted thoughts,
+the supplied icon and startup repair; see [Catch verification](docs/catch-validation.md)
+and the [startup/icon record](docs/startup-icon-validation.md). The
+[quieter cursor-play v2 proposal](docs/cursor-play-v2-plan.md) awaits approval and is not implemented.
+Historical build paths
 in older reports describe their original delivery locations.
 
 ## Check the behavior

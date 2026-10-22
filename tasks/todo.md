@@ -1,21 +1,48 @@
 # Animation rebuild checklist
 
-## Catch the Cursor — dedicated proposal, not implemented
+## Gallop, timer and sleep correction — delivered, 2026-10-22
+
+- [x] Replace running with eight reference-led gallop poses and sustained 360ms drawn expressions; update braking, provenance and production-timing previews.
+- [x] Retain fresh side-entry qualification through idle gestures; expose armed cooldown in the ordinary menu.
+- [x] Allow unattended disappointed curl to settle into sleep, preserving real pet/pickup overrides.
+- [x] Pass 72 focused checks and two executable resource/manifest checks; preserve the verified predecessor and build the flat release. [Report and remaining human checks](../docs/run-timer-sleep-fix.md).
+
+## Cursor play v2 — approved implementation, 2026-10-22
+
+[Complete design, exact invitation/countdown rules and acceptance matrix](../docs/cursor-play-v2-plan.md).
+
+- [x] Read current animation guidance/validation, runtime/timer/menu ownership and supplied visual references; record revised philosophy and plan.
+- [x] User approved implementation: “GO for it, Good luck.”
+- [x] V0: remove the game-overlay module/windows/status/guides/floating button; retain ordinary menu controls and independent QA previews.
+- [x] V1: invisible side-zone fresh-entry/cooldown/sleep gates and actual timed countdown, with deterministic/native phase evidence.
+- [x] V2: replace walking and remove idle-follow behavior/UI/callers; preserve supported game recovery and update coverage.
+- [x] V3: playful drawn run/jump expressions, accurate new paw contacts and reviewed turns/misses.
+- [x] Checkpoint: native complete no-overlay invitation/countdown/hunt/return plus pet/hold and cooldown-entry checks.
+- [x] V4: three distinct victory and three loss stories with common compatible comfort; sparse context-specific shuffled lines.
+- [x] V5: add exact-once local played/won keepsakes to normal menu/nook and persistence; keep menu explanation quiet and brief.
+- [x] V6: actual-controller normal/slow previews, 212 source checks plus all three exact-package checks, native actual-paint coverage, provenance and verified Frame Master findings; flat two-executable release. [Final report](../docs/cursor-play-v2-validation.md).
+
+Separately authorized now: diagnose/fix Windows startup and adopt root `neko_sleep.ico`; record their checks independently. Older open work below is preserved.
+
+## Catch the Cursor — delivered, 2026-10-22
+
+Implementation was subsequently authorized. [Verification, previews and limitations](../docs/catch-validation.md).
 
 - [x] Record the revised automatic/horizontal/jumping/win/loss/comfort/queue requirements and supersede conflicting portfolio assumptions in [the dedicated plan](../docs/catch-the-cursor-plan.md).
-- [ ] C1: prototype lateral geometry, measured jump/contact envelopes and unobtrusive reference-inspired guides; verify clipping and baseline invariance.
-- [ ] C2: author one complete ready/run/turn/pounce/contact/miss/recovery art path at canonical scale; review native/slow/light/dark transitions.
-- [ ] C3: implement the manual menu-to-round-to-result slice, with single-contact victory and neutral cancellation; prove input, nap/count and saved-origin compatibility.
-- [ ] Checkpoint: native moving/stationary/high/edge target cases, actual paw contacts and arbitrary-phase cancellation pass before expanding art.
-- [ ] C4: author/import frustrated attempts, three victory hops, disappointed curl/breathing and pet comfort; verify all outcome/carry/comfort seams and no automatic nap takeover.
-- [ ] C5: implement bounded, coalesced priority intents and default-on configurable 90s scheduling; fake-clock tests cover naps, busy activities, settings edits, cancellation and no backlog. Detailed dependencies and acceptance are in the design.
-- [ ] C6: reduced-motion alternatives, complete native/source/art/package checks and updated provenance/docs; keep the two-file flat release layout.
+- [x] C1: lateral geometry, measured jump/contact envelopes and guides; baseline and clipping checks.
+- [x] C2: complete authored ready/run/turn/jump/miss/recovery bank; native and slow/light/dark review.
+- [x] C3: manual menu/nook play, one-contact victory, neutral cancellation, input/count/saved-origin compatibility.
+- [x] Checkpoint: stationary high/low/distant targets, real paw-alpha contacts, all jump cancellation phases; native playback uses scripted observations without moving the real pointer.
+- [x] C4: safe protest reach, retained reviewed three-hop win, new disappointed curl/breathing and comfort/rise; quiet curl carry with no nap takeover.
+- [x] C5: coalesced game intent, manual priority, existing pending pet/window categories and nap eligibility; default-on persisted 90s timer and deterministic checks.
+- [x] C6: reduced-motion play, source/native/package verification, provenance/previews/docs and flat release.
+- [ ] Follow-up hardware QA: physical mixed-DPI/multiple-monitor use and long-session resource behavior. Human play-testing/tuning remains valuable.
 
 The older G1/G2 portfolio tasks below remain for future games where needed; click interception and eight-direction art are specifically not required for this first game.
 
-## Mini-games — proposed; implementation not started
+## Other mini-games — proposed; implementation not started
 
-Design: [Mini-games plan](../docs/minigames-plan.md). The research/plan request is complete; the open items below are future implementation work, not a claim of authorization. All previous completed records remain below.
+Design: [Mini-games plan](../docs/minigames-plan.md). Catch is delivered above; the older portfolio breakdown below is historical planning for shared/later work, not authorization for the other games. All previous completed records remain below.
 
 - [x] Study current movement, input, state ownership, animation guide and latest pickup verification; research primary behavior/product/platform sources.
 - [x] Plan all three requested games and rank five additional candidates; document stories, transitions, controls, fairness, reduced motion, scope and verification.

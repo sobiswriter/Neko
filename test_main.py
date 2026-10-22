@@ -23,6 +23,22 @@ APP.setQuitOnLastWindowClosed(False)
 
 
 class DesktopTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from animations import SpriteAtlas
+        cls.atlas = SpriteAtlas(Path(__file__).parent / "assets")
+
+    def test_supplied_icon_is_used_for_pet_tray_and_nook(self):
+        from PySide6.QtGui import QIcon
+        from main import ICON_PATH
+        expected = QIcon(str(ICON_PATH)).pixmap(32, 32).toImage()
+        self.assertFalse(expected.isNull())
+        self.assertEqual(self.neko.windowIcon().pixmap(32, 32).toImage(), expected)
+        self.assertEqual(self.neko.tray_icon.icon().pixmap(32, 32).toImage(), expected)
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        self.assertEqual(self.neko.stats_window.windowIcon().pixmap(32, 32).toImage(), expected)
+
     def test_stationary_hold_is_not_a_pet_and_keeps_the_drag_offset(self):
         start = time.monotonic()
         point = QPoint(96, 70)
@@ -265,6 +281,9 @@ class DesktopTests(unittest.TestCase):
             cancel()
             self.assertFalse(self.neko.companion.pet_pending)
     def setUp(self):
+        atlas_patch = patch("main.SpriteAtlas", return_value=self.atlas)
+        atlas_patch.start()
+        self.addCleanup(atlas_patch.stop)
         self.folder = tempfile.TemporaryDirectory()
         self.settings = QSettings(str(Path(self.folder.name) / "prefs.ini"), QSettings.IniFormat)
         self.activity = patch("main.desktop_activity", return_value=(0, 100, False))
@@ -277,6 +296,7 @@ class DesktopTests(unittest.TestCase):
         self.sound_backend.start()
         self.neko = NekoWidget(self.settings)
         self.neko.tick_timer.stop()
+        self.neko.invitation_timer.stop()
         self.neko.show_neko()
         APP.processEvents()
 
@@ -531,7 +551,7 @@ class DesktopTests(unittest.TestCase):
             self.neko.companion.state = state
             self.neko.refresh_asset()
             self.assertEqual(self.neko.animation_timer.interval(), 50)
-        self.neko.companion.state = NekoState.FOLLOWING
+        self.neko.companion.state = NekoState.IDLE
         self.neko.refresh_asset()
         self.assertEqual(self.neko.animation_timer.interval(), 100)
 
@@ -750,15 +770,6 @@ class DesktopTests(unittest.TestCase):
             self.neko.on_brain_finished("too soon", True)
         say.assert_not_called()
 
-    def test_following_shares_the_activity_reaction_cooldown(self):
-        self.neko.last_follow = -99999
-        self.neko.companion.last_activity_reaction = time.monotonic()
-        cursor = self.neko.geometry().center() - QPoint(220, 0)
-        self.neko.last_cursor = cursor - QPoint(30, 0)
-        with patch("main.QCursor.pos", return_value=cursor):
-            self.neko.tick()
-        self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
-
     def test_nook_timing_controls_apply_and_persist(self):
         with patch("main.autostart_enabled", return_value=False):
             self.neko.open_stats_window()
@@ -768,8 +779,8 @@ class DesktopTests(unittest.TestCase):
             spin.setValue(value)
             self.assertEqual(getattr(self.neko.companion, key), value)
             self.assertEqual(self.settings.value(key, type=int), value)
-        self.neko.stats_window.follow.setChecked(False)
-        self.assertFalse(self.settings.value("follow_mouse", type=bool))
+        self.assertFalse(hasattr(self.neko.stats_window, "follow"))
+        self.assertFalse(self.settings.contains("follow_mouse"))
         with patch("main.desktop_activity", return_value=(45, 100, False)):
             self.neko.tick()
         self.assertEqual(self.neko.companion.state, NekoState.FALLING_ASLEEP)
@@ -802,15 +813,14 @@ class DesktopTests(unittest.TestCase):
             self.neko.pin_to_top(force=True)
         pin.assert_not_called()
 
-    def test_following_cannot_walk_under_an_open_nook(self):
+    def test_cursor_cannot_walk_under_an_open_nook(self):
         with patch("main.autostart_enabled", return_value=False):
             self.neko.open_stats_window()
-        self.neko.last_follow = -99999
         cursor = self.neko.geometry().center() - QPoint(220, 0)
         self.neko.last_cursor = cursor - QPoint(30, 0)
         with patch("main.QCursor.pos", return_value=cursor):
             self.neko.tick()
-        self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
+        self.assertNotEqual(self.neko.current_clip, "walk")
 
     def test_timers_accept_typed_values_and_commit_on_enter(self):
         with patch("main.autostart_enabled", return_value=False):
@@ -894,68 +904,17 @@ class DesktopTests(unittest.TestCase):
             other.bubble.deleteLater()
             other.deleteLater()
 
-    def test_mouse_following_is_bounded_and_optional(self):
-        self.neko.last_follow = -99999
+    def test_idle_cursor_movement_never_translates_neko(self):
+        self.neko.set_auto_games(False)
         origin = self.neko.pos()
-        cursor = self.neko.geometry().center() - QPoint(220, 0)
-        self.neko.last_cursor = cursor - QPoint(30, 0)
-        with patch("main.QCursor.pos", return_value=cursor):
-            self.neko.tick()
-            self.assertEqual(self.neko.current_clip, "walk")
-            for _ in range(100):
-                self.neko.animate()
-        self.assertGreater((self.neko.pos() - origin).manhattanLength(), 0)
-        self.assertLessEqual((self.neko.pos() - origin).manhattanLength(), 165)
-        self.neko.set_follow_mouse(False)
-        self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
-
-    def test_walks_stay_horizontal_with_cursor_above_or_below(self):
-        area = self.neko.screen().availableGeometry()
-        origin = area.center() - self.neko.rect().center()
-        for offset in (QPoint(-220, -160), QPoint(220, 160)):
-            with self.subTest(offset=offset):
-                self.neko.move(origin)
-                self.neko.follow_origin = origin
-                self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic(), 6.5)
-                cursor = self.neko.geometry().center() + offset
-                with patch("main.QCursor.pos", return_value=cursor):
-                    for _ in range(100):
-                        self.neko.animate()
-                direction = -1 if offset.x() < 0 else 1
-                self.assertEqual(self.neko.y(), origin.y())
-                self.assertEqual(self.neko.x(), origin.x() + direction * 130)
-                self.assertEqual(self.neko.look_direction, direction)
-                self.assertEqual(self.neko.companion.state, NekoState.IDLE)
-
-    def test_cursor_directly_above_does_not_start_or_continue_walking(self):
-        self.neko.last_follow = -99999
-        origin = self.neko.pos()
-        cursor = self.neko.geometry().center() - QPoint(0, 250)
-        self.neko.last_cursor = cursor - QPoint(30, 0)
-        with patch("main.QCursor.pos", return_value=cursor):
-            self.neko.tick()
-            self.assertNotEqual(self.neko.companion.state, NekoState.FOLLOWING)
-            self.neko.follow_origin = origin
-            self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic(), 6.5)
-            self.neko.animate()
-        self.assertEqual(self.neko.pos(), origin)
-        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
-
-    def test_typing_stops_a_mouse_expedition(self):
-        self.neko.follow_origin = self.neko.pos()
-        self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic(), 3.2)
-        self.neko.activity.keyboard.extend([time.monotonic()] * 8)
-        self.neko.tick()
-        self.assertEqual(self.neko.companion.state, NekoState.TYPING)
-
-    def test_following_stops_at_the_deadline_even_before_next_behavior_tick(self):
-        self.neko.follow_origin = self.neko.pos()
-        self.neko.companion.pose(NekoState.FOLLOWING, time.monotonic() - 4, 3.2)
-        original = self.neko.pos()
-        with patch("main.QCursor.pos", return_value=self.neko.geometry().center() - QPoint(220, 0)):
-            self.neko.animate()
-        self.assertEqual(self.neko.pos(), original)
-        self.assertEqual(self.neko.companion.state, NekoState.IDLE)
+        for offset in (QPoint(-220, -160), QPoint(220, 160), QPoint(220, 0), QPoint(-220, 0)):
+            cursor = self.neko.geometry().center() + offset
+            with patch("main.QCursor.pos", return_value=cursor):
+                self.neko.tick()
+                for _ in range(100):
+                    self.neko.animate()
+            self.assertEqual(self.neko.pos(), origin)
+            self.assertNotEqual(self.neko.current_clip, "walk")
 
     def test_pinning_uses_no_activation_and_no_move_flags(self):
         with patch("main.QApplication.platformName", return_value="windows"), \
@@ -1070,6 +1029,7 @@ class DesktopTests(unittest.TestCase):
         shortcut = Path(self.folder.name) / "DesktopNeko.lnk"
         shortcut.touch()
         with patch("main.legacy_shortcut", return_value=shortcut), \
+                patch("main.clear_startup_elevation") as clear_elevation, \
                 patch("main.winreg.CreateKey"), patch("main.winreg.SetValueEx") as write:
             set_autostart(True)
         command = write.call_args.args[-1]
@@ -1077,6 +1037,7 @@ class DesktopTests(unittest.TestCase):
         self.assertIn('"', command)
         self.assertIn("main.py", command)
         self.assertFalse(shortcut.exists())
+        clear_elevation.assert_called_once()
 
     def test_startup_failure_preserves_the_old_shortcut(self):
         shortcut = Path(self.folder.name) / "DesktopNeko.lnk"

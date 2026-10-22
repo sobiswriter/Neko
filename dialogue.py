@@ -297,20 +297,6 @@ that arrow has no paws. how does it get around?
 it's being very interesting, on purpose i think.
 do you suppose it likes cats?
 """,
-    "follow": """
-caught up. almost.
-tiny expedition complete.
-the arrow knows some good spots.
-just following a very small lead.
-is this a better place to sit?
-a little stroll for my little paws.
-new spot. same cat.
-the cursor and i have an understanding.
-four paws. one extremely small adventure.
-i found a different bit of floor for us.
-walked a whole little distance. deserve a sit.
-is the arrow showing us around?
-""",
     "wake": """
 mrrp? oh, there you are.
 i was dreaming about a very small box.
@@ -418,6 +404,96 @@ this corner deserves a little head tilt too.
 checking the other half of my tiny kingdom.
 """,
 }
+LINES.update({
+    "game_announce": """
+ooh, that arrow… give me a moment!
+i see a very catchable little arrow.
+wait there. my paws are getting ready!
+you brought the arrow over for me?
+tiny hunter reporting for a tiny chase.
+ears ready… paws nearly ready…
+hold on, i need my pouncing face.
+that wiggle looks suspiciously fun.
+""",
+    "game_go": """
+Here I come! Tiny paws, big plans!
+Here I come! That arrow is mine!
+Here I come! Ready or meowt!
+Here I come! Pounce time!
+""",
+    "game_pursuit": """
+wait for my little legs!
+zoom zoom, very serious kitten business!
+i am speed. small speed.
+just one teeny paw touch…
+my ears are in chase mode!
+you're wiggly. i like wiggly.
+left paw, right paw, nearly there!
+all four paws are doing their best!
+the arrow has underestimated me.
+little legs, don't fail me now!
+my tail is helping. probably.
+oh! a pounce-shaped opportunity!
+""",
+    "game_win": """
+gotcha! did you see my paws?!
+mine! i caught a whole arrow!
+tiny hunter, enormous victory.
+i did it! i actually did it!
+that calls for a little happy dance.
+please admire my excellent pouncing.
+one arrow captured. many proud feelings.
+can you tell i'm very pleased?
+my paws would like a round of applause.
+the arrow and i had a meeting. i won.
+look! these are champion paws!
+i shall be smug for one tiny moment.
+""",
+    "game_protest_high": """
+no fair! my paws don't come with wings!
+that's above my kitten ceiling!
+come down a little, you sneaky arrow.
+too high! i ordered a shorter sky.
+""",
+    "game_protest_low": """
+hey! the arrow went under my paws!
+too low! my nose is up here.
+no fair hiding below the kitten floor.
+come back up where my paws can reach!
+""",
+    "game_protest_side": """
+no fair! that corner is outside my tiny kingdom.
+hey, bring the arrow back over here!
+my little legs have a travel limit!
+that was a very sneaky sideways escape.
+""",
+    "game_protest_monitor": """
+hey! you took my arrow to another screen!
+no fair, my paws are on this monitor!
+the arrow has left the kitten kingdom.
+come back to my side of the desktop!
+""",
+    "game_loss": """
+oh… my paws were so sure.
+i almost had it. almost counts a little?
+the arrow was extra slippery today.
+i need a small sulk. and maybe a pet.
+my tiny hunting feelings need a moment.
+i'm folding up my paws for now.
+that pounce looked better in my head.
+hmph. a cuddle might fix this.
+""",
+    "game_comfort": """
+oh… you came to check on me.
+okay. one little cuddle helps.
+my paws feel a bit braver now.
+you can stay. especially your hand.
+that's the exact pet i needed.
+i forgive the arrow. mostly.
+thank you for my little comfort break.
+fine… i suppose i'm still your kitten.
+""",
+})
 LINES = {kind: tuple(line.strip() for line in text.splitlines() if line.strip())
          for kind, text in LINES.items()}
 
@@ -426,6 +502,7 @@ class OfflineDialogue:
     def __init__(self, rng=None):
         self.rng = rng if rng is not None else random.Random()
         self.bags = {}
+        self.last = {}
         self.recent = deque(maxlen=6)
 
     def pick(self, kind):
@@ -434,11 +511,14 @@ class OfflineDialogue:
         if not bag:
             bag.extend(LINES[kind])
             self.rng.shuffle(bag)
+            if len(bag) > 1 and bag[-1] == self.last.get(kind):
+                bag[0], bag[-1] = bag[-1], bag[0]
         for index in range(len(bag) - 1, -1, -1):
-            if bag[index] not in self.recent:
+            if bag[index] not in self.recent and bag[index] != self.last.get(kind):
                 line = bag.pop(index)
                 break
         else:
             line = bag.pop()
         self.recent.append(line)
+        self.last[kind] = line
         return line

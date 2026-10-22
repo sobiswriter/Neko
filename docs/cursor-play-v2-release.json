@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-22",
+  "source_art_commit": "08f27f37414e8a186bbb96d1332eee98f9da8db9",
+  "current": {
+    "path": "dist\\DesktopNeko.exe",
+    "bytes": 111857913,
+    "sha256": "b968569ac7ea611e1587e593ce4499446809e0ed834a5bd7f707a81a98b9ec3f"
+  },
+  "previous": {
+    "path": "dist\\DesktopNeko-previous.exe",
+    "bytes": 102553575,
+    "sha256": "0237d5d01723ff19c9e64b84885505b63c765373eb607b6783f7ffa19e5058d3"
+  },
+  "source_files": {
+    "main.py": "d18a7d3f5891063929219657941ad1f26a072299d812bdbf5f4c6118a58bfdd7",
+    "animations.py": "5730b073ed93981ab661eaf5409f1ec7caae79008c882b78eb7dbfe040e1dbe5",
+    "games.py": "cd31d9eb28b7ce6a66edf5560d2a2b6ff164058e3b740c76c1dea452e078441d",
+    "behavior.py": "255ea9b1cfbb6d869c0dba2c7b266ab1fc84ed631a05c4b742a8a5f82ea5549e",
+    "dialogue.py": "f3105fa47b6adff969f95503cc5b817b5dc53d23162c1d5ecba90ba8dca5a51d",
+    "activity.py": "1b66f28d25bce54f1a74dd809e14debdcac387cadbdeddaad7d5d7e07379b58d",
+    "app_context.py": "cea38549b1325a6bb4afb30df2d0ead553a4bfbb9e55edad2ad9cf557db3b46f",
+    "cursors.py": "ac4ce764c2d5d1abe822fa94fcf64be158bfb270440d7d59151b03349e392533",
+    "thoughts.py": "957bca6edcab3e58abe122e81bdef154241ace543aa162c621d0af2b523d89fc",
+    "llm_brain.py": "83bc6084b140bf548aa62d1fcf47742a24c2c2a806dbb9463e41ba1c478a6a2d",
+    "main.spec": "41c72a5926c3143b9d25bc3d2927e022d55498186425df64e71121553169ffa8",
+    "neko_sleep.ico": "de69930171e4d1887e0e3ab1a2351cd5abc3d22d607a3496e680d1c8b1ed5bfd"
+  },
+  "assets": {
+    "assets\\neko-game-emotion-v1.png": "0d8d8763581f1815cbb4eb28744205f82feedd29c22ce461e520fde3eb4955db",
+    "assets\\neko-game-hunt-v1.png": "ad65816fd40c1ebfb253b10302cf5c5c9d608d2f8b34fd511fc01b3dfa33e37d",
+    "assets\\neko-game-hunt-v2.png": "85b29b7bab3979adb4b36b38dbc5cff8befc0ac085e8f570e95ff98c07e185ea",
+    "assets\\neko-game-loss-a-v2.png": "2760f7165b0c7d05b602a6ed24be23c7f617de57893e80a4d29d94ade79487bf",
+    "assets\\neko-game-loss-b-v2.png": "20e02ed8c40d874c115e083d59f4de0098a7cda150dfdf74bd307e0ea64b9036",
+    "assets\\neko-game-loss-bridge-v2.png": "c4a7dd6d1d29757444ebfb7f1bf0acb4e5e6db1dc663706a0bd2898c27c4db3b",
+    "assets\\neko-game-loss-c-v2.png": "eb073de6e882eea6a9cb294737186e40001f19f6b8cfe66303da72264d768c7e",
+    "assets\\neko-game-ready-v2.png": "92ac6140fcb781d0fb36953759d3b669abb6f8d8fb4eb40c747e972ac217dfc1",
+    "assets\\neko-game-walk-v2.png": "7e0289cb46bd9348226917578a5f5f03e462a55ae92853e11563b5fa38e3cd82",
+    "assets\\neko-game-win-grasp-v2.png": "dfd5d3485a7c1d8b666f71740e2a72c08e816b8a00987e7341c9a62cbf07de16",
+    "assets\\neko-game-win-hop-v2.png": "dfabd8f8d6d8e07409473bd68611ebfb98fb4c4a9a2923955d2aeb77282737f5",
+    "assets\\neko-game-win-proud-v2.png": "88fe025c4885eff4bda0dd3c76175f1ed614e56b76581485d95c03019cfa7f2a"
+  },
+  "source_tests": {
+    "discovered": 215,
+    "passed": 212,
+    "opt_in_skipped": 3
+  },
+  "packaged_checks": {
+    "passed": 3,
+    "target": "actual dist/DesktopNeko.exe",
+    "checks": [
+      "resource/art/icon hashes and absence of retired overlay module",
+      "native startup, tray, topmost and second-instance rejection",
+      "supplied ICO resources and ordinary-user manifest"
+    ]
+  },
+  "build_command": ".venv\\Scripts\\python.exe -m PyInstaller --noconfirm --clean --distpath dist --workpath build/cursor-v2/pyinstaller main.spec",
+  "sign_in_reboot_tested": false,
+  "startup_command": "\"C:\\Users\\soura\\OneDrive\\Desktop\\Wroking Right now\\Neko\\dist\\DesktopNeko.exe\"",
+  "compatibility_flags": null
+}

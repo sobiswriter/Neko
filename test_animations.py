@@ -6,15 +6,19 @@ import unittest
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QColor, QImage
 
-from animations import CLIPS, PET_ROWS, CARRY_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
 
 
 APP = QApplication.instance() or QApplication([])
 
 
 class AnimationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.atlas = SpriteAtlas(Path(__file__).parent / "assets")
+
     def test_tall_canvas_preserves_the_old_visible_footprint_below_top_padding(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         idle = atlas.frame("idle", 0)
         self.assertEqual((idle.width(), idle.height()), (192, 144))
         self.assertAlmostEqual(sprite_bounds(idle.toImage()).top(), 48, delta=2)
@@ -22,7 +26,7 @@ class AnimationTests(unittest.TestCase):
                             for x in range(192) for y in range(32)))
 
     def test_pet_drawings_have_no_detached_sheet_fragments(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for name, rows in PET_ROWS.items():
             for index in range(rows * 4):
                 image = atlas.frames[CLIPS[name].bank, index // 4, index % 4].toImage()
@@ -45,7 +49,7 @@ class AnimationTests(unittest.TestCase):
                 self.assertEqual(sum(size > 2 for size in sizes), 1, (name, index, sizes))
 
     def test_drawn_neutral_recovery_matches_the_idle_head_position(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         idle = atlas.frame("idle", 0).toImage()
         bounds = sprite_bounds(idle)
         idle_head = bounds.left() + pet_landmarks(idle.copy(bounds))[1]
@@ -69,7 +73,7 @@ class AnimationTests(unittest.TestCase):
                 self.assertGreaterEqual(min(clip.durations), 50)
 
     def test_all_pet_sequences_have_real_transitions_and_shared_idle_endpoints(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         idle = atlas.frame("idle", 0).toImage()
         for name in ("happy", "nuzzle", "knead", "chin_scritch", "roll", "paw_offer", "ear_rub",
                      "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek"):
@@ -83,7 +87,7 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
 
     def test_reworked_idles_have_drawn_entry_action_and_return_to_idle(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         idle = atlas.frame("idle", 0).toImage()
         for name in ("groom", "stretch", "loaf", "sniff", "ears", "yawn", "peek", "look_left", "look_right"):
             clip = CLIPS[name]
@@ -95,8 +99,8 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
 
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
-        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 1)
+        atlas = self.atlas
+        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4)
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
@@ -109,7 +113,7 @@ class AnimationTests(unittest.TestCase):
         self.assertTrue(all(frame.width() == CANVAS_WIDTH and frame.height() == CANVAS_HEIGHT for frame in atlas.frames.values()))
 
     def test_petting_reference_heads_match_idle_width_and_vertical_anchor(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for name in ("idle", "happy", "nuzzle", "knead", "chin_scritch", "roll", "ear_rub",
                      "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
             image = atlas.frame(name, 0).toImage()
@@ -123,7 +127,7 @@ class AnimationTests(unittest.TestCase):
             self.assertAlmostEqual(sprite_bounds(image).top(), 16 + CANVAS_TOP, delta=2, msg=name)
 
     def test_calibrated_pet_poses_are_not_clipped_by_the_canvas(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for name in ("happy", "nuzzle", "knead", "chin_scritch", "roll", "ear_rub",
                      "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek", "paw_offer"):
             clip = CLIPS[name]
@@ -135,7 +139,7 @@ class AnimationTests(unittest.TestCase):
                                     for x in (0, CANVAS_WIDTH - 1) for y in range(CANVAS_HEIGHT)), (name, index))
 
     def test_idle_and_activity_frames_keep_their_seated_scale(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for bank, rows in (("idle", (0,)), ("activity", (0,))):
             for row in rows:
                 for col in range(4):
@@ -151,7 +155,7 @@ class AnimationTests(unittest.TestCase):
             self.assertEqual(clip.frame_index(sum(clip.durations) / 1000 + 1), clip.order[-1], name)
 
     def test_pet_sequences_use_all_their_drawings_and_return_to_rest(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for name in PET_ROWS:
             clip = CLIPS[name]
             self.assertEqual(set(clip.order), set(range(PET_ROWS[name] * 4 + 1)))
@@ -181,7 +185,7 @@ class AnimationTests(unittest.TestCase):
         self.assertEqual(clip.order[-7:], tuple(range(18, 25)))
 
     def test_hops_have_three_airborne_arcs_with_grounded_contacts_between_them(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         clip = CLIPS["happy_hop"]
         grounded = [sprite_bounds(atlas.frames[clip.bank, index // 4, index % 4].toImage()).bottom() >= 96 + CANVAS_TOP
                     for index in clip.order]
@@ -191,7 +195,7 @@ class AnimationTests(unittest.TestCase):
         self.assertTrue(grounded[0] and grounded[-1])
 
     def test_kneading_head_stays_quiet_during_pressure_and_recovery_is_drawn(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         clip = CLIPS["knead"]
         crowns = [sprite_bounds(atlas.frames[clip.bank, index // 4, index % 4].toImage()).top()
                   for index in range(6, 18)]
@@ -202,7 +206,7 @@ class AnimationTests(unittest.TestCase):
             self.assertNotEqual(atlas.frames[clip.bank, rows - 1, 2].toImage(), blink, name)
 
     def test_near_neutral_pet_poses_keep_idle_head_scale(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for name in PET_ROWS:
             clip = CLIPS[name]
             for index in (1, PET_ROWS[name] * 4 - 1):
@@ -218,7 +222,7 @@ class AnimationTests(unittest.TestCase):
                     self.assertAlmostEqual(sprite_bounds(image).top(), 16 + CANVAS_TOP, delta=2, msg=(name, index))
 
     def test_tail_play_and_lifecycle_load_all_their_drawings(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for name in ("tail_chase", "tail_catch", "arrive", "depart"):
             clip = CLIPS[name]
             indices = set(clip.order)
@@ -234,7 +238,7 @@ class AnimationTests(unittest.TestCase):
         self.assertNotEqual(atlas.frame("arrive", 0).toImage(), atlas.frame("arrive", 999).toImage())
 
     def test_tail_actions_share_idle_endpoints_and_finish_before_the_idle_slot(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         idle = atlas.frame("idle", 0).toImage()
         for name in ("tail", "tail_chase", "tail_catch"):
             self.assertFalse(CLIPS[name].loop, name)
@@ -256,7 +260,7 @@ class AnimationTests(unittest.TestCase):
         self.assertGreater(sum(CLIPS["tail_chase"].durations), sum(CLIPS["tail_catch"].durations) + 800)
 
     def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for key, frame in atlas.frames.items():
             if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith("idleplay-"):
                 continue
@@ -267,7 +271,7 @@ class AnimationTests(unittest.TestCase):
                                 for x in (0, CANVAS_WIDTH - 1) for y in range(CANVAS_HEIGHT)), key)
 
     def test_tail_swishing_does_not_pull_the_head_sideways(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         centers = []
         for index in range(8):
             clip = CLIPS["tail"]
@@ -279,7 +283,7 @@ class AnimationTests(unittest.TestCase):
         self.assertEqual(atlas.frames["tailswish", 2, 0].toImage(), atlas.frames["idle", 0, 2].toImage())
 
     def test_lifecycle_motion_continues_between_drawn_poses_and_has_clean_endpoints(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         idle = atlas.frame("idle", 0).toImage()
         self.assertEqual(atlas.frame("arrive", 999).toImage(), idle)
         self.assertNotEqual(atlas.frame("depart", 0).toImage(), idle)
@@ -293,7 +297,7 @@ class AnimationTests(unittest.TestCase):
         self.assertFalse(any(bytes(image.constBits())))
 
     def test_sleep_and_wake_use_eight_real_frames_and_meet_at_the_same_sleep_pose(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         for name in ("fall_asleep", "wake"):
             self.assertEqual(len(CLIPS[name].order), 8)
             self.assertFalse(CLIPS[name].loop)
@@ -311,7 +315,7 @@ class AnimationTests(unittest.TestCase):
         self.assertEqual(CLIPS["fall_asleep"].frame_index(-1), 0)
 
     def test_reduced_motion_holds_a_real_frame(self):
-        atlas = SpriteAtlas(Path(__file__).parent / "assets")
+        atlas = self.atlas
         self.assertEqual(atlas.frame("typing", 0).toImage(),
                          atlas.frame("typing", 10, motion=False).toImage())
 

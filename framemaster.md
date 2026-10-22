@@ -6,6 +6,12 @@ Baseline: the expressive petting revision completed on **2026-10-22**, artwork/r
 
 The later [pickup revision](docs/pickup-validation.md) implements held expressions and interruptible release. Its [approved design](docs/pickup-animation-plan.md), [exact provenance](docs/pickup-prompts.json) and [native measurements](docs/pickup-native.json) extend the method below. Historical reports retain their original dimensions/counts; current production values include the pickup extension.
 
+The first [Catch the Cursor release](docs/catch-validation.md) added 48 source slots for lateral hunting and disappointment/comfort. Its [prompts and assembly regions](docs/catch-prompts.json), [all imported slots](docs/neko-game-frames.png) and [native playback measurements](docs/catch-native.json) describe that release's 576 entries.
+
+The approved [cursor-play v2 revision](docs/cursor-play-v2-validation.md) replaces hunting and walking, adds anticipation/countdown and six distinct outcomes, and connects losses to the retained curl through a drawn look-up. That release contained729 entries; its [exact provenance](docs/cursor-play-v2-prompts.json), [imported slots](docs/cursor-play-v2-frames.png) and [native timing](docs/cursor-play-v2-native.json) remain historical evidence.
+
+The subsequent [gallop/timer/sleep correction](docs/run-timer-sleep-fix.md) adds one12-slot gallop/turn bank. Current atlas: **741 entries**, including212 game source slots and the appended walk idle. [Run provenance](docs/run-timer-sleep-prompts.json), [light/dark frames](docs/gallop-fix-frames.png) and [short preview](docs/gallop-fix.gif). Per the user's credit/time limit, verification is focused; full native play-through and broad regression are deliberately left to the user.
+
 ## 1. The design philosophy
 
 Neko is a small character performing an action, rather than a still image being moved around. A reaction needs a readable physical story:
@@ -68,7 +74,7 @@ Current pet production values in [animations.py](animations.py):
 | Near-idle final head center | Within 2 px of actual idle |
 | Final crown position | About y=48, ±2 px after top padding; held crown y=16 |
 | Pet/carry playback repaint interval | Precise Qt timer, 50 ms, nominal 20 FPS |
-| Total atlas entries | 528: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle |
+| Total atlas entries | 741: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle + 212 game source slots + one appended walk idle |
 
 These are baseline measurements, not permission to force every posture into a seated shape. A lying kitten is lower and wider. Check continuity against appropriate anatomical landmarks throughout the action. If a new pose needs space, measure it at the retained character scale before changing the fixed canvas. Do not resize the desktop window on each pose.
 
@@ -111,6 +117,20 @@ These are revision-specific recipes, with full output identities in the JSON; th
 - **Ear rub:** anticipation slot 1 selects near-neutral softened-lid source drawing 14, avoiding an oversized early tilted head.
 
 ## 6. Import at one scale; anchor the physical support
+
+### Cursor-play v2 evidence
+
+The supplied gallop GIF has eight decoded frames (first0ms, remaining seven100ms). Its mechanics emphasize hind loading, leg gathering, spine extension and forepaw support. The replacement run selects eight drawings at90ms each, with drawn excited squeezed eyes across four consecutive poses (360ms), then four attentive open-eye support poses. This replaces the old70ms single-pose expression accent. Source flight poses3/4 have fixed5/8px lift offsets; contact poses remain at baseline130. Neutral calibration and all existing jump/paw-contact artwork remain unchanged. This recipe has light/dark strip, short runtime-timing preview and focused bounds/component checks, not a full new native gameplay validation.
+
+The game importer retains one neutral calibration per batch: head62/body82, baseline130 in the 192×144 canvas. Do not reuse a seated-width heuristic as a head-width measurement for a lying pose: the haunch can join the longest alpha run. Review the actual face, support and silhouette together. The first loss-c batch visibly grew through later rows and was redrawn against the actual new curl; per-pose fitting was rejected.
+
+Both ready drafts yielded fifteen drawings. Repeat the complete gathering crouch once (source11), then use the squeeze, reopen and final launch-ready drawing; this gives sixteen runtime slots without inventing anatomy. Its longest complete tail is 387px wide, requiring 448px packed cells/baseline436. Other v2 batches retain384/baseline372. Complete silhouette crops preserve original RGBA, including faint alpha; labels/matte are removed through ImageGen edits, not pixel painting.
+
+The grasp victory's final tall sit was rejected. Its complete supported recovery uses source14→13→2→1→generated neutral0→actual idle; packed18/19 select source0. Hop/grasp batches have a measured constant +2px x registration. The walk's final source sit was 6px shorter than canonical: packed15 selects generated neutral0 after the completed supported sit/blink, before appended actual idle16; settle lasts720ms. Three hop arcs and a single hug bounce use explicit in-canvas offsets in `load_games`; proud-paw celebration remains grounded.
+
+New lowered-face curls cannot cut straight to the retained outward-looking curl: the crown changes by about18px. The eight-slot common look-up bridge supplies small drawn ear/head changes before the retained curl and comfort. Seven used entries last120ms each. All three seams must be reviewed; appending a canonical endpoint alone is insufficient.
+
+Count the notice and each numeral as independent controller phases. Start the phase clock after its actual thought label is presented, so backdrop preparation cannot shorten a beat. Native cue timestamps are stronger evidence than the first later polling observation of a phase. The warmed Windows probe measured each numeral near one second, all six outcome orders, all hunt/walk/countdown drawings, unchanged foreground and actual thought hit-through. This was DPR 1.0 on one monitor; mixed-DPI behavior remains unverified on physical hardware.
 
 The current pet importer in `SpriteAtlas.load_pets` reads four columns and `PET_ROWS[name]` rows, overscans each cell vertically by one eighth, scales the cell to width 128 and finds its main sprite bounds. `pet_landmarks` measures the longest opaque head run in the upper three-fifths and extreme contact pixels in the bottom 14 rows. This heuristic suits the current drawings; validate it before applying it to a new hanging or turned pose.
 
@@ -156,6 +176,16 @@ The [tail/lifecycle notes](docs/tail-lifecycle-notes.md) and [exact revision pro
 - A later startup correction starts arrival timing on the first Qt animation tick so loading cannot consume the fall before the window appears. See [startup verification](docs/startup-thought-validation.md). Preserve the landing target through hiding, reduced motion, monitor changes and quit.
 
 ## 7. Carry artwork changes through the runtime
+
+### Cursor-game drawings and contact
+
+Verified in [Catch QA](docs/catch-validation.md): extract complete significant connected silhouettes before packing; nominal source-row cuts admitted preceding-row paws in a hunt drawing. Store exact crop regions in provenance. Source bounding crops retain original alpha; a generated transparency edit is not proof that every fringe was removed. Inspect the final native light/dark output and test significant imported components.
+
+Game source cells use the existing 128px nearest-neighbor sampling step before connected-silhouette extraction. Each bank keeps fixed neutral-head/height calibration (62px/82px), 192×144 canvas and ground130. Airborne poses remain registered in that canvas; the controller supplies the world arc once. The actual painter's y−1 offset must also be included in collision coordinates. The reviewed high-reach point is hunt19 (49,80); landing contact is hunt21 (59,124). Contact additionally needs the current pose's authored forepaw region and visible alpha, mirrored with the drawing. Never count head/tail/transparent padding or interpolate a fictitious pointer trail.
+
+The game runs a precise 20ms timer so its 40–80ms connecting poses can be observed; ordinary pet/carry/tail timings remain intact. Reuse the accepted three-hop clip unchanged for a game victory without entering a counted pet state. A disappointed curl is an explicit mood, distinct from a nap; hide/carry preserve it and a deliberate pet owns its get-up. Preserve the original resting position during pursuit/flight and return home after recovery; an actual user drag can choose a new resting origin.
+
+Native scripted cursor observations validate real Qt playback and drawing coverage, not human enjoyment or physical multi-monitor/DPI behavior. Keep those limits explicit.
 
 Read callers before changing a shared function. An animation change can reach:
 
@@ -231,6 +261,8 @@ The current pet catalog includes 0.8s ordinary idle first, the full longest reac
 
 An offscreen screenshot or generated GIF is not proof of native timing. Let a test-owned visible window warm up, start each action, record every expected pose entry and paint interval through the real Qt event loop, and capture light/dark native rendering. A synthetic polling loop can distort timing; starting before the window is visible can miss initial entries in the probe.
 
+The v2 probe observes `current_frame` calls from actual Qt painting while production's own animation timer advances the controller. Calling `animate()` from a second 20ms probe timer would double the repaint rate and is rejected as timing evidence. Group paint intervals within each staged scene; an intentional idle gap between scenes is not a dropped game frame. After displaying the notice, use a fresh monotonic timestamp for a staged outcome: passing the pre-label time back into the controller correctly triggers its backwards-clock cancellation.
+
 Exercise repeated clicks through the longest clip, nap during a reaction, hide/show, reduced motion, actual drag versus pet, saved-origin roundtrip and corner clamping. Verify transparent-margin hit testing and tray framing after footprint changes. For interruptible actions add systematic release/cancel checks at every phase and timing boundary.
 
 ### E. Build and inspect the actual deliverable
@@ -272,6 +304,11 @@ Do not relax an anatomy, scale, timing or clipping check merely to accept a new 
 
 | Date | Finding and correction | Evidence / remaining limit |
 | --- | --- | --- |
+| 2026-10-22 | A70ms run expression disappeared in motion; redraw the gallop against the user's eight-frame mechanics reference and keep acting across four poses (360ms), instead of freezing one pose longer. Add fixed flight lift only to airborne drawings. Idle gestures also discarded qualified invitations; defer launch until their supported finish. A persistent loss curl bypassed the nap state machine; complete its existing silent get-up/home path, then honor the due nap without counting a pet. |72 focused checks pass (71 timer/game/behavior plus care override), including reproductions that failed before correction. Twelve imported slots/741 atlas entries; [preview, provenance and limits](docs/run-timer-sleep-fix.md). Extended play, full suite and native animation QA intentionally deferred at the user's request. |
+| 2026-10-22 | Cursor-play v2 needed connected playful run/walk and six outcomes. Reject label/matte drafts, a proportion-drifting loss-c and an over-tall grasp recovery. Use complete silhouette crops, one repeated ready hold, whole-batch registration and a drawn curl look-up; retain the real neutral before walk idle. Countdown clocks begin after label presentation. | 729 atlas entries; all 200 game source slots pass bounds/components; 552 retained frames/41 unaffected clips compare unchanged. Native full pose coverage, actual one-second cues, hit-through and no focus theft in [v2 QA](docs/cursor-play-v2-validation.md). No physical mixed-DPI/multi-monitor trial or guarantee of subjective fun; prompts and rejected selections remain recorded. |
+| 2026-10-22 | A second probe timer calling `animate()` doubled the observed native paint rate; gaps between independent scenes also polluted the maximum. Observe actual `current_frame` calls under production's own timer and group intervals by scene. A staged outcome needs a fresh timestamp after the notice label, otherwise backwards-clock cancellation is correct. | Every used hunt/countdown/walk/outcome pose is actually painted; median 20.004ms, within-scene maximum 71.12ms at DPR 1.0. [Native record](docs/cursor-play-v2-native.json). Reject polling-only frame coverage as display evidence; other hardware remains untested. |
+| 2026-10-22 | A bare zero-delay deferred play callback could enter the desktop tick after its widget was deleted during QA teardown. Supply the widget as the Qt single-shot context so its lifetime owns the callback. | The same 20 controller/desktop checks now pass without the teardown traceback. No artwork, clip timing or proposed v2 behavior changes. [Startup/icon maintenance record](docs/startup-icon-validation.md). |
+| 2026-10-22 | Nominal hunt source cells included the previous row's seated paws, reducing one imported run pose to a fragment. Extract complete significant silhouettes, pack fixed cells, sample to 128px before import and add bounds/component checks. Collision must include the painter's y−1 offset and mirror actual paw-alpha regions. | All 48 game slots pass bounds/significant-component checks; stationary high/low/distant contacts and both mirrored directions pass. All 528 earlier frames/42 clips compare unchanged. Native jump/loss/curl/comfort/three-hop entry coverage recorded in [Catch QA](docs/catch-validation.md). Source alpha fringe and attached anatomy still require visual review; physical mixed-DPI and human tuning remain unverified. |
 | 2026-10-22 | Independent typing/window/cursor/follow cooldowns allowed frequent alternating reactions; idle thoughts also bypassed the full configured speech interval. Use one configurable activity minimum (60s default, 15–600s) and the full automatic speech minimum, discarding activity events during cooldown. | 38 behavior/dialogue and 12 desktop checks pass, covering shared boundaries, preferences, quiet/AI guards and no event backlog. Idle animation cadence and deliberate pet replies remain independent. [Report](docs/activity-reaction-validation.md). |
 | 2026-10-22 | Native blur escaped the rounded window even though Qt/Win32 regions excluded the corners; the earlier mask-only test missed it. Replace private accent blur with a softly blurred per-thought background sample clipped in the painter, and test actual outside pixels. Reuse also exposed a stale fixed-height constraint; reset before remeasurement. | All 36 outside-corner samples across initial/resized/restored display are unchanged; seven focused source checks pass. The background sample is local/static until the thought closes and clears on hide. [Current report](docs/thought-rounded-clip-validation.md). |
 | 2026-10-22 | User requested rounder glass and less frosting. Match 20px corners across mask/paint/style and blend the whole overlay at 88% opacity. | Five focused source checks and native corner/click-through/focus checks pass; background stripe contrast increased 4→13, retaining more clear detail. This softens the composed effect, not Windows' fixed blur radius; glyphs share the overlay opacity. |

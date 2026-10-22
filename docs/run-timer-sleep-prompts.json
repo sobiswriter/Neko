@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-22",
+  "tool": "built-in ImageGen",
+  "prompt": "Use case: illustration-story. Production hard-pixel sprite sheet for the SAME white kitten Neko in references one and two: white fur, charcoal stepped outline, gray underchin/chest, pink ears/nose, big dark eyes with square highlights, compact torso and large consistent head. Reference three is MECHANICS ONLY: copy its lively compact arched-backed feline gallop, springy hindquarters, foreleg reach/tuck and trailing attached tail; do not copy its black coloring or background. Exactly TWELVE complete isolated kittens in FOUR columns and THREE rows, true transparent alpha with broad clear gutters, no numbers, text, grid, floor, shadows, fog or halos. Same physical head/body volume throughout, fixed camera, four anatomical legs only (occlude far legs naturally), one connected neck/torso, one attached tail. All side poses FACE LEFT, mirror mechanics reference as needed. First cell front seated neutral identical to reference one, solely calibration. Next EIGHT cells are chronological connected running gallop: gathered hind-paw load with forepaws lifted; hind push and gathered forelegs; rising airborne forward reach; full extended flight with forelegs reaching and hindlegs trailing; forepaw landing with elbows yielding; weight passes over planted forepaws with hindlegs swinging underneath; hind paws gather under torso while forepaws release; hind load connecting to the first run cell. A springy real cat gallop, NOT a sliding low flat cat with the same outstretched arms in every frame. Clear leg contact, spine extension/contraction and believable head volume. Keep excited squeezed eyelids like >_< PHYSICALLY DRAWN, happy little mouth and attentive ears throughout the FIRST FOUR run poses, not a one-frame blink. Reopen playful focused eyes through the LAST FOUR run poses for landing/support, keeping the happy mouth. No stamped face symbols. Keep each pose at its natural height: importer adds a small flight arc, no exaggerated image-position bouncing. Final THREE cells: shorter braking stride, planted forepaws gathering to stop, supported near-front half-sit connecting toward seated idle. Clean crisp pixel clusters at enlarged source scale; every ear/paw/tail complete and separated from neighboring drawings.",
+  "references": [
+    "assets/neko_idle.png",
+    "build/cursor-v2/idle-reference.png (actual idle)",
+    "C:/Users/soura/Downloads/374ea8e3cdcf78cf7172bedf3bae22f5.gif (mechanics, eight frames; first0ms then seven100ms)",
+    "build/run-fix/reference-frames.png (complete decoded contact sheet used by ImageGen)"
+  ],
+  "sources": {
+    "run": {
+      "original": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-fd85e881-bfe4-41e2-892c-893c169d5a6d.png"
+    }
+  },
+  "timing": {
+    "run_order": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "durations_ms": [
+      90,
+      90,
+      90,
+      90,
+      90,
+      90,
+      90,
+      90
+    ],
+    "excited_eye_span_ms": 360,
+    "flight_offset_px": {
+      "3": 5,
+      "4": 8
+    }
+  },
+  "assembly": {
+    "run": {
+      "source": "C:\\Users\\soura\\.codex\\generated_images\\01a162fa-0456-7d31-b435-3947ee3e555c\\exec-fd85e881-bfe4-41e2-892c-893c169d5a6d.png",
+      "regions": [
+        [
+          59,
+          89,
+          297,
+          354,
+          42062
+        ],
+        [
+          386,
+          115,
+          694,
+          360,
+          40482
+        ],
+        [
+          730,
+          115,
+          1065,
+          349,
+          41856
+        ],
+        [
+          1094,
+          109,
+          1425,
+          336,
+          41756
+        ],
+        [
+          31,
+          477,
+          349,
+          709,
+          42246
+        ],
+        [
+          380,
+          477,
+          710,
+          708,
+          44333
+        ],
+        [
+          740,
+          476,
+          1065,
+          705,
+          40045
+        ],
+        [
+          1101,
+          473,
+          1425,
+          715,
+          40159
+        ],
+        [
+          39,
+          795,
+          355,
+          1039,
+          44036
+        ],
+        [
+          388,
+          810,
+          715,
+          1039,
+          42376
+        ],
+        [
+          770,
+          816,
+          1067,
+          1039,
+          39670
+        ],
+        [
+          1149,
+          795,
+          1390,
+          1054,
+          41082
+        ]
+      ],
+      "asset": "assets/neko-game-run-v2.png",
+      "packing": "4 columns; 384px cells; baseline372; complete RGBA crops; no painting or alpha threshold cleanup"
+    }
+  },
+  "asset_sha256": "6a61791a218c8a4d83661e46df1757fcaddf0ce47b4e1403ef2fafce781aee99",
+  "atlas_entries": 741
+}

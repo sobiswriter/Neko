@@ -1,16 +1,28 @@
 # Animation rebuild
 
+## Gallop/timer/sleep correction — authorized, 2026-10-22
+
+Delivered: [fixes, previews, focused verification and release identities](../docs/run-timer-sleep-fix.md). Extended play-testing remains with the user as requested.
+
+User requests a fast fix with focused checks, leaving extended play-testing to them. Use the supplied eight-frame100ms gallop as the mechanics reference, preserving Neko's identity and scale. One12-slot bank: neutral calibration; eight connected gallop poses (hind load/push, gathered ascent, reaching flight, full extension, fore contact, yielded support, hind gathering, hind load); three supported braking/turn poses ending near-front. Keep drawn excited squeezed eyes across the first four poses (360ms at90ms/pose), then reopen for landing/support across four poses. One720ms loop; only airborne flight poses receive small fixed5/8px registration offsets. Ground contacts stay planted; no face glyphs or per-pose scaling. Preserve jump/contact and outcome artwork. Review one native-size light/dark strip and short production-timing GIF, run focused timer/sleep/atlas regressions, build flat current/previous releases and inspect resources. Broad native play-through/full suite intentionally deferred to the user.
+
+## Cursor play v2 — approved, 2026-10-22
+
+The user approved the [complete v2 design](../docs/cursor-play-v2-plan.md). Delivery and verification are complete: [final report, previews and release](../docs/cursor-play-v2-validation.md). Unrelated open work below is preserved.
+
+Native-size source review found the new loss endpoints look down, whereas the retained curl/comfort looks outward. The implemented eight-slot common bridge uses neutral calibration; lowered curled hold; ears lifting; head tilting outward; chin rising; and settling into the actual curl. Seven used drawings at 120ms each play after each complete loss and before the retained curl loop. Ground/support stays fixed, hidden legs remain tucked, forepaws support the chin and one tail wraps the haunch. All three entry seams, actual curl endpoint, existing comfort/carry and actual native-painted entries are verified in the final report. The prototype is now tested practice recorded in Frame Master.
+
 ## Catch the Cursor — dedicated planning revision, 2026-10-22
 
-Status: dedicated design requested; game implementation not yet authorized. See [Catch the Cursor](../docs/catch-the-cursor-plan.md). It supersedes the first game's earlier opt-in-only, free-2D and three-catch assumptions: automatic play defaults on at a configurable 90s interval, running is horizontal only, jumps use measured reach, one genuine contact wins, unreachable play/timeouts lead to a disappointed curl until petted, and bounded/coalesced activity intents protect naps and complete transitions.
+Status: implementation subsequently authorized and delivered. See [verification](../docs/catch-validation.md) and [Catch the Cursor](../docs/catch-the-cursor-plan.md). Automatic play defaults on at a configurable 90s interval, running is horizontal only, jumps use measured reach, one genuine contact wins, unreachable play/timeouts lead to a disappointed curl until petted, and bounded/coalesced intents protect naps and complete transitions.
 
 Delivery order: lateral geometry/contact trial → one complete hunt art path → manual playable slice → native checkpoint → full win/loss/comfort art → bounded scheduler and settings → interruption/accessibility/release checks. Eight-direction locomotion and Dodge's click-interception trial are not dependencies of this revised first game. The user requested only this plan and the thought-backdrop implementation today.
 
-Thought backdrop: implemented as a compact rounded, click-through frosted label, keeping sharp text and existing timing/quiet rules. See its [verification](../docs/thought-backdrop-validation.md). Mini-game code/art remain unimplemented.
+Thought backdrop: implemented as a compact rounded, click-through frosted label, keeping sharp text and existing timing/quiet rules. See its [verification](../docs/thought-backdrop-validation.md). Catch the Cursor now has its own runtime and artwork; other games remain proposals.
 
 ## Mini-games — proposed, 2026-10-22
 
-Status: research and planning only; not approved for implementation. See the [complete mini-games design](../docs/minigames-plan.md) for the three requested games, five additional candidates, references, animation stories, input/ownership rules, reduced-motion variants and acceptance matrix. Previous completed work remains below.
+Status: Catch the Cursor subsequently implemented under its dedicated design; the remaining portfolio is research/planning only. See the [complete mini-games design](../docs/minigames-plan.md) for the other games and candidates. Previous completed work remains below.
 
 Recommendation: Catch the Cursor (Neko hunts), Run Away / Kitten Tag (player pursues) and Dodge Clicks (aim/timing), followed by Yarn Rally and then Peek-a-Box. Prototype native transparent click ownership and directional movement before producing full game art. Zero-alpha desktop regions normally pass clicks through; Dodge must not ship until in-area misses can be consumed and outside input/teardown are verified.
 
@@ -229,3 +241,18 @@ Generated art can drift anatomically; use simple silhouettes and targeted regene
 `.venv/Scripts/python.exe -m PyInstaller --noconfirm --clean main.spec`
 
 `NEKO_TEST_EXE=dist/DesktopNeko.exe .venv/Scripts/python.exe -m unittest test_packaging -v`
+
+## Catch the Cursor — implementation authorized, 2026-10-22
+
+Deliver the dedicated proposal: manual menu/nook play, automatic games enabled at a persisted 90-second default (30–600 seconds), lateral runway, committed paw-contact jumps, three-hop win, protest/loss curl and deliberate-pet comfort. Use a bounded game intent and coalesced existing activity categories; revalidate eligibility rather than replay stale poses.
+
+Scope: games.py controller/geometry; behavior.py ownership; animations.py and new authored assets; main.py menu/settings/input/lifecycle; focused game/integration/package tests; actual-controller previews; provenance, verification, README and Frame Master. Existing nap/pet/carry counts, saved origin, accepted tail artwork and animation scale are compatibility gates.
+
+Storyboard: idle → attentive ready (1.4s) → supported side run/turn → crouch (0.2s) → committed reach/landing (0.6s) → puzzled miss/retry or proud grasp → retained reviewed three-hop celebration → walk home/sit. Continuous unreachable play gets one protest and safe attempt, then ears/head lower → supported curl/breathe until comfort. Pet: acknowledge → eyes reopen → uncurl/rise → canonical idle. Curl pickup uses the existing quiet side-entry bridge and returns to disappointed curl without creating a nap. Four anatomical limbs with occlusion, stable head volume, a single attached tail. New source banks use constant batch calibration; review all selected poses on light/dark and native playback.
+
+Verify geometry/contact and scheduler first, one full manual path next, then outcomes/automatic scheduling/interruption and exact executable. Do not substitute rotating tail-chase art for a lateral run. No pointer warp/capture, global input hook, new runtime dependency or other mini-games.
+## Current proposal: playful idle cursor interaction v2 — awaiting approval
+
+The user requested a thorough plan before any v2 gameplay/art changes. Read [the complete v2 proposal](../docs/cursor-play-v2-plan.md): replace walking and remove idle cursor-following; playful run/jump acting; three victory and three loss stories; sparse varied lines; remove the game overlay; default-90s cooldown arms a fresh left/right side-zone entry outside care space; actual staged 3/2/1 countdown; defer through sleep and wake recovery; persist played/Neko-win keepsakes in the ordinary menu/nook. All new animation/geometry numbers are proposed trial targets, not tested findings.
+
+Order after approval: V0 remove the play overlay → V1 invisible invitation/countdown → V2 walk/follow removal → V3 playful run/jump/contact → native review checkpoint → V4 outcomes/dialogue → V5 keepsake counters/menu copy → V6 verification/release. Existing release and historical findings remain the baseline. Startup repair and supplied-icon adoption are separately authorized maintenance, not approval to implement v2.
