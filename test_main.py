@@ -564,18 +564,21 @@ class DesktopTests(unittest.TestCase):
             self.neko.tick()
         self.assertEqual(self.neko.bubble.text(), "a thought already here.")
 
-    def test_thoughts_are_background_free_and_allow_time_to_read(self):
+    def test_thoughts_have_a_small_frosted_backdrop_and_allow_time_to_read(self):
         self.assertTrue(self.neko.say("Look at meeee!"))
         APP.processEvents()
         self.assertGreaterEqual(self.neko.bubble.font().pixelSize(), 16)
         self.assertGreaterEqual(self.neko.bubble.font().weight(), 600)
-        self.assertGreaterEqual(self.neko.bubble.width(), 260)
+        self.assertLessEqual(self.neko.bubble.width(), 270)
+        self.assertGreaterEqual(self.neko.bubble.width(), 96)
+        self.assertTrue(self.neko.bubble.testAttribute(Qt.WA_TransparentForMouseEvents))
+        self.assertTrue(self.neko.bubble.windowFlags() & Qt.WindowTransparentForInput)
         self.assertGreaterEqual(self.neko.bubble_timer.interval(), 5500)
         image = self.neko.bubble.grab().toImage()
         background = image.pixelColor(6, image.height() // 2)
-        self.assertEqual(background.alpha(), 0)
-        self.assertTrue(all(image.pixelColor(x, 0).alpha() == 0
-                            for x in range(image.width())))
+        self.assertGreater(background.alpha(), 0)
+        self.assertLess(background.alpha(), 200)
+        self.assertEqual(image.pixelColor(0, 0).alpha(), 0)
         ink = [image.pixelColor(x, y) for x in range(image.width())
                for y in range(image.height()) if image.pixelColor(x, y).alpha() > 0]
         self.assertTrue(any(c.lightness() > 220 and c.alpha() > 200 for c in ink))

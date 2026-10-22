@@ -27,6 +27,7 @@ from app_context import app_kind
 from animations import SpriteAtlas, Clip, CLIPS, drop_progress, held_clip, sprite_bounds, CANVAS_WIDTH, CANVAS_PADDING, CANVAS_TOP, CANVAS_HEIGHT
 from dialogue import OfflineDialogue
 from cursors import petting_cursors
+from thoughts import ThoughtLabel
 
 
 ASSET_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "assets"
@@ -382,17 +383,7 @@ class NekoWidget(QWidget):
                 self.movies[name] = movie
         self.current_asset = "idle"
         self.current_clip = "idle"
-        self.bubble = QLabel(None, Qt.ToolTip | Qt.FramelessWindowHint
-                             | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
-                             | Qt.WindowTransparentForInput)
-        self.bubble.setAttribute(Qt.WA_ShowWithoutActivating)
-        self.bubble.setAttribute(Qt.WA_TranslucentBackground)
-        self.bubble.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.bubble.setTextFormat(Qt.PlainText)
-        self.bubble.setWordWrap(True)
-        self.bubble.setFixedWidth(270)
-        self.bubble.setStyleSheet("background: transparent; color: #fffaf0; border: 0;"
-                                 "padding: 6px; font: 600 16px 'Segoe UI';")
+        self.bubble = ThoughtLabel()
         shadow = QGraphicsDropShadowEffect(self.bubble)
         shadow.setBlurRadius(4)
         shadow.setOffset(0, 1)

@@ -100,9 +100,12 @@ Soft sounds are optional and off until you enable them.
   All automatic words share an 8–30 second pause and never replace a visible bubble.
   Every spontaneous idle attempts its own local thought, including “Look at meeee!”
   and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
-  Thoughts use cream 16px semibold text with a small dark shadow around the letters,
-  transparent margins and no background or border. They wrap within 270px and
-  remain for 5.5–10 seconds of reading time.
+  Thoughts use cream 16px semibold text with a small dark shadow and a compact,
+  rounded frosted backdrop. The desktop behind it blurs while the lettering stays
+  sharp; unsupported systems retain a light translucent tint. It stays click-through,
+  takes no focus, fits short lines and wraps within 270px for 5.5–10 seconds.
+  No desktop capture or new runtime dependency is used. See the
+  [native preview and verification](docs/thought-backdrop-validation.md).
 - **Little app rituals.** VLC gets a watch-buddy loaf and questions about what
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
@@ -196,8 +199,8 @@ The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
 `dist\DesktopNeko-previous.exe`. Keep these two files directly in `dist`, without
 release subfolders. Quit the existing Neko before launching the new build;
 the single-instance lock prevents two kittens running together.
-The latest build includes pickup and slightly faster petting; see the
-[speed update verification](docs/petting-speed-validation.md). Historical build paths
+The latest build includes pickup, slightly faster petting and frosted thoughts; see the
+[thought backdrop verification](docs/thought-backdrop-validation.md). Historical build paths
 in older reports describe their original delivery locations.
 
 ## Check the behavior

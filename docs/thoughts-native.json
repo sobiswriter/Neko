@@ -1,0 +1,19 @@
+{
+  "native_backdrop": true,
+  "click_through_to_test_window": true,
+  "foreground_unchanged": true,
+  "sizes": [
+    [
+      137,
+      58
+    ],
+    [
+      270,
+      58
+    ]
+  ],
+  "frosted_stripe_contrast": 3,
+  "background_stripe_contrast": 70,
+  "dpr": 1.0,
+  "passed": true
+}
