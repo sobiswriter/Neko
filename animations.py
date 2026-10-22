@@ -137,6 +137,21 @@ for mood in ("excited", "calm", "unimpressed", "sleepy"):
     order = tuple(range(4, 12)) if mood == "sleepy" else tuple(range(12))
     CLIPS[f"held_{mood}"] = Clip(f"carry-{mood}", 0, (2400 // len(order),) * len(order), order, loop=True)
 
+CLIPS.update({
+    "game_ready": Clip("game-hunt", 0, (300, 350, 350, 400), (0, 1, 2, 3)),
+    "game_run": Clip("game-hunt", 0, (70,) * 8, tuple(range(4, 12)), loop=True),
+    "game_turn": Clip("game-hunt", 0, (100, 100, 150), (12, 13, 14)),
+    "game_prepare": Clip("game-hunt", 0, (200,), (16,)),
+    "game_jump": Clip("game-hunt", 0, (40, 80, 80, 240, 40, 60, 50, 50), tuple(range(16, 24))),
+    "game_miss": Clip("game-hunt", 0, (150, 150, 150), (23, 14, 2)),
+    "game_settle": Clip("game-hunt", 0, (150, 150, 200), (13, 14, 15)),
+    "game_loss": Clip("game-emotion", 0, (150,) * 12, tuple(range(12))),
+    "game_curl": Clip("game-emotion", 0, (900, 900, 900, 900), (8, 9, 10, 11), loop=True),
+    "game_comfort": Clip("game-emotion", 0, (150,) * 10 + (250, 250), tuple(range(12, 24))),
+    "game_gentle_rest": Clip("game-hunt", 0, (1000,), (2,)),
+    "game_gentle_reach": Clip("game-hunt", 0, (1000,), (19,)),
+})
+
 
 def held_clip(elapsed, sleeping=False):
     if sleeping:
@@ -308,6 +323,41 @@ class SpriteAtlas:
             painter.end()
             self.frames[key] = frame
         self.load_carry(path)
+        self.load_games(path)
+
+    def load_games(self, path):
+        """All-or-nothing game art; constant calibration from each bank's neutral."""
+        imported = {}
+        idle = self.frames["idle", 0, 0]
+        for name in ("hunt", "emotion"):
+            image = QImage(str(Path(path) / f"neko-game-{name}-v1.png"))
+            if image.isNull() or image.width() % 4 or image.height() % 6:
+                return
+            width, height = image.width() // 4, image.height() // 6
+            poses = []
+            for index in range(24):
+                cell = image.copy(index % 4 * width, index // 4 * height, width, height).scaledToWidth(128, Qt.FastTransformation)
+                bounds = sprite_bounds(cell)
+                if bounds.isEmpty():
+                    return
+                poses.append(cell.copy(bounds))
+            head = pet_landmarks(poses[0])[0]
+            sx, sy = 62 / head, 82 / poses[0].height()
+            for index, pose in enumerate(poses):
+                sprite = QPixmap.fromImage(pose).scaled(round(pose.width() * sx), round(pose.height() * sy),
+                                                       Qt.IgnoreAspectRatio, Qt.FastTransformation)
+                if sprite.width() > CANVAS_WIDTH - 4 or sprite.height() > CANVAS_HEIGHT - 4:
+                    return
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawPixmap((CANVAS_WIDTH - sprite.width()) // 2, 130 - sprite.height(), sprite)
+                painter.end()
+                imported[f"game-{name}", index // 4, index % 4] = frame
+        for name, indices in (("hunt", (0, 15)), ("emotion", (0, 23))):
+            for index in indices:
+                imported[f"game-{name}", index // 4, index % 4] = idle
+        self.frames.update(imported)
 
     def load_carry(self, path):
         idle = self.frames["idle", 0, 0]
