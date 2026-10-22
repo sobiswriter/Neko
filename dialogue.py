@@ -330,28 +330,92 @@ i'll just make myself a little comfy.
 a small hello from a small cat.
 """,
     "tail": """
+swish, swoosh. i'm conducting the room.
+my tail has a tiny dance to do.
 my tail is thinking about something.
 swish. a very small opinion.
 it's got a mind of its own, that tail.
 just checking that the tail still works.
 """,
     "groom": """
+oh! were you watching my beauty routine?
+one ear polish. then i'm all yours.
 one moment. important paw maintenance.
 must look presentable for all this sitting.
 a tidy paw is a happy paw.
 just polishing the tiny equipment.
 """,
     "loaf": """
+fresh loaf! please admire gently.
+paws tucked. maximum cozy achieved.
 all paws have been safely put away.
 loaf mode. freshly baked.
 i am becoming a very small bread.
 this is my most efficient shape.
 """,
     "yawn": """
+yaaawn... did my ears get taller?
+big feelings. very small sleepy cat.
 that was a very small yawn. honest.
 do you ever just... mrrraah.
 my mouth had a stretch of its own.
 a yawn escaped. i'll allow it.
+""",
+    "tail_chase": """
+Look at meeee!
+Round.. around... around...
+one more little circle! maybe two!
+my tail keeps taking the scenic route.
+very serious zoomie business happening here.
+four paws, zero straight lines.
+""",
+    "tail_catch": """
+gotcha, fluff!
+wait. that wiggly thing belongs to me?
+two paws. one very slippery plan.
+you saw that little pounce, right?
+tail inspection complete. suspiciously soft.
+the tiniest victory for the tiniest hunter.
+""",
+    "stretch": """
+biiiig stretch... tiny cat.
+look how loooong my paws can go!
+just unfolding my very important legs.
+one little paw shake for good measure.
+stretch first. supervise later.
+""",
+    "ears": """
+did you hear that? my ears did!
+left ear says mrrp. right ear agrees.
+tiny antennas, reporting for duty.
+something interesting? let me listen.
+just tuning in to your little corner.
+""",
+    "sniff": """
+sniff sniff... interesting!
+one tiny nose investigation.
+is that a new idea i smell?
+my whiskers would like a closer look.
+curiosity fits very nicely on my face.
+""",
+    "peek": """
+just one eye open. for you.
+i wasn't sleeping. i was secretly peeking.
+oh! you're still here. good.
+a little peek from the cozy department.
+my ears woke up before the rest of me.
+""",
+    "look_left": """
+something over there? let me look!
+left-side inspection. very official.
+my whiskers have a question about that corner.
+just a curious little tilt this way.
+""",
+    "look_right": """
+ooh. what's happening on this side?
+right-side inspection. equally official.
+this corner deserves a little head tilt too.
+checking the other half of my tiny kingdom.
 """,
 }
 LINES = {kind: tuple(line.strip() for line in text.splitlines() if line.strip())

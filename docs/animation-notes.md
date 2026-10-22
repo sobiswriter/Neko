@@ -1,5 +1,13 @@
 # Neko animation art
 
+The import details below record the original art passes. Current runtime frames
+use a 112x112 canvas; pet reactions use the later [idle-matched head calibration](pet-scale-and-cursor.md)
+in place of the original whole-body height fitting described below.
+
+Current petting art and final prompts are documented in [petting-notes.md](petting-notes.md).
+The notes below record earlier sheets. Their wave and paw-offer rows are retired,
+and historical preview GIFs containing those reactions have been removed.
+
 Generated with the built-in ImageGen tool using assets/neko_idle.png as the
 character reference. Four separate 4 x 4 sheets replace the earlier 8 x 8 atlas.
 Smaller action groups made it easier to keep paws, tails and head proportions
@@ -62,7 +70,7 @@ Existing gestures play once and rest inside their 5–6 second behavior slots;
 tail swishes, kneading, walking and paw taps use slower continuous cycles.
 rendering runs at 10 FPS, with action lengths preserved and slower holds for blinks and sleep.
 docs/neko-sleep-preview.gif shows the actual frame player. The preview simulates
-a pet between sleep and waking; runtime sleep has no automatic wake deadline.
+a pet between sleep and waking; runtime now also supports an optional nap duration.
 
 ### Transition generation prompt
 

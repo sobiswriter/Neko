@@ -4,28 +4,80 @@ A little company for your Windows desktop. Neko stretches, settles down, notices
 your cursor, and naps when you step away. No chores, guilt, or attention meter.
 Soft sounds are optional and off until you enable them.
 
-![Neko's new drawn animations](docs/neko-preview.gif)
+![Neko's petting animations](docs/neko-pet-catalog.gif)
 
 ## Living with Neko
 
-- **Click to pet.** Eight reactions: head pats, cheek nuzzles, paw greetings,
-  kneading, chin scritches, a tiny blep, offering a paw, and relaxed ear rubs.
-  Each plays gently and settles; all eight appear before the rotation repeats.
+- **Click to pet.** Twelve individually paced reactions with 16–28 source pose slots: head pats, cheek nuzzles,
+  kneading, chin scritches, a playful roll, offering a paw, relaxed ear rubs,
+  a front stretch, back arch, tiny hop, side flop, and shoulder peek.
+  Each has drawn anticipation/action/recovery and uses the actual idle drawing
+  at both ends, with a complete drawn recovery before the final idle. The old four-frame pet rows are
+  excluded from playback. Each plays once and returns to normal idle blinking;
+  kneading makes four alternating paw pairs first. The hop has three little jumps;
+  shoulder peek looks both ways, yawns and holds a sleepy face; side flop snoozes,
+  winks and wakes before getting up. Contact gestures linger with soft lids and
+  small ear/paw movements. All twelve appear before the
+  rotation repeats. Repeated clicks count immediately and coalesce into one
+  next reaction, which waits for the current landing/get-up to finish.
   If she's asleep, a pet plays her waking sequence instead.
-- **Drag to move.** She looks around while held and blinks when set down. Dragging
-  never counts as petting. Position is remembered, including on another monitor.
+  Petting now runs about 15% faster, keeping every pose and complete recovery;
+  the shortest 50ms poses retain their original duration.
+- **Pick her up.** Dragging starts a lift immediately; a stationary click-hold starts
+  after 250ms. She dangles with little paw/tail movements, going from excited to
+  calm after three seconds, mildly unimpressed after ten, then sleepy after twenty.
+  A little yawn happens once before her sleepy loop. Release at any point—even
+  mid-lift or mid-yawn—and she settles at the chosen location and returns to idle.
+  Re-grabbing follows the visible pose back into the hold and preserves her expression.
+  Holding never counts as petting; quick clicks still do. Real naps stay asleep
+  while carried, with a due timed wake waiting for supported placement. Reduced
+  motion uses a still held pose and immediate placement. Position is remembered.
+  See the [complete pickup preview and verification](docs/pickup-validation.md).
+- **A little helping hand.** Hovering shows an open palm; holding uses a closed hand
+  for dragging. A pet click plays a short palm stroke without moving the actual pointer.
+  Leaving, hiding, entering fullscreen or reduced motion stops the stroke.
 - **Come close.** She sniffs at a moving cursor and sometimes takes a small walk
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks use 96 drawings, including eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 528 entries, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
-  Tail swishes, kneading and paw taps use slower continuous cycles. Rendering runs at
-  10 FPS, keeping the same action lengths and walking speed.
-  Every frame has a 112 × 100 transparent canvas;
-  seated poses share an 82-pixel height so petting no longer makes her shrink.
+  Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
+  Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS.
+  Petting/carrying use a precise Qt timer so short connecting poses get screen time.
+  Arrival/departure briefly use 30 FPS for smooth travel,
+  keeping walking speed unchanged.
+  Every frame has a 192 × 144 transparent canvas, with extra horizontal room for
+  rolls/deeper reaches and 32 transparent pixels above the original footprint for lifting.
+  Idle remains about 82 pixels tall;
+  pet sequences use a 62px-wide seated head reference and 82px-tall reference body.
+  Each retains one calibration throughout its poses, with ground contacts used
+  for registration. Crouching and lying down preserve their natural posture;
+  no whole-body refitting happens per frame. The hops follow three small in-canvas arcs.
   Walking, loafing and sleep preserve their natural posture and proportions.
+  Grooming, stretching, loafing, sniffing, ear flicks, yawning, sleepy peeks and
+  directional looks now have drawn anticipation and recovery: paw lick and ear wipe,
+  a stretch/paw shake, tuck into loaf, tiny nose twitches and contented blinks.
+  The accepted lazy swish gains a blink before sitting still again.
+- **A little tail trouble.** She runs low with closed eyes and a trailing tail through five quick
+  turns, following the supplied GIF's eleven 50ms poses. The catch game takes two turns, then a small pounce and a
+  two-paw catch before the tip slips away. An eager head tilt and crouch lead into play;
+  a half-sit and contented blink bring her back to sitting. Chase lasts 4.69 seconds,
+  catch 3.68 seconds. Each gets three times an ordinary idle's selection weight,
+  with no consecutive repeats and the same rest between gestures.
+  These do not change the twelve pet reactions.
+- **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
+  sit-up before her greeting. She enters from her monitor's top edge and lands at
+  her saved position. **Let her go · quit** gives her a little sad look and lowered
+  ears, then the existing crouch and graceful hop. These eight-drawing
+  transitions last 1.9 and 2.15 seconds, use continuous travel between poses,
+  and start the arrival clock on Qt's first animation tick so a slow launch
+  cannot spend the fall before it appears. Visible fullscreen launches also
+  play the drop-in, silently; the fullscreen hiding preference still applies.
+  They keep her saved desktop position, and do not accept pets or
+  window reactions midway through. Reduced motion skips the jumps; quitting
+  while hidden or fullscreen is immediate. Hide/Show remains immediate.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual
@@ -34,26 +86,53 @@ Soft sounds are optional and off until you enable them.
   ongoing animation instead of disappearing immediately.
 - **Step away.** She yawns and naps after a configurable period without input.
   The default is three minutes; choose 1–3600 seconds. Type a number and press Enter
-  or leave the field to save it. She curls down before sleeping and stays asleep
-  through typing, app switches and elapsed time. Only a deliberate pet wakes her;
-  dragging moves her without waking her. The old 90-second automatic wake is gone.
+  or leave the field to save it. **Nap duration** independently chooses how long
+  she stays asleep: 1–3600 seconds, or 0 (**Until petted**, the default).
+  The nap clock starts when she finishes curling down; changes apply to the current nap.
+  Typing, app switches and dragging let her sleep. A pet wakes her early,
+  and timed naps use the same gentle waking transition. After waking she stays
+  awake for at least the inactivity delay before another nap.
   Ignoring her never creates chores or penalties.
-- **Offline personality.** 298 short lines, including more personal questions and
+- **Offline personality.** 346 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
-  All automatic words share an 8–30 second pause and never replace a visible bubble.
+  All automatic words—including idle, activity and optional AI comments—respect
+  the full **Thoughts every** minimum (default 75 seconds) and never replace a visible bubble.
+  Every spontaneous idle attempts its own local thought, including “Look at meeee!”
+  and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
+  Thoughts use cream 16px semibold text with a small dark shadow and a compact,
+  rounded glass backdrop with a faint rim, a nearly clear tint and gentler frosting.
+  The desktop behind it blurs while the lettering stays
+  sharp; unsupported systems retain a light translucent tint. It stays click-through,
+  takes no focus, fits short lines and wraps within 270px for 5.5–10 seconds.
+  A tiny backdrop sample is softened inside the rounded edges when each thought
+  appears; it stays still until the thought closes. The sample stays in memory,
+  is cleared on hide and is never saved or uploaded. No new runtime dependency is used.
+  See the [rounded blur fix and verification](docs/thought-rounded-clip-validation.md).
 - **Little app rituals.** VLC gets a watch-buddy loaf and questions about what
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
   their own lines and matching gestures. These are app hints, not content analysis.
+  Typing, window/tab events, cursor curiosity and following share one minimum
+  reaction gap: **60 seconds** by default, adjustable from **15–600 seconds** through
+  **Neko's nook → Company → Activity reactions every**. Events during that gap
+  are discarded, so they cannot pile up. Idle gestures keep their separate timing;
+  deliberate pets and naps still work normally.
+
+  To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
+  contains all 346 phrases in 33 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  Edit or add one phrase per line inside the existing triple-quoted groups; keep the
+  section names/quotes and aim for at most 110 characters per phrase. Source launches
+  use your edits on restart; the packaged executable needs rebuilding. Optional AI
+  comments are generated separately and are not part of this file.
 - **Soft mews & purrs.** Enable them in the nook's Settings tab; Listen previews a
   small mew. These original synthesized cues are up to a second long, with low
   volume encoded into the WAV files. A deliberate pet can purr or mew; she can
   chirp on arrival. Automatic cues have a 45-second pause and are suppressed during media apps,
   quiet company and fullscreen. Turning sounds off or hiding stops playback.
 - **Right-click for her nook.** Quiet company, reduced motion, startup, optional
-  AI, mouse following, sleep delay, chatter and idle gesture frequency, and lifetime
+  AI, mouse following, sleep delay and duration, chatter and idle gesture frequency, and lifetime
   pet/nap counts live in one small window. Double-click the tray
   icon to find her again.
   Menus and the nook open beside her, with no periodic re-pinning over the controls.
@@ -132,6 +211,14 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
+The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
+`dist\DesktopNeko-previous.exe`. Keep these two files directly in `dist`, without
+release subfolders. Quit the existing Neko before launching the new build;
+the single-instance lock prevents two kittens running together.
+The latest build includes pickup, slightly faster petting and frosted thoughts; see the
+[thought backdrop verification](docs/thought-rounded-clip-validation.md). Historical build paths
+in older reports describe their original delivery locations.
+
 ## Check the behavior
 
 ```powershell
@@ -159,27 +246,78 @@ processes they launch.
 
 ## Character assets
 
-The four `assets/neko-*-v3.png` sheets each contain four sequences of four drawings.
+The base idle, pets, activity and movement v3 sheets each contain four sequences of four drawings.
 `assets/neko-transitions-v1.png` adds sixteen sleep/wake drawings with a constant
 character scale through the change in posture. `assets/neko-affection-v1.png`
-adds sixteen drawings for four extra petting reactions. Frame
+contains historical chin scritches, blep and ear rubs; those pet rows are no longer imported.
+`assets/neko-petting-a-v1.png` and `assets/neko-petting-b-v1.png` each contain
+three rows of four drawings from an earlier petting pass; they too are historical.
+`assets/neko-tailplay-v4.png` supplies the eleven-pose running cycle and five preparation/payoff poses.
+`assets/neko-tailsettle-v1.png` adds eight entry/recovery poses, calibrated separately
+and appended to the tail sequence without altering the accepted running artwork.
+`assets/neko-arrival-v1.png` supplies the graceful landing; the first two drawings in
+`assets/neko-farewell-v1.png` introduce sadness before the retained hop in
+`assets/neko-lifecycle-v2.png`. `assets/neko-tailswish-v1.png` supplies the lazy swish.
+`assets/neko-idleplay-a-v1.png`, `assets/neko-idleplay-b-v1.png` and
+`assets/neko-idleplay-c-v1.png` provide the new idle stories. Replaced idle/activity/
+movement rows and the rejected swish candidates are not imported. New idle stories
+share measured head calibration throughout each sequence and return to canonical idle.
+The retired wave, old paw-offer and original tail-swish rows are never loaded into the atlas. Frame
 durations and directional variants live in `animations.py`. Frames are imported
 once at a consistent scale and anchored at their feet. Generated-sheet bleed from
 neighboring cells is excluded when locating each silhouette.
 
 The [generation prompts and art notes](docs/animation-notes.md) document the built-in
-ImageGen workflow. The original six transparent PNGs remain as fallbacks. Matching
+ImageGen workflow; [tail and lifecycle notes](docs/tail-lifecycle-notes.md) include
+the rebuilt motion, [revision prompts](docs/playful-motion-prompts.md), and frame-by-frame QA.
+Run `tools/preview_animations.py` with optional Pillow installed to regenerate the runtime catalogs.
+See [idle personality and readability verification](docs/idle-personality-validation.md),
+the [generation prompts](docs/idle-personality-prompts.md) and the
+[native before/after bubble preview](docs/neko-thought-readability.png).
+The later [startup and transparent-thought correction](docs/startup-thought-validation.md)
+supersedes that bubble styling; see the [current text-only preview](docs/neko-thought-transparent.png).
+The [expressive petting revision and per-reaction verification](docs/petting-revision-validation.md)
+records current timings, expression choices, native rendering and safe repeated-click handoffs.
+See the [expression/gesture study](docs/petting-expression-study.md) for the acting references.
+Current petting uses twelve dedicated `assets/neko-pet-*-v1.png` sheets, with
+16–28 source slots each and a separate canonical-idle handoff. The playful roll
+replaces blep. Older pet sheets remain historical assets rather than active pet playback.
+Nine `assets/neko-carry-*-v1.png` sheets add 100 source slots for lifting, held
+expressions, facial bridges and entry from side/low/rolled postures. They share
+measured head calibration and supported recovery; release can interrupt every phase.
+The original six
+transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can
 be disabled in the nook, holding a still frame without losing direct interaction.
 Missing art has a small text-cat fallback.
 `gen_gif.py` is the original optional animation experiment; it needs Pillow and
 generates a bouncing ball, so it isn't part of the app or build.
 
+## Animation authoring
+
+Read [framemaster.md](framemaster.md) before planning or changing animations.
+It records the successful method: physical storyboards, subtle expressions,
+ImageGen prompt requirements, exact frame assembly, fixed scale and support
+registration, complete idle transitions, runtime integration and visual/native
+verification. It also records rejected approaches and known testing limits.
+
+[AGENTS.md](AGENTS.md) directs future animation work to that guide. Add verified
+discoveries to the relevant section and its dated findings log, with evidence and
+remaining limits; keep proposed techniques separate from tested practice.
+
+The [pickup revision](docs/pickup-validation.md) implements the excited → calm →
+mildly unimpressed → sleepy hold, release from any phase and gentle placement.
+Its [approved design](docs/pickup-animation-plan.md), [exact prompts/assembly](docs/pickup-prompts.json)
+and [native measurements](docs/pickup-native.json) preserve the reasoning and evidence.
+Run `tools/preview_pickup.py` with optional Pillow to reproduce the full mood preview
+and source/release sheets. Progress and verification are in [tasks/todo.md](tasks/todo.md).
+
 ## Project map
 
 - `behavior.py`: timing, temporary poses, naps, and pet reactions; no Qt or network.
 - `main.py`: desktop integration, rendering, preferences, nook, and tray.
 - `animations.py`: sprite atlas loading, frame timing and directional clips.
+- `cursors.py`: small palm-stroke cursor frames with a stationary hotspot.
 - `activity.py`: local keyboard headers, Windows events and foreground executable name.
 - `app_context.py`: local app categories and media title hints.
 - `dialogue.py`: offline lines and per-context shuffle bags.
@@ -187,5 +325,7 @@ generates a bouncing ball, so it isn't part of the app or build.
 - `llm_brain.py`: optional title-only Gemini worker.
 - `test_*.py`: standard-library unittest suite, with Qt's event helpers.
 - `Plan.txt`: interaction rules for keeping future changes quiet and minimal.
+- `framemaster.md`: animation philosophy, production method, verification and discoveries.
+- `AGENTS.md`: animation-specific instructions for future agents.
 
 Built by Sobi, who kinda likes Nekos.

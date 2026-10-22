@@ -1,0 +1,171 @@
+{
+  "tool": "built-in ImageGen",
+  "date": "2026-10-22",
+  "reference": "assets/neko_idle.png",
+  "generated_directory": "C:/Users/soura/.codex/generated_images/01a15f1f-2cae-75e3-9793-bde993066c70",
+  "prompts": [
+    {
+      "name": "lift-release",
+      "prompt": "Use case: stylized-concept. Asset type: production transparent pixel-art sprite sheet for Desktop Neko. Input image is ONLY canonical character identity: same white kitten, gray underchin/chest shading, charcoal stepped outlines, pink triangular nose and inner ears, big black eyes with tiny square highlights, compact torso, large head. Fixed near-front camera matching reference, identical physical head size in ALL cells. One head, two ears, connected neck/torso, exactly FOUR anatomical legs (two forelegs/two hindlegs), ONE attached tail viewer-right. Hidden legs remain hidden, no duplicated paw under a lifted leg. Draw a gentle pick-up into vertical dangling pose and supported set-down. In the held pose shoulders supported by implied invisible support, neck SHORT/natural, two front paws dangling in front of chest, two hindpaws hanging lower from hips, tail curved attached at right. NO human hand, scruff pinch, rope or prop. Held body mildly elongated from unfolding joints, not stretched neck, no giant belly. Calm soft half-lids, little neutral mouth. Exact FOUR columns and FOUR rows = SIXTEEN full-body sequential poses, chronological left-to-right then down. Equal cells with generous transparent padding, NO cut-offs or neighboring overlap. Row1: 1 exact canonical neutral seated round eyes; 2 lids soften, shoulders anticipate lift, paws still grounded; 3 shoulders lift a little, haunches begin unfolding, hindpaws on ground; 4 shoulders higher, forepaws curl gently and clear ground, hindpaws nearly unweighted. Row2: 5 hindpaws just leave ground, torso unfolds; 6 fully suspended upright, forepaws dangling naturally and TWO lower hindpaws, head same size; 7 suspended settling with tiny wrist relaxation, no anatomy change; 8 neutral calm held pose, four anatomical legs and attached tail clearly coherent. Row3: 9 same calm held pose, legs relax; 10 prepare landing, paws orient downward; 11 lower body, hindlegs begin folding toward supported contact, eyes attentive; 12 forepaws contact implied ground, hips still slightly raised. Row4: 13 hindquarters meet ground with connected folded hindlegs; 14 gentle supported compression with softly bent elbows, tail follows; 15 shoulders gradually rise into seated, lids reopen; 16 exact canonical neutral seated matching pose1. SMALL successive joint changes. Head may move vertically but its physical size never changes. Transparent alpha only, hard-edged pixel clusters readable with head62px wide at runtime. NO background, floor, shadow, haze, writing, numbers, grid, labels, watermark, motion marks, decorations or hearts. Keep every tail and ear entirely inside its cell. This is animation source art, not a storyboard with text.",
+      "output": "exec-02bd724a-f458-4283-95c0-5d949236b22a.png",
+      "references": [
+        "assets/neko_idle.png"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "calm-loop",
+      "prompt": "Use case: stylized-concept. Asset type: transparent production PIXEL ART animation sprite sheet. Reference image1 is the exact suspended body pose to preserve: white Neko kitten, SAME large head and hanging torso proportions, pink ears/nose, charcoal pixel outline, gray chin/chest, TWO short dangling forelegs/paws over front of chest and TWO longer lower hindlegs/paws, ONE tail attached viewer-right. Match this identity and near-front camera exactly. Create ONE calm seamless held loop in exactly THREE equal rows of FOUR cells, 12 full-body drawings ordered row-major, generous clear spacing and padding. SAME fixed physical head size and held attachment/shoulder location every pose. No standing/seated poses. Important facial change: eyes visibly RELAXED HALF-LIDDED, short straight horizontal charcoal upper lids partly covering SMALL dark pupils underneath, tiny neutral dash mouth. NOT the reference's wide round eyes or upward smiling eye arches. Ears soft naturally forward. Body almost motionless with a tiny slow 1-2px-at-native lateral sway: poses1-3 gradually settle left slightly with wrists loose;4-6 drift back to center and tiny breath;7-9 settle right slightly with tail tip lagging;10-12 return to exact pose1 body/face for seamless repeat. Paws stay attached and un-crossed, front paws do NOT kick, lower hindpaws stay distinct, no paw left behind. Head/shoulder anchor stays steady; only minute body/leg/tail movement. Every next drawing very small changes. Exactly four anatomical legs, connected natural short neck/torso, one head/two ears, one attached tail. Transparent alpha, full tails and ears inside cells, NO shadow/floor/background/haze/hand/props/decorations/text/numbers/grid/watermark. Hard-edged small stepped pixel clusters readable at head62px runtime. Do not elongate neck or add limbs. Image1 is body/identity reference; change face to half-lidded calm acting.",
+      "output": "exec-6f58241a-b857-445f-892f-d1b0bfc9c793.png",
+      "references": [
+        "lift-release source slot7"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "excited-loop",
+      "prompt": "Use case: precise-object-edit. Edit this production pixel-art sprite sheet. Preserve EXACT THREE ROWS of FOUR full-body kitten sprites, EVERY body/leg/paw/tail position, same physical head size and attachment axis, transparent padding and pixel style. It is a 12-phase suspended kitten loop, NOT a walking/standing pose. Change only facial acting and very subtle ear perk to EXCITED. Every kitten has bright big round black eyes with tiny square white highlights matching Neko's canonical innocent eyes, ears attentively perked, a tiny gentle mouth. In cell3 and cell4 ONLY, use a brief excited eye squeeze (two short inward angled closed-eye strokes, playful NOT angry), then reopen in cells5-6. Do not make constant grins or angry brows. Keep same head/nose/mouth placement; cheeks not enlarged. Bodies, FOUR attached anatomical legs (two forelegs hanging in front, two hindlegs below) and ONE attached tail unchanged, fixed near-front camera. Cell12 returns to cell1. Keep charcoal stepped outlines, white fur/gray chest/pink ears and nose. True transparency, no shadow/floor/background/hand/props/text/numbers/grid/watermark. No extra limbs or paws. Geometry stays phase matched with input so changing mood never moves the body.",
+      "output": "exec-5c061316-335f-47bc-98ef-8fa10aff6b35.png",
+      "references": [
+        "exec-6f58241a-b857-445f-892f-d1b0bfc9c793.png"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "unimpressed-loop",
+      "prompt": "Use case: precise-object-edit. Edit ONLY face/ear acting on this exact three-row FOUR-column twelve-frame held-kitten PIXEL ART loop. Preserve EVERY body, foreleg, hindleg, paw and tail position exactly phase-for-phase, head size/center/shape, layout, outline and true transparency. White Neko kitten, gray chest, charcoal stepped pixel line, pink nose/inner ears. Make a cute MILDLY UNIMPRESSED 'still holding me?' face: two straight level heavy upper lids with only thin dark pupil slivers showing below, tiny flat neutral dash mouth. One ear subtly tips sideways a small amount, other stays upright. This is playful slight impatience, NEVER threatening/angry/scared; NO diagonal angry eyebrows, snarl, bared teeth, defensive flattened ears, tears, blush or rage marks. Near-front head geometry unchanged. In frames7-9 a very small extra sideways ear tip, then return by frame12 to frame1. SAME four attached anatomical legs: two little forepaws hanging at chest, two lower hindpaws, one attached viewer-right tail. No standing, no hands/props. No background/floor/shadow/haze/text/grid/numbers/watermark. Hard pixel clusters. Twelve complete sprites with equal generous transparent cell padding. Facial emotion should read more deadpan/half-asleep than the calmer input, with more covered eyes but no squashing head.",
+      "output": "exec-d3bb6b37-3cbc-48e5-9fc7-02951f6f6750.png",
+      "references": [
+        "exec-6f58241a-b857-445f-892f-d1b0bfc9c793.png"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "sleepy-yawn-loop",
+      "prompt": "Use case: stylized-concept. Production transparent PIXEL ART sheet of Neko, EXACT suspended kitten in reference1; reference2 only provides mildly unimpressed eyelids. Preserve head size and camera, white/gray/pink palette, charcoal stepped outline, TWO dangling forepaws in front of chest, TWO longer lower hindpaws, ONE attached right tail, connected natural short neck. EXACT FOUR ROWS of FOUR equal cells =16 complete full-body sprites, row-major. Generous clear alpha padding. This sheet starts a ONE-TIME tiny yawn, then a seamless sleepy held loop. Row1 (poses1-4): 1 heavy level half-lids, mouth just starts opening; 2 eyelids closing while little jaw opens vertically; 3 fully closed soft eyes and cute open yawn with actual lowered jaw, NOT a human grin; 4 jaw closed back to a tiny dash, eyes fully closed, relaxed. Yawn is subtle, no giant stretched neck or face. Rows2-4 (poses5-16): twelve phases with FULLY CLOSED peaceful eyes as short shallow downward-curving closed-lid lines, tiny neutral mouth, ears softly forward. Keep the same body phases as reference1's twelve sprites: 5-7 barely drift left;8-10 back to center;11-13 barely drift right;14-16 back to same pose5. Tiny slow breathing, paws loose and always attached, head/shoulder anchor almost fixed, no kicking or sagging neck. Pose16 matches pose5 for a seamless closed-eye loop. Head volume/eye/nose positions identical in all cells, no smiling upward eye arches. Do not change held torso or leg length. Exactly four anatomical legs, no missing/extra paw. Transparent alpha only, no background/floor/shadow/haze/hand/props/decorations/letters/numbers/grid/watermark, no cropped tails or ears. Hard pixel clusters readable at head62px wide.",
+      "output": "exec-97256f93-802c-43d3-8d4e-1cb0411951aa.png",
+      "references": [
+        "exec-6f58241a-b857-445f-892f-d1b0bfc9c793.png",
+        "exec-d3bb6b37-3cbc-48e5-9fc7-02951f6f6750.png"
+      ],
+      "accepted": false
+    },
+    {
+      "name": "expression-bridges",
+      "prompt": "Use case: stylized-concept. Production transparent PIXEL ART sheet for exact Neko suspended kitten. Make EXACT THREE ROWS of FOUR cells =12 full-body sprites. All sprites share IDENTICAL calm held body, head size, camera, shoulder anchor, four leg positions and attached right tail, matching reference1's first held body. Only eyelids/ears/mouth change. White fur, gray underchin/chest, charcoal pixel outline, pink nose/ears. Tiny natural neck, TWO forepaws hanging at chest, TWO hindpaws hanging lower, ONE attached tail, no extra limbs. Reference1 calm; reference2 excited; reference3 unimpressed; reference4 sleepy. Row1 is four subtle EXCITED TO CALM facial drawings: 1 round bright eyes/tiny happy mouth; 2 upper lids soften just a little and mouth settles; 3 eyes partly covered by relaxed lids, mouth neutral; 4 relaxed half-lidded eyes matching calm reference1. Row2 is four CALM TO MILDLY UNIMPRESSED drawings: 5 calm half-lids; 6 eyelids lower slightly and one ear begins tipping sideways; 7 more level lowered lids, little flat mouth; 8 final mildly unimpressed thin pupil slivers, ear gently tipped like reference3, NOT angry. Row3 is four SLEEPY TO ATTENTIVE RELEASE drawings: 9 sleepy fully closed shallow curved lids, jaw closed; 10 lids lift into narrow slits; 11 soft half-lidded attentive eyes; 12 eyes open gently and ready for landing. No yawn or head movement in this sheet. Every row starts/ends in the specified expression but EVERY body/limb/head position remains exactly the same. Generous equal transparent spacing, all ears/tails complete. Hard pixel clusters and stable face geometry. TRUE transparent alpha; NO background/floor/shadow/haze/hand/props/decorations/text/numbers/grid/watermark.",
+      "output": "exec-190f7045-5722-4fda-b648-f08723c1d8b8.png",
+      "references": [
+        "exec-6f58241a-b857-445f-892f-d1b0bfc9c793.png",
+        "exec-5c061316-335f-47bc-98ef-8fa10aff6b35.png",
+        "exec-d3bb6b37-3cbc-48e5-9fc7-02951f6f6750.png",
+        "exec-97256f93-802c-43d3-8d4e-1cb0411951aa.png"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "sleepy-geometry-repair",
+      "prompt": "Use case: precise-object-edit. Edit this EXACT THREE ROW by FOUR COLUMN twelve-frame calm held-kitten pixel-art loop. Keep EVERY existing body, leg, paw, attached tail and head silhouette pixel position unchanged in ALL twelve cells. SAME head size, body length, image layout and alpha padding, same charcoal/white/gray/pink palette and near-front camera. Change ONLY the eyes, mouth/jaw locally, and tiny eyelid acting. Row1 cells1-4: one tiny yawn. Cell1 existing half-lids, mouth starts opening a little; cell2 eyes softly close, mouth opens small vertically; cell3 closed lids and small open yawn, no giant jaw/neck stretching; cell4 mouth closed neutral dash, eyes fully closed. Rows2-3 cells5-12: peaceful FULLY CLOSED eyes as short shallow curved closed-lid lines, tiny neutral dash mouth; retain the EXACT eight body/leg/tail poses at the same locations and sizes. This becomes the sleepy breathing loop. IMPORTANT do not shorten torso or hindlegs, do not redesign head or change the body volumes. Exactly FOUR anatomical legs stay unchanged: two dangling forelegs at chest, two hindlegs below, ONE attached right tail. NO new paws or stray/detached pixels anywhere. Any small highlight pixels must be inside the connected sprite silhouette. True transparent alpha, no floor/shadow/haze/background/hand/props/decorations/text/numbers/grid/watermark. Twelve full-body sprites, same generous transparent cell padding. Pixel-art feature edit only; no new stance or camera.",
+      "rejects": "Original sleepy-yawn-loop: shortened body and detached components in imported frame4.",
+      "output": "exec-bff9df98-9c23-45fa-b73a-c72a6790b737.png",
+      "references": [
+        "exec-6f58241a-b857-445f-892f-d1b0bfc9c793.png"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "side-sleep-entry",
+      "prompt": "Use case: stylized-concept. Asset: production transparent PIXEL ART eight-pose pickup transition for exact white Neko kitten. Image1 is actual starting curled/sidelying sleeping posture, image2 is target upright suspended body/identity. SAME physical head size and white/gray/charcoal/pink pixel palette, no zoom. EXACT TWO rows of FOUR complete sprites =8 chronological full-body drawings. Pose1 matches image1 curled sidelying kitten on ground, CLOSED peaceful eyes. Pose2 shoulders gently lift a little while forelegs release curl, hindquarters still supported. Pose3 chest rises, forepaws start dangling, hips rotate under connected torso, hindpaws still touch. Pose4 shoulders higher and body begins unfolding, hindpaws unweight. Pose5 hips unfold below shoulders, all paws clear ground. Pose6 vertical suspended, TWO short forepaws at front of chest and TWO lower dangling hindpaws, one attached viewer-right tail. Pose7 tiny settling into exact image2 body proportions. Pose8 exact image2's suspended body pose but eyes CLOSED and mouth tiny neutral dash. Closed eyes throughout, naturally supported SHORT neck, no neck stretching or scruff/hand/rope. Every leg remains attached through one correct joint path, exactly TWO forelegs and TWO hindlegs anatomical total; hidden limbs stay hidden until rotated into view, no extra paws left on ground. ONE head/two ears/connected torso/ONE attached tail. Gentle small sequential movements, physically continuous side-to-upright unfolding, no sudden sitting detour. Head may rotate gradually from initial tilt into near-front final view; its volume stays fixed. Generous equal transparent cell spacing, tails and ears inside cells. True transparent alpha, NO floor/shadow/background/haze/props/human hands/text/numbers/grid/watermark/decorations. Hard pixel clusters readable at head62px runtime.",
+      "output": "exec-9afacfa1-83d7-42f0-951f-75a140a62478.png",
+      "references": [
+        "runtime sleep clip at0s, nearest-neighbor4x",
+        "lift-release source slot7"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "low-entry",
+      "prompt": "Use case: stylized-concept. Production transparent PIXEL ART eight-pose lifting transition for exact Neko. Image1 is exact starting deep front stretch with low chest/high hips, image2 is exact final suspended pose and character identity. Same fixed physical head volume/white fur/gray chest/charcoal stepped outline/pink ears and nose. EXACT TWO equal ROWS of FOUR complete sprites =8 chronological poses. Pose1 same deep stretch image1, two forepaws extended on floor, hindlegs support hips, one attached raised tail; relaxed closed lids. Pose2 forepaws draw slightly inward as chest starts lifting, hindlegs still planted. Pose3 shoulders lift and forelegs bend, head comes upward with SHORT natural connected neck. Pose4 forepaws clear floor and relax downward from shoulders, hindlegs still just supporting. Pose5 hips unfold below rising shoulders, hindpaws unweight, torso turns gently to near-front. Pose6 fully suspended, two short dangling forepaws in front of chest and two lower hindpaws, attached right tail. Pose7 settle, eyelids gently reopen into attentive calm. Pose8 exact image2 full suspended pose and proportions, round attentive eyes, tiny neutral mouth. Small connected joint changes, stable head size, NO shrinking body to fit or stretching neck, NO extra paw left on floor after lift. Anatomical total exactly FOUR legs, ONE attached tail, ONE head/two ears/connected body. Hidden limbs remain hidden until appropriately revealed. Equal generous transparent cell padding, every ear/tail inside. True alpha, hard pixel clusters at head62px runtime; NO floor/shadow/haze/background/hand/props/text/numbers/grid/watermark/decorations.",
+      "output": "exec-622f5eef-c5c3-45e1-82f7-f515058566e5.png",
+      "references": [
+        "runtime pet_stretch clip at2.5s, nearest-neighbor4x",
+        "lift-release source slot7"
+      ],
+      "accepted": true
+    },
+    {
+      "name": "roll-entry",
+      "prompt": "Use case: stylized-concept. Production transparent PIXEL ART eight-pose pickup transition for exact white Neko. Image1 actual starting playful belly-up/side-rolled posture, image2 target suspended pose and identity. Preserve SAME physical head size/volume, white coat, gray chest, charcoal stepped pixel outlines, pink ears/nose. EXACT TWO equal ROWS of FOUR complete sprites =8 chronological poses. 1 matches image1 rolled kitten with tilted head, two curled forepaws near chest and folded hindlegs, one attached tail. 2 body gently rotates toward its side as shoulders start lifting, head follows naturally. 3 chest rises further, tilted head gradually upright, two forelegs relax out of curl; hindquarters still near ground. 4 shoulders lift, hips rotate under connected torso, hindpaws unweight. 5 body unfolds vertically, four limbs remain anatomically attached, forepaws hang nearer chest and hindpaws below. 6 nearly image2 vertical dangling pose, SHORT natural neck. 7 suspended tiny settling, head upright near-front. 8 exactly image2 held body proportions and attached right tail. Eyes curious round on1-2, soften briefly3-4, attentive round5-8, tiny neutral mouth. NO extra limb or paw: precisely TWO anatomical forelegs/TWO hindlegs total, hidden limbs stay hidden then reveal naturally, no feet left behind. ONE head/two ears/connected torso/ONE attached tail, no detached joints or neck elongation. Small connected drawn rotations, no instant flip or seated detour. Hard-edged pixel clusters at head62px runtime, generous equal transparent padding, no cropped ears/tails. True alpha, NO floor/shadow/haze/background/hand/props/text/numbers/grid/watermark/decorations.",
+      "output": "exec-079cdc9e-b9c1-45f9-91b6-b1a0cbab4dc7.png",
+      "references": [
+        "runtime roll clip at2.8s, nearest-neighbor4x",
+        "lift-release source slot7"
+      ],
+      "accepted": false
+    },
+    {
+      "name": "roll-alpha-repair",
+      "prompt": "Use case: background-extraction. Edit this exact EIGHT-pose two-row FOUR-column Neko pixel-art sheet. Remove ALL gray glow, haze, gradient, backdrop and shadows outside the kitten silhouettes. Output TRUE transparent alpha outside every sprite, completely clear cell gaps and margins. Preserve every original kitten drawing: same anatomy, pose/order, head/body size, four legs, one attached tail, expressions, black stepped outline, white/gray/pink pixel colors, and exact two rows/four columns. Do not redraw poses or add anything. Keep crisp pixel edges; no dark/gray halo or semiopaque cloud surrounding any kitten. This is production transparent animation source art. NO floor, background, light glow, haze, shadow, text, watermark or marks. Only the eight existing clean connected kitten silhouettes on alpha.",
+      "rejects": "Roll-entry generated a gray halo/backdrop despite alpha request.",
+      "output": "exec-045ecc03-abc7-4674-b564-e3149fb39f4b.png",
+      "references": [
+        "exec-079cdc9e-b9c1-45f9-91b6-b1a0cbab4dc7.png"
+      ],
+      "accepted": false
+    },
+    {
+      "name": "roll-clean-redraw",
+      "prompt": "Use case: stylized-concept. Production transparent PIXEL ART eight-pose pickup transition for exact white Neko. Image1 actual starting playful belly-up/side-rolled posture, image2 target suspended pose and identity. Preserve SAME physical head size/volume, white coat, gray chest, charcoal stepped pixel outlines, pink ears/nose. EXACT TWO equal ROWS of FOUR complete sprites =8 chronological poses. 1 matches image1 rolled kitten with tilted head, two curled forepaws near chest and folded hindlegs, one attached tail. 2 body gently rotates toward its side as shoulders start lifting, head follows naturally. 3 chest rises further, tilted head gradually upright, two forelegs relax out of curl; hindquarters still near ground. 4 shoulders lift, hips rotate under connected torso, hindpaws unweight. 5 body unfolds vertically, four limbs remain anatomically attached, forepaws hang nearer chest and hindpaws below. 6 nearly image2 vertical dangling pose, SHORT natural neck. 7 suspended tiny settling, head upright near-front. 8 exactly image2 held body proportions and attached right tail. Eyes curious round on1-2, soften briefly3-4, attentive round5-8, tiny neutral mouth. NO extra limb or paw: precisely TWO anatomical forelegs/TWO hindlegs total, hidden limbs stay hidden then reveal naturally, no feet left behind. ONE head/two ears/connected torso/ONE attached tail, no detached joints or neck elongation. Small connected drawn rotations, no instant flip or seated detour. Hard-edged pixel clusters at head62px runtime, generous equal transparent padding, no cropped ears/tails. True alpha, NO floor/shadow/haze/background/hand/props/text/numbers/grid/watermark/decorations. Critical rendering constraints: flat transparent SPRITE SOURCE artwork, NOT a cinematic illustration. Absolutely NO lighting effect or glow of any kind. Completely clear transparent alpha immediately outside the crisp black outlines. Bright opaque white coat, opaque charcoal contour. Surrounding cell gaps are empty alpha, with no gray atmospheric pixels. Do not add any ambient shadow behind or beneath the kittens.",
+      "rejects": "Roll alpha edit retained gray halo; reject both earlier roll outputs.",
+      "output": "exec-096396e0-0a10-4600-b944-69c898167429.png",
+      "references": [
+        "runtime roll clip at2.8s, nearest-neighbor4x",
+        "lift-release source slot7"
+      ],
+      "accepted": true
+    }
+  ],
+  "assembly": {
+    "layout": "Extract complete high-alpha connected silhouettes with horizontal column overscan, sort chronological row-major, pack four columns. Minimum384px cells; enlarge each shared cell axis when required to retain complete source silhouettes. No anatomy or expressions painted.",
+    "sources": {
+      "lift": "exec-02bd724a-f458-4283-95c0-5d949236b22a.png",
+      "calm": "exec-6f58241a-b857-445f-892f-d1b0bfc9c793.png",
+      "excited": "exec-5c061316-335f-47bc-98ef-8fa10aff6b35.png",
+      "unimpressed": "exec-d3bb6b37-3cbc-48e5-9fc7-02951f6f6750.png",
+      "sleepy": "exec-bff9df98-9c23-45fa-b73a-c72a6790b737.png",
+      "bridges": "exec-190f7045-5722-4fda-b648-f08723c1d8b8.png",
+      "side": "exec-9afacfa1-83d7-42f0-951f-75a140a62478.png",
+      "low": "exec-622f5eef-c5c3-45e1-82f7-f515058566e5.png",
+      "roll": "exec-096396e0-0a10-4600-b944-69c898167429.png"
+    },
+    "slots": {
+      "lift": 16,
+      "calm": 12,
+      "excited": 12,
+      "unimpressed": 12,
+      "sleepy": 12,
+      "bridges": 12,
+      "side": 8,
+      "low": 8,
+      "roll": 8
+    },
+    "selection": "All accepted source indices retained in row-major order. Lift slot15 selects source0 again as the generated neutral before the separate appended canonical idle. Runtime lift slot0 is actual idle; appended slot16 is actual idle.",
+    "sleepy": "Reject original output: shortened body and detached imported fragments12px/5px. Use the precise face-only calm-sheet edit instead: first4 yawn drawings once, source4..11 are8 closed-eye loop poses. Requested16 in rejected draft but actual output12; actual layout always inspected.",
+    "roll": "Reject first output and background-extraction edit: both retain visible gray halo. Use fresh clean redraw with transparent gaps; no programmatic background/anatomy painting.",
+    "import": "Each packed cell samples to128px wide using Qt.FastTransformation before component bounds, matching the existing pet importer. One scale per bank: horizontal62/reference head span; lift vertical82/neutral full height, other banks uniform head-span scale. Held head span measured only in upper40% to exclude a high tail. Folded entry families use final upright held drawing as calibration and a silhouette-center track referenced to that head.",
+    "anchors": "Original canvas padded32px above, resulting192x144. Seated ground130, canonical crown48, held crown16. Lift crowns48,48,46,42,34,24,18,16. Main release crowns18,24,34,48,48,51,48,48. Pose-family bridge tops interpolate from supported ground to held crown using authored joint changes. Initial user-visible frame is preserved and an entry translation fades to zero; no crossfading or joint interpolation.",
+    "timing": "8x50ms normal lift,2.4s held loops. Awake mood stages0-3s excited,3-10s calm,10-20s unimpressed,20+s sleepy. Two4x100ms mood bridges; yawn150/150/200/150ms once. Release uses live snapshot, drawn face/closing bridge and700ms authored landing. Nap release reverses closed-eye side entry. Mid-entry release retraces visited drawings then existing recovery. Re-grab retraces release and completes remaining lift. Mood clock pauses during release and retracing, retaining expression phase.",
+    "compatibility": "All427 pre-pickup atlas drawings compare byte-for-byte after cropping32px top padding; all32 original clip definitions unchanged. Saved visible origin adds/subtracts QPoint40,32. Tray crops central112x112 at40,32. Legacy catalogs omit empty top padding.",
+    "verification": "Every100 imported carry source slots passes connected-fragment/head-scale/bounds checks and visual source review. Native full mood/release/entry measurements in pickup-native.json. Mixed-DPI physical monitor transfer and long-session resource behavior remain untested."
+  },
+  "asset_sha256": {
+    "neko-carry-bridges-v1.png": "4a1312c83a32777d25bf4d5007d0cd6363f8a42b95b83d215a8d5e9bcc861dd4",
+    "neko-carry-calm-v1.png": "7f04e02cd96bbf069a937f558370d6fdf3c2c746ffd639002d07c417b88612cc",
+    "neko-carry-excited-v1.png": "e555516411f2d59f6c31a29ace991501690ab124b32899999e2696a732337bc2",
+    "neko-carry-lift-v1.png": "f22035d6b738f34d359b10b47a704f610d16e898bd8d2634b3ce8754310ed859",
+    "neko-carry-low-v1.png": "20b5e89bd67f8349ed7d447638e97ed7f27483303ea7b0740c786f2b2df7d390",
+    "neko-carry-roll-v1.png": "9d394693296d3d487a6c3b355f692fa37c63b962650db23d1125f4bd77dcacf3",
+    "neko-carry-side-v1.png": "3e1ce101152d37bc209445bb21bcf571bcc8973bd9760d11ce2aabd65bfe5ff0",
+    "neko-carry-sleepy-v1.png": "f2a9689ac43d76b2dde760170846dd5409659f96110ccd757b51fd291938e0ee",
+    "neko-carry-unimpressed-v1.png": "4a88d12a951a07b4d72582452f38518146f3fa15e5205641102f714f2c85a9ad"
+  }
+}

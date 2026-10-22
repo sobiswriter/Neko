@@ -20,32 +20,49 @@ class NekoState(Enum):
     EAR_FLICK = auto()
     SNIFFING = auto()
     CHEEK_RUB = auto()
-    WAVING = auto()
     KNEADING = auto()
     LOAFING = auto()
     FOLLOWING = auto()
     CHIN_SCRITCH = auto()
-    BLEPPING = auto()
+    ROLLING = auto()
     PAW_OFFER = auto()
     EAR_RUB = auto()
+    PET_STRETCH = auto()
+    BACK_ARCH = auto()
+    HAPPY_HOP = auto()
+    SIDE_FLOP = auto()
+    SHOULDER_PEEK = auto()
+    TAIL_CHASE = auto()
+    TAIL_CATCH = auto()
+    ARRIVING = auto()
+    LEAVING = auto()
+    HELD = auto()
+    SETTING_DOWN = auto()
 
 
-PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.WAVING, NekoState.KNEADING,
-              NekoState.CHIN_SCRITCH, NekoState.BLEPPING, NekoState.PAW_OFFER, NekoState.EAR_RUB)
+PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
+              NekoState.CHIN_SCRITCH, NekoState.ROLLING, NekoState.PAW_OFFER, NekoState.EAR_RUB,
+              NekoState.PET_STRETCH, NekoState.BACK_ARCH, NekoState.HAPPY_HOP,
+              NekoState.SIDE_FLOP, NekoState.SHOULDER_PEEK)
+CARRY_STATES = (NekoState.HELD, NekoState.SETTING_DOWN)
 IDLE_STATES = (NekoState.STRETCHING, NekoState.GROOMING, NekoState.PEEKING,
                NekoState.YAWNING, NekoState.TAIL_SWISH, NekoState.EAR_FLICK,
-               NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS)
+               NekoState.SNIFFING, NekoState.LOAFING, NekoState.CURIOUS,
+               NekoState.TAIL_CHASE, NekoState.TAIL_CATCH)
 APP_MOODS = {"music": NekoState.TAIL_SWISH, "video": NekoState.LOAFING,
              "coding": NekoState.TYPING, "drawing": NekoState.CURIOUS,
-             "writing": NekoState.TYPING, "chat": NekoState.WAVING,
+             "writing": NekoState.TYPING, "chat": NekoState.CHEEK_RUB,
              "game": NekoState.PEEKING, "files": NekoState.SNIFFING,
              "terminal": NekoState.EAR_FLICK}
 
 
 class Companion:
-    def __init__(self, now, rng=None, sleep_seconds=180, chatter_seconds=75, idle_seconds=14):
+    def __init__(self, now, rng=None, sleep_seconds=180, chatter_seconds=75, idle_seconds=14,
+                 sleep_duration=0, reaction_seconds=60):
         self.rng = rng if rng is not None else random.Random()
         self.sleep_seconds = sleep_seconds
+        self.sleep_duration = sleep_duration
+        self.nap_started = None
         self.chatter_seconds = chatter_seconds
         self.idle_seconds = idle_seconds
         self.state = NekoState.IDLE
@@ -53,37 +70,92 @@ class Companion:
         self.next_nap = 0
         self.next_idle = now + self.idle_seconds
         self.next_comment = now + self.chatter_seconds
-        self.last_curiosity = now - 18
-        self.last_typing = now - 45
+        self.reaction_seconds = reaction_seconds
+        self.last_activity_reaction = float("-inf")
         self.drowsy = False
         self.last_interaction = now - 90
         self.last_idle = None
         self.last_pet = None
         self.pet_bag = []
+        self.pet_pending = False
         self.pending_window = None
         self.reaction_kind = "switch"
         self.pets = 0
         self.naps = 0
         self.comments = 0
+        self.carry_rest = None
+        self.carry_started = 0
+
+    def begin_carry(self, now):
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
+            return False
+        if self.carry_rest is None:
+            self.carry_rest = (self.state, self.pose_until)
+            self.carry_started = now
+        self.state = NekoState.HELD
+        self.pet_pending = False
+        self.pending_window = None
+        self.pose_until = float("inf")
+        self.last_interaction = now
+        return True
+
+    def release_carry(self, now, seconds):
+        if self.state == NekoState.HELD:
+            self.state = NekoState.SETTING_DOWN
+            self.pose_until = now + seconds
+
+    def finish_carry(self, now):
+        if self.carry_rest is None:
+            return None
+        previous, deadline = self.carry_rest
+        self.carry_rest = None
+        self.state = previous
+        self.pose_until = deadline
+        self.pending_window = None
+        self.last_interaction = now
+        self.next_idle = now + self.idle_seconds
+        self.next_comment = max(self.next_comment, now + 15)
+        if previous == NekoState.FALLING_ASLEEP and now >= deadline:
+            self.state = NekoState.SLEEPING
+            self.nap_started = deadline
+        if self.state == NekoState.SLEEPING:
+            if (self.sleep_duration > 0 and self.nap_started is not None
+                    and now >= self.nap_started + self.sleep_duration):
+                self.wake(now)
+                return "wake"
+            return "settled"
+        if self.state == NekoState.FALLING_ASLEEP:
+            return "sleep"
+        self.state = NekoState.IDLE
+        self.next_nap = now + self.sleep_seconds
+        return "idle"
 
     def pose(self, state, now, seconds):
+        if state not in PET_STATES:
+            self.pet_pending = False
         self.state = state
         self.pose_until = now + seconds
         self.next_idle = max(self.next_idle, now + self.idle_seconds)
 
     def pet(self, now):
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
+            return False
         self.pets += 1
         self.last_interaction = now
         if self.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
-            self.pending_window = None
-            self.next_nap = now + self.sleep_seconds
-            self.next_comment = max(self.next_comment, now + 15)
-            self.last_curiosity = now
-            self.pose(NekoState.WAKING, now, 2.6)
-            return
+            self.wake(now)
+            return True
         if self.state == NekoState.WAKING:
-            return
+            return False
         self.next_comment = max(self.next_comment, now + 15)
+        if self.state in PET_STATES and now < self.pose_until:
+            self.pet_pending = True
+            return False
+        self.start_pet(now)
+        return True
+
+    def start_pet(self, now):
+        self.pet_pending = False
         if not self.pet_bag:
             self.pet_bag = list(PET_STATES)
             self.rng.shuffle(self.pet_bag)
@@ -92,11 +164,41 @@ class Companion:
         self.last_pet = self.pet_bag.pop()
         self.pose(self.last_pet, now, 5.8)
 
+    def finish_pet(self, now):
+        pending = self.pet_pending
+        self.pet_pending = False
+        if pending:
+            self.start_pet(now)
+            return "pet"
+        self.state = NekoState.IDLE
+        return "idle"
+
+    def wake(self, now):
+        self.pending_window = None
+        self.nap_started = None
+        self.next_nap = now + self.sleep_seconds
+        self.next_comment = max(self.next_comment, now + 15)
+        self.last_activity_reaction = now
+        self.pose(NekoState.WAKING, now, 2.6)
+
+    def activity_ready(self, now):
+        return now - self.last_activity_reaction >= self.reaction_seconds
+
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
              window_changed=False, keyboard_events=0, window_event=None, app_kind=None):
+        if self.state in CARRY_STATES:
+            self.pending_window = None
+            if self.state == NekoState.SETTING_DOWN and now >= self.pose_until:
+                return self.finish_carry(now)
+            return None
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
+            self.pending_window = None
+            return None
         if idle_seconds < 10:
             self.drowsy = False
-        if window_event or window_changed:
+        if not self.activity_ready(now):
+            self.pending_window = None
+        elif window_event or window_changed:
             self.pending_window = (window_event or "switch", now, app_kind)
         if self.pending_window and now - self.pending_window[1] > 7:
             self.pending_window = None
@@ -105,12 +207,19 @@ class Companion:
             self.pending_window = None
             if self.state == NekoState.FALLING_ASLEEP and now >= self.pose_until:
                 self.state = NekoState.SLEEPING
+                self.nap_started = now
                 return "settled"
+            if (self.state == NekoState.SLEEPING and self.sleep_duration > 0
+                    and self.nap_started is not None and now >= self.nap_started + self.sleep_duration):
+                self.wake(now)
+                return "wake"
             if self.state == NekoState.WAKING and now >= self.pose_until:
                 self.state = NekoState.IDLE
                 return "idle"
             return None
 
+        if self.state in PET_STATES:
+            return self.finish_pet(now) if now >= self.pose_until else None
         if idle_seconds >= self.sleep_seconds and now >= self.next_nap:
             self.pending_window = None
             self.pose(NekoState.FALLING_ASLEEP, now, 2.6)
@@ -123,24 +232,25 @@ class Companion:
                 return "idle"
             return None
 
-        if keyboard_events >= 6 and now - self.last_typing >= 30:
-            self.last_typing = now
+        if keyboard_events >= 6 and self.activity_ready(now):
+            self.last_activity_reaction = now
+            self.pending_window = None
             self.pose(NekoState.TYPING, now, 5.5)
             return "typing"
 
-        if self.pending_window and now - self.last_curiosity >= 8:
+        if self.pending_window and self.activity_ready(now):
             self.reaction_kind = self.pending_window[0]
             context = self.pending_window[2] if self.reaction_kind in ("open", "switch", "tab") else None
             self.reaction_kind = context or self.reaction_kind
             self.pending_window = None
-            self.last_curiosity = now
+            self.last_activity_reaction = now
             state = APP_MOODS.get(context, NekoState.PEEKING if self.reaction_kind == "close" else NekoState.CURIOUS)
             self.pose(state, now, 6)
             return "curious"
 
-        if cursor_near and now - self.last_curiosity >= 18:
+        if cursor_near and self.activity_ready(now):
             self.reaction_kind = "cursor"
-            self.last_curiosity = now
+            self.last_activity_reaction = now
             self.pose(NekoState.SNIFFING, now, 5.5)
             return "curious"
 
@@ -150,7 +260,8 @@ class Companion:
             return "fidget"
 
         if now >= self.next_idle:
-            choices = [s for s in IDLE_STATES if s != self.last_idle]
+            choices = [s for s in IDLE_STATES if s != self.last_idle
+                       for _ in range(3 if s in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH) else 1)]
             self.last_idle = self.rng.choice(choices)
             self.pose(self.last_idle, now, 8 if self.last_idle == NekoState.LOAFING else 6)
             self.next_idle = now + self.idle_seconds * self.rng.uniform(0.8, 1.3)

@@ -1,6 +1,7 @@
 """Opt-in checks for the real Windows executable; no API calls or startup changes."""
 
 import os
+import hashlib
 from pathlib import Path
 import subprocess
 import time
@@ -16,12 +17,39 @@ class PackagingTests(unittest.TestCase):
     def test_bundle_has_art_and_ai_but_no_credentials_or_foreign_icu(self):
         from PyInstaller.archive.readers import CArchiveReader
         archive = CArchiveReader(str(self.exe))
-        names = {name.replace("\\", "/") for name in archive.toc}
+        names = {name.replace("\\", "/"): name for name in archive.toc}
         self.assertIn("assets/neko_idle.png", names)
         for bank in ("idle", "pets", "activity", "movement"):
             self.assertIn(f"assets/neko-{bank}-v3.png", names)
         self.assertIn("assets/neko-transitions-v1.png", names)
         self.assertIn("assets/neko-affection-v1.png", names)
+        self.assertNotIn("assets/neko-petting-v1.png", names)
+        self.assertIn("assets/neko-petting-a-v1.png", names)
+        self.assertIn("assets/neko-petting-b-v1.png", names)
+        for reaction in ("happy", "nuzzle", "knead", "chin_scritch", "roll", "paw_offer", "ear_rub",
+                         "pet_stretch", "back_arch", "happy_hop", "side_flop", "shoulder_peek"):
+            self.assertIn(f"assets/neko-pet-{reaction}-v1.png", names)
+            asset = f"assets/neko-pet-{reaction}-v1.png"
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest(), asset)
+        self.assertNotIn("assets/neko-pet-blep-v1.png", names)
+        for bank in ("lift", "calm", "excited", "unimpressed", "sleepy", "bridges", "side", "low", "roll"):
+            asset = f"assets/neko-carry-{bank}-v1.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest(), asset)
+        self.assertIn("assets/neko-tailplay-v4.png", names)
+        self.assertIn("assets/neko-tailsettle-v1.png", names)
+        self.assertNotIn("assets/neko-tailplay-v3.png", names)
+        self.assertIn("assets/neko-arrival-v1.png", names)
+        self.assertIn("assets/neko-farewell-v1.png", names)
+        self.assertNotIn("assets/neko-tailplay-v2.png", names)
+        self.assertIn("assets/neko-lifecycle-v2.png", names)
+        self.assertIn("assets/neko-tailswish-v1.png", names)
+        for bank in ("a", "b", "c"):
+            self.assertIn(f"assets/neko-idleplay-{bank}-v1.png", names)
+        self.assertNotIn("assets/neko-tailplay-v1.png", names)
+        self.assertNotIn("assets/neko-lifecycle-v1.png", names)
         self.assertNotIn("assets/neko-atlas.png", names)
         for kind in ("mew", "chirp", "purr"):
             self.assertIn(f"assets/sounds/{kind}.wav", names)
@@ -35,6 +63,8 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("animations", modules)
         self.assertIn("dialogue", modules)
         self.assertIn("app_context", modules)
+        self.assertIn("cursors", modules)
+        self.assertIn("thoughts", modules)
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui

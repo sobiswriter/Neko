@@ -8,26 +8,40 @@ Interaction rules
   Visual reactions before words. No attention debt, chores, streaks, or guilt.
   Drawn sequences and connected reactions; optional short cursor walks and soft sounds.
   Petting is deliberate: a click, not a drag or an accidental hover.
-  Window curiosity has an eight-second cooldown; cursor curiosity uses 18 seconds.
-  Typing bursts earn paw taps and local questions, throttled to 30 seconds.
+  Hover uses an open palm; holding uses a closed hand; a click adds a 630ms palm stroke.
+  The cursor image moves, never the actual pointer; reduced motion skips the stroke.
+  Pet sheets calibrate to idle's 62x50 head and starting height, rather than whole-body fit.
+  Window/tab activity, typing, cursor curiosity and following share a configurable 60-second minimum reaction gap (15-600 seconds). Drop events during cooldown instead of queuing a delayed burst.
+  Typing bursts earn paw taps and local questions within that shared reaction limit.
   Never read key values or typed text. Local title hashes help notice app tab changes.
   Idle gestures default to about 14 seconds; configurable from five to 120 seconds.
   Sleep delay defaults to three minutes; configurable from one to 3600 seconds.
   Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
-  Eight frames lower her into sleep; only a deliberate pet plays the eight-frame wake.
-  Typing, window changes, dragging and elapsed time do not wake her. No timed wake-up.
-  Eight pet responses rotate through a shuffled bag before repeating.
-  Nine idle moods avoid consecutive repeats.
-  298 offline lines use context shuffle bags, with personal questions and app rituals.
+  Eight frames lower her into sleep; a pet or optional nap deadline plays the eight-frame wake.
+  Typing, window changes and carrying do not wake her; a due nap deadline waits for supported placement if held.
+  Exactly twelve dedicated pet sequences rotate through a shuffled bag before repeating.
+  Keep head pats, cheek nuzzle, kneading, chin scritches, playful roll and ear rubs.
+  Paw offer, front stretch, back arch, three little hops, sleepy side flop and both-shoulder peek complete the set.
+  Use 16–28 source slots per sequence plus canonical idle after complete drawn recovery.
+  Pet stories last 2.8–6.8 seconds, with distinct soft lids, winks, excited eyes, sleep and yawn acting.
+  Kneading has four alternating paw pairs; the flop sleeps, winks, wakes and rises; peek looks both ways then yawns and holds a sleepy face.
+  Nap duration is independently configurable: 1–3600 seconds or 0 until petted (default).
+  Eleven idle moods avoid consecutive repeats, including extended tail games and idle stories with drawn anticipation/recovery.
+  Tail chase turns clockwise; tail catch pins the tip beneath one forepaw before it slips away.
+  Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
+  shows mild sadness then the accepted small hop before quitting. Arrival travels from the monitor top; only the landing position is saved.
+  Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
+  346 offline lines in dialogue.py use 33 context shuffle bags, with personal questions and app rituals. One phrase per line inside its named triple-quoted groups; source edits need restart and packaged edits need a rebuild.
   Local foreground app names and media title hints select lines and matching gestures.
-  Shared speech cooldown prevents spam. No recording or actual playback detection.
+  All automatic speech, including idle and optional AI, respects the full Thoughts every minimum. Deliberate pet replies may bypass it. No recording or actual playback detection.
   Ambient thoughts default to 75 seconds; configurable from 15 to 600. Quiet removes them.
   Cursor walks move only left/right at the same height, keep a gap, last at most 6.5 seconds and travel about 220 pixels maximum.
   Eligible moving cursors invite another walk after 25 seconds.
-  Keep 5–6 second gesture slots: one natural gesture followed by a relaxed rest.
+  Spontaneous idles keep 5–6 second slots; pet reactions finish at their actual clip deadlines.
   No repeated grooming, stretching, waving or head-bobbing within one gesture slot.
-  Tail swishes, kneading and paw taps use gentle continuous cycles.
-  Rendering runs at 10 FPS, preserving action lengths and cursor-walk speed.
+  Kneading and paw taps use gentle continuous cycles; the lazy swish plays once and settles with a blink.
+  Rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS, with precise pet/carry timers; arrival/departure use 30 FPS.
+  Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
   Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
   Automatic sound has a 45-second pause; quiet/fullscreen/media suppress it.
@@ -38,7 +52,13 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  Ninety-six drawings including eight pet reactions and sleep/wake transitions.
+  528 atlas entries include twelve pet stories, idle stories, five/two-turn tail games, arrival, departure, sleep and 100 pickup source slots plus idle. Tail games keep triple idle selection weight.
+  Keep visible idle scale and saved visible origin; a fixed 192x144 transparent canvas supplies horizontal gesture room and 32px top padding for lifting. Saved origins add/subtract QPoint(40,32).
+  Quick clicks pet; movement past drag distance picks up immediately; a stationary hold picks up after 250ms without pet counts.
+  Held expressions progress excited (0-3s), calm (3-10s), mildly unimpressed (10-20s), sleepy (20s+); yawn once, then loop.
+  Release from every pose into supported placement. Early release retraces lift; re-grab retraces release and finishes the remaining lift, preserving expression time. Real naps remain distinct.
+  Read framemaster.md before animation work and add verified discoveries with evidence; pickup provenance/verification lives in docs/pickup-validation.md.
+  Every idle attempts a matching local thought. Text is 16px semibold with a nearly clear rounded glass backdrop and a faint rim, visible for 5.5-10 seconds. A local per-thought backdrop sample is softly blurred and clipped inside the rounded shape, then cleared on hide; unavailable samples use the light tint. Text adapts to light/dark samples. Thoughts remain click-through and do not take focus; no sample is saved or uploaded.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.
 

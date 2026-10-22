@@ -1,10 +1,103 @@
 import random
 import unittest
+from unittest.mock import patch
 
 from behavior import Companion, NekoState, PET_STATES, IDLE_STATES
 
 
 class CompanionTests(unittest.TestCase):
+    def test_activity_types_share_one_configurable_cooldown_without_backlog(self):
+        pet = Companion(0, idle_seconds=10000, chatter_seconds=10000)
+        self.assertEqual(pet.tick(10, 0, window_event="open"), "curious")
+        pet.tick(16, 0)
+        for now in (20, 40, 69.99):
+            self.assertIsNone(pet.tick(now, 0, keyboard_events=8, cursor_near=True, window_event="tab"))
+            self.assertIsNone(pet.pending_window)
+        self.assertEqual(pet.tick(70, 0, keyboard_events=8), "typing")
+        pet.tick(76, 0)
+        self.assertIsNone(pet.tick(80, 0, cursor_near=True))
+        pet.reaction_seconds = 15
+        self.assertEqual(pet.tick(85, 0, cursor_near=True), "curious")
+        pet.tick(91, 0)
+        self.assertIsNone(pet.tick(100, 0))
+
+    def test_holding_owns_reactions_without_counting_pets_or_naps(self):
+        self.pet.pet(1)
+        self.pet.pet(1.1)
+        self.assertTrue(self.pet.begin_carry(2))
+        self.assertFalse(self.pet.pet_pending)
+        for now in (2.1, 12, 25, 10000):
+            self.assertIsNone(self.pet.tick(now, 9999, keyboard_events=50, window_event="open"))
+            self.assertFalse(self.pet.pet(now))
+            self.assertEqual(self.pet.state, NekoState.HELD)
+        self.assertEqual((self.pet.pets, self.pet.naps), (2, 0))
+        self.pet.release_carry(10001, 0.7)
+        self.assertIsNone(self.pet.tick(10001.69, 9999))
+        self.assertEqual(self.pet.tick(10001.7, 9999), "idle")
+        self.assertGreater(self.pet.next_nap, 10001.7)
+
+    def test_sleeping_carry_preserves_nap_and_defers_a_due_wake_until_set_down(self):
+        self.pet.sleep_duration = 10
+        self.pet.tick(180, 180)
+        self.pet.tick(183, 0)
+        started = self.pet.nap_started
+        self.pet.begin_carry(184)
+        self.assertIsNone(self.pet.tick(205, 0))
+        self.assertEqual(self.pet.nap_started, started)
+        self.pet.release_carry(205, 0.7)
+        self.assertEqual(self.pet.tick(205.7, 0), "wake")
+        self.assertEqual((self.pet.naps, self.pet.pets), (1, 0))
+        self.assertEqual(self.pet.state, NekoState.WAKING)
+
+    def test_regrab_keeps_the_same_underlying_nap_and_hold_clock(self):
+        self.pet.tick(180, 180)
+        deadline = self.pet.pose_until
+        self.pet.begin_carry(181)
+        self.pet.release_carry(182, 0.7)
+        self.pet.begin_carry(182.2)
+        self.assertEqual(self.pet.carry_started, 181)
+        self.pet.finish_carry(184)
+        self.assertEqual(self.pet.state, NekoState.SLEEPING)
+        self.assertEqual(self.pet.nap_started, deadline)
+        self.assertEqual(self.pet.naps, 1)
+
+    def test_carry_cannot_interrupt_arrival_or_departure(self):
+        for state in (NekoState.ARRIVING, NekoState.LEAVING):
+            self.pet.state = state
+            self.assertFalse(self.pet.begin_carry(10))
+            self.assertEqual(self.pet.state, state)
+
+    def test_waking_carry_finishes_upright_without_replaying_a_partial_wake(self):
+        self.pet.wake(10)
+        self.pet.begin_carry(10.2)
+        self.pet.release_carry(10.6, 0.7)
+        self.assertEqual(self.pet.tick(11.3, 0), "idle")
+        self.assertEqual(self.pet.state, NekoState.IDLE)
+        self.assertGreaterEqual(self.pet.next_nap, 11.3 + self.pet.sleep_seconds)
+
+    def test_repeated_pets_wait_for_recovery_and_coalesce_without_losing_click_counts(self):
+        pet = Companion(0, random.Random(4))
+        pet.pet(10)
+        first, deadline = pet.state, pet.pose_until
+        pet.pet(10.1)
+        pet.pet(10.2)
+        self.assertEqual(pet.state, first)
+        self.assertEqual(pet.pose_until, deadline)
+        self.assertEqual(pet.pets, 3)
+        self.assertIsNone(pet.tick(10.3, 0))
+        self.assertEqual(pet.tick(deadline, 0), "pet")
+        self.assertNotEqual(pet.state, first)
+        self.assertEqual(pet.pets, 3)
+        self.assertFalse(pet.pet_pending)
+
+    def test_nap_deadline_does_not_cut_through_a_pet_recovery(self):
+        self.pet.pet(10)
+        state = self.pet.state
+        self.assertIsNone(self.pet.tick(11, 9999))
+        self.assertEqual(self.pet.state, state)
+        self.assertEqual(self.pet.tick(self.pet.pose_until, 9999), "idle")
+        self.assertEqual(self.pet.tick(20, 9999), "sleep")
+
     def setUp(self):
         self.pet = Companion(0, random.Random(4))
 
@@ -92,6 +185,80 @@ class CompanionTests(unittest.TestCase):
         self.assertNotEqual(pet.state, NekoState.SLEEPING)
         self.assertEqual(pet.tick(45, 45), "sleep")
 
+    def test_arrival_and_departure_cannot_be_interrupted_by_sleep_or_activity(self):
+        for state in (NekoState.ARRIVING, NekoState.LEAVING):
+            self.pet.pose(state, 0, 3)
+            self.assertIsNone(self.pet.tick(9999, 9999, cursor_near=True,
+                                            keyboard_events=20, window_event="open"))
+            self.assertEqual(self.pet.state, state)
+            self.assertIsNone(self.pet.pending_window)
+            pets = self.pet.pets
+            self.pet.pet(10000)
+            self.assertEqual(self.pet.state, state)
+            self.assertEqual(self.pet.pets, pets)
+
+    def test_tail_games_are_idle_choices_without_expanding_pet_rotation(self):
+        self.assertIn(NekoState.TAIL_CHASE, IDLE_STATES)
+        self.assertIn(NekoState.TAIL_CATCH, IDLE_STATES)
+        self.assertEqual(len(PET_STATES), 12)
+
+    def test_tail_games_get_three_times_the_idle_weight_without_repeating(self):
+        self.pet.last_idle = NekoState.TAIL_CHASE
+        with patch.object(self.pet.rng, "choice", wraps=self.pet.rng.choice) as choose:
+            self.assertEqual(self.pet.tick(20, 0, quiet=True), "fidget")
+        choices = choose.call_args.args[0]
+        self.assertNotIn(NekoState.TAIL_CHASE, choices)
+        for state in IDLE_STATES:
+            if state != NekoState.TAIL_CHASE:
+                self.assertEqual(choices.count(state), 3 if state == NekoState.TAIL_CATCH else 1)
+
+    def test_weighted_tail_games_still_leave_room_for_every_other_idle(self):
+        counts = dict.fromkeys(IDLE_STATES, 0)
+        previous = None
+        for _ in range(3000):
+            self.assertEqual(self.pet.tick(self.pet.next_idle + 1, 0, quiet=True), "fidget")
+            self.assertNotEqual(self.pet.state, previous)
+            counts[self.pet.state] += 1
+            previous = self.pet.state
+            self.pet.tick(self.pet.pose_until, 0, quiet=True)
+        share = (counts[NekoState.TAIL_CHASE] + counts[NekoState.TAIL_CATCH]) / 3000
+        self.assertGreater(share, 0.30)
+        self.assertLess(share, 0.45)
+        self.assertTrue(all(counts.values()))
+
+    def test_timed_nap_counts_from_settling_and_wakes_gently_without_immediate_resleep(self):
+        pet = Companion(0, sleep_seconds=45, sleep_duration=60)
+        pet.tick(45, 45)
+        pet.tick(48, 48)
+        self.assertIsNone(pet.tick(107, 107, keyboard_events=20, window_event="open"))
+        self.assertEqual(pet.state, NekoState.SLEEPING)
+        self.assertEqual(pet.tick(108, 108), "wake")
+        self.assertEqual(pet.state, NekoState.WAKING)
+        self.assertEqual(pet.pets, 0)
+        self.assertEqual(pet.tick(111, 111), "idle")
+        self.assertNotEqual(pet.tick(112, 112), "sleep")
+        self.assertEqual(pet.tick(153, 153), "sleep")
+
+    def test_active_nap_respects_duration_edits_and_can_be_petted_awake_early(self):
+        self.pet.tick(180, 180)
+        self.pet.tick(183, 183)
+        self.pet.sleep_duration = 60
+        self.assertIsNone(self.pet.tick(200, 0))
+        self.pet.sleep_duration = 0
+        self.assertIsNone(self.pet.tick(1000, 0))
+        self.pet.sleep_duration = 120
+        self.pet.pet(1001)
+        self.assertEqual(self.pet.state, NekoState.WAKING)
+        self.assertIsNone(self.pet.nap_started)
+
+    def test_shortening_an_active_nap_wakes_at_the_new_deadline(self):
+        self.pet.sleep_duration = 120
+        self.pet.tick(180, 180)
+        self.pet.tick(183, 183)
+        self.pet.sleep_duration = 30
+        self.assertIsNone(self.pet.tick(212, 0))
+        self.assertEqual(self.pet.tick(213, 0), "wake")
+
     def test_window_event_waits_for_current_animation(self):
         self.pet.pose(NekoState.GROOMING, 10, 3)
         self.pet.tick(11, 0, window_event="open")
@@ -108,7 +275,7 @@ class CompanionTests(unittest.TestCase):
     def test_pet_and_idle_choices_do_not_repeat_consecutively(self):
         previous = None
         seen = set()
-        for now in range(0, 500, 5):
+        for now in range(0, 600, 6):
             self.pet.pet(now)
             self.assertNotEqual(previous, self.pet.state)
             seen.add(self.pet.state)
@@ -122,6 +289,7 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(seen, set(IDLE_STATES))
 
     def test_pet_rotation_shows_every_response_before_repeating(self):
+        self.assertEqual(len(PET_STATES), 12)
         for cycle in range(4):
             seen = set()
             for index in range(len(PET_STATES)):
@@ -137,6 +305,7 @@ class CompanionTests(unittest.TestCase):
     def test_window_switches_do_not_interrupt_a_nap_or_pet(self):
         self.pet.pet(50)
         self.assertIsNone(self.pet.tick(51, 0, window_changed=True))
+        self.pet.tick(self.pet.pose_until, 0)
         self.pet.tick(200, 200)
         self.assertIsNone(self.pet.tick(201, 201, window_changed=True))
         self.pet.tick(203, 203)
