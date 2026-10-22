@@ -18,7 +18,7 @@ Interaction rules
   Sleep delay defaults to three minutes; configurable from one to 3600 seconds.
   Timer edits commit on Enter or focus loss; controls, loading and saving share bounds.
   Eight frames lower her into sleep; a pet or optional nap deadline plays the eight-frame wake.
-  Typing, window changes and dragging do not wake her; the optional nap deadline does.
+  Typing, window changes and carrying do not wake her; a due nap deadline waits for supported placement if held.
   Exactly twelve dedicated pet sequences rotate through a shuffled bag before repeating.
   Keep head pats, cheek nuzzle, kneading, chin scritches, playful roll and ear rubs.
   Paw offer, front stretch, back arch, three little hops, sleepy side flop and both-shoulder peek complete the set.
@@ -40,7 +40,7 @@ Interaction rules
   Spontaneous idles keep 5–6 second slots; pet reactions finish at their actual clip deadlines.
   No repeated grooming, stretching, waving or head-bobbing within one gesture slot.
   Kneading and paw taps use gentle continuous cycles; the lazy swish plays once and settles with a blink.
-  Rendering runs at 10 FPS; tail running and petting use 20 FPS, with a precise pet timer; arrival/departure use 30 FPS.
+  Rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS, with precise pet/carry timers; arrival/departure use 30 FPS.
   Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
   Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
@@ -52,8 +52,12 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  427 atlas entries include twelve pet stories, idle stories, five/two-turn tail games, arrival, departure and sleep. Tail games get triple idle selection weight.
-  Keep visible idle scale and saved visible origin; a 192x112 transparent canvas supplies horizontal gesture room.
+  528 atlas entries include twelve pet stories, idle stories, five/two-turn tail games, arrival, departure, sleep and 100 pickup source slots plus idle. Tail games keep triple idle selection weight.
+  Keep visible idle scale and saved visible origin; a fixed 192x144 transparent canvas supplies horizontal gesture room and 32px top padding for lifting. Saved origins add/subtract QPoint(40,32).
+  Quick clicks pet; movement past drag distance picks up immediately; a stationary hold picks up after 250ms without pet counts.
+  Held expressions progress excited (0-3s), calm (3-10s), mildly unimpressed (10-20s), sleepy (20s+); yawn once, then loop.
+  Release from every pose into supported placement. Early release retraces lift; re-grab retraces release and finishes the remaining lift, preserving expression time. Real naps remain distinct.
+  Read framemaster.md before animation work and add verified discoveries with evidence; pickup provenance/verification lives in docs/pickup-validation.md.
   Every idle attempts a matching local thought. Text is 16px semibold cream with a small dark glyph shadow, no background panel, visible for 5.5-10 seconds.
   Place the menu and nook beside her. Skip topmost reassertion while these are open.
   Startup is opt-in; a single-instance lock prevents duplicate pets.

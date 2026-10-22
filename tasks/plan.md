@@ -1,8 +1,8 @@
 # Animation rebuild
 
-## Pickup animation — proposed, 2026-10-22
+## Pickup animation — approved, 2026-10-22
 
-Status: documentation and planning complete; pickup implementation awaits review of this proposal. The user requested a plan before making this next feature. Previous completed plans are preserved below.
+Status: approved and implemented. Final source, native and packaged checks pass; see [verification](../docs/pickup-validation.md). The delivered build is `dist/pickup-qol/DesktopNeko.exe`. Previous completed plans are preserved below.
 
 The full [pickup design](../docs/pickup-animation-plan.md) defines the storyboard, input/state rules, pose budgets, release/cancel behavior, dependency-ordered slices and acceptance matrix. [Frame Master](../framemaster.md) records the verified production method, and root `AGENTS.md` directs animation work to consult and maintain it.
 

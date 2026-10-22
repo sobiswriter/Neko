@@ -1,14 +1,14 @@
 # Pickup, held moods and gentle set-down
 
-**Status: proposed for user review, 2026-10-22. No pickup artwork or runtime changes have been made.**
+**Status: approved and implemented, 2026-10-22.** This document preserves the agreed design targets. See [final behavior and verification](pickup-validation.md) for measured timings, completed checks and the delivered build.
 
 This is a strong extension of direct interaction: the same drag becomes a little performance whose expression responds to time spent together. The important design decision is to keep one continuous physical hold underneath the changing expressions. A longer hold should reveal more personality without making release wait for a long movie to finish.
 
 Use [Frame Master](../framemaster.md) for artwork, calibration and review. The user's supplied photograph informs the upright dangling silhouette: compact head, connected shoulders/torso, two hanging forepaws, two hindpaws and an attached curved tail. Translate that silhouette into Neko's existing pixel design. Keep the palm as the cursor; do not add a photographic hand, background or reference-image markings to the sprite.
 
-## Current behavior and proposed interaction
+## Baseline and agreed interaction
 
-Today `main.py` stores the press position/offset, starts dragging after `QApplication.startDragDistance()`, shows `CURIOUS` while moving and `PEEKING` after release. A press without sufficient movement becomes a pet on release. Actual sleeping/falling-asleep/waking states are preserved when dragged. There is no distinct pickup state, elapsed hold sequence or set-down animation.
+Before this revision, `main.py` stored the press position/offset, starts dragging after `QApplication.startDragDistance()`, shows `CURIOUS` while moving and `PEEKING` after release. A press without sufficient movement becomes a pet on release. Actual sleeping/falling-asleep/waking states are preserved when dragged. There was no distinct pickup state, elapsed hold sequence or set-down animation.
 
 Proposed input rules:
 
@@ -76,7 +76,7 @@ Hide, fullscreen hiding, lost mouse capture, an observed released button outside
 
 ## Ordered implementation plan
 
-These are future implementation slices after this design is reviewed. [tasks/todo.md](../tasks/todo.md) is the working checklist; each slice must remain small enough to review independently.
+The following records the agreed implementation slices, now completed and verified. [tasks/todo.md](../tasks/todo.md) is the working checklist; each slice must remain small enough to review independently.
 
 | Step | Deliverable / acceptance | Dependencies; likely scope | Verification |
 | --- | --- | --- | --- |

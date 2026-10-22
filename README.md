@@ -21,8 +21,16 @@ Soft sounds are optional and off until you enable them.
   rotation repeats. Repeated clicks count immediately and coalesce into one
   next reaction, which waits for the current landing/get-up to finish.
   If she's asleep, a pet plays her waking sequence instead.
-- **Drag to move.** She looks around while held and blinks when set down. Dragging
-  never counts as petting. Position is remembered, including on another monitor.
+- **Pick her up.** Dragging starts a lift immediately; a stationary click-hold starts
+  after 250ms. She dangles with little paw/tail movements, going from excited to
+  calm after three seconds, mildly unimpressed after ten, then sleepy after twenty.
+  A little yawn happens once before her sleepy loop. Release at any point—even
+  mid-lift or mid-yawn—and she settles at the chosen location and returns to idle.
+  Re-grabbing follows the visible pose back into the hold and preserves her expression.
+  Holding never counts as petting; quick clicks still do. Real naps stay asleep
+  while carried, with a due timed wake waiting for supported placement. Reduced
+  motion uses a still held pose and immediate placement. Position is remembered.
+  See the [complete pickup preview and verification](docs/pickup-validation.md).
 - **A little helping hand.** Hovering shows an open palm; holding uses a closed hand
   for dragging. A pet click plays a short palm stroke without moving the actual pointer.
   Leaving, hiding, entering fullscreen or reduced motion stops the stroke.
@@ -30,16 +38,17 @@ Soft sounds are optional and off until you enable them.
   left or right toward it, keeping the same height. Each walk can last 6.5 seconds, travels at most about 220 pixels,
   and keeps a gap from the arrow. Mouse following is optional, with a 25-second rest.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 427 entries, including eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 528 entries, including eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
-  Normal rendering runs at 10 FPS; tail running and petting use 20 FPS.
-  Petting uses a precise Qt timer so its short connecting poses get screen time.
+  Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS.
+  Petting/carrying use a precise Qt timer so short connecting poses get screen time.
   Arrival/departure briefly use 30 FPS for smooth travel,
   keeping walking speed unchanged.
-  Every frame has a 192 × 112 transparent canvas, with extra horizontal room for
-  rolls and deeper reaches. Idle remains about 82 pixels tall;
+  Every frame has a 192 × 144 transparent canvas, with extra horizontal room for
+  rolls/deeper reaches and 32 transparent pixels above the original footprint for lifting.
+  Idle remains about 82 pixels tall;
   pet sequences use a 62px-wide seated head reference and 82px-tall reference body.
   Each retains one calibration throughout its poses, with ground contacts used
   for registration. Crouching and lying down preserve their natural posture;
@@ -185,9 +194,10 @@ The startup/thought correction build is `dist\updated\DesktopNeko.exe` while the
 previous executable is running. Quit the existing Neko from her tray menu before
 launching it; the single-instance lock prevents two kittens running together.
 
-The current expressive twelve-reaction build is `dist\expressive-petting\DesktopNeko.exe`.
-It supersedes the earlier `dist\petting-qol\DesktopNeko.exe`; quit the existing Neko first.
-See the [release verification](docs/petting-revision-validation.md) for its artwork and native checks.
+The current pickup build is `dist\pickup-qol\DesktopNeko.exe`. It includes the expressive
+twelve-reaction petting revision and supersedes `dist\expressive-petting\DesktopNeko.exe`
+and `dist\petting-qol\DesktopNeko.exe`. Quit the existing Neko first.
+See the [pickup verification](docs/pickup-validation.md) for its artwork and native checks.
 
 ## Check the behavior
 
@@ -252,6 +262,9 @@ See the [expression/gesture study](docs/petting-expression-study.md) for the act
 Current petting uses twelve dedicated `assets/neko-pet-*-v1.png` sheets, with
 16–28 source slots each and a separate canonical-idle handoff. The playful roll
 replaces blep. Older pet sheets remain historical assets rather than active pet playback.
+Nine `assets/neko-carry-*-v1.png` sheets add 100 source slots for lifting, held
+expressions, facial bridges and entry from side/low/rolled postures. They share
+measured head calibration and supported recovery; release can interrupt every phase.
 The original six
 transparent PNGs remain as fallbacks. Matching
 GIFs in `assets/` still take precedence over the atlas for customization. Motion can
@@ -272,11 +285,12 @@ verification. It also records rejected approaches and known testing limits.
 discoveries to the relevant section and its dated findings log, with evidence and
 remaining limits; keep proposed techniques separate from tested practice.
 
-The [pickup and held-mood plan](docs/pickup-animation-plan.md) proposes an excited →
-calm → mildly unimpressed → sleepy hold, with release from any phase and a gentle
-return to the chosen resting location. It is a design for review; current dragging
-still uses the existing look-around/set-down behavior. Implementation tasks are in
-[tasks/todo.md](tasks/todo.md).
+The [pickup revision](docs/pickup-validation.md) implements the excited → calm →
+mildly unimpressed → sleepy hold, release from any phase and gentle placement.
+Its [approved design](docs/pickup-animation-plan.md), [exact prompts/assembly](docs/pickup-prompts.json)
+and [native measurements](docs/pickup-native.json) preserve the reasoning and evidence.
+Run `tools/preview_pickup.py` with optional Pillow to reproduce the full mood preview
+and source/release sheets. Progress and verification are in [tasks/todo.md](tasks/todo.md).
 
 ## Project map
 

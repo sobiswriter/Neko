@@ -1,0 +1,163 @@
+{
+  "platform": "windows",
+  "dpr": 1.0,
+  "mood_entries": {
+    "entry": 8,
+    "held_excited": 12,
+    "held_calm": 12,
+    "held_unimpressed": 12,
+    "held_sleepy": 8,
+    "carry_to_calm": 4,
+    "carry_to_unimpressed": 4,
+    "carry_yawn": 4,
+    "down": 13
+  },
+  "release_cases": [
+    {
+      "held_seconds": 0.025,
+      "entries": 2
+    },
+    {
+      "held_seconds": 0.125,
+      "entries": 4
+    },
+    {
+      "held_seconds": 0.225,
+      "entries": 6
+    },
+    {
+      "held_seconds": 0.375,
+      "entries": 9
+    },
+    {
+      "held_seconds": 1.2,
+      "entries": 10
+    },
+    {
+      "held_seconds": 3.15,
+      "entries": 13
+    },
+    {
+      "held_seconds": 9.95,
+      "entries": 13
+    },
+    {
+      "held_seconds": 10.15,
+      "entries": 13
+    },
+    {
+      "held_seconds": 19.95,
+      "entries": 13
+    },
+    {
+      "held_seconds": 20.15,
+      "entries": 15
+    },
+    {
+      "held_seconds": 20.35,
+      "entries": 16
+    },
+    {
+      "held_seconds": 20.55,
+      "entries": 17
+    },
+    {
+      "held_seconds": 22,
+      "entries": 13
+    },
+    {
+      "held_seconds": 10000,
+      "entries": 13
+    }
+  ],
+  "posture_families": [
+    {
+      "name": "stretch",
+      "entry_poses": 8,
+      "release_poses": 13
+    },
+    {
+      "name": "flop",
+      "entry_poses": 11,
+      "release_poses": 13
+    },
+    {
+      "name": "roll",
+      "entry_poses": 8,
+      "release_poses": 13
+    },
+    {
+      "name": "nap",
+      "entry_poses": 8,
+      "release_poses": 10
+    }
+  ],
+  "rest_position": "unchanged; saved origin round-trips",
+  "counts": "no pets or naps added by carrying",
+  "hit_testing": {
+    "top": "passes through",
+    "left": "passes through",
+    "kitten": "kitten"
+  },
+  "median_paint_ms": 49.973,
+  "release_response_ms": {
+    "median": 0.624,
+    "max": 1.006
+  },
+  "regrab_cases": [
+    {
+      "case": "early",
+      "regrab_entries": 7,
+      "all_observed": true
+    },
+    {
+      "case": "mood-boundary",
+      "regrab_entries": 2,
+      "all_observed": true
+    },
+    {
+      "case": "mid-yawn",
+      "regrab_entries": 2,
+      "all_observed": true
+    },
+    {
+      "case": "nap",
+      "regrab_entries": 2,
+      "all_observed": true
+    }
+  ],
+  "primary_screen_corners": "all4 full192x144 footprints fit",
+  "native_input": {
+    "delivery": "Qt mouse press/move/release events on visible Windows widget",
+    "drag_delta": [
+      80,
+      40
+    ],
+    "saved_origin": "passed",
+    "pointer": "unchanged",
+    "pet_count": 0
+  },
+  "source_commit": "e227e0b4d78d9795fb3c2a1e59e04ae86182cf7d",
+  "source_suite": {
+    "run": 171,
+    "passed": 169,
+    "skipped_opt_in_packaging": 2,
+    "duration_seconds": 403.161
+  },
+  "expanded_release_samples": 86,
+  "preview": {
+    "normal_ms": 27000,
+    "half_speed_ms": 54000,
+    "source_slots": 100,
+    "posture_entries": 6,
+    "release_stories": 7
+  },
+  "package": {
+    "path": "dist/pickup-qol/DesktopNeko.exe",
+    "size_bytes": 100251184,
+    "sha256": "78da7654dd1450d3c0b8755c7fd731a60125e6ffe9f9c04d8f3fb3346e42b918",
+    "checks_passed": 2,
+    "carry_asset_hashes_verified": 9,
+    "pet_asset_hashes_verified": 12
+  }
+}

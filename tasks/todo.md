@@ -1,75 +1,77 @@
 # Animation rebuild checklist
 
-## Pickup animation — proposed; implementation not started
+## Pickup animation — approved and completed
 
 - [x] Create `framemaster.md` from the verified animation method, link it from README and require future animation agents to consult/update it through `AGENTS.md`.
 - [x] Study current dragging, sleep preservation, cursor, clip timing and saved-position paths; record the detailed [pickup design](../docs/pickup-animation-plan.md) and plan summary.
-- [ ] User review of the pickup proposal before artwork/runtime implementation.
+- [x] User reviewed the pickup proposal and authorized implementation with “Do it then”.
 
 ### 1. Geometry and anchor trial
 
 Description: prove the dangling pose and hardest lift/landing shapes at the retained character scale.
 
-- [ ] Acceptance: anatomically coherent held pose/opposing sway extremes/mid-lift/contact; measured bounds decide whether vertical space is needed.
-- [ ] Verification: native-size light/dark review, enlarged anatomy, idle landmark overlays and documented anchor/canvas measurements.
+- [x] Acceptance: initial held/mid-lift/contact trial reviewed at native size; retained head 62px and hanging body about 100px require room above idle.
+- [x] Verification: measured 32px top-padding decision; all 427 existing frame pixels and 32 clip definitions unchanged after padding removal; 98 focused animation/desktop tests pass.
 - Dependencies: proposal review. Likely files: trial sheet, provenance, QA notes (3; medium).
 
 ### 2. One complete calm art path
 
 Description: author calm lift, seamless loop and release entrances before multiplying moods.
 
-- [ ] Acceptance: every loop phase and early-lift phase connects to release; supported recovery reaches actual idle without snapping.
-- [ ] Verification: inspect every drawing, adjacent pair and loop/release seam; alpha/anatomy/scale review passes before import.
+- [x] Acceptance: every loop phase and early-lift phase connects to release; supported recovery reaches actual idle without snapping.
+- [x] Verification: inspect every drawing, adjacent pair and loop/release seam; alpha/anatomy/scale review passes before import.
 - Dependencies: 1. Likely files: up to 3 sheets plus provenance/QA (up to 5; split by entry/loop/release if needed).
 
 ### 3. Import and preview
 
-- [ ] Canvas slice, only if measured necessary: preserve logical visible origin in load/save, fixed footprint, tray framing and transparent-margin hit testing. Verify old position roundtrips and screen-edge clamping. Files: `animations.py`, `main.py`, associated tests (up to 4; medium).
-- [ ] Art slice: add calibrated held/release clips and complete preview sampling; scale, bounds, actual idle endpoint and unrelated animation pixel/cadence checks pass. Files: `animations.py`, `test_animations.py`, preview tool (3; medium).
+- [x] Canvas slice, only if measured necessary: preserve logical visible origin in load/save, fixed footprint, tray framing and transparent-margin hit testing. Verify old position roundtrips and screen-edge clamping. Files: `animations.py`, `main.py`, associated tests (up to 4; medium).
+- [x] Art slice: add calibrated held/release clips and complete preview sampling; scale, bounds, actual idle endpoint and unrelated animation pixel/cadence checks pass. Files: `animations.py`, `test_animations.py`, preview tool (3; medium).
 - Dependencies: 2; measured canvas compatibility precedes final registration.
 
 ### 4. Input ownership and calm carry
 
 Description: quick click pets; drag or stationary hold picks up; release/re-grab works without pet counts or cursor jumps.
 
-- [ ] Acceptance: proposed 250ms and Qt drag-distance boundaries behave correctly; every lift/held phase releases promptly; re-grab continues from visible position with one active owner.
-- [ ] Verification: meaningful behavior/main tests around input boundaries, all release phases, external release and unchanged pet counts; native drag/save roundtrip.
-- [ ] Entry-art follow-through: classify current awake seated/crouched/side-lying/airborne postures; draw missing pickup connections rather than forcing idle. Verify interrupted roll/flop/hop plus representative idle entries. Keep each art/provenance/QA slice to 3–5 files.
+- [x] Acceptance: 250ms and Qt drag-distance boundaries behave correctly; every lift/held phase releases promptly; re-grab continues from visible position with one active owner.
+- [x] Verification: meaningful behavior/main tests around input boundaries, all release phases, external release and unchanged pet counts; native drag/save roundtrip.
+- [x] Entry-art follow-through: classify current awake seated/crouched/side-lying/airborne postures; draw missing pickup connections rather than forcing idle. Verify interrupted roll/flop/hop plus representative idle entries. Keep each art/provenance/QA slice to 3–5 files.
 - Dependencies: 3. Runtime files: `behavior.py`, `main.py`, focused tests (4; medium).
 
 ### Checkpoint A — calm path
 
-- [ ] Native pickup → calm loop → set-down plays completely, with arbitrary release/re-grab, no scale/anchor jump and correct saving. Resolve failures before generating mood variants.
+- [x] Native pickup → calm loop → set-down plays completely, with arbitrary release/re-grab, no scale/anchor jump and correct saving. Common body and native calm-path review complete; expression variants are integrated and verified.
 
 ### 5. Expression artwork, one mood per slice
 
-- [ ] Excited: bright eyes/brief squeeze, perked ears and restrained curled-paw gesture; phase-matched geometry and gradual calm bridge reviewed.
-- [ ] Mildly unimpressed: level lids/tiny neutral mouth, restrained ear/tail accent; distinct native-size acting without distressed flailing.
-- [ ] Sleepy: heavy lids, one entry yawn with release-safe jaw closure, then quiet indefinite breathing loop.
+- [x] Excited: bright eyes/brief squeeze, perked ears and restrained curled-paw gesture; phase-matched geometry and gradual calm bridge reviewed.
+- [x] Mildly unimpressed: level lids/tiny neutral mouth, restrained ear/tail accent; distinct native-size acting without distressed flailing.
+- [x] Sleepy: heavy lids, one entry yawn with release-safe jaw closure, then quiet indefinite breathing loop.
 - Verification per slice: every source/imported pose on light/dark backgrounds, phase overlays against calm body, no anatomical/feature drift, clean expression bridges.
 - Dependencies: Checkpoint A. Each slice: mood sheet, provenance and QA notes (3; medium).
 
 ### 6. Elapsed mood progression
 
-- [ ] Acceptance: excited → calm → mildly unimpressed → sleepy progresses once by monotonic hold duration; body phase survives mood changes; sleepy loop runs indefinitely and release overrides all bridges/yawn.
-- [ ] Verification: just-before/at/after proposed 3/10/20s boundaries, long holds, sparse mouse events, every expression/release phase; inspect actual native playback.
+- [x] Acceptance: excited → calm → mildly unimpressed → sleepy progresses once by monotonic hold duration; body phase survives mood changes; sleepy loop runs indefinitely and release overrides all bridges/yawn.
+- [x] Verification: just-before/at/after 3/10/20s boundaries, long holds, sparse mouse events, every expression/release phase; inspect actual native playback.
 - Dependencies: 5. Likely files: behavior/atlas/main and focused tests (split to at most 5 files per slice).
 
 ### 7. Real nap and cancellation slices
 
-- [ ] Nap slice: existing sleeping/falling-asleep/waking behavior is deliberately handled; carrying does not count another nap or wake on drag; a due timed wake waits for supported placement. Verify counts, timer rules and subsequent idle/nap scheduling. Files: behavior/main and tests (up to 4).
-- [ ] Desktop slice: hide/show, lost capture/button release outside, fullscreen policy, motion toggle, screen change, menu/quit clear ownership safely; save the logical rest origin even during lift/descent. Verify no stuck cursor/capture/state, stale pending pets or double departure trajectory. Files: main and focused tests (2–3).
+- [x] Nap slice: existing sleeping/falling-asleep/waking behavior is deliberately handled; carrying does not count another nap or wake on drag; a due timed wake waits for supported placement. Verify counts, timer rules and subsequent idle/nap scheduling. Files: behavior/main and tests (up to 4).
+- [x] Desktop slice: hide/show, lost capture/button release outside, fullscreen policy, motion toggle, screen change, menu/quit clear ownership safely; save the logical rest origin even during lift/descent. Verify no stuck cursor/capture/state, stale pending pets or double departure trajectory. Files: main and focused tests (2–3).
 - Dependencies: 4 and 6.
 
 ### Checkpoint B — complete interruption matrix
 
-- [ ] Full regressions pass; native every-phase release/cancel tests show correct timing, complete recovery, stable placement and distinct moods. Record physical DPI/multi-monitor coverage or its absence.
+- [x] Full regression suite: 171 run, 169 passed, 2 opt-in package checks skipped; both packaged checks then passed. All 86 release samples, 14 native release cases, 4 re-grabs and 4 posture families pass. Physical mixed-DPI/multi-monitor and long-session limits are recorded.
 
 ### 8. Artifacts and release verification
 
-- [ ] Render runtime-derived normal/slow catalogs, every-pose sheets and native light/dark captures; verify decoded duration and pose coverage. Save exact prompts/selections/calibration and update Frame Master findings plus README.
-- [ ] Build a distinct executable; both opt-in package checks pass; bundled art hashes match final sheets; record source commit/hash and stop only test-owned processes.
+- [x] Render runtime-derived normal/slow catalogs, every-pose sheets and native light/dark captures; verify decoded duration and pose coverage. Save exact prompts/selections/calibration and update Frame Master findings plus README.
+- [x] Build a distinct executable; both opt-in package checks pass; bundled art hashes match final sheets; record source commit/hash and stop only test-owned processes.
 - Dependencies: Checkpoint B. Split preview/provenance/docs and build verification into separate reviewable slices.
+
+Delivered: `dist/pickup-qol/DesktopNeko.exe`. See [final verification](../docs/pickup-validation.md) and [native/release measurements](../docs/pickup-native.json).
 
 ---
 

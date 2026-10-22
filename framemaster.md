@@ -4,7 +4,7 @@ This is the working reference for every agent making or changing Neko animations
 
 Baseline: the expressive petting revision completed on **2026-10-22**, artwork/runtime commit `28c4620`. Its [verification report](docs/petting-revision-validation.md), [exact prompts and assembly record](docs/petting-revision-prompts.json), [expression study](docs/petting-expression-study.md) and [native measurements](docs/petting-revision-native.json) are the evidence behind this guide. Earlier reports describe earlier versions; their numbers are not automatically current.
 
-The [pickup design](docs/pickup-animation-plan.md) is proposed work. Holding stages and interruptible release described there do not exist in the current runtime.
+The later [pickup revision](docs/pickup-validation.md) implements held expressions and interruptible release. Its [approved design](docs/pickup-animation-plan.md), [exact provenance](docs/pickup-prompts.json) and [native measurements](docs/pickup-native.json) extend the method below. Historical reports retain their original dimensions/counts; current production values include the pickup extension.
 
 ## 1. The design philosophy
 
@@ -60,15 +60,15 @@ Current pet production values in [animations.py](animations.py):
 
 | Item | Verified baseline |
 | --- | --- |
-| Transparent runtime canvas | 192 × 112 px for every atlas frame |
+| Transparent runtime canvas | 192 × 144 px for every atlas frame; original 192 × 112 area padded 32px above |
 | Horizontal padding relative to old 112px footprint | 40 px on each side |
 | Seated reference body height | About 82 px |
 | Seated reference head width | 62 px; endpoint tests allow ±4 px |
-| Ground reference | `ground = 98` in import placement |
+| Ground reference | Import y=98, then 32px top padding: runtime y=130 |
 | Near-idle final head center | Within 2 px of actual idle |
-| Final crown position | About y=16, ±2 px in the endpoint check |
-| Pet playback repaint interval | Precise Qt timer, 50 ms, nominal 20 FPS |
-| Total atlas entries | 427: 147 non-pet + 268 pet source slots + 12 appended idle entries |
+| Final crown position | About y=48, ±2 px after top padding; held crown y=16 |
+| Pet/carry playback repaint interval | Precise Qt timer, 50 ms, nominal 20 FPS |
+| Total atlas entries | 528: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle |
 
 These are baseline measurements, not permission to force every posture into a seated shape. A lying kitten is lower and wider. Check continuity against appropriate anatomical landmarks throughout the action. If a new pose needs space, measure it at the retained character scale before changing the fixed canvas. Do not resize the desktop window on each pose.
 
@@ -170,16 +170,33 @@ Read callers before changing a shared function. An animation change can reach:
 
 `Companion.pet()` counts clicks immediately and coalesces at most one pending reaction. `finish_pet()` starts that pending reaction at the completed action's safe end, without counting it twice. `main.refresh_asset()` replaces the provisional behavior duration with the actual clip sum at every pet start, including queued starts. A longer clip must not be truncated by an old generic duration. Nap waits for active pet completion; a tiny snooze inside flop stays a pet state rather than starting a real nap. Hide/reduced motion clear pending pets.
 
-Current timer classes differ intentionally: petting uses precise 50 ms; accepted tail motion uses 50 ms coarse; arrival/departure briefly use 33 ms; ordinary idle uses 100 ms. Source-pose timing and Qt repaint interval are separate. Custom GIF assets still override atlas playback where supported; inspect customization paths when changing behavior.
+Current timer classes differ intentionally: petting/carrying use precise 50 ms; accepted tail motion uses 50 ms coarse; arrival/departure briefly use 33 ms; ordinary idle uses 100 ms. Source-pose timing and Qt repaint interval are separate. Custom GIF assets still override ordinary atlas playback where supported; carrying/lifecycle own their authored drawings and do not play a competing custom movie. Inspect customization paths when changing behavior.
 
 ### Desktop and presentation compatibility
 
-- The 192 × 112 widget is fixed during playback. Keep original visible placement through the saved-position convention: load `saved - QPoint(40,0)`, save `(arrival_target or current_position) + QPoint(40,0)`. The expanded canvas is clamped to available screen space; edges can therefore nudge a placement.
-- Keep the tray icon's central 112 × 112 crop (`x=40`) so transparent padding does not make her icon tiny. Check painted shadow/heart/text centers after canvas changes.
+- The 192 × 144 widget is fixed during playback. Keep original visible placement through the saved-position convention: load `saved - QPoint(40,32)`, save `(arrival_target or current_position) + QPoint(40,32)`. The expanded canvas is clamped to available screen space; edges can therefore nudge a placement. Lift/descent artwork stays inside that canvas, so its transient offset never enters preferences.
+- Keep the tray icon's central 112 × 112 crop (`x=40,y=32`) so transparent padding does not make her icon tiny. Preserve shadow/heart/text and mouse-follow reference positions when adding canvas space. Legacy catalogs omit the empty top padding to keep their earlier layout.
+  For following, use the original footprint's `QRect.center()` after removing top padding; `width // 2` differs by one pixel from Qt's integer rectangle center and changed the tested walking stop point.
 - Transparent side padding must pass through to desktop clicks; the visible kitten remains interactive. Added space is not an invisible click-blocking panel.
 - Arrival travels from the actual monitor top and starts its clock on the first animation tick. Save its final landing target, not a temporary airborne window position. Departure retains its sad pause and accepted hop trajectory.
 - Thoughts remain background-free: cream semibold glyphs with a small dark glyph shadow, no panel/border. Cursor artwork retains a fixed hotspot; the pet stroke never moves the actual pointer.
-- Dragging does not count as petting and currently preserves real sleeping/waking states. A new hold feature must deliberately handle these existing rules rather than accidentally waking her.
+- Carrying does not count as petting, preserves real naps and defers a due timed wake until supported placement. An already waking kitten finishes upright on placement rather than replaying a partial wake. Held drowsiness remains distinct from the real nap lifecycle.
+
+### Interruptible pickup method
+
+The pickup revision uses four expression sets over compatible held body phases, authored entry families and one shared landing. See its linked report/provenance for exact timings and source identities.
+
+1. Prototype the retained-scale hanging silhouette first. The roughly 100px hanging body required 32px top padding for a readable lift; head/body were not shrunk. All 427 earlier drawings compare exactly after removing that padding, and all 32 earlier clip definitions are unchanged.
+2. Generate the common held loop, then edit expressions against it. Reject geometry drift: the original sleepy generation shortened the torso and introduced detached fragments. Its face-only repair retained the accepted loop body. Reject visible background haze too; the rolled entry required a fresh clean redraw after a failed alpha repair.
+3. Calibrate each bank once. Sample cells to width 128 before connected bounds, then use a 62px head span. For hanging drawings, measure only the upper 40% to exclude a high tail. Side/low/rolled entry families calibrate from their final upright held drawing; track their full silhouettes relative to that reference head instead of trying to measure a tilted/occluded starting head as seated.
+4. Preserve the actual currently visible frame at recognition. Align the appropriate drawn entry family and fade its placement offset to zero. Do not insert idle before lifting from a stretch/flop/roll. Normal entry is eight 50ms slots; awake side entries also reopen the eyes through drawn bridges.
+5. Release owns the next visible response. Capture the current frame, close/reopen the face through authored drawings where needed, then use the 700ms supported landing. For real sleep, reverse the closed-eye side entry into the curled nap pose. Early release reverses visited entry drawings and uses the starting gesture's existing recovery.
+6. Re-grab reverses the visited release and must also finish any unvisited lift. A test reproduced a 22px jump when that remaining lift was omitted. Preserve active expression time through release/retracing so re-grab cannot skip a mood bridge or reopen a yawn abruptly. Keep the unvisited lift separate from the remaining placement path; when released again during retracing, retain its frozen expression elapsed time rather than deriving it from a transient path clock.
+7. Use existing `Clip` timing for dynamic paths as well as atlas clips. Keep drawing selection/phase separate from behavior ownership: `HELD`/`SETTING_DOWN` suppress competing actions, while real nap state/counts are retained separately. Keep all path storage bounded; long holds reuse loops rather than accumulating frames.
+8. Load carry banks as a complete set. Missing/corrupt sheets must preserve ordinary dragging/fallback instead of exposing a half-loaded pose family that crashes on release. Validate with a damaged-bank regression and bundled-asset hashes.
+9. Keep every state renderable even without a live input payload. The all-states smoke check creates held states directly; it exposed a missing-context assumption in the renderer. An absent carry context now selects safe idle and can be cancelled. Keep that regression alongside the live-grab tests.
+
+The current mood targets are excited 0–3s, calm 3–10s, mildly unimpressed 10–20s and sleepy 20s onward. Two four-drawing facial bridges and a one-time 650ms yawn prevent abrupt face switches. Loops have a 2.4s period; sleepy uses eight closed-eye drawings rather than repeating its yawn. Short click versus 250ms stationary hold versus immediate distance-triggered drag are separately tested.
 
 ## 8. Verification: drawings, sampling, real playback, release
 
@@ -188,6 +205,8 @@ Current timer classes differ intentionally: petting uses precise 50 ms; accepted
 For logic/calibration changes, first add the smallest meaningful regression demonstrating the defect. Do not write tests that merely restate an array. Example: count three separated airborne passages from rendered ground bounds, rather than only asserting that an offset tuple exists.
 
 Before shared atlas/canvas work, snapshot unrelated clip definitions and rendered frames. The last revision compared all 147 non-pet frames pixel-for-pixel after cropping the new padding (`40,0,112,112`) and verified unchanged clip definitions. This protected the accepted tail art/cadence. A reversed calibration-sign mutation was also rejected by head-alignment checks; mutation stayed in memory, not in production files.
+
+The pickup comparison retains each QImage object while copying `constBits()` into bytes; do not hash a buffer exposed by a temporary image whose owner has already been released. That correction produced a clean comparison of all 427 earlier frames after cropping `(0,32,192,112)` and all 32 original clip definitions.
 
 ### B. Review every selected drawing and connection
 
@@ -228,9 +247,13 @@ Remove-Item Env:NEKO_TEST_EXE
 
 The native packaging smoke check needs the existing Neko closed because the shared single-instance lock is intentional. Tests stop only their own process trees. Check bundle resource presence and hashes against final PNGs, native startup/tray/topmost behavior, second-instance rejection and exclusion of credentials/unrelated DLLs. Record the executable hash and actual source/art commit; do not claim an older executable contains new art.
 
+For pickup, run `tools/preview_pickup.py` as well: it uses the real controller paths, asserts all held/bridge/yawn pose coverage, decodes the 27s GIF duration and exports every source slot plus seven complete release stories. The ordinary pet catalogs still describe the earlier nine-second pet timeline. Review native re-grab and arbitrary-release cases separately from an uninterrupted loop.
+
 ### Evidence and honest limits
 
 The baseline native run observed all 280 pet entries; median paint intervals were 49.85–50.03ms at DPR 1.0. Full discovery ran 149 tests: 147 passed, two opt-in package checks skipped. After final fragment rejection, three focused render checks and the corrected stretch's 25-entry native playback passed; both final packaged checks passed. This is not a claim that the entire suite was rerun after that last selection edit.
+
+The later pickup revision ran full discovery again: 171 tests, 169 passed and two opt-in package checks skipped, followed by both final packaged checks passing. Its 100 carry source slots, 86 release samples, 14 native releases, four native re-grabs and stretch/flop/roll/nap entry paths were checked. Median native paint interval was 49.973ms at DPR 1.0. See the [current report](docs/pickup-validation.md) for exact cases, source/build identities and the 27s/54s previews.
 
 Physical mixed-DPI/multiple-monitor hardware and long-session resource behavior were not exercised. Automated geometry checks and our visual review cannot promise the absence of every possible anatomy defect. Report what was observed and what remains untested.
 
@@ -253,3 +276,9 @@ Do not relax an anatomy, scale, timing or clipping check merely to accept a new 
 | 2026-10-22 | Uneven generated layout and separately drawn knead/stretch batches caused pose drift. Extract complete silhouettes, compare neutral landmarks, use fixed batch calibration and redraw unsuitable mechanics. | Exact selections/ratios in [assembly record](docs/petting-revision-prompts.json); heuristics still need checking for new postures. |
 | 2026-10-22 | A detached 16px line survived bounding-box cropping beside stretch pose 14. Reject the drawing, select a clean neighboring hold and add a connected-fragment regression. | Final light/dark review, focused checks and native stretch replay passed. Connected extra limbs still require visual review. |
 | 2026-10-22 | Short previews and floating intro subtraction could hide recovery or skip connecting poses. Derive preview length from longest clip, round intro-adjusted time and assert pose coverage/decoded duration. | Current catalogs cover every used entry and decode to 9s/18s. Preview sampling alone does not prove native playback. |
+| 2026-10-22 | Retained-scale hanging required 32px more space above idle. Pad the fixed canvas, preserve saved/tray/visual origins and leave existing pixels alone. | All427 previous frames and32 clips unchanged; native saved-origin and top/side click-through checks pass. See [pickup verification](docs/pickup-validation.md). |
+| 2026-10-22 | A newly generated sleepy body shortened and fragmented; rolled entry acquired a gray halo that survived an alpha edit. Reject these drafts; repair sleepy acting against the accepted body and redraw roll cleanly. | Exact accepted/rejected outputs in [pickup provenance](docs/pickup-prompts.json); all 100 imported carry slots reviewed and pass fragment/scale/bounds checks. |
+| 2026-10-22 | Re-grabbing an early release omitted the rest of the lift, causing a reproduced 22px crown jump. Retrace release, append unvisited lift and pause the expression clock during return. | Early-regrab and mood-boundary regressions pass; arbitrary native release paths are recorded separately. |
+| 2026-10-22 | A hash probe exposed a buffer from a temporary QImage, invalidating the measurement. Retain the image object before copying its bytes. | Recomputed against commit `199392b`: all 427 earlier drawings compare exactly. Production drawing was unaffected. |
+| 2026-10-22 | The all-states smoke check constructed a held state without its grab payload, exposing an unsafe render assumption. Fall back safely and allow cancellation when context is absent. | Both the direct missing-context regression and the original all-poses render check pass; keep live-input tests too. |
+| 2026-10-22 | Integer half-width arithmetic shifted the mouse-follow anchor by one pixel after padding, changing the horizontal walk stop by a two-pixel step. Use the adjusted original footprint's Qt rectangle center. | The existing above/below-cursor and directly-above walking regressions pass with their original expected stop values. |
