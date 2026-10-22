@@ -5,6 +5,7 @@ import hashlib
 from pathlib import Path
 import subprocess
 import time
+import tempfile
 import unittest
 
 
@@ -103,6 +104,22 @@ class PackagingTests(unittest.TestCase):
             level = manifest.find(".//{urn:schemas-microsoft-com:asm.v3}requestedExecutionLevel")
             self.assertIsNotNone(level)
             self.assertEqual(level.attrib["level"], "asInvoker")
+
+    def test_compiled_atlas_matches_source_frames(self):
+        from PyInstaller.archive.readers import CArchiveReader
+        from PySide6.QtWidgets import QApplication
+        from animations import SpriteAtlas
+        app = QApplication.instance() or QApplication([])
+        archive = CArchiveReader(str(self.exe))
+        names = {name.replace("\\", "/"): name for name in archive.toc}
+        original = SpriteAtlas(Path(__file__).parent / "assets")
+        with tempfile.TemporaryDirectory() as folder:
+            for filename in ("neko-runtime.png", "neko-runtime.json"):
+                Path(folder, filename).write_bytes(archive.extract(names[f"assets/{filename}"]))
+            compiled = SpriteAtlas(folder)
+        self.assertEqual(compiled.frames.keys(), original.frames.keys())
+        for key, frame in original.frames.items():
+            self.assertEqual(compiled.frames[key].toImage(), frame.toImage(), key)
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui

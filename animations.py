@@ -1,6 +1,7 @@
 """Drawn sprite sequences with per-frame timing and a shared ground anchor."""
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 
 from PySide6.QtCore import QRect, Qt
@@ -224,6 +225,8 @@ def carry_head(image):
 class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
+        if self.load_runtime(path):
+            return
         cells = {}
         for bank, version, rows in (("idle", 3, 4), ("activity", 3, 4),
                                     ("movement", 3, 4), ("transitions", 1, 4),
@@ -337,6 +340,27 @@ class SpriteAtlas:
             self.frames[key] = frame
         self.load_carry(path)
         self.load_games(path)
+
+    def load_runtime(self, path):
+        """Release builds contain the exact calibrated frames, prepared at build time."""
+        try:
+            keys = json.loads((Path(path) / "neko-runtime.json").read_text(encoding="utf-8"))
+            keys = [tuple(key) for key in keys]
+            if not keys or len(set(keys)) != len(keys):
+                return False
+            required = {(clip.bank, clip.row + i // 4, i % 4)
+                        for clip in CLIPS.values() for i in clip.order}
+            if not required.issubset(keys):
+                return False
+            image = QImage(str(Path(path) / "neko-runtime.png"))
+            if image.size().toTuple() != (16 * CANVAS_WIDTH, ((len(keys) + 15) // 16) * CANVAS_HEIGHT):
+                return False
+            self.frames = {key: QPixmap.fromImage(image.copy(
+                i % 16 * CANVAS_WIDTH, i // 16 * CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT))
+                for i, key in enumerate(keys)}
+            return True
+        except (OSError, ValueError, TypeError):
+            return False
 
     def load_games(self, path):
         """All-or-nothing game art; constant calibration from each bank's neutral."""

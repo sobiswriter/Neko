@@ -236,6 +236,12 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
+Packaging prepares all 741 calibrated animation frames once with
+`tools/bake_atlas.py`. The executable loads those finished frames directly,
+avoiding source-sheet silhouette analysis on every launch. Source launches keep
+the original importer; source artwork and custom asset overrides are retained.
+See the [startup measurements and verification](docs/startup-performance-validation.md).
+
 The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
 `dist\DesktopNeko-previous.exe`. Keep these two files directly in `dist`, without
 release subfolders. Quit the existing Neko before launching the new build;

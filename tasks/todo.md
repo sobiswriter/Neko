@@ -1,5 +1,11 @@
 # Animation rebuild checklist
 
+## Startup correction — 2026-10-22
+
+- [x] Reproduce startup latency and profile the source atlas bottleneck.
+- [x] Prepare calibrated release frames at build time; preserve all 741 frames exactly and retain source fallback.
+- [x] Verify real executable startup improvement (6.97s → 2.14s), four package checks and flat current/previous release. [Report](../docs/startup-performance-validation.md).
+
 ## Gallop, timer and sleep correction — delivered, 2026-10-22
 
 - [x] Replace running with eight reference-led gallop poses and sustained 360ms drawn expressions; update braking, provenance and production-timing previews.

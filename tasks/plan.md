@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Startup correction — 2026-10-22
+
+Profile before changing behavior; move proven source-sheet preprocessing into the release build, retain source fallback and compare every final frame exactly. Measure actual executable UI readiness before/after, check packaged contents/icon/instance handling and preserve the verified immediate predecessor. [Evidence and limits](../docs/startup-performance-validation.md).
+
 ## Gallop/timer/sleep correction — authorized, 2026-10-22
 
 Delivered: [fixes, previews, focused verification and release identities](../docs/run-timer-sleep-fix.md). Extended play-testing remains with the user as requested.
