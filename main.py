@@ -297,6 +297,12 @@ class StatsWindow(QDialog):
 
     def showEvent(self, event):
         self.focus.setChecked(self.neko.quiet)
+        self.auto_games.blockSignals(True)
+        self.auto_games.setChecked(self.neko.game_timer.enabled)
+        self.auto_games.blockSignals(False)
+        self.game_interval.blockSignals(True)
+        self.game_interval.setValue(self.neko.game_timer.interval)
+        self.game_interval.blockSignals(False)
         self.ai.setChecked(self.neko.ai_enabled)
         self.reactivity.setChecked(self.neko.reactive)
         self.fullscreen.setChecked(self.neko.hide_fullscreen)
@@ -612,8 +618,8 @@ class NekoWidget(QWidget):
             return
         self.game_timer.request(time.monotonic(), manual=True)
         if self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
-            if self.stats_window:
-                self.stats_window.mood.setText("Play is waiting. Pet her to wake, or let her nap.")
+            self.tray_icon.showMessage("Catch the Cursor", "Play is waiting. Pet Neko to wake her, or let her nap.",
+                                       QSystemTrayIcon.Information, 4000)
         self.stop_following()
         # Menu callbacks complete before eligibility is checked; the nook may stay open for manual play.
         if self.stats_window:

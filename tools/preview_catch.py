@@ -93,6 +93,8 @@ def native(neko, app):
     import win32gui
     paints, coverage, captures = [], {}, []
     owned_focus_seen = False
+    guides_through = None
+    stop_hit = None
     original = neko.paintEvent
     scripted_cursor = QPoint(660, 390)
     foreground = win32gui.GetForegroundWindow()
@@ -119,7 +121,7 @@ def native(neko, app):
     cursor_patch.start()
 
     def drive():
-        nonlocal scripted_cursor, owned_focus_seen
+        nonlocal scripted_cursor, owned_focus_seen, guides_through, stop_hit
         owned = {int(neko.winId()), int(backdrop.winId())}
         if neko.game_overlay:
             owned.update((int(neko.game_overlay.winId()), int(neko.game_overlay.stop.winId())))
@@ -133,6 +135,11 @@ def native(neko, app):
             scripted_cursor = QPoint(480, 385)
         if 5 < elapsed < 7 and "light" not in flags:
             flags.add("light")
+            assert neko.game_overlay.isVisible()
+            point = (round(neko.game.runway.left + 200), round(neko.game.runway.y + 124))
+            guides_through = win32gui.WindowFromPoint(point) != int(neko.game_overlay.winId())
+            stop_point = neko.game_overlay.stop.geometry().center()
+            stop_hit = win32gui.WindowFromPoint((stop_point.x(), stop_point.y())) == int(neko.game_overlay.stop.winId())
             QApplication.primaryScreen().grabWindow(0, 180, 240, 900, 470).save(str(ROOT / "docs/neko-catch-native-light.png"))
             captures.append("light")
         if elapsed > 11 and "loss" not in flags:
@@ -152,19 +159,18 @@ def native(neko, app):
             timer.stop()
             cursor_patch.stop()
             intervals = [(b - a) * 1000 for a, b in zip(paints, paints[1:]) if b - a < .15]
-            point = QPoint(300, 340)
-            through = win32gui.WindowFromPoint((point.x(), point.y())) != int(neko.game_overlay.winId())
             report = {"platform": QApplication.platformName(), "dpr": neko.devicePixelRatioF(),
                       "paint_count": len(paints), "median_ms": statistics.median(intervals),
                       "coverage": {k: sorted(v) for k, v in coverage.items()}, "captures": captures,
                       "foreground_unchanged": foreground == win32gui.GetForegroundWindow(),
                       "owned_windows_took_focus": owned_focus_seen,
-                      "guides_click_through": through,
+                      "guides_click_through": guides_through, "stop_receives_its_own_clicks": stop_hit,
                       "cursor": "scripted observations; real pointer never moved", "pets": neko.companion.pets,
                       "naps": neko.companion.naps}
             for clip in ("game_ready", "game_jump", "game_loss", "game_curl", "game_comfort", "happy_hop"):
                 assert set(CLIPS[clip].order) <= coverage.get(clip, set()), (clip, coverage.get(clip))
             assert not owned_focus_seen
+            assert guides_through and stop_hit
             (ROOT / "docs/catch-native.json").write_text(json.dumps(report, indent=2))
             neko.end_game(immediate=True, clear_mood=True)
             neko.hide()

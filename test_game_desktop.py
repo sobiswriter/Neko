@@ -156,6 +156,22 @@ class DesktopGameTests(unittest.TestCase):
             self.n.request_game()
         self.assertIsNone(self.n.game)
 
+    def test_nook_refreshes_timer_preferences_and_sleeping_request_explains_wait(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.n.open_stats_window()
+        self.n.stats_window.close()
+        self.n.set_auto_games(False)
+        self.n.set_game_interval(120)
+        self.n.open_stats_window()
+        self.assertFalse(self.n.stats_window.auto_games.isChecked())
+        self.assertEqual(self.n.stats_window.game_interval.value(), 120)
+        self.n.companion.state = NekoState.SLEEPING
+        with patch.object(self.n.tray_icon, "showMessage") as message:
+            self.n.request_game()
+        message.assert_called_once()
+        self.assertEqual(self.n.companion.state, NekoState.SLEEPING)
+        self.assertEqual(self.n.game_timer.pending, "manual")
+
     def test_gentle_game_has_no_translation_and_can_win(self):
         self.n.motion = False
         self.start()
