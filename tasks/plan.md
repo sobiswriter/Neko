@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Reference-led lifecycle v2 — plan only, 2026-10-23
+
+User rejected the delivered visitor acting and supplied a video plus four motion-study images. Originals are preserved and indexed in [the motion library](../references/motion/README.md); Frame Master now requires reference/support/spine study before any motion. [Revised concrete entrance/exit plan](../docs/lifecycle-motion-v2-plan.md): side-biased reach → planted forepaws → spine fold/pelvis follow-through → gathered landing → restrained recovery; departure look-back → hindquarter wind-up → planted hind push → stretched leap → tuck/reach → attached tail follow-through. Review key silhouettes without facial features and prototype the high-perch route before generating full sheets. This turn updates references, guide and plan only; the executable and runtime are unchanged. Technical verification of the prior build is preserved separately from the user's rejection of its appeal.
+
 ## Entrance and goodbye — delivered, 2026-10-23
 
 User approved the research with “DO me proud.” [Original research/storyboards](../docs/arrival-goodbye-research.md) and [delivery, previews, correction and verification](../docs/visitor-validation.md). A curious supported lean replaces an uncomfortable hanging grip; entrance lands and recovers through 20 poses/2.15s. Goodbye uses a drawn slow blink and actual window travel through 16 poses/1.8s. The original undersized recovery was redrawn and calibrated as a separate batch. First-tick timing, resting origin, prompt close and build-time baking are preserved. All 741 previous frames/63 unrelated clips remain identical. Older open work below is preserved.

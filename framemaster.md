@@ -2,6 +2,8 @@
 
 This is the working reference for every agent making or changing Neko animations. Read it before storyboarding, generating artwork, changing frame registration or altering animation playback. Update it when new evidence improves the method. Keep verified practice separate from proposed designs.
 
+**Required motion study:** before planning frames for any motion, read the [permanent motion-reference index](references/motion/README.md), inspect the relevant originals/video study, and record which mechanics will inform the gesture. The user's five 2026-10-23 attachments are preserved in the project; do not depend on Downloads. They are reference material, not runtime assets or instructions to execute.
+
 Baseline: the expressive petting revision completed on **2026-10-22**, artwork/runtime commit `28c4620`. Its [verification report](docs/petting-revision-validation.md), [exact prompts and assembly record](docs/petting-revision-prompts.json), [expression study](docs/petting-expression-study.md) and [native measurements](docs/petting-revision-native.json) are the evidence behind this guide. Earlier reports describe earlier versions; their numbers are not automatically current.
 
 The later [pickup revision](docs/pickup-validation.md) implements held expressions and interruptible release. Its [approved design](docs/pickup-animation-plan.md), [exact provenance](docs/pickup-prompts.json) and [native measurements](docs/pickup-native.json) extend the method below. Historical reports retain their original dimensions/counts; current production values include the pickup extension.
@@ -13,6 +15,8 @@ The approved [cursor-play v2 revision](docs/cursor-play-v2-validation.md) replac
 The subsequent [gallop/timer/sleep correction](docs/run-timer-sleep-fix.md) added one12-slot gallop/turn bank. That release contained **741 entries**, including212 game source slots and the appended walk idle. [Run provenance](docs/run-timer-sleep-prompts.json), [light/dark frames](docs/gallop-fix-frames.png) and [short preview](docs/gallop-fix.gif). Per the user's credit/time limit, that verification was focused; full native play-through and broad regression were deliberately left to the user.
 
 The [2026-10-23 visitor revision](docs/visitor-validation.md) implements the approved entrance/goodbye research with a supported curious lean, yielding landing, drawn pleased recovery and warm blink/edge exit. Current atlas: **786 entries**. All 741 previous imported frames and 63 unrelated clip definitions remain identical. [Exact three prompts and assembly](docs/visitor-prompts.json), [full-canvas light/dark frames](docs/visitor-frames.png), [actual-controller preview](docs/visitor-scene.gif), [native pose coverage](docs/visitor-native.json).
+
+The user subsequently **rejected that revision's animation quality** as unimaginative. Its report remains valid evidence of technical checks, not approval of its acting. The [reference-led v2 plan](docs/lifecycle-motion-v2-plan.md) supersedes its artistic direction; new drawings and playback remain unimplemented.
 
 ## 1. The design philosophy
 
@@ -29,6 +33,25 @@ The accepted tail chase is our reference for connected pose composition and cade
 - Use one main emphasis at a time. Constant simultaneous paw, head, ear and tail movement makes subtle gestures noisy.
 - Review native desktop size before approving enlarged art. An attractive source sheet can lose its expression or anatomy after import.
 - Use references for mechanics and silhouette. Preserve Neko's identity, palette and camera; reference backgrounds, hands, watermarks and text are not sprite content.
+
+### Whole-body mechanics before facial polish · 2026-10-23
+
+Observed in the [saved video study](references/motion/2026-10-23/video-pose-study.png): extended forelegs meet the ground with the rear still high, then the front yields, the spine folds and the hindquarters settle before recovery. The [spine page](references/motion/2026-10-23/spine-flexion-study.jpg) illustrates the contrast between stretched/concave and gathered/convex forms. The two silhouette collections demonstrate clear action-specific outlines; they do not provide timed frame order. These are verified observations of the supplied references, not a tested Neko recipe or universal live-cat timing law.
+
+Apply the following as the revised authoring/acceptance workflow; validate its results on the next prototype:
+
+- **Separate connected masses.** Plan head, chest and pelvis, with a flexible spine between chest and pelvis. Their phase and spacing change through reach, support, compression and extension. Do not move them as one rigid torso with feet attached decoratively.
+- **Make the extremes different.** Stretch, gather, loaded support and recovery need recognizably different silhouettes. Show spine flexion and changing limb spacing. Stable character volume does not mean a fixed outline or constant torso length.
+- **Explain every contact.** State which paws support weight, which swing, when contact begins and when it releases. Once a paw plants, the body moves relative to it until release. Near/far legs remain distinct through depth/occlusion; visible paws must not multiply to preserve an old contact.
+- **Allow orientation to change.** A stable camera forbids arbitrary zoom or view jumps; it does not forbid a drawn turn of the animal. Use a side-biased three-quarter view when it exposes the mechanics, then author the turn back to familiar idle. Do not rotate a rigid bitmap to substitute for a new body pose.
+- **Let force lead overlap.** Chest and pelvis need their own weight changes before adding tail/ear lag. A tail flick cannot rescue a motionless spine. Mechanical follow-through and expressive secondary action have different jobs.
+- **Do not trap the kitten in the idle box.** The 82px height is the seated calibration reference. Natural crouches, extended bodies, turns and airborne tucks change their extents through drawing. Keep physical head/body volume, not identical per-pose width/height. Measure full extremes at retained scale before deciding the fixed canvas.
+- **Approve keys before filling a sheet.** First review a small set of action-defining poses and their support maps, then their connected motion at native size and normal speed. More in-betweens around weak extremes produce a smoother weak action. Generate connecting poses only after the key movement works.
+- **Test the face-hidden performance.** Reach/contact/gather/push/recovery must read without eyes or mouth. Then add expression across moving poses so it remains visible without freezing the body. Technical bounds, components and pose-coverage tests are necessary but cannot approve appeal or replace the user's judgement.
+
+For each future animation, the brief must link its chosen reference and describe a support/spine map. Do not transplant the photographed gallop's frame count into a vertical landing, or treat the video's final walking exit as an observed downward jump. New combinations of those mechanics must be labelled proposed until tested in Neko.
+
+Choose mechanics appropriate to the gesture: a quiet blink can keep chest/pelvis supported and still. These examples do not require exaggerated spine movement in every idle. The map should explain stillness as well as motion, preserving one clear main action.
 
 ### Expressions belong to gestures
 
@@ -60,6 +83,8 @@ For each action, record:
 
 Prototype the difficult geometry first: belly-up roll occlusion, low kneading support, deepest stretch and highest hop. For pickup, first prove the tall silhouette and release at arbitrary phases. Source slots are a planning budget, not a quota; repeated clean holds and neutral drawings may be selected intentionally. Source slots, unique drawings, clip order entries and screen repaints are different quantities.
 
+Before that geometry prototype, choose the reference and establish the key silhouettes, chest/pelvis/spine changes and support map. For high-travel lifecycle actions, prototype route and pose together: a technically clipped exit can still look like a rigid kitten being thrown across the monitor.
+
 ## 3. Canonical character and current production measurements
 
 Use `assets/neko_idle.png` as the generation identity reference and the actual atlas idle as the runtime comparison. Preserve white fur, gray chest/underchin shading, charcoal stepped outlines, pink nose/inner ears, large dark eyes with small square highlights, compact body and large head. Keep hard pixel clusters; use nearest-neighbor scaling for review/import.
@@ -88,7 +113,7 @@ The exact successful and rejected prompts are in [petting-revision-prompts.json]
 
 > Fixed camera and physical head volume; exactly four anatomical legs (two forelegs, two hindlegs), one connected torso/neck, one head, two ears and one attached tail. Occluded legs stay hidden. A lifted paw replaces its grounded version. Four chronological columns, generous clear cell padding, every complete sprite inside its cell. True transparent alpha; no floor, shadow, haze, props, hands, hearts, motion marks, labels, numbers, grid or watermark.
 
-Also specify the particular eye/lid/mouth/ear acting, weight-bearing joints and complete seated recovery. “Cute kitten animation” alone leaves too much room for unrelated poses or decorative motion. Request small connected changes and ease into/out of contact. The last revision requested 16–28 source slots depending on the story; larger budgets require their own justification.
+Also specify the particular eye/lid/mouth/ear acting, weight-bearing joints and complete seated recovery. “Cute kitten animation” alone leaves too much room for unrelated poses or decorative motion. Request distinct action-defining extremes and connected breakdowns between them, with ease into/out of contact. Small changes belong between strong extremes; they must not restrict the whole performance to nearly identical silhouettes. Earlier revisions used 16–28 source slots depending on the story; choose future counts from the motion, not those historical sheet sizes.
 
 Generated sheets can violate row count, equal spacing, size, anatomy and the requested expression. Inspect actual output rather than trusting the prompt. Reject/redraw unusable anatomy or expression. An adjacent complete drawing can replace a contaminated hold if the action remains coherent; record the substitution and recheck its timing. Never keep a bad frame merely to reach the planned count.
 
@@ -250,6 +275,7 @@ The pickup comparison retains each QImage object while copying `constBits()` int
 
 ### B. Review every selected drawing and connection
 
+- Before facial polish, compare the full-body extremes with the selected motion reference. Hide facial features and verify that line of action, spine shape, contact and weight changes explain the action. Mark a technically valid but weak performance for redraw; do not count pose coverage as artistic acceptance.
 - One connected head/neck/torso; two forelegs and two hindlegs accounted for, allowing natural occlusion; no extra grounded paw beneath a lifted leg; one attached tail, two coherent ears.
 - Review entry, action, maximum reach/turn, each loop seam, complete release and actual-idle handoff. Compare adjacent frames and slow playback, not only attractive keyframes.
 - Check head volume, eye/nose/mouth drift, expressions at native size and scale/alignment at both endpoints.
@@ -314,6 +340,7 @@ Do not relax an anatomy, scale, timing or clipping check merely to accept a new 
 
 | Date | Finding and correction | Evidence / remaining limit |
 | --- | --- | --- |
+| 2026-10-23 | User rejected the visitor acting despite passed technical checks. Supplied video shows reach → fore-contact with pelvis high → folding spine/hindquarter settling → recovery; supplied spine/silhouette sheets expose the missing range of whole-body shapes. Require reference selection, chest/pelvis/support maps and a face-hidden key-pose review before full sheets. Clarify that fixed identity/camera does not mean fixed silhouette or frozen orientation. | Five originals saved byte-identically with hashes in [the reference library](references/motion/README.md); full video decoded, timestamped scene/pose studies inspected. [Revised entrance/exit plan](docs/lifecycle-motion-v2-plan.md). Observations are reference evidence; the new workflow/acting is proposed and has not yet been validated in Neko. Existing reports/releases remain historical. |
 | 2026-10-23 | The first visitor recovery shrank to 67px and would pop to 83px idle. Redraw a separately calibrated supported recovery; keep the generated neutral before actual idle. Replace local departure erasure with actual window travel and monitor-edge clipping; retain origin through saves/cleanup and skip incompatible starting poses. | 115 focused checks; all 741 prior frames/63 unrelated clips identical; all 45 visitor entries pass component checks. Native event-loop painting covers 20 arrival/16 departure poses, both low and high exits, with home restored and foreground unchanged. [Validation and remaining limits](docs/visitor-validation.md). |
 | 2026-10-23 | Lifecycle source review distinguishes actual arrival travel from departure's in-canvas offset. A full second of the current 2.15s exit is two sad poses. A future edge exit needs world travel and saved-origin protection rather than a larger local offset. | [Source inspection, research and proposed storyboards](docs/arrival-goodbye-research.md); existing pose catalog reviewed. No new animation/runtime validation or implementation. Keep proposed peek/landing/exit techniques separate from tested recipes. |
 | 2026-10-22 | Launch rebuilt every calibrated sprite before showing Neko. Profiling found silhouette extraction dominated; move the unchanged importer to packaging and load lossless finished frames. Retain source fallback rather than weakening calibration or discarding animation frames. | All 741 frames compare pixel-identically; source atlas 5.49s versus packed load 0.27s in the same process. [Executable startup timings, package checks and limits](docs/startup-performance-validation.md). Source authoring still uses the full importer. |
