@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-22",
+  "source_sha256": {
+    "main.py": "ef3574d36e192fa4f897cbf43c20eb14717751b54900353df14073b43f393216",
+    "animations.py": "3c2da267fb1059d7b18bc1e86144688e5bdfd8c0a5ff3e6d4e7ef92b2b0e1842",
+    "games.py": "659236adf148c3433b036b094d10f78f23c939bd6c2d9c48f13b73a472c30ce9",
+    "assets/neko-game-run-v2.png": "6a61791a218c8a4d83661e46df1757fcaddf0ce47b4e1403ef2fafce781aee99",
+    "test_game_desktop.py": "22c75d8a2c261fec39edea7723e67bb9d433cc47a020a978377453648006a066",
+    "test_invitation.py": "247acb2071a53d4c1170d3ca98ae7b05828ba5abb307820d817342b04be19e53"
+  },
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 112730633,
+      "sha256": "31933e124f5464da4517742772ea7c42194dc181cad4d3ee3191886dbe588797"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 111857913,
+      "sha256": "b968569ac7ea611e1587e593ce4499446809e0ed834a5bd7f707a81a98b9ec3f"
+    }
+  },
+  "verification": {
+    "focused_tests_passed": 72,
+    "executable_resource_manifest_tests_passed": 2,
+    "full_suite": "not run, per requested focused verification",
+    "native_gameplay_and_sleep_soak": "left to user",
+    "90_second_wall_clock_wait": "not run; timer logic checked deterministically"
+  }
+}

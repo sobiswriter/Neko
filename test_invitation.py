@@ -3,6 +3,13 @@ from games import GameTimer, Runway
 
 
 class InvitationTests(unittest.TestCase):
+    def test_fresh_entry_can_wait_for_an_idle_animation_to_finish(self):
+        timer = GameTimer(0)
+        timer.tick(100, True, False, can_start=False)
+        timer.tick(100.2, True, True, can_start=False)
+        self.assertIsNone(timer.tick(100.5, True, True, can_start=False))
+        self.assertEqual(timer.tick(101, True, True), "automatic")
+
     def test_short_outside_flicker_does_not_mature_after_entry(self):
         timer = GameTimer(0)
         timer.tick(100, True, False)

@@ -157,6 +157,46 @@ class DesktopGameTests(unittest.TestCase):
             self.n.request_game()
         self.assertIsNone(self.n.game)
 
+    def test_idle_gesture_does_not_swallow_an_armed_side_invitation(self):
+        self.n.game_timer.due = self.now - 1
+        self.n.companion.state = NekoState.TAIL_CHASE
+        for dt, point in ((0, QPoint(346, 420)), (.2, QPoint(650, 420)), (.6, QPoint(650, 420))):
+            with patch("main.time.monotonic", return_value=self.now + dt), patch("main.QCursor.pos", return_value=point):
+                self.n.poll_game()
+        self.assertIsNone(self.n.game)
+        self.n.companion.state = NekoState.IDLE
+        with patch("main.time.monotonic", return_value=self.now + .7), patch("main.QCursor.pos", return_value=QPoint(650, 420)):
+            self.n.poll_game()
+        self.assertEqual(self.n.game.source, "automatic")
+
+    def test_unattended_sulk_can_finish_and_sleep_without_a_pet(self):
+        self.start()
+        self.n.game.started = True
+        self.n.game.result = "loss"
+        self.n.game.enter("curl", self.now)
+        self.n.companion.state = NekoState.DISAPPOINTED
+        self.n.companion.next_nap = 0
+        with patch("main.time.monotonic", return_value=self.now), patch("main.desktop_activity", return_value=(9999, 0, False)):
+            self.n.tick()
+        self.assertEqual(self.n.game.phase, "comfort")
+        self.assertEqual(self.n.game_interaction, "sleep")
+        self.step(4, (2000, -100))
+        self.assertIsNone(self.n.game)
+        with patch("main.time.monotonic", return_value=self.now), patch("main.desktop_activity", return_value=(9999, 0, False)):
+            self.n.tick()
+        self.assertEqual(self.n.companion.state, NekoState.FALLING_ASLEEP)
+        self.assertEqual((self.n.companion.pets, self.n.companion.naps), (0, 1))
+
+    def test_pet_can_override_the_automatic_settle_for_sleep(self):
+        self.start()
+        self.n.game.enter("comfort", self.now)
+        self.n.game_interaction = "sleep"
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.pet_reaction()
+        self.step(4, (2000, -100))
+        self.assertIsNone(self.n.game)
+        self.assertEqual((self.n.companion.pets, self.n.companion.naps), (1, 0))
+
     def test_button_held_in_another_app_discards_invitation_entry(self):
         self.n.game_timer.due = self.now - 1
         with patch("main.ctypes.windll.user32.GetAsyncKeyState", return_value=0x8000), \

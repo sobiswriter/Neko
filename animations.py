@@ -138,7 +138,7 @@ for mood in ("excited", "calm", "unimpressed", "sleepy"):
     CLIPS[f"held_{mood}"] = Clip(f"carry-{mood}", 0, (2400 // len(order),) * len(order), order, loop=True)
 
 GAME_ROWS = {"emotion": 6, "hunt": 6, "walk": 4, "ready": 4, "win-hop": 6,
-             "win-grasp": 5, "win-proud": 5, "loss-a": 4, "loss-b": 4, "loss-c": 4, "loss-bridge": 2}
+             "win-grasp": 5, "win-proud": 5, "loss-a": 4, "loss-b": 4, "loss-c": 4, "loss-bridge": 2, "run": 3}
 CLIPS.update({
     "game_ready": Clip("game-ready", 0, (200,) * 4),
     "game_three": Clip("game-ready", 0, (250,) * 4, (4, 5, 6, 7)),
@@ -146,8 +146,8 @@ CLIPS.update({
     "game_one": Clip("game-ready", 0, (250,) * 4, (12, 13, 14, 15)),
     "game_go": Clip("game-ready", 0, (350,), (15,)),
     "game_ready_cancel": Clip("game-ready", 0, (60,) * 16, tuple(reversed(range(16)))),
-    "game_run": Clip("game-hunt", 0, (70,) * 8, tuple(range(4, 12)), loop=True),
-    "game_turn": Clip("game-hunt", 0, (100, 100, 150), (12, 13, 14)),
+    "game_run": Clip("game-run", 0, (90,) * 8, tuple(range(1, 9)), loop=True),
+    "game_turn": Clip("game-run", 0, (100, 100, 150), (9, 10, 11)),
     "game_prepare": Clip("game-hunt", 0, (200,), (16,)),
     "game_jump": Clip("game-hunt", 0, (40, 80, 80, 240, 40, 60, 50, 50), tuple(range(16, 24))),
     "game_miss": Clip("game-hunt", 0, (150, 150, 150), (23, 14, 2)),
@@ -370,6 +370,8 @@ class SpriteAtlas:
                     hop = (0, 0, 0, 0, 3, 9, 4, 0, 0, 5, 13, 5, 0, 0, 3, 8, 4, 0, 0, 0, 0, 0, 0, 0)[index]
                 elif name == "win-grasp":
                     hop = {9: 4, 10: 10, 11: 4}.get(index, 0)
+                elif name == "run":
+                    hop = {3: 5, 4: 8}.get(index, 0)
                 left = (CANVAS_WIDTH - sprite.width()) // 2 + (2 if name in ("win-hop", "win-grasp") else 0)
                 painter.drawPixmap(left, 130 - hop - sprite.height(), sprite)
                 painter.end()

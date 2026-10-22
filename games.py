@@ -52,7 +52,7 @@ class GameTimer:
             self.pending = source
             self.log.append((now, "queued", source))
 
-    def tick(self, now, eligible, in_zone=False):
+    def tick(self, now, eligible, in_zone=False, can_start=True):
         if self.enabled and now >= self.due and self.pending is None:
             self.request(now)
         if not eligible or not self.pending:
@@ -71,7 +71,7 @@ class GameTimer:
                     else:
                         self.entered_at = now
                 invited = self.entered_at is not None and now - self.entered_at >= .25
-        if invited:
+        if invited and can_start:
             source, self.pending = self.pending, None
             self.previous_due = self.due
             self.due = math.inf

@@ -1,5 +1,12 @@
 # Animation rebuild checklist
 
+## Gallop, timer and sleep correction — delivered, 2026-10-22
+
+- [x] Replace running with eight reference-led gallop poses and sustained 360ms drawn expressions; update braking, provenance and production-timing previews.
+- [x] Retain fresh side-entry qualification through idle gestures; expose armed cooldown in the ordinary menu.
+- [x] Allow unattended disappointed curl to settle into sleep, preserving real pet/pickup overrides.
+- [x] Pass 72 focused checks and two executable resource/manifest checks; preserve the verified predecessor and build the flat release. [Report and remaining human checks](../docs/run-timer-sleep-fix.md).
+
 ## Cursor play v2 — approved implementation, 2026-10-22
 
 [Complete design, exact invitation/countdown rules and acceptance matrix](../docs/cursor-play-v2-plan.md).

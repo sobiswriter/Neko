@@ -1,5 +1,11 @@
 # Animation rebuild
 
+## Gallop/timer/sleep correction — authorized, 2026-10-22
+
+Delivered: [fixes, previews, focused verification and release identities](../docs/run-timer-sleep-fix.md). Extended play-testing remains with the user as requested.
+
+User requests a fast fix with focused checks, leaving extended play-testing to them. Use the supplied eight-frame100ms gallop as the mechanics reference, preserving Neko's identity and scale. One12-slot bank: neutral calibration; eight connected gallop poses (hind load/push, gathered ascent, reaching flight, full extension, fore contact, yielded support, hind gathering, hind load); three supported braking/turn poses ending near-front. Keep drawn excited squeezed eyes across the first four poses (360ms at90ms/pose), then reopen for landing/support across four poses. One720ms loop; only airborne flight poses receive small fixed5/8px registration offsets. Ground contacts stay planted; no face glyphs or per-pose scaling. Preserve jump/contact and outcome artwork. Review one native-size light/dark strip and short production-timing GIF, run focused timer/sleep/atlas regressions, build flat current/previous releases and inspect resources. Broad native play-through/full suite intentionally deferred to the user.
+
 ## Cursor play v2 — approved, 2026-10-22
 
 The user approved the [complete v2 design](../docs/cursor-play-v2-plan.md). Delivery and verification are complete: [final report, previews and release](../docs/cursor-play-v2-validation.md). Unrelated open work below is preserved.

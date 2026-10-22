@@ -13,15 +13,17 @@ Soft sounds are optional and off until you enable them.
   by default, with **90 seconds** between opportunities (adjustable from 30–600 seconds).
   The cooldown arms play; she waits for a fresh approach into the invisible reachable area
   beside her, outside her petting space. A stationary cursor cannot trigger it at expiry.
-  Naps, carrying, reactions, menus, typing and fullscreen take priority; Quiet company pauses it.
+  Naps, carrying, care, menus, typing and fullscreen take priority; Quiet company pauses it.
+  A fresh side approach during an idle gesture waits for that gesture to finish.
   She notices the arrow, gives a real **3… 2… 1… Here I come!**, then runs and pounces.
   There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
   wins one of three celebrations: happy hops, a proud hug or champion paws.
   Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
   sulks give her more life. Each chase lasts up to 45 seconds; four continuous seconds
   outside her reachable band ends it, with a little protest first.
-  After a loss she curls up, a little disappointed, until a quick pet comforts her through
-  a drawn get-up. Moving her preserves that mood and never counts as a nap.
+  After a loss she curls up, a little disappointed. A pet comforts her through a drawn get-up;
+  if left unattended, she can settle for her configured nap instead of sulking forever.
+  Moving her preserves that mood and never counts as a nap.
   **End game** lives in her ordinary menu/nook; petting, holding, hide and fullscreen can cancel neutrally.
   Gentle motion off uses a stationary paw target. The real pointer is never moved,
   hidden or captured. **Games played** and **Neko wins** are saved locally in her menu and nook.
@@ -58,7 +60,7 @@ Soft sounds are optional and off until you enable them.
 - **Come close.** She can notice a nearby cursor while keeping her place.
   Cursor chasing belongs to Catch the Cursor; ordinary idle following has been removed.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 729 entries, including 200 game source slots and a shared walk endpoint, with eight-frame transitions into
+  yawns and sleepy peeks share an atlas of 741 entries, including 212 game source slots and a shared walk endpoint, with eight-frame transitions into
   sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
   motion followed by a relaxed rest, without repeated head-bobbing or stretching.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.

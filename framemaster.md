@@ -8,7 +8,9 @@ The later [pickup revision](docs/pickup-validation.md) implements held expressio
 
 The first [Catch the Cursor release](docs/catch-validation.md) added 48 source slots for lateral hunting and disappointment/comfort. Its [prompts and assembly regions](docs/catch-prompts.json), [all imported slots](docs/neko-game-frames.png) and [native playback measurements](docs/catch-native.json) describe that release's 576 entries.
 
-The approved [cursor-play v2 revision](docs/cursor-play-v2-validation.md) replaces hunting and walking, adds anticipation/countdown and six distinct outcomes, and connects losses to the retained curl through a drawn look-up. Current atlas: **729 entries**, including 200 game source slots and an appended canonical walk endpoint. [Exact provenance](docs/cursor-play-v2-prompts.json), [every new imported slot](docs/cursor-play-v2-frames.png) and [native timing/coverage](docs/cursor-play-v2-native.json) record the evidence. All 552 retained frames (528 earlier plus the 24 curl/comfort frames) and 41 non-game/non-walk clips compare unchanged.
+The approved [cursor-play v2 revision](docs/cursor-play-v2-validation.md) replaces hunting and walking, adds anticipation/countdown and six distinct outcomes, and connects losses to the retained curl through a drawn look-up. That release contained729 entries; its [exact provenance](docs/cursor-play-v2-prompts.json), [imported slots](docs/cursor-play-v2-frames.png) and [native timing](docs/cursor-play-v2-native.json) remain historical evidence.
+
+The subsequent [gallop/timer/sleep correction](docs/run-timer-sleep-fix.md) adds one12-slot gallop/turn bank. Current atlas: **741 entries**, including212 game source slots and the appended walk idle. [Run provenance](docs/run-timer-sleep-prompts.json), [light/dark frames](docs/gallop-fix-frames.png) and [short preview](docs/gallop-fix.gif). Per the user's credit/time limit, verification is focused; full native play-through and broad regression are deliberately left to the user.
 
 ## 1. The design philosophy
 
@@ -72,7 +74,7 @@ Current pet production values in [animations.py](animations.py):
 | Near-idle final head center | Within 2 px of actual idle |
 | Final crown position | About y=48, ±2 px after top padding; held crown y=16 |
 | Pet/carry playback repaint interval | Precise Qt timer, 50 ms, nominal 20 FPS |
-| Total atlas entries | 729: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle + 200 game source slots + one appended walk idle |
+| Total atlas entries | 741: 147 earlier non-pet + 280 pet + 100 carry source slots + one appended carry idle + 212 game source slots + one appended walk idle |
 
 These are baseline measurements, not permission to force every posture into a seated shape. A lying kitten is lower and wider. Check continuity against appropriate anatomical landmarks throughout the action. If a new pose needs space, measure it at the retained character scale before changing the fixed canvas. Do not resize the desktop window on each pose.
 
@@ -117,6 +119,8 @@ These are revision-specific recipes, with full output identities in the JSON; th
 ## 6. Import at one scale; anchor the physical support
 
 ### Cursor-play v2 evidence
+
+The supplied gallop GIF has eight decoded frames (first0ms, remaining seven100ms). Its mechanics emphasize hind loading, leg gathering, spine extension and forepaw support. The replacement run selects eight drawings at90ms each, with drawn excited squeezed eyes across four consecutive poses (360ms), then four attentive open-eye support poses. This replaces the old70ms single-pose expression accent. Source flight poses3/4 have fixed5/8px lift offsets; contact poses remain at baseline130. Neutral calibration and all existing jump/paw-contact artwork remain unchanged. This recipe has light/dark strip, short runtime-timing preview and focused bounds/component checks, not a full new native gameplay validation.
 
 The game importer retains one neutral calibration per batch: head62/body82, baseline130 in the 192×144 canvas. Do not reuse a seated-width heuristic as a head-width measurement for a lying pose: the haunch can join the longest alpha run. Review the actual face, support and silhouette together. The first loss-c batch visibly grew through later rows and was redrawn against the actual new curl; per-pose fitting was rejected.
 
@@ -300,6 +304,7 @@ Do not relax an anatomy, scale, timing or clipping check merely to accept a new 
 
 | Date | Finding and correction | Evidence / remaining limit |
 | --- | --- | --- |
+| 2026-10-22 | A70ms run expression disappeared in motion; redraw the gallop against the user's eight-frame mechanics reference and keep acting across four poses (360ms), instead of freezing one pose longer. Add fixed flight lift only to airborne drawings. Idle gestures also discarded qualified invitations; defer launch until their supported finish. A persistent loss curl bypassed the nap state machine; complete its existing silent get-up/home path, then honor the due nap without counting a pet. |72 focused checks pass (71 timer/game/behavior plus care override), including reproductions that failed before correction. Twelve imported slots/741 atlas entries; [preview, provenance and limits](docs/run-timer-sleep-fix.md). Extended play, full suite and native animation QA intentionally deferred at the user's request. |
 | 2026-10-22 | Cursor-play v2 needed connected playful run/walk and six outcomes. Reject label/matte drafts, a proportion-drifting loss-c and an over-tall grasp recovery. Use complete silhouette crops, one repeated ready hold, whole-batch registration and a drawn curl look-up; retain the real neutral before walk idle. Countdown clocks begin after label presentation. | 729 atlas entries; all 200 game source slots pass bounds/components; 552 retained frames/41 unaffected clips compare unchanged. Native full pose coverage, actual one-second cues, hit-through and no focus theft in [v2 QA](docs/cursor-play-v2-validation.md). No physical mixed-DPI/multi-monitor trial or guarantee of subjective fun; prompts and rejected selections remain recorded. |
 | 2026-10-22 | A second probe timer calling `animate()` doubled the observed native paint rate; gaps between independent scenes also polluted the maximum. Observe actual `current_frame` calls under production's own timer and group intervals by scene. A staged outcome needs a fresh timestamp after the notice label, otherwise backwards-clock cancellation is correct. | Every used hunt/countdown/walk/outcome pose is actually painted; median 20.004ms, within-scene maximum 71.12ms at DPR 1.0. [Native record](docs/cursor-play-v2-native.json). Reject polling-only frame coverage as display evidence; other hardware remains untested. |
 | 2026-10-22 | A bare zero-delay deferred play callback could enter the desktop tick after its widget was deleted during QA teardown. Supply the widget as the Qt single-shot context so its lifetime owns the callback. | The same 20 controller/desktop checks now pass without the teardown traceback. No artwork, clip timing or proposed v2 behavior changes. [Startup/icon maintenance record](docs/startup-icon-validation.md). |
