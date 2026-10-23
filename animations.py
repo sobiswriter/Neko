@@ -58,7 +58,7 @@ class Clip:
 
 
 CLIPS = {
-    "idle": Clip("idle-v2-rest", 0, (2100, 200, 200, 300, 100, 100, 100, 300, 2400), tuple(range(9)), loop=True),
+    "idle": Clip("idle-v2-rest", 0, (2100, 200, 200, 300, 100, 100, 100, 300, 2300, 100), tuple(range(10)), loop=True),
     "tail": Clip("tailswish", 0, (300, 220, 220, 350, 220, 220, 280, 450, 700), (0, 1, 2, 3, 4, 5, 6, 8, 7)),
     "ears": Clip("idle-v2-ears", 0, (350, 200, 200, 250, 200, 350, 250, 250, 300, 350, 250, 250, 500), tuple(range(13))),
     "sniff": Clip("idle-v2-sniff", 0, (350, 250, 250, 250, 350, 350, 450, 300, 250, 300, 300, 250, 500), tuple(range(13))),
@@ -117,7 +117,7 @@ CLIPS = {
     "peek": Clip("idle-v2-peek", 0, (400, 250, 250, 250, 450, 450, 450, 300, 250, 250, 300, 300, 600), tuple(range(13))),
 }
 
-IDLE_ROWS = {"rest": 2, "loaf": 3, "stretch": 4, "groom": 3, "yawn": 3,
+IDLE_ROWS = {"rest": 3, "loaf": 3, "stretch": 4, "groom": 3, "yawn": 3,
              "peek": 3, "ears": 3, "sniff": 3, "look": 6}
 
 

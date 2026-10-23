@@ -25,7 +25,7 @@ class AnimationTests(unittest.TestCase):
             frame = self.atlas.frames[clip.bank, index // 4, index % 4].toImage()
             self.assertEqual(frame.copy(0,120,192,24), reference.copy(0,120,192,24), index)
             self.assertEqual(frame.copy(119,98,73,46), reference.copy(119,98,73,46), index)
-            self.assertEqual(frame.copy(84,83,10,17), reference.copy(84,83,10,17), index)
+            self.assertEqual(frame.copy(84,83,10,10), reference.copy(84,83,10,10), index)
             self.assertEqual(sprite_bounds(frame).bottom(), sprite_bounds(reference).bottom())
             outlines.append({(x,y) for y in range(104,120) for x in range(78,119)
                              if frame.pixelColor(x,y).alpha() >= 128
@@ -35,9 +35,22 @@ class AnimationTests(unittest.TestCase):
                     eyes = 73 <= y < 93 and (67 <= x < 84 or 94 <= x < 112)
                     ear = 59 <= x < 82 and 46 <= y < 73
                     torso = 78 <= x < 119 and 100 <= y < 120
-                    if not (eyes or ear or torso):
+                    mouth = 83 <= x < 95 and 93 <= y < 99
+                    if not (eyes or ear or torso or mouth):
                         self.assertEqual(frame.pixelColor(x,y), reference.pixelColor(x,y), (index,x,y))
         self.assertGreater(len(set(map(frozenset,outlines))), 2, "Need drawn limb acting, not a color pulse")
+
+    def test_resting_smile_lasts_half_the_loop_with_drawn_entry_and_release(self):
+        clip = CLIPS["idle"]
+        self.assertEqual(sum(clip.durations), 5800)
+        self.assertEqual(sum(ms for i,ms in zip(clip.order,clip.durations) if i in (5,6,7,8,9)), 2900)
+        mouth = lambda i: self.atlas.frames[clip.bank,i//4,i%4].toImage().copy(83,93,12,6)
+        self.assertTrue(all(mouth(i) == mouth(0) for i in range(5)))
+        self.assertTrue(all(mouth(i) == mouth(6) for i in (7,8)))
+        self.assertEqual(mouth(5),mouth(9))
+        self.assertNotEqual(mouth(5),mouth(0))
+        self.assertNotEqual(mouth(5),mouth(6))
+        self.assertEqual(self.atlas.frames[clip.bank,3,0].toImage(),self.atlas.frames["idle",0,0].toImage())
 
     def test_updated_looks_finish_with_a_drawn_happy_tilt_and_quiet_swish_stays_original(self):
         for name, intro, happy, recovery in (("look_left", (0,1,2,3,4,3,2,1,7), 18, 19),
@@ -408,7 +421,7 @@ class AnimationTests(unittest.TestCase):
     def test_idle_holds_then_blinks_and_loops(self):
         idle = CLIPS["idle"]
         self.assertEqual(idle.frame_index(0), 0)
-        self.assertGreaterEqual(idle.durations[-1], 1500)
+        self.assertGreaterEqual(idle.durations[-2], 1500)
         self.assertEqual(idle.frame_index(3.5), 8)
         blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (4, 5, 6))
         self.assertEqual(blink_ms, 300)

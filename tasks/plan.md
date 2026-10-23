@@ -311,3 +311,10 @@ Order after approval: V0 remove the play overlay → V1 invisible invitation/cou
 Replace the rejected breathing rest only. Study creator sitting-idle previews; retain generated iterations and exact prompts. Small foreleg/shoulder resettle, ear response and brisk happy blink; planted contacts, fixed head/scale and long quiet holds. Preserve all other art/clip definitions. Scope: rest source, assembly, idle timing, focused assertions, synchronized preview, native pose coverage, provenance/FrameMaster/README, flat current/previous release. Necessary source/native/package checks only; user judges appeal.
 
 Completed: four focused source cases, new-rest component/unchanged-art assertions, corrected native full sequence and three package checks pass. Built flat current/previous executables; prior verified release rotated only after success. Browser local-file playback is blocked; native-size synchronized GIF and keys are supplied for human review.
+
+
+## Accepted resting idle: mouth-only smile · 2026-10-23
+
+User chooses half-loop smile. Reuse existing authored mouth entry/hold/release; preserve accepted body and all synchronized non-mouth pixels. Keep5.8s loop/300ms blink. Scope: mouth composite/rest source count, idle quiet-hold split, focused tests/comparison/provenance/FrameMaster/README and flat current/previous build. No unrelated acting or settings.
+
+Completed: three focused source cases, full-loop synchronized mouth-only comparison, connected components, complete native0..9 sequence and three final package checks pass. Current build and verified immediate predecessor are retained in the flat release folder.
