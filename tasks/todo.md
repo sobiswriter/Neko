@@ -1,3 +1,9 @@
+## Newly authored resting breath · 2026-10-23
+
+- [x] Generate eight new breathing/expression poses, reject global torso drift, assemble reviewed local motion at fixed head/paw/tail anchors.
+- [x] Verify actual chest motion, fixed silhouette/support,300ms blink, all native phases and878 unrelated frames/64 clips; retain prompt/source and comparison.
+- [x] Pass final packed-frame/resource/startup checks, preserve the verified predecessor and record release identities. [Evidence](../docs/rest-breathing-validation.md).
+
 ## Resting stability and selective rollback · 2026-10-23
 
 - [x] Restore the original look-left/look-right/quiet-swish pixels, selections and cadence.

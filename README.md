@@ -60,9 +60,10 @@ Soft sounds are optional and off until you enable them.
 - **Come close.** She can notice a nearby cursor while keeping her place.
   Cursor chasing belongs to Catch the Cursor; ordinary idle following has been removed.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 883 entries, including 212 game source slots and 98 current/historical lifecycle entries, with eight-frame transitions into
-  sleep and back to sitting. Resting idle keeps the exact seated body still, with warm eyelid expressions,
-  a quick300ms blink and long open-eyed holds in a6.1s loop. Refreshed gestures last 3.5–6 seconds with drawn support changes
+  yawns and sleepy peeks share an atlas of 887 entries, including 212 game source slots and 98 current/historical lifecycle entries, with eight-frame transitions into
+  sleep and back to sitting. Resting idle uses eight newly drawn breathing/expression phases: a subtle local
+  chest/shoulder breath, tiny happy smile and quick300ms blink in a4s loop.
+  Head height, planted paws, tail and physical scale stay anchored. Refreshed gestures last 3.5–6 seconds with drawn support changes
   and complete recovery before the next rest. Pet requests wait for that recovery.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
   Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS; cursor games use a precise 50 FPS timer.
@@ -82,8 +83,9 @@ Soft sounds are optional and off until you enable them.
   a supported front stretch, sequential paw tuck into loaf, nose twitches and contented blinks.
   Left/right looks and lazy tail swish use their original drawings and cadence again;
   tail chase/catch remain preserved.
-  [Current before/after comparisons](docs/idle-stability-compare.html) ·
-  [resting stability verification](docs/idle-stability-validation.md).
+  [New resting before/after](docs/rest-breathing-compare.html) ·
+  [resting breath verification](docs/rest-breathing-validation.md) ·
+  [restored look/tail comparisons](docs/idle-stability-compare.html).
 - **A little tail trouble.** She runs low with closed eyes and a trailing tail through five quick
   turns, following the supplied GIF's eleven 50ms poses. The catch game takes two turns, then a small pounce and a
   two-paw catch before the tip slips away. An eager head tilt and crouch lead into play;
@@ -269,7 +271,7 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
-Packaging prepares all 883 calibrated animation frames once with
+Packaging prepares all 887 calibrated animation frames once with
 `tools/bake_atlas.py`. The executable loads those finished frames directly,
 avoiding source-sheet silhouette analysis on every launch. Source launches keep
 the original importer; source artwork and custom asset overrides are retained.

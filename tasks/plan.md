@@ -1,3 +1,7 @@
+## Newly authored resting breath · 2026-10-23
+
+User rejects eye-only freeze and requests new frames with subtle breathing/happy blinks, brisk movement and no global up/down/size drift. Draw eight new local chest/shoulder/expression poses; keep head/paw/tail anchors and silhouette stable,300ms blink,4s loop. Preserve restored looks/swish and all other clips. Reject source outer-torso drift, retain exact prompts/assembly and old/new comparison; verify local motion/anchors, native full sequence and final packed frames/resources/startup only. Preserve the verified immediate predecessor. [Evidence](../docs/rest-breathing-validation.md).
+
 ## Resting stability and selective rollback · 2026-10-23
 
 User rejects refreshed left/right looks and lazy tail. Restore their verified original frames, orders and cadence. Retain the liked warm eye acting in rest, but eliminate independent full-body redraws: immutable canonical seated body, generated eye-band transitions only,300ms blink, identical alpha and all pixels outside eyes. Preserve the other seven refreshes and accepted chase/catch. Save exact prompt/assembly, synchronized previous/fixed comparisons and focused stability/native/bundle/startup evidence. Preserve verified current before flat release replacement. [Evidence](../docs/idle-stability-validation.md).

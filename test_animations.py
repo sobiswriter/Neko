@@ -17,7 +17,7 @@ class AnimationTests(unittest.TestCase):
     def setUpClass(cls):
         cls.atlas = SpriteAtlas(Path(__file__).parent / "assets")
 
-    def test_resting_blink_keeps_every_pixel_outside_the_eyes_fixed(self):
+    def test_resting_breath_keeps_support_and_scale_fixed_with_local_drawn_motion(self):
         reference = self.atlas.frames["idle", 0, 0].toImage()
         clip = CLIPS["idle"]
         for index in set(clip.order):
@@ -25,8 +25,19 @@ class AnimationTests(unittest.TestCase):
             for y in range(CANVAS_HEIGHT):
                 for x in range(CANVAS_WIDTH):
                     self.assertEqual(frame.pixelColor(x, y).alpha(), reference.pixelColor(x, y).alpha())
-                    if not (73 <= y < 93 and (67 <= x < 84 or 94 <= x < 112)):
+                    eyes = 73 <= y < 93 and (67 <= x < 84 or 94 <= x < 112)
+                    mouth = 83 <= x < 95 and 93 <= y < 99
+                    chest = 78 <= x < 108 and 104 <= y < 117
+                    if not (eyes or mouth or chest):
                         self.assertEqual(frame.pixelColor(x, y), reference.pixelColor(x, y), (index, x, y))
+        inhale = self.atlas.frames[clip.bank, 0, 1].toImage()
+        crest = self.atlas.frames[clip.bank, 0, 2].toImage()
+        changed = 0
+        for x in range(78, 108):
+            for y in range(104, 117):
+                before, after = inhale.pixelColor(x, y).getRgb(), crest.pixelColor(x, y).getRgb()
+                changed += max(abs(a - b) for a, b in zip(before[:3], after[:3])) > 20
+        self.assertGreater(changed, 8)
 
     def test_rejected_looks_and_quiet_swish_use_the_original_orders_and_timing(self):
         self.assertEqual(CLIPS["look_left"].bank, "idleplay-c")
@@ -371,13 +382,13 @@ class AnimationTests(unittest.TestCase):
     def test_idle_holds_then_blinks_and_loops(self):
         idle = CLIPS["idle"]
         self.assertEqual(idle.frame_index(0), 0)
-        self.assertGreaterEqual(idle.durations[0], 2000)
-        self.assertEqual(idle.frame_index(2.4), 0)
-        blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (1, 2))
+        self.assertGreaterEqual(idle.durations[-1], 1500)
+        self.assertEqual(idle.frame_index(2.4), 8)
+        blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (3, 4, 5))
         self.assertEqual(blink_ms, 300)
-        self.assertEqual(idle.frame_index(3.05), 1)
-        self.assertEqual(idle.frame_index(3.15), 2)
-        self.assertEqual(idle.frame_index(3.25), 1)
+        self.assertEqual(idle.frame_index(1.45), 3)
+        self.assertEqual(idle.frame_index(1.55), 4)
+        self.assertEqual(idle.frame_index(1.65), 5)
         self.assertEqual(idle.frame_index(sum(idle.durations) / 1000), 0)
         self.assertEqual(self.atlas.frame("idle", 2.4, motion=False).toImage(), self.atlas.frames["idle", 0, 0].toImage())
 
