@@ -1,4 +1,4 @@
-"""Compare current idles to a verified executable at their actual playback speeds."""
+"""Compare quiet idles against an explicitly supplied pre-refresh executable."""
 import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from dataclasses import asdict
@@ -54,8 +54,7 @@ def preview(executable):
         for name in ("neko-runtime.png", "neko-runtime.json"):
             Path(temporary, name).write_bytes(archive.extract(names["assets/" + name]))
         old = previous.SpriteAtlas(temporary)
-        retired = {"idleplay-a", "idleplay-b", "idleplay-c", "tailswish"}
-        retained = [key for key in old.frames if key[0] not in retired]
+        retained = [key for key in old.frames if key in current.frames]
         assert all(old.frames[key].toImage() == current.frames[key].toImage() for key in retained)
         allowed = {name for name, _ in ITEMS}
         unchanged = [name for name in CLIPS if name not in allowed]
@@ -104,4 +103,4 @@ def preview(executable):
 
 
 if __name__ == "__main__":
-    preview(Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "dist/DesktopNeko-previous.exe")
+    preview(Path(sys.argv[1]))

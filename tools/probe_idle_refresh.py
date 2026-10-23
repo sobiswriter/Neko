@@ -58,9 +58,11 @@ def probe(output):
                 app.processEvents()
                 time.sleep(.004)
             painted = sorted({index for _, index in cat.paints})
+            sequence = [index for n, (_, index) in enumerate(cat.paints)
+                        if n == 0 or index != cat.paints[n - 1][1]]
             expected = sorted(set(CLIPS[name].order))
             gaps = [b[0] - a[0] for a, b in zip(cat.paints, cat.paints[1:])]
-            result[name] = {"painted": painted, "expected": expected, "complete": painted == expected,
+            result[name] = {"painted": painted, "expected": expected, "complete": painted == expected, "sequence": sequence,
                             "duration_ms": round(duration * 1000), "timer_ms": cat.animation_timer.interval(),
                             "max_paint_gap_ms": round(max(gaps, default=0) * 1000, 2)}
             print(name, result[name], flush=True)

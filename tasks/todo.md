@@ -1,3 +1,10 @@
+## Resting stability and selective rollback · 2026-10-23
+
+- [x] Restore the original look-left/look-right/quiet-swish pixels, selections and cadence.
+- [x] Replace wobbling resting redraws with authored eye bands on one exact fixed body;300ms blink.
+- [x] Verify fixed pixels/alpha,861 unaffected entries/61 clips,17 original restored frames, desktop recovery/pickup and native pose coverage; retain comparisons/provenance.
+- [x] Pass the three necessary packed-frame/resource/startup checks, preserve the verified immediate predecessor and record release identities. [Evidence and limits](../docs/idle-stability-validation.md).
+
 # Animation rebuild checklist
 
 ## Approved idle refresh · 2026-10-23

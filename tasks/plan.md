@@ -1,3 +1,7 @@
+## Resting stability and selective rollback · 2026-10-23
+
+User rejects refreshed left/right looks and lazy tail. Restore their verified original frames, orders and cadence. Retain the liked warm eye acting in rest, but eliminate independent full-body redraws: immutable canonical seated body, generated eye-band transitions only,300ms blink, identical alpha and all pixels outside eyes. Preserve the other seven refreshes and accepted chase/catch. Save exact prompt/assembly, synchronized previous/fixed comparisons and focused stability/native/bundle/startup evidence. Preserve verified current before flat release replacement. [Evidence](../docs/idle-stability-validation.md).
+
 # Animation rebuild
 
 ## Approved idle refresh · 2026-10-23

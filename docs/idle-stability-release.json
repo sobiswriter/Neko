@@ -1,0 +1,188 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "321e628",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 127521450,
+      "sha256": "d4bcaa32bc5ec5adbcfc14b123f34e3bed119c38155153fb5ff9887d4c446f78"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 127833593,
+      "sha256": "c0ab5ad82710cc7b869c16bcbdf71e58a4c6fe70c428e410352a0894a852eee3"
+    }
+  },
+  "source": {
+    "animations.py": {
+      "bytes": 36999,
+      "sha256": "67f97462284833cfe5927e43f6799919dee1a3c3b86410749126c6de737ecf4b"
+    },
+    "test_animations.py": {
+      "bytes": 23323,
+      "sha256": "d9e513c4f38ea0e8f75198dcbf3093a3deffc8c00206c7c138c6b61e01175729"
+    },
+    "test_main.py": {
+      "bytes": 73102,
+      "sha256": "9d463bdd55e3fc4c166c26e7520cdd144e585d5f31a18928d81762d8f3c5ec3f"
+    },
+    "tools/assemble_rest_blink.py": {
+      "bytes": 3536,
+      "sha256": "751b351a8cac0765a25a3d2d5faa06e1ea131a7902332b69fc7c4f1935f81ee5"
+    },
+    "tools/preview_idle_stability.py": {
+      "bytes": 5979,
+      "sha256": "152ebf5124980ac1ce9fc308ce28f9afe1317c65c7f6f3a8d9f93f0ffee153fc"
+    },
+    "tools/probe_idle_refresh.py": {
+      "bytes": 3854,
+      "sha256": "a507dc7798b49a2527f56418227fc3cf64512f8e35db2189b87a0d81170d07ad"
+    }
+  },
+  "active_refresh_assets": {
+    "assets/neko-idle-rest-v2.png": {
+      "bytes": 15147,
+      "sha256": "dfd919f18b56d2c046e534d5929ced8cf5bae4cf187e03632caa534fb98152b7"
+    },
+    "assets/neko-idle-loaf-v2.png": {
+      "bytes": 112964,
+      "sha256": "b89be0a2c726fc62e09c270b0d14e23bbe1c3c52b320a2db6dee457389ea57aa"
+    },
+    "assets/neko-idle-stretch-v2.png": {
+      "bytes": 177006,
+      "sha256": "d77bce21708e495bd880a49882f54be87994d6bb2f33bb20993c3c82ab079d1a"
+    },
+    "assets/neko-idle-groom-v2.png": {
+      "bytes": 118695,
+      "sha256": "6796317d855ba0bbf677f46bf2c159d1a9b7f94fca44a869be2e177a5cfea6c0"
+    },
+    "assets/neko-idle-yawn-v2.png": {
+      "bytes": 117033,
+      "sha256": "dc5e612dfbddf10f868a101f4b6e915e6aadd26433da81e08df7572c6cc3d619"
+    },
+    "assets/neko-idle-peek-v2.png": {
+      "bytes": 118547,
+      "sha256": "8b91db4304da7a5dd54106f6426fc80b67b13c3aa18a843752897a6e843d3444"
+    },
+    "assets/neko-idle-ears-v2.png": {
+      "bytes": 109041,
+      "sha256": "bfe3b3f78ac7e63c455611418f01d64d92a3937b6fa1a45854df6bf5535441b6"
+    },
+    "assets/neko-idle-sniff-v2.png": {
+      "bytes": 120587,
+      "sha256": "0e9f4bb25468032eaaf559a297827ae9a87addd0ccd8c99f1bd52ddf2b77719d"
+    }
+  },
+  "frozen_modules_match_source": {
+    "main": true,
+    "animations": true,
+    "behavior": true,
+    "thoughts": true,
+    "event_log": true,
+    "games": true
+  },
+  "main_and_behavior_bytecode_unchanged": true,
+  "metrics": {
+    "atlas_entries": 883,
+    "unchanged_frames_from_previous": 861,
+    "restored_pixel_identical_original_frames": 17,
+    "unchanged_clips": [
+      "ears",
+      "sniff",
+      "tail_chase",
+      "tail_catch",
+      "arrive",
+      "depart",
+      "happy",
+      "nuzzle",
+      "pet_stretch",
+      "back_arch",
+      "happy_hop",
+      "side_flop",
+      "shoulder_peek",
+      "knead",
+      "chin_scritch",
+      "roll",
+      "paw_offer",
+      "ear_rub",
+      "typing",
+      "groom",
+      "yawn",
+      "fall_asleep",
+      "wake",
+      "sleep",
+      "walk",
+      "stretch",
+      "loaf",
+      "peek",
+      "pickup",
+      "set_down",
+      "carry_to_calm",
+      "carry_to_unimpressed",
+      "carry_open_eyes",
+      "carry_yawn",
+      "held_excited",
+      "held_calm",
+      "held_unimpressed",
+      "held_sleepy",
+      "game_ready",
+      "game_three",
+      "game_two",
+      "game_one",
+      "game_go",
+      "game_ready_cancel",
+      "game_run",
+      "game_turn",
+      "game_prepare",
+      "game_jump",
+      "game_miss",
+      "game_settle",
+      "game_win_0",
+      "game_win_1",
+      "game_win_2",
+      "game_loss_0",
+      "game_loss_1",
+      "game_loss_2",
+      "game_loss_finish",
+      "game_curl",
+      "game_comfort",
+      "game_gentle_rest",
+      "game_gentle_reach"
+    ],
+    "restored_clips": [
+      "look_left",
+      "tail",
+      "look_right"
+    ],
+    "protected_tail_chase_catch_identical": true,
+    "blink_ms": 300,
+    "rest_loop_ms": 6100,
+    "eye_rectangles": [
+      [
+        67,
+        73,
+        84,
+        93
+      ],
+      [
+        94,
+        73,
+        112,
+        93
+      ]
+    ]
+  },
+  "checks": {
+    "source_cases_passed": 7,
+    "source_cases_passed_initially": 6,
+    "desktop_case_rechecked": 1,
+    "native_changed_clips_complete": 4,
+    "final_package_checks_passed": 3,
+    "checks_not_repeated": [
+      "full suite",
+      "unchanged icon/manifest",
+      "unrelated bundled goodbye",
+      "physical mixed-DPI/multiple-monitor",
+      "long soak"
+    ]
+  },
+  "scope": "Original left/right look and quiet swish restored; fixed shared resting body, generated eyelid regions only,300ms blink. Seven other refreshed gestures and protected tail chase/catch unchanged."
+}

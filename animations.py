@@ -58,9 +58,8 @@ class Clip:
 
 
 CLIPS = {
-    "idle": Clip("idle-v2-rest", 0, (2200, 350, 400, 150, 150, 150, 500, 400, 300, 2200),
-                 (0, 1, 2, 3, 4, 6, 7, 10, 11, 12), loop=True),
-    "tail": Clip("idle-v2-tail", 0, (350, 200, 250, 300, 400, 300, 250, 250, 350, 400, 300, 300, 550), tuple(range(13))),
+    "idle": Clip("idle-v2-rest", 0, (3000, 100, 100, 100, 2800), (0, 1, 2, 1, 3), loop=True),
+    "tail": Clip("tailswish", 0, (300, 220, 220, 350, 220, 220, 280, 450, 700), (0, 1, 2, 3, 4, 5, 6, 8, 7)),
     "ears": Clip("idle-v2-ears", 0, (350, 200, 200, 250, 200, 350, 250, 250, 300, 350, 250, 250, 500), tuple(range(13))),
     "sniff": Clip("idle-v2-sniff", 0, (350, 250, 250, 250, 350, 350, 450, 300, 250, 300, 300, 250, 500), tuple(range(13))),
     "tail_chase": Clip("tailplay", 0, (300, 180, 180, 100) + (50,) * 55 + (100, 180, 300, 600),
@@ -110,14 +109,14 @@ CLIPS = {
     "sleep": Clip("transitions", 1, (1400, 1400), (2, 3), loop=True),
     "walk": Clip("game-walk", 0, (120,) * 8, tuple(range(4, 12)), loop=True),
     "stretch": Clip("idle-v2-stretch", 0, (400, 200, 200, 250, 250, 300, 450, 400, 500, 250, 250, 250, 250, 300, 350, 300, 450), tuple(range(17))),
-    "look_left": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 500), (0, 1, 2, 3, 4, 3, 2, 1, 7, 16)),
-    "look_right": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 500), (8, 9, 10, 11, 12, 11, 10, 9, 15, 16)),
+    "look_left": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 1, 2, 3, 7)),
+    "look_right": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 4, 5, 6, 7)),
     "loaf": Clip("idle-v2-loaf", 0, (400, 250, 250, 250, 300, 900, 900, 500, 350, 300, 350, 300, 950), tuple(range(13))),
     "peek": Clip("idle-v2-peek", 0, (400, 250, 250, 250, 450, 450, 450, 300, 250, 250, 300, 300, 600), tuple(range(13))),
 }
 
-IDLE_ROWS = {"rest": 3, "loaf": 3, "stretch": 4, "groom": 3, "yawn": 3,
-             "peek": 3, "ears": 3, "sniff": 3, "look": 4, "tail": 3}
+IDLE_ROWS = {"rest": 1, "loaf": 3, "stretch": 4, "groom": 3, "yawn": 3,
+             "peek": 3, "ears": 3, "sniff": 3}
 
 
 PET_ROWS = {"happy": 4, "nuzzle": 5, "knead": 6, "chin_scritch": 4, "roll": 6, "paw_offer": 5,
@@ -379,10 +378,9 @@ class SpriteAtlas:
                     index // 4 * CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT)
             imported[bank, 0, 0] = idle
             imported[bank, rows, 0] = idle
-            if name == "look":
-                imported[bank, 2, 0] = idle
         self.frames = {key: frame for key, frame in self.frames.items()
-                       if key[0] not in ("idleplay-a", "idleplay-b", "idleplay-c", "tailswish")}
+                       if key[0] not in ("idleplay-a", "idleplay-b")
+                       and not (key[0] == "idleplay-c" and key[1] < 4)}
         self.frames.update(imported)
 
     def load_motion(self, path):

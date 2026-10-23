@@ -2,6 +2,8 @@
 
 Resting idle has first priority in idle refreshes. Every animation brief must specify readable, action-specific eye, ear, mouth and head expressions, their held duration and drawn transitions; expressions are a standing requirement, not an optional polish pass. Review them at native desktop size and normal speed. Preserve quiet holds and supported anatomy. For replacements, retain and show synchronized old/new comparisons. Never change the accepted tail chase/catch incidentally.
 
+Stationary resting blinks must retain the exact shared seated silhouette, scale and pixels outside the authored eye regions. Matching bounding boxes alone does not prevent redraw wobble. Any future breathing motion needs explicit native-size review before replacing this stable rest.
+
 Before planning, generating or modifying Neko animations, read [framemaster.md](framemaster.md) and the current validation report it links. Follow its character, anatomy, scale, transition, runtime and verification guidance.
 
 When animation work produces a verified discovery, update the relevant section of `framemaster.md` and its dated findings log. Record the evidence, correction, rejected approach and remaining limits; keep proposed techniques distinct from tested practice. Update affected prompts/assembly records, previews, tests and README descriptions together. Preserve historical validation reports.

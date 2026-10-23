@@ -17,6 +17,28 @@ class AnimationTests(unittest.TestCase):
     def setUpClass(cls):
         cls.atlas = SpriteAtlas(Path(__file__).parent / "assets")
 
+    def test_resting_blink_keeps_every_pixel_outside_the_eyes_fixed(self):
+        reference = self.atlas.frames["idle", 0, 0].toImage()
+        clip = CLIPS["idle"]
+        for index in set(clip.order):
+            frame = self.atlas.frames[clip.bank, index // 4, index % 4].toImage()
+            for y in range(CANVAS_HEIGHT):
+                for x in range(CANVAS_WIDTH):
+                    self.assertEqual(frame.pixelColor(x, y).alpha(), reference.pixelColor(x, y).alpha())
+                    if not (73 <= y < 93 and (67 <= x < 84 or 94 <= x < 112)):
+                        self.assertEqual(frame.pixelColor(x, y), reference.pixelColor(x, y), (index, x, y))
+
+    def test_rejected_looks_and_quiet_swish_use_the_original_orders_and_timing(self):
+        self.assertEqual(CLIPS["look_left"].bank, "idleplay-c")
+        self.assertEqual(CLIPS["look_left"].row, 4)
+        self.assertEqual(CLIPS["look_left"].order, (0, 1, 2, 3, 7))
+        self.assertEqual(CLIPS["look_right"].order, (0, 4, 5, 6, 7))
+        for name in ("look_left", "look_right"):
+            self.assertEqual(CLIPS[name].durations, (300, 400, 850, 450, 700))
+        self.assertEqual(CLIPS["tail"].bank, "tailswish")
+        self.assertEqual(CLIPS["tail"].order, (0, 1, 2, 3, 4, 5, 6, 8, 7))
+        self.assertEqual(CLIPS["tail"].durations, (300, 220, 220, 350, 220, 220, 280, 450, 700))
+
     def test_tall_canvas_preserves_the_old_visible_footprint_below_top_padding(self):
         atlas = self.atlas
         idle = atlas.frame("idle", 0)
@@ -94,7 +116,7 @@ class AnimationTests(unittest.TestCase):
         idle = atlas.frame("idle", 0).toImage()
         for name in ("groom", "stretch", "loaf", "sniff", "ears", "yawn", "peek", "look_left", "look_right"):
             clip = CLIPS[name]
-            self.assertTrue(clip.bank.startswith("idle-v2-"), name)
+            self.assertTrue(clip.bank.startswith("idle-v2-") or name in ("look_left", "look_right"), name)
             self.assertGreaterEqual(len(set(clip.order)), 5, name)
             self.assertFalse(clip.loop, name)
             self.assertLess(sum(clip.durations), 8000 if name == "loaf" else 6000, name)
@@ -115,7 +137,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
         atlas = self.atlas
-        self.assertEqual(len(atlas.frames), 839 - 73 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS))
+        self.assertEqual(len(atlas.frames), 839 - 56 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS))
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
@@ -350,11 +372,12 @@ class AnimationTests(unittest.TestCase):
         idle = CLIPS["idle"]
         self.assertEqual(idle.frame_index(0), 0)
         self.assertGreaterEqual(idle.durations[0], 2000)
-        self.assertEqual(idle.frame_index(2.4), 1)
-        blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (3, 4, 5, 6))
-        self.assertGreaterEqual(blink_ms, 300)
-        self.assertLessEqual(blink_ms, 500)
-        self.assertNotIn(5, idle.order)  # A second closed-eye hold made the blink sluggish.
+        self.assertEqual(idle.frame_index(2.4), 0)
+        blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (1, 2))
+        self.assertEqual(blink_ms, 300)
+        self.assertEqual(idle.frame_index(3.05), 1)
+        self.assertEqual(idle.frame_index(3.15), 2)
+        self.assertEqual(idle.frame_index(3.25), 1)
         self.assertEqual(idle.frame_index(sum(idle.durations) / 1000), 0)
         self.assertEqual(self.atlas.frame("idle", 2.4, motion=False).toImage(), self.atlas.frames["idle", 0, 0].toImage())
 

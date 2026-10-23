@@ -799,11 +799,12 @@ class DesktopTests(unittest.TestCase):
             if state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):
                 continue
             start = time.monotonic()
-            self.neko.companion.state = state
+            self.neko.companion.pose(state, start, 6)
             self.neko.pose_started = start
             self.neko.refresh_asset()
             duration = sum(CLIPS[self.neko.current_clip].durations) / 1000
-            self.assertAlmostEqual(self.neko.companion.pose_until, start + duration)
+            deadline = duration if CLIPS[self.neko.current_clip].bank.startswith("idle-v2-") else 6
+            self.assertAlmostEqual(self.neko.companion.pose_until, start + deadline)
             self.assertEqual(self.neko.animation_timer.interval(), 100)
             now = start + duration * .45
             before = self.neko.current_frame(now).toImage()
