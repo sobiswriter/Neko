@@ -183,6 +183,14 @@ class PackagingTests(unittest.TestCase):
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
                     process.wait(timeout=5)
 
+    def test_bundled_menu_plays_goodbye_from_idle_gesture_and_visible_fullscreen(self):
+        import sys
+        with tempfile.TemporaryDirectory() as folder:
+            result = subprocess.run([sys.executable, str(Path(__file__).parent / "tools/probe_bundled_goodbye.py"),
+                                     str(self.exe), str(Path(folder) / "result.json")],
+                                    capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

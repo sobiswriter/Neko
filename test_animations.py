@@ -321,7 +321,7 @@ class AnimationTests(unittest.TestCase):
         clip = CLIPS["depart"]
         self.assertEqual(clip.order[:8], (0, 1, 2, 16, 17, 18, 19, 20))
         self.assertGreaterEqual(sum(clip.durations[:5]), 700)
-        self.assertEqual(clip.order[8:], (4, 5) + tuple(range(6, 16)))
+        self.assertEqual(clip.order[8:], (4, 5, 6, 7, 8, 11, 13, 14, 15))
         self.assertEqual(departure_progress(1.2), 0)
         self.assertGreater(departure_progress(1.3), 0)
 

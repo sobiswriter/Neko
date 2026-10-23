@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Drop-out correction — 2026-10-23
+
+User approves the rest but reports missing goodbye in the exe and requests one graceful leap. Reproduce with the replaced executable's main/animation bytecode, assets and actual Qt menu action. Fix awake-gesture and deliberately visible fullscreen skip paths; preserve recovery before one sad goodbye, suppress competing actions and retain prompt interruption. Remove the flight tuck/re-extension/steep reversal through selection only. Preserve all839 frames and entrance. [Evidence and limits](../docs/dropout-fix-validation.md).
+
 ## Reference-led lifecycle v2 — delivered, 2026-10-23
 
 Implementation authorized by the user's “Well let's hope you don't disappoint this time.” Latest direction requires one graceful diagonal leap per action. Delivered reference-led key art, face-hidden review, connected poses, planted contacts and diagonal routes; prior release/provenance preserved. [Current evidence](../docs/lifecycle-v2-validation.md).

@@ -1,5 +1,12 @@
 # Animation rebuild checklist
 
+## Drop-out correction — 2026-10-23
+
+- [x] Reproduce zero goodbye paints in the previous executable's awake-gesture and visible-fullscreen menu paths; retain before records under ignored build storage.
+- [x] Queue finite awake recovery, respect visible-fullscreen preference, preserve pending-close interruptions and suppress competing reactions.
+- [x] Select one continuous reaching flight without midair tuck/re-extension; keep sadness and entrance unchanged.
+- [x] Pass125 source checks across focused runs and five package checks; add a permanent bundled-menu probe and preserve all839 frames. [Report](../docs/dropout-fix-validation.md).
+
 ## Reference-led lifecycle v2 — delivered, 2026-10-23
 
 - [x] Preserve all five supplied originals in the project and verify byte-identical hashes; index source identities and motion-use limits.

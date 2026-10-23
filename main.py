@@ -446,6 +446,7 @@ class NekoWidget(QWidget):
         self.carry_clock_offset = 0
         self.carry_released_elapsed = None
         self.closing = False
+        self.quit_pending = False
         self.started = time.monotonic()
         self.pose_started = self.started
         self.look_direction = -1
@@ -587,6 +588,9 @@ class NekoWidget(QWidget):
             self.end_game(immediate=True)
         self.motion = enabled
         if not enabled:
+            if self.quit_pending:
+                self.finish_quit()
+                return
             self.companion.pet_pending = False
             self.reset_pet_cursor()
             if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
@@ -676,7 +680,7 @@ class NekoWidget(QWidget):
     def poll_game(self):
         now = time.monotonic()
         manual = self.game_timer.pending == "manual"
-        eligible = (self.game is None and not self.closing and not self.is_manually_hidden
+        eligible = (self.game is None and not self.closing and not self.quit_pending and not self.is_manually_hidden
                     and self.isVisible() and not self.fullscreen and not self.menu.isVisible()
                     and not (self.stats_window and self.stats_window.isVisible())
                     and self.companion.state in (NekoState.IDLE,) + IDLE_STATES and self.drag_origin is None
@@ -846,6 +850,11 @@ class NekoWidget(QWidget):
 
     def animate(self):
         now = time.monotonic()
+        if self.quit_pending and now >= self.companion.pose_until:
+            self.quit_pending = False
+            self.companion.state = NekoState.IDLE
+            self.quit_neko()
+            return
         if self.game and self.companion.state in GAME_STATES:
             self.advance_game(now)
             self.update()
@@ -893,6 +902,9 @@ class NekoWidget(QWidget):
 
     def set_hide_fullscreen(self, enabled):
         self.hide_fullscreen = enabled
+        if enabled and self.fullscreen and self.quit_pending:
+            self.finish_quit()
+            return
         if enabled and self.fullscreen and self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
             self.finish_transition()
         self.dismiss_bubble()
@@ -958,7 +970,7 @@ class NekoWidget(QWidget):
         self.bubble.hide()
 
     def tick(self):
-        if (self.closing or self.is_manually_hidden
+        if (self.closing or self.quit_pending or self.is_manually_hidden
                 or self.companion.state == NekoState.LEAVING):
             return
         now = time.monotonic()
@@ -1186,6 +1198,8 @@ class NekoWidget(QWidget):
         self.offline_line("idle")
 
     def pet_reaction(self):
+        if self.quit_pending:
+            return
         if self.game_interaction == "sleep":
             self.game_interaction = "pet"
         if self.game:
@@ -1478,7 +1492,7 @@ class NekoWidget(QWidget):
         super().leaveEvent(event)
 
     def mousePressEvent(self, event):
-        if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
+        if self.quit_pending or self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING):
             event.ignore()
             return
         if event.button() == Qt.LeftButton:
@@ -1548,7 +1562,7 @@ class NekoWidget(QWidget):
         self.dismiss_bubble()
 
     def clamp_position(self, *args):
-        if self.companion.state == NekoState.LEAVING:
+        if self.quit_pending or self.companion.state == NekoState.LEAVING:
             self.finish_quit()
             return
         if self.companion.state == NekoState.ARRIVING:
@@ -1570,7 +1584,7 @@ class NekoWidget(QWidget):
         self.companion.pet_pending = False
         self.reset_pet_cursor()
         self.restore_arrival_position()
-        if self.companion.state == NekoState.LEAVING:
+        if self.quit_pending or self.companion.state == NekoState.LEAVING:
             self.finish_quit()
             return
         if self.companion.state == NekoState.ARRIVING:
@@ -1588,7 +1602,7 @@ class NekoWidget(QWidget):
         self.sync_animation()
 
     def show_neko(self, greet=False):
-        if self.closing or self.companion.state == NekoState.LEAVING:
+        if self.closing or self.quit_pending or self.companion.state == NekoState.LEAVING:
             return
         self.is_manually_hidden = False
         self.hide_action.setText("Hide Neko")
@@ -1606,7 +1620,7 @@ class NekoWidget(QWidget):
         self.pin_to_top(force=True)
 
     def open_stats_window(self):
-        if self.closing or self.companion.state == NekoState.LEAVING:
+        if self.closing or self.quit_pending or self.companion.state == NekoState.LEAVING:
             return
         self.dismiss_bubble()
         if self.stats_window is None:
@@ -1641,13 +1655,13 @@ class NekoWidget(QWidget):
         self.settings.sync()
 
     def quit_neko(self):
-        if self.closing or self.companion.state == NekoState.LEAVING:
+        if self.closing or self.quit_pending or self.companion.state == NekoState.LEAVING:
             return
-        compatible = self.companion.state in (NekoState.IDLE, NekoState.ARRIVING)
+        compatible = self.companion.state not in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING) + CARRY_STATES + GAME_STATES
         self.cancel_pickup()
         self.end_game(immediate=True, clear_mood=True)
         self.restore_arrival_position()
-        if (compatible and self.motion and self.isVisible() and not self.fullscreen and not self.is_manually_hidden
+        if (compatible and self.motion and self.isVisible() and not (self.fullscreen and self.hide_fullscreen) and not self.is_manually_hidden
                 and not self.atlas.frame("depart", 0).isNull()):
             self.drag_origin = None
             self.ai_generation += 1
@@ -1656,7 +1670,14 @@ class NekoWidget(QWidget):
             self.menu.hide()
             if self.stats_window:
                 self.stats_window.close()
-            self.start_transition(NekoState.LEAVING, "depart")
+            if self.companion.state not in (NekoState.IDLE, NekoState.ARRIVING):
+                # Let the authored recovery finish rather than snapping a moving pose to seated goodbye.
+                self.quit_pending = True
+                self.companion.pet_pending = False
+                self.companion.pending_window = None
+                self.companion.pose_until = self.pose_started + sum(CLIPS[self.current_clip].durations) / 1000
+            else:
+                self.start_transition(NekoState.LEAVING, "depart")
         else:
             self.finish_quit()
 
@@ -1725,6 +1746,7 @@ class NekoWidget(QWidget):
                 self.offline_line("hello")
 
     def finish_quit(self):
+        self.quit_pending = False
         self.reset_pet_cursor()
         self.restore_arrival_position()
         self.transition_timer.stop()

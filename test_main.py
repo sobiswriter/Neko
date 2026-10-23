@@ -508,6 +508,56 @@ class DesktopTests(unittest.TestCase):
             quit_app.assert_called_once()
         self.assertTrue(self.neko.closing)
 
+    def test_menu_goodbye_finishes_an_awake_gesture_then_leaves_once(self):
+        self.neko.companion.state = NekoState.TAIL_CHASE
+        self.neko.pose_started = time.monotonic()
+        self.neko.refresh_asset()
+        action = next(action for action in self.neko.menu.actions() if action.text() == "Let her go · quit")
+        with patch("main.QApplication.quit") as quit_app:
+            action.trigger()
+            self.assertTrue(getattr(self.neko, "quit_pending", False))
+            self.assertFalse(self.neko.closing)
+            deadline = self.neko.companion.pose_until
+            self.neko.pet_reaction()
+            self.neko.tick()
+            action.trigger()
+            self.assertEqual(self.neko.companion.pose_until, deadline)
+            with patch("main.time.monotonic", return_value=deadline + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.companion.state, NekoState.LEAVING)
+            quit_app.assert_not_called()
+            self.neko.finish_transition()
+            quit_app.assert_called_once()
+
+    def test_visible_fullscreen_pet_still_plays_menu_goodbye(self):
+        self.neko.fullscreen = True
+        self.neko.hide_fullscreen = False
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertEqual(self.neko.companion.state, NekoState.LEAVING)
+            quit_app.assert_not_called()
+
+    def test_motion_off_can_finish_a_pending_gesture_goodbye(self):
+        self.neko.companion.state = NekoState.TAIL_CHASE
+        self.neko.refresh_asset()
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertTrue(self.neko.quit_pending)
+            self.neko.set_motion(False)
+            quit_app.assert_called_once()
+            self.assertFalse(self.neko.quit_pending)
+
+    def test_fullscreen_hiding_can_finish_a_pending_gesture_goodbye(self):
+        self.neko.companion.state = NekoState.TAIL_CHASE
+        self.neko.refresh_asset()
+        self.neko.fullscreen = True
+        self.neko.hide_fullscreen = False
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertTrue(self.neko.quit_pending)
+            self.neko.set_hide_fullscreen(True)
+            quit_app.assert_called_once()
+
     def test_departure_is_clipped_at_its_monitor_not_a_neighbour_below(self):
         self.neko.start_transition(NekoState.LEAVING, "depart")
         self.neko.lifecycle_area = QRect(0, 0, 800, 800)

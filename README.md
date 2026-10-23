@@ -93,17 +93,18 @@ Soft sounds are optional and off until you enable them.
   The 1.98s entrance uses 19 selected poses and ends at her actual idle and saved position.
   **Let her go · quit** gives her lowered ears, soft sad eyes and a dipped head,
   then a drawn turn into a loaded crouch and one diagonal
-  leap out, stretching then tucking/reaching with her attached tail following.
+  leap out, extending into a continuous downward reach with her attached tail following.
   High perches use a nearer side boundary; low departures head diagonally down.
-  This 20-entry goodbye lasts 2.20s and moves the actual window, while preserving
+  This 17-entry goodbye lasts 2.20s and moves the actual window, while preserving
   her resting position. Both clocks start on Qt's first animation tick so loading
   cannot spend the performance before it appears. Visible fullscreen launches also
   play the drop-in, silently; the fullscreen hiding preference still applies.
   They keep her saved desktop position, and do not accept pets or
   window reactions midway through. Reduced motion skips the jumps; quitting
-  while hidden or fullscreen is immediate. Sleeping, held or other incompatible
-  poses close immediately rather than snapping into a seated goodbye. Hide/Show
-  remains immediate. [Preview and verification](docs/lifecycle-v2-validation.md).
+  while hidden is immediate. A visible fullscreen pet still says goodbye when
+  fullscreen hiding is disabled. Awake gestures finish their drawn recovery before
+  goodbye, with new reactions paused. Sleeping, held and active game states close
+  immediately. Hide/Show remains immediate. [Preview and verification](docs/dropout-fix-validation.md).
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual

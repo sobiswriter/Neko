@@ -102,6 +102,7 @@ if __name__ == "__main__":
                 sheet.paste(frame, (x + 8, y + 16), frame)
                 draw.text((x + 8, y + 162), f"{name} {i}", fill="#918b83")
             band += (len(clip.order) + 7) // 8
-    sheet.save(ROOT / "docs/lifecycle-v2-frames.png")
-    scene(atlas, ROOT / "docs/lifecycle-v2-scene.gif")
-    scene(atlas, ROOT / "docs/lifecycle-v2-silhouette.gif", silhouette=True)
+    prefix = sys.argv[1] if len(sys.argv) > 1 else "dropout-fix"
+    sheet.save(ROOT / f"docs/{prefix}-frames.png")
+    scene(atlas, ROOT / f"docs/{prefix}-scene.gif")
+    scene(atlas, ROOT / f"docs/{prefix}-silhouette.gif", silhouette=True)
