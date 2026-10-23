@@ -1,3 +1,9 @@
+## Updated looks and happy tilted smile · 2026-10-23
+
+- [x] Preserve updated glance cells and append separately authored happy head tilts/neutral recoveries in both directions; save supplied reference and provenance.
+- [x] Correct neutral registration, verify updated selections/support/ear slopes/components, compare879 retained frames/63 other clips and observe both exact native sequences.
+- [x] Pass all three necessary resource/baked-frame/startup checks, preserve the verified predecessor and record release identities. [Evidence](../docs/look-tilt-validation.md).
+
 ## Newly authored resting breath · 2026-10-23
 
 - [x] Generate eight new breathing/expression poses, reject global torso drift, assemble reviewed local motion at fixed head/paw/tail anchors.

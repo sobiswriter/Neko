@@ -109,14 +109,16 @@ CLIPS = {
     "sleep": Clip("transitions", 1, (1400, 1400), (2, 3), loop=True),
     "walk": Clip("game-walk", 0, (120,) * 8, tuple(range(4, 12)), loop=True),
     "stretch": Clip("idle-v2-stretch", 0, (400, 200, 200, 250, 250, 300, 450, 400, 500, 250, 250, 250, 250, 300, 350, 300, 450), tuple(range(17))),
-    "look_left": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 1, 2, 3, 7)),
-    "look_right": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 4, 5, 6, 7)),
+    "look_left": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 150, 150, 600, 150, 150, 200, 500),
+                      (0, 1, 2, 3, 4, 3, 2, 1, 7, 16, 17, 18, 17, 16, 19, 24)),
+    "look_right": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 150, 150, 600, 150, 150, 200, 500),
+                       (8, 9, 10, 11, 12, 11, 10, 9, 15, 20, 21, 22, 21, 20, 23, 24)),
     "loaf": Clip("idle-v2-loaf", 0, (400, 250, 250, 250, 300, 900, 900, 500, 350, 300, 350, 300, 950), tuple(range(13))),
     "peek": Clip("idle-v2-peek", 0, (400, 250, 250, 250, 450, 450, 450, 300, 250, 250, 300, 300, 600), tuple(range(13))),
 }
 
 IDLE_ROWS = {"rest": 2, "loaf": 3, "stretch": 4, "groom": 3, "yawn": 3,
-             "peek": 3, "ears": 3, "sniff": 3}
+             "peek": 3, "ears": 3, "sniff": 3, "look": 6}
 
 
 PET_ROWS = {"happy": 4, "nuzzle": 5, "knead": 6, "chin_scritch": 4, "roll": 6, "paw_offer": 5,
@@ -378,9 +380,10 @@ class SpriteAtlas:
                     index // 4 * CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT)
             imported[bank, 0, 0] = idle
             imported[bank, rows, 0] = idle
+            if name == "look":
+                imported[bank, 2, 0] = idle
         self.frames = {key: frame for key, frame in self.frames.items()
-                       if key[0] not in ("idleplay-a", "idleplay-b")
-                       and not (key[0] == "idleplay-c" and key[1] < 4)}
+                       if key[0] not in ("idleplay-a", "idleplay-b", "idleplay-c")}
         self.frames.update(imported)
 
     def load_motion(self, path):

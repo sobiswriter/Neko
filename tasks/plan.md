@@ -1,3 +1,7 @@
+## Updated looks and happy tilted smile · 2026-10-23
+
+User requests restored updated looks plus the original tilted smile from their screenshot. Preserve the updated sixteen-cell glance bank and add eight new drawn head/neck tilt/neutral poses;600ms happy closed-eye smile,150ms connecting tilts, complete level recovery,4.9s performance. Support/paws/tail stay planted; separate authored head tilts per direction, no full-body mirror/rotation. Preserve rest breathing and original quiet tail/chase/catch. Retain references/provenance/comparisons; verify only changed source anchors/components/selection, native sequence and final resource/frame/startup checks, then preserve/rotate the predecessor. [Evidence](../docs/look-tilt-validation.md).
+
 ## Newly authored resting breath · 2026-10-23
 
 User rejects eye-only freeze and requests new frames with subtle breathing/happy blinks, brisk movement and no global up/down/size drift. Draw eight new local chest/shoulder/expression poses; keep head/paw/tail anchors and silhouette stable,300ms blink,4s loop. Preserve restored looks/swish and all other clips. Reject source outer-torso drift, retain exact prompts/assembly and old/new comparison; verify local motion/anchors, native full sequence and final packed frames/resources/startup only. Preserve the verified immediate predecessor. [Evidence](../docs/rest-breathing-validation.md).

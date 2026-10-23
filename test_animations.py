@@ -39,16 +39,42 @@ class AnimationTests(unittest.TestCase):
                 changed += max(abs(a - b) for a, b in zip(before[:3], after[:3])) > 20
         self.assertGreater(changed, 8)
 
-    def test_rejected_looks_and_quiet_swish_use_the_original_orders_and_timing(self):
-        self.assertEqual(CLIPS["look_left"].bank, "idleplay-c")
-        self.assertEqual(CLIPS["look_left"].row, 4)
-        self.assertEqual(CLIPS["look_left"].order, (0, 1, 2, 3, 7))
-        self.assertEqual(CLIPS["look_right"].order, (0, 4, 5, 6, 7))
-        for name in ("look_left", "look_right"):
-            self.assertEqual(CLIPS[name].durations, (300, 400, 850, 450, 700))
+    def test_updated_looks_finish_with_a_drawn_happy_tilt_and_quiet_swish_stays_original(self):
+        for name, intro, happy, recovery in (("look_left", (0,1,2,3,4,3,2,1,7), 18, 19),
+                                            ("look_right", (8,9,10,11,12,11,10,9,15), 22, 23)):
+            clip = CLIPS[name]
+            self.assertEqual(clip.bank, "idle-v2-look")
+            self.assertEqual(clip.order[:9], intro)
+            self.assertEqual(clip.order[-2:], (recovery, 24))
+            self.assertEqual(sum(clip.durations), 4900)
+            self.assertEqual(clip.durations[clip.order.index(happy)], 600)
         self.assertEqual(CLIPS["tail"].bank, "tailswish")
         self.assertEqual(CLIPS["tail"].order, (0, 1, 2, 3, 4, 5, 6, 8, 7))
         self.assertEqual(CLIPS["tail"].durations, (300, 220, 220, 350, 220, 220, 280, 450, 700))
+
+    def test_look_tilts_keep_the_lower_body_fixed_and_preserve_updated_glance_drawings(self):
+        canonical = self.atlas.frames["idle",0,0].toImage()
+        original = QImage(str(Path(__file__).parent / "references/look-tilt/2026-10-23/updated-look-base.png"))
+        for index in range(24):
+            frame = self.atlas.frames["idle-v2-look",index//4,index%4].toImage()
+            if index < 16:
+                expected = canonical if index in (0,8) else original.copy(index%4*192,index//4*144,192,144)
+                self.assertEqual(frame, expected.convertToFormat(frame.format()), index)
+            else:
+                self.assertEqual(frame.copy(0,108,192,36), canonical.copy(0,108,192,36), index)
+        ear_heights = []
+        for index in (18,22):
+            frame = self.atlas.frames["idle-v2-look",index//4,index%4].toImage()
+            ears = [[],[]]
+            for y in range(34,73):
+                for x in range(48,136):
+                    color = frame.pixelColor(x,y)
+                    if color.alpha() > 128 and color.red() - color.green() > 25 and color.red() > 180:
+                        ears[int(x >= 88)].append(y)
+            self.assertTrue(all(ears))
+            ear_heights.append(sum(ears[1])/len(ears[1])-sum(ears[0])/len(ears[0]))
+        self.assertGreater(ear_heights[0], 4)
+        self.assertLess(ear_heights[1], -4)
 
     def test_tall_canvas_preserves_the_old_visible_footprint_below_top_padding(self):
         atlas = self.atlas
@@ -127,7 +153,7 @@ class AnimationTests(unittest.TestCase):
         idle = atlas.frame("idle", 0).toImage()
         for name in ("groom", "stretch", "loaf", "sniff", "ears", "yawn", "peek", "look_left", "look_right"):
             clip = CLIPS[name]
-            self.assertTrue(clip.bank.startswith("idle-v2-") or name in ("look_left", "look_right"), name)
+            self.assertTrue(clip.bank.startswith("idle-v2-"), name)
             self.assertGreaterEqual(len(set(clip.order)), 5, name)
             self.assertFalse(clip.loop, name)
             self.assertLess(sum(clip.durations), 8000 if name == "loaf" else 6000, name)
@@ -148,7 +174,7 @@ class AnimationTests(unittest.TestCase):
 
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
         atlas = self.atlas
-        self.assertEqual(len(atlas.frames), 839 - 56 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS))
+        self.assertEqual(len(atlas.frames), 839 - 64 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS))
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
