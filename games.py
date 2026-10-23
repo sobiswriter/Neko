@@ -41,7 +41,7 @@ class GameTimer:
         self.enabled, self.interval = enabled, interval
         self.due = now + interval
         self.pending = None
-        self.log = deque(maxlen=64)
+        self.log = deque(maxlen=50)
         self.outside_since = None
         self.entered_at = None
         self.previous_due = self.due
@@ -151,7 +151,7 @@ class CursorGame:
         self.history = deque(maxlen=4)
         self.end_x, self.height, self.start_x = self.x, 0, self.x
         self.after_landing = None
-        self.log = deque([(now, "ready")], maxlen=128)
+        self.log = deque([(now, "ready")], maxlen=50)
 
     def enter(self, phase, now, line=None):
         self.phase, self.since = phase, now

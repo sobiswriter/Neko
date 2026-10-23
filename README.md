@@ -175,9 +175,13 @@ Soft sounds are optional and off until you enable them.
   an automatic invitation is waiting or blocked. Filter by category or copy the
   visible log. The Journal tab can monitor automatic play live; other Nook controls
   pause automatic invitations while open. Deliberate Play works from the Nook.
-  Logs keep up to 500 recent entries in memory and rotate a local 512 KB JSONL file
-  with one predecessor. File-write trouble is shown in the Journal; no raw keys,
-  typed text, window titles or cursor trails are logged. [Verification](docs/idle-diagnostics-validation.md).
+  State and game-phase entries follow actual painting, including held expressions
+  and reduced-motion poses. Thoughts log the words painted and when they hide;
+  requests, blocked decisions and accepted pets are identified separately.
+  Only the latest **50 entries** remain in memory and the saved JSONL file.
+  Older rows and the former rotated file are removed automatically, including
+  on startup. File-write trouble is shown in the Journal; no raw keys,
+  typed text, window titles or cursor trails are logged. [Verification](docs/journal-coherence-validation.md).
 
 The [idle-animation refresh plan](docs/idle-refresh-plan.md) is ready for review.
 Current artwork/playback, including the approved tail chase/catch, is unchanged.

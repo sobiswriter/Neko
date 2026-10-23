@@ -34,7 +34,7 @@ class DesktopGameTests(unittest.TestCase):
         self.assertEqual(self.n.game.source, "automatic")
         nook.update_journal()
         self.assertIn("invitation accepted", nook.activity_log.toPlainText())
-        self.assertIn("started: automatic", nook.activity_log.toPlainText())
+        self.assertIn("session created: automatic", nook.activity_log.toPlainText())
 
     @classmethod
     def setUpClass(cls):

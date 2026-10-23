@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "3f23781",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 125999227,
+      "sha256": "b908c68269366dd9340e76f92ca92aca870e29886f6defd0db1feda8f2770e92"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 125997607,
+      "sha256": "ec44a6e8a37e37603d218936dea9b63c3fc390b89e20230572493e196e1487da"
+    }
+  },
+  "source": {
+    "main.py": {
+      "bytes": 99027,
+      "sha256": "f5e81d11b0df46b669ed57c7183fea7f9700a5c9c5e1fa354e84edd912ec1a85"
+    },
+    "thoughts.py": {
+      "bytes": 4997,
+      "sha256": "a2775ebd54d1cdc1f66c83974daeadac5985076950a6d347beaf5e86015a3b98"
+    },
+    "event_log.py": {
+      "bytes": 2214,
+      "sha256": "e486de8244362e67bb6223198d39f7ce4b818a37208e752e2d3b1d244a2959c6"
+    },
+    "games.py": {
+      "bytes": 13523,
+      "sha256": "476eb2167580af69ca75a9e0003a8f48a281ba070a66d330c2f9b168e736537e"
+    },
+    "test_event_log.py": {
+      "bytes": 3206,
+      "sha256": "d040f755227700c2000885f8ce5311fd48027362e0629aa9d92e557a36874cd2"
+    },
+    "test_main.py": {
+      "bytes": 71767,
+      "sha256": "bc0755332c48a988716364bc6a9dea088cee5361b32dce9e0015c20f067a4e72"
+    },
+    "test_game_desktop.py": {
+      "bytes": 19557,
+      "sha256": "a862198413500b6da68b081f986c089c45a1bd393bf84a598e90a2b5dc511a7a"
+    },
+    "test_games.py": {
+      "bytes": 6827,
+      "sha256": "49c588bf9b065b9cb284a855d3e500d516dc11110ed4f1cafbc3b167ab1dbf46"
+    },
+    "tools/probe_bundled_goodbye.py": {
+      "bytes": 7445,
+      "sha256": "01eecf28174440540381c4865d482865142c537a23a3d21f75a89832a7392691"
+    }
+  },
+  "checks": {
+    "source_run": 257,
+    "source_passed": 252,
+    "opt_in_package_skipped_during_discovery": 5,
+    "final_package": 5
+  },
+  "frozen_modules_match_source": {
+    "main": true,
+    "thoughts": true,
+    "event_log": true,
+    "games": true
+  },
+  "baked_resources_unchanged": {
+    "assets/neko-runtime.png": true,
+    "assets/neko-runtime.json": true
+  },
+  "animation_module_unchanged": true,
+  "atlas_entries": 839,
+  "clips": 65,
+  "retention": {
+    "memory": 50,
+    "saved_file": 50,
+    "legacy_rotation_deleted": true
+  },
+  "native_comparison": {
+    "painted_states": 8,
+    "phases": 7,
+    "thoughts": 5,
+    "journal_and_disk_match": true,
+    "retained_after_80_and_reload": 50
+  },
+  "scope": "Actual painted state/clip/phase/word observation and visibility, separate interaction decisions, latest50 atomic persistence/legacy cleanup. Art and animation timing unchanged.",
+  "limits": "Qt painting does not establish physical unobscured visibility; no physical pointer/mixed-DPI/multi-monitor/long-soak trial. Storage errors remain visible and trimming retries."
+}

@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Journal coherence and retention · 2026-10-23
+
+User reports logs disagree with actions and requires only the latest50 entries. Reproduce selected-but-unpainted poses/words and ignored pet reporting; observe performed state/actual clip, game phase and thought words at painting, separate model requests/waits/accepted interactions, and observe real visibility events. Keep existing art, timing and game rules. Replace500-entry memory/byte rotation with50-event memory and atomic saved-file snapshots, trimming legacy rows/rotation on startup and keeping visible disk-error recovery. Verify full source checks, independent native paint/log/file parity,50-entry reopen and packaged code; preserve the verified executable before the flat build. [Evidence](../docs/journal-coherence-validation.md).
+
 ## Sleeping goodbye · 2026-10-23
 
 User explicitly requests waking before sadness and dropping out. Reuse the existing eight-drawing2.34s uncurl/wake and17-entry2.20s sad/load/push/single diagonal flight, keeping support and scale intact. Finish an in-progress curl before wake; retain an in-progress wake's clock. Pending quit suppresses competing reactions and duplicate quit, with motion-off/hiding/monitor changes retaining prompt close. No new source poses or changes to the idle proposal/protected tail actions. Reproduce the menu failure, check source and frozen menu/timer painting, preview the complete path, preserve the verified executable and build flat. [Evidence](../docs/sleep-goodbye-validation.md).

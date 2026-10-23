@@ -1,5 +1,12 @@
 # Animation rebuild checklist
 
+## Journal coherence and retention · 2026-10-23
+
+- [x] Reproduce unpainted selection/word and ignored-pet discrepancies; move performed-action evidence to drawing/visibility paths.
+- [x] Keep only50 entries in memory/on disk and internal diagnostic buffers; migrate old rows/rotation automatically and guard disk-failure recovery.
+- [x] Run257 source checks (252 pass/five package skips); independently match native automatic-play poses, phases and words to the journal/file, and verify50 entries after80/reopen.
+- [x] Pass all five final package checks, match frozen runtime modules to source, preserve identical art/clip definitions and rotate the verified predecessor. [Evidence](../docs/journal-coherence-validation.md).
+
 ## Sleeping goodbye · 2026-10-23
 
 - [x] Reproduce sleeping, partial wake and partial curl quit failures.

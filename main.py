@@ -402,7 +402,7 @@ class StatsWindow(QDialog):
             self.activity_log.setPlainText(text)
             scroll.setValue(scroll.maximum() if at_end else position)
         self.log_status.setText("Log file unavailable; events remain visible here." if journal.error else
-                                "Local activity log · up to 500 recent events\nSaved as neko-events.jsonl")
+                                "Local activity log · latest 50 events\nOlder events are deleted automatically")
         self.log_status.setToolTip((journal.error + "\n" if journal.error else "") + str(journal.path))
 
     def change_startup(self, enabled):
@@ -426,6 +426,7 @@ class NekoWidget(QWidget):
         self.journal = EventLog(log_root / "neko-events.jsonl")
         self.journal.add("System", "session", "Neko started")
         self.logged_state = self.logged_game = None
+        self.pending_reaction = None
         self.companion = Companion(time.monotonic())
         try:
             interval = max(30, min(600, int(self.settings.value("game_interval", 90))))
@@ -522,6 +523,9 @@ class NekoWidget(QWidget):
         self.current_asset = "idle"
         self.current_clip = "idle"
         self.bubble = ThoughtLabel()
+        self.thought_channel = "thought"
+        self.bubble.shown.connect(lambda text: self.journal.add("Thought", "shown", f"{self.thought_channel}: {text}"))
+        self.bubble.dismissed.connect(lambda text: self.journal.add("Thought", "hidden", f"{self.thought_channel}: {text}"))
         shadow = QGraphicsDropShadowEffect(self.bubble)
         shadow.setBlurRadius(4)
         shadow.setOffset(0, 1)
@@ -784,7 +788,7 @@ class NekoWidget(QWidget):
         self.companion.pending_window = None
         runway = Runway(area.left(), area.right() - self.width() + 1, self.y(), lift)
         self.game = CursorGame(now, (self.x(), self.y()), runway, self.motion, source)
-        self.journal.add("Game", "started", source)
+        self.journal.add("Game", "session created", source)
         self.game.direction = -1 if QCursor.pos().x() < self.x() + self.width() // 2 else 1
         self.companion.pose(NekoState.PLAYING, now, math.inf)
         self.play_action.setText("End game")
@@ -835,13 +839,9 @@ class NekoWidget(QWidget):
         cursor = QCursor.pos()
         point = (cursor.x(), cursor.y())
         game.update(now, point, self.game_contact(now, point))
-        marker = id(game), game.phase, game.result
-        if marker != self.logged_game:
-            self.logged_game = marker
-            result = game.result or ("unscored" if game.phase == "done" else "pending")
-            self.journal.add("Game", "phase", f"{game.source}: {game.phase}; result={result}")
         self.move(round(game.x), round(game.y))
         if game.phase == "done":
+            self.journal.add("Game", "finished", f"{game.source}; result={game.result or 'unscored'}")
             interaction, self.game_interaction = self.game_interaction, None
             self.game = None
             self.play_action.setText("Play · Catch the Cursor")
@@ -887,7 +887,6 @@ class NekoWidget(QWidget):
             game.outcome_seconds = sum(CLIPS[self.game_clip()].durations) / 1000
             self.current_clip = self.game_clip()
         self.update_game_stats()
-        self.record_state()
         line = game.take_line()
         if line and line.startswith("protest_") and QApplication.screenAt(cursor) != QApplication.screenAt(self.geometry().center()):
             line = "protest_monitor"
@@ -1031,6 +1030,7 @@ class NekoWidget(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
+        self.journal.add("System", "visibility", "shown")
         if self.game and self.game.phase == "comfort":
             now = time.monotonic()
             self.game.since += max(0, now - self.game.last)
@@ -1141,10 +1141,10 @@ class NekoWidget(QWidget):
                 self.ai_generation += 1
                 self.dismiss_bubble()
             elif action == "typing":
-                self.journal.add("Activity", "reaction", "typing burst")
+                self.pending_reaction = "typing burst"
                 self.offline_line("typing")
             elif action == "curious":
-                self.journal.add("Activity", "reaction", self.companion.reaction_kind)
+                self.pending_reaction = self.companion.reaction_kind
                 self.offline_line(self.companion.reaction_kind)
             elif action == "fidget":
                 self.offline_line(self.current_clip)
@@ -1165,22 +1165,33 @@ class NekoWidget(QWidget):
             self.random_dialogue()
 
     def record_state(self):
-        marker = self.companion.state, self.current_clip
-        if marker == self.logged_state:
+        if not self.isVisible():
             return
-        self.logged_state = marker
+        marker = self.companion.state, self.rendered_clip, self.motion
         state = self.companion.state
-        category = ("Sleep" if state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING) else
-                    "Idle" if state in (NekoState.IDLE,) + IDLE_STATES else
-                    "Game" if state in GAME_STATES else
-                    "Lifecycle" if state in (NekoState.ARRIVING, NekoState.LEAVING) else "Care")
-        self.journal.add(category, "state", f"{state.name.lower()} · {self.current_clip}")
+        if marker != self.logged_state:
+            self.logged_state = marker
+            category = ("Sleep" if state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING) else
+                        "Idle" if state in (NekoState.IDLE,) + IDLE_STATES else
+                        "Game" if state in GAME_STATES else
+                        "Lifecycle" if state in (NekoState.ARRIVING, NekoState.LEAVING) else "Care")
+            self.journal.add(category, "state", f"{state.name.lower()} · {self.rendered_clip}" + (" · still pose" if not self.motion else ""))
+        if self.pending_reaction:
+            self.journal.add("Activity", "reaction", f"{self.pending_reaction} · {self.rendered_clip}")
+            self.pending_reaction = None
+        if self.game:
+            marker = id(self.game), self.game.phase, self.game.result
+            if marker != self.logged_game:
+                self.logged_game = marker
+                self.journal.add("Game", "phase", f"{self.game.source}: {self.game.phase}; result={self.game.result or 'pending'}")
+        else:
+            self.logged_game = None
 
     def refresh_asset(self):
+        self.pending_reaction = None
         if self.game and self.companion.state in GAME_STATES:
             self.current_clip = self.game_clip()
             self.current_asset = "idle"
-            self.record_state()
             self.sync_animation()
             return
         self.current_clip = {
@@ -1210,7 +1221,6 @@ class NekoWidget(QWidget):
             NekoState.CURIOUS: "curious", NekoState.HAPPY: "happy",
             NekoState.GROOMING: "peek",
         }.get(self.companion.state, "idle")
-        self.record_state()
         self.sync_animation()
 
     def paintEvent(self, event):
@@ -1235,11 +1245,14 @@ class NekoWidget(QWidget):
         top = -100 - CANVAS_TOP
         if movie and not movie.currentPixmap().isNull():
             pixmap = movie.currentPixmap().scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
+            self.rendered_clip = f"asset {self.current_asset}"
             top = -pixmap.height()
         elif pixmap.isNull():
             pixmap = self.assets[self.current_asset].scaled(88, 88, Qt.KeepAspectRatio, Qt.FastTransformation)
+            self.rendered_clip = f"fallback {self.current_asset}"
             top = -pixmap.height()
         if pixmap.isNull():
+            self.rendered_clip = "text fallback"
             painter.setPen(QColor("#a67671"))
             painter.drawText(QRectF(-45, -85, 90, 85), Qt.AlignCenter, "=^·ω·^=")
         else:
@@ -1255,6 +1268,8 @@ class NekoWidget(QWidget):
             painter.setPen(QColor("#cf9699"))
             painter.setFont(QFont("Segoe UI Symbol", 12))
             painter.drawText(QRectF(78 + CANVAS_PADDING, 12 + CANVAS_TOP - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
+        painter.end()
+        self.record_state()
 
     def say(self, text, prompted=False, hold_ms=None, kind="thought"):
         if (self.closing or self.is_manually_hidden or self.fullscreen
@@ -1279,6 +1294,7 @@ class NekoWidget(QWidget):
         y = max(area.top(), min(y, area.bottom() - self.bubble.height()))
         self.bubble.move(x, y)
         self.bubble.prepare_backdrop()
+        self.thought_channel = "gesture" if kind in GESTURE_THOUGHTS else "general idle" if kind in ("idle", "ai_idle") else kind
         self.bubble.show()
         self.bubble_timer.start(hold_ms if hold_ms is not None else max(5500, min(10000, len(text) * 75)))
         self.companion.comments += 1
@@ -1286,8 +1302,6 @@ class NekoWidget(QWidget):
             self.last_words = time.monotonic()
         if kind in ("idle", "ai_idle"):
             self.companion.next_comment = time.monotonic() + self.companion.chatter_seconds
-        channel = "gesture" if kind in GESTURE_THOUGHTS else "general idle" if kind in ("idle", "ai_idle") else kind
-        self.journal.add("Thought", "shown", f"{channel}: {text}")
         return True
 
     def offline_line(self, kind, prompted=False):
@@ -1315,19 +1329,20 @@ class NekoWidget(QWidget):
     def pet_reaction(self):
         if self.quit_pending:
             return
-        self.journal.add("Care", "pet", "deliberate interaction")
         if self.game_interaction == "sleep":
             self.game_interaction = "pet"
         if self.game:
             if self.game.phase == "curl":
                 if self.game.comfort(time.monotonic()):
                     self.companion.pets += 1
+                    self.journal.add("Care", "pet accepted", "comfort")
                     self.companion.state = NekoState.COMFORTING
                     self.advance_game(time.monotonic())
                 return
             if self.game.phase == "comfort":
                 return
             self.game_interaction = "pet"
+            self.journal.add("Care", "pet requested", "waiting for safe game recovery")
             self.end_game()
             return
         if self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
@@ -1336,6 +1351,7 @@ class NekoWidget(QWidget):
         was_sleeping = self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)
         self.ai_generation += 1
         started = self.companion.pet(now)
+        self.journal.add("Care", "pet accepted", "wake" if was_sleeping else "queued" if self.companion.pet_pending else self.companion.state.name.lower())
         self.play_sound(random.choice(("mew", "purr")), prompted=True)
         if not started:
             return
@@ -1397,7 +1413,9 @@ class NekoWidget(QWidget):
         self.setCursor(Qt.OpenHandCursor)
 
     def current_frame(self, now):
+        self.rendered_clip = self.current_clip
         if self.game and self.companion.state in GAME_STATES:
+            self.rendered_clip = self.game_clip()
             elapsed = now - self.game.since
             if self.game.phase == "ready_cancel":
                 elapsed += (15 - self.game.cancel_index) * .06
@@ -1416,9 +1434,11 @@ class NekoWidget(QWidget):
                 now = self.press_started
             return self.atlas.frame(self.current_clip, now - self.pose_started, self.motion)
         if self.companion.carry_rest is None:
+            self.rendered_clip = "idle"
             return self.atlas.frame("idle", 0, self.motion)
         if not self.motion:
             sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.DISAPPOINTED)
+            self.rendered_clip = "held_sleepy" if sleeping else "held_calm"
             return self.atlas.frame("held_sleepy" if sleeping else "held_calm", 0)
         elapsed = max(0, now - self.carry_path_started)
         if self.carry_path and (elapsed < sum(self.carry_path_clip.durations) / 1000
@@ -1426,6 +1446,7 @@ class NekoWidget(QWidget):
             return self.carry_path[self.carry_path_clip.frame_index(elapsed)]
         sleeping = self.companion.carry_rest[0] in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.DISAPPOINTED)
         clip, elapsed = held_clip(self.carry_elapsed(now), sleeping)
+        self.rendered_clip = clip
         return self.atlas.frame(clip, elapsed)
 
     def set_carry_path(self, frames, now, durations=None):
@@ -1667,6 +1688,8 @@ class NekoWidget(QWidget):
         if hasattr(self, "hold_timer"):
             self.cancel_pickup()
         super().hideEvent(event)
+        self.logged_state = self.logged_game = None
+        self.journal.add("System", "visibility", "hidden")
 
     def screen_changed(self, *args):
         self.end_game(immediate=True)
@@ -1698,7 +1721,6 @@ class NekoWidget(QWidget):
             self.hide_neko()
 
     def hide_neko(self):
-        self.journal.add("System", "visibility", "hidden")
         self.cancel_pickup()
         self.companion.pet_pending = False
         self.reset_pet_cursor()

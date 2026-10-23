@@ -2,7 +2,7 @@
 
 import ctypes
 
-from PySide6.QtCore import QRectF, Qt
+from PySide6.QtCore import QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPalette, QPen, QPixmap, QRegion
 from PySide6.QtWidgets import QApplication, QGraphicsBlurEffect, QGraphicsScene, QLabel
 
@@ -25,6 +25,9 @@ def soften(source):
 
 
 class ThoughtLabel(QLabel):
+    shown = Signal(str)
+    dismissed = Signal(str)
+
     def __init__(self):
         super().__init__(None, Qt.ToolTip | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
                          | Qt.WindowDoesNotAcceptFocus | Qt.WindowTransparentForInput)
@@ -38,6 +41,7 @@ class ThoughtLabel(QLabel):
                           "border-radius: 20px; padding: 8px 10px; font: 600 16px 'Segoe UI';")
         self.ensurePolished()
         self.backdrop = QPixmap()
+        self.painted_text = None
         palette = self.palette()
         palette.setColor(QPalette.WindowText, QColor("#fffaf0"))
         self.setPalette(palette)
@@ -72,6 +76,9 @@ class ThoughtLabel(QLabel):
         painter.drawRoundedRect(QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5), 20, 20)
         painter.end()
         super().paintEvent(event)
+        if self.isVisible() and self.painted_text != self.text():
+            self.painted_text = self.text()
+            self.shown.emit(self.painted_text)
 
     def prepare_backdrop(self):
         self.backdrop = QPixmap()
@@ -103,3 +110,6 @@ class ThoughtLabel(QLabel):
     def hideEvent(self, event):
         self.backdrop = QPixmap()
         super().hideEvent(event)
+        if self.painted_text is not None:
+            text, self.painted_text = self.painted_text, None
+            self.dismissed.emit(text)

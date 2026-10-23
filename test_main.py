@@ -868,11 +868,15 @@ class DesktopTests(unittest.TestCase):
         self.assertFalse(self.neko.activity.enabled)
 
     def test_typing_signal_selects_a_real_paw_animation(self):
+        self.neko.journal.entries.clear()
         self.neko.activity.keyboard.extend([time.monotonic()] * 8)
         self.neko.tick()
         self.assertEqual(self.neko.companion.state, NekoState.TYPING)
         self.assertEqual(self.neko.current_clip, "typing")
         self.assertIn(self.neko.bubble.text(), LINES["typing"])
+        self.assertFalse(any(e["category"] == "Activity" for e in self.neko.journal.entries))
+        self.neko.grab()
+        self.assertIn("typing burst · typing", self.neko.journal.text("Activity"))
 
     def test_app_switch_speaks_offline(self):
         self.neko.last_window = 99
@@ -1030,9 +1034,12 @@ class DesktopTests(unittest.TestCase):
     def test_journal_shows_actual_dialogue_and_state_changes_with_category_filter(self):
         self.neko.companion.state = NekoState.FALLING_ASLEEP
         self.neko.refresh_asset()
+        self.neko.grab()
         self.neko.companion.state = NekoState.IDLE
         self.neko.refresh_asset()
+        self.neko.grab()
         self.neko.offline_line("idle")
+        self.neko.bubble.grab()
         words = self.neko.bubble.text()
         with patch("main.autostart_enabled", return_value=False):
             self.neko.open_stats_window()
@@ -1046,6 +1053,41 @@ class DesktopTests(unittest.TestCase):
         self.neko.journal.error = "disk unavailable"
         nook.update_journal()
         self.assertIn("unavailable", nook.log_status.text())
+
+    def test_journal_omits_unpainted_states_and_records_the_actual_held_expression(self):
+        self.neko.grab()
+        self.neko.journal.entries.clear()
+        self.neko.companion.state = NekoState.SNIFFING
+        self.neko.refresh_asset()
+        self.neko.companion.state = NekoState.GROOMING
+        self.neko.refresh_asset()
+        self.assertNotIn("[Idle]", self.neko.journal.text())
+        self.neko.grab()
+        self.neko.grab()
+        states = [e["detail"] for e in self.neko.journal.entries if e["action"] == "state"]
+        self.assertEqual(states, ["grooming · groom"])
+        self.neko.begin_pickup()
+        with patch("main.time.monotonic", return_value=self.neko.companion.carry_started + 12):
+            self.neko.grab()
+        self.assertIn("held · held_unimpressed", self.neko.journal.text())
+
+    def test_thought_journal_records_only_painted_words_and_their_dismissal(self):
+        self.neko.dismiss_bubble()
+        self.neko.journal.entries.clear()
+        self.neko.say("unpainted words", kind="idle")
+        self.neko.say("actual words", kind="pet")
+        self.neko.bubble.grab()
+        self.neko.bubble.grab()
+        self.neko.dismiss_bubble()
+        events = [(e["action"], e["detail"]) for e in self.neko.journal.entries if e["category"] == "Thought"]
+        self.assertEqual(events, [("shown", "pet: actual words"), ("hidden", "pet: actual words")])
+
+    def test_ignored_pet_is_not_logged_as_an_accepted_pet(self):
+        self.neko.companion.state = NekoState.ARRIVING
+        self.neko.journal.entries.clear()
+        self.neko.pet_reaction()
+        self.assertFalse(any(e["action"] in ("pet", "pet accepted") for e in self.neko.journal.entries))
+        self.assertEqual(self.neko.companion.pets, 0)
 
     def test_gesture_thought_cannot_linger_past_its_active_pose(self):
         self.neko.companion.state = NekoState.SNIFFING

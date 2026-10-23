@@ -6,15 +6,15 @@ from pathlib import Path
 
 
 class EventLog:
-    def __init__(self, path, limit=500, max_bytes=512 * 1024):
+    def __init__(self, path):
         self.path = Path(path)
-        self.entries = deque(maxlen=limit)
-        self.max_bytes, self.error, self.statuses = max_bytes, "", {}
+        self.entries = deque(maxlen=50)
+        self.error, self.statuses = "", {}
         try:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             if self.path.exists():
                 with self.path.open(encoding="utf-8") as stream:
-                    for line in deque(stream, maxlen=limit):
+                    for line in stream:
                         try:
                             entry = json.loads(line)
                             if isinstance(entry, dict) and all(isinstance(entry.get(k), str) for k in ("time", "category", "action", "detail")):
@@ -23,6 +23,8 @@ class EventLog:
                             continue
         except (OSError, UnicodeError) as error:
             self.error = str(error)
+            return
+        self.save()
 
     def add(self, category, action, detail="", changed=False):
         detail, key = str(detail)[:500], (category, action)
@@ -32,11 +34,15 @@ class EventLog:
         entry = {"time": datetime.now().astimezone().isoformat(timespec="milliseconds"),
                  "category": category, "action": action, "detail": detail}
         self.entries.append(entry)
+        self.save()
+
+    def save(self):
         try:
-            if self.path.exists() and self.path.stat().st_size >= self.max_bytes:
-                self.path.replace(self.path.with_suffix(".previous.jsonl"))
-            with self.path.open("a", encoding="utf-8") as stream:
-                stream.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            temporary = self.path.with_suffix(".tmp")
+            temporary.write_text("".join(json.dumps(entry, ensure_ascii=False) + "\n" for entry in self.entries), encoding="utf-8")
+            temporary.replace(self.path)
+            self.path.with_suffix(".previous.jsonl").unlink(missing_ok=True)
             self.error = ""
         except OSError as error:
             self.error = str(error)

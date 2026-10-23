@@ -1,0 +1,275 @@
+{
+  "painted_states": [
+    "idle \u00b7 idle",
+    "playing \u00b7 game_ready",
+    "playing \u00b7 game_three",
+    "playing \u00b7 game_two",
+    "playing \u00b7 game_one",
+    "playing \u00b7 game_go",
+    "playing \u00b7 game_run",
+    "playing \u00b7 game_prepare"
+  ],
+  "logged_states": [
+    "idle \u00b7 idle",
+    "playing \u00b7 game_ready",
+    "playing \u00b7 game_three",
+    "playing \u00b7 game_two",
+    "playing \u00b7 game_one",
+    "playing \u00b7 game_go",
+    "playing \u00b7 game_run",
+    "playing \u00b7 game_prepare"
+  ],
+  "painted_phases": [
+    "automatic: ready; result=pending",
+    "automatic: three; result=pending",
+    "automatic: two; result=pending",
+    "automatic: one; result=pending",
+    "automatic: go; result=pending",
+    "automatic: run; result=pending",
+    "automatic: prepare; result=pending"
+  ],
+  "logged_phases": [
+    "automatic: ready; result=pending",
+    "automatic: three; result=pending",
+    "automatic: two; result=pending",
+    "automatic: one; result=pending",
+    "automatic: go; result=pending",
+    "automatic: run; result=pending",
+    "automatic: prepare; result=pending"
+  ],
+  "painted_words": [
+    "you brought the arrow over for me?",
+    "3\u2026",
+    "2\u2026",
+    "1\u2026",
+    "Here I come! That arrow is mine!"
+  ],
+  "logged_words": [
+    "you brought the arrow over for me?",
+    "3\u2026",
+    "2\u2026",
+    "1\u2026",
+    "Here I come! That arrow is mine!"
+  ],
+  "journal_matches_disk": true,
+  "automatic_chase_started": true,
+  "entries": [
+    {
+      "time": "2026-10-23T11:02:24.055+05:30",
+      "category": "System",
+      "action": "session",
+      "detail": "Neko started"
+    },
+    {
+      "time": "2026-10-23T11:02:24.057+05:30",
+      "category": "Game",
+      "action": "configuration",
+      "detail": "automatic=True; interval=90 sec"
+    },
+    {
+      "time": "2026-10-23T11:02:32.521+05:30",
+      "category": "System",
+      "action": "visibility",
+      "detail": "show requested"
+    },
+    {
+      "time": "2026-10-23T11:02:32.528+05:30",
+      "category": "System",
+      "action": "visibility",
+      "detail": "shown"
+    },
+    {
+      "time": "2026-10-23T11:02:32.621+05:30",
+      "category": "Idle",
+      "action": "state",
+      "detail": "idle \u00b7 idle"
+    },
+    {
+      "time": "2026-10-23T11:02:32.661+05:30",
+      "category": "Game",
+      "action": "side area",
+      "detail": "outside; fresh approach can qualify"
+    },
+    {
+      "time": "2026-10-23T11:02:32.663+05:30",
+      "category": "Game",
+      "action": "waiting",
+      "detail": "cooldown"
+    },
+    {
+      "time": "2026-10-23T11:02:33.126+05:30",
+      "category": "Game",
+      "action": "queued",
+      "detail": "automatic"
+    },
+    {
+      "time": "2026-10-23T11:02:33.127+05:30",
+      "category": "Game",
+      "action": "side area",
+      "detail": "entered; checking stable hover"
+    },
+    {
+      "time": "2026-10-23T11:02:33.129+05:30",
+      "category": "Game",
+      "action": "waiting",
+      "detail": "stable hover"
+    },
+    {
+      "time": "2026-10-23T11:02:33.466+05:30",
+      "category": "Game",
+      "action": "invitation accepted",
+      "detail": "automatic"
+    },
+    {
+      "time": "2026-10-23T11:02:33.470+05:30",
+      "category": "Game",
+      "action": "session created",
+      "detail": "automatic"
+    },
+    {
+      "time": "2026-10-23T11:02:33.506+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_ready"
+    },
+    {
+      "time": "2026-10-23T11:02:33.509+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: ready; result=pending"
+    },
+    {
+      "time": "2026-10-23T11:02:33.513+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_announce: you brought the arrow over for me?"
+    },
+    {
+      "time": "2026-10-23T11:02:33.571+05:30",
+      "category": "Game",
+      "action": "waiting",
+      "detail": "game already active"
+    },
+    {
+      "time": "2026-10-23T11:02:34.302+05:30",
+      "category": "Thought",
+      "action": "hidden",
+      "detail": "game_announce: you brought the arrow over for me?"
+    },
+    {
+      "time": "2026-10-23T11:02:34.346+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_3\u2026: 3\u2026"
+    },
+    {
+      "time": "2026-10-23T11:02:34.353+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_three"
+    },
+    {
+      "time": "2026-10-23T11:02:34.355+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: three; result=pending"
+    },
+    {
+      "time": "2026-10-23T11:02:35.348+05:30",
+      "category": "Thought",
+      "action": "hidden",
+      "detail": "game_3\u2026: 3\u2026"
+    },
+    {
+      "time": "2026-10-23T11:02:35.378+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_2\u2026: 2\u2026"
+    },
+    {
+      "time": "2026-10-23T11:02:35.385+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_two"
+    },
+    {
+      "time": "2026-10-23T11:02:35.386+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: two; result=pending"
+    },
+    {
+      "time": "2026-10-23T11:02:36.384+05:30",
+      "category": "Thought",
+      "action": "hidden",
+      "detail": "game_2\u2026: 2\u2026"
+    },
+    {
+      "time": "2026-10-23T11:02:36.428+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_1\u2026: 1\u2026"
+    },
+    {
+      "time": "2026-10-23T11:02:36.435+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_one"
+    },
+    {
+      "time": "2026-10-23T11:02:36.436+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: one; result=pending"
+    },
+    {
+      "time": "2026-10-23T11:02:37.430+05:30",
+      "category": "Thought",
+      "action": "hidden",
+      "detail": "game_1\u2026: 1\u2026"
+    },
+    {
+      "time": "2026-10-23T11:02:37.480+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_go: Here I come! That arrow is mine!"
+    },
+    {
+      "time": "2026-10-23T11:02:37.488+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_go"
+    },
+    {
+      "time": "2026-10-23T11:02:37.490+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: go; result=pending"
+    },
+    {
+      "time": "2026-10-23T11:02:37.839+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_run"
+    },
+    {
+      "time": "2026-10-23T11:02:37.841+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: run; result=pending"
+    },
+    {
+      "time": "2026-10-23T11:02:38.518+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_prepare"
+    },
+    {
+      "time": "2026-10-23T11:02:38.521+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: prepare; result=pending"
+    }
+  ],
+  "retained_after_80_events": 50
+}

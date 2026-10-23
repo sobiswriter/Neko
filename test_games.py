@@ -3,6 +3,15 @@ from games import CursorGame, GameTimer, Runway
 
 
 class GameTests(unittest.TestCase):
+    def test_internal_diagnostics_keep_only_latest_50_entries(self):
+        timer = GameTimer(0)
+        game = CursorGame(0, (500, 500), Runway(0, 1000, 500, 100))
+        for i in range(80):
+            timer.note(i, "waiting", str(i))
+            game.enter("run", i)
+        self.assertEqual([row[0] for row in timer.log], list(range(30, 80)))
+        self.assertEqual([row[0] for row in game.log], list(range(30, 80)))
+
     def test_timer_defaults_coalesces_promotes_and_restarts_from_completion(self):
         timer = GameTimer(0)
         self.assertIsNone(timer.tick(89.99, True))

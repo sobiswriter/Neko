@@ -32,12 +32,14 @@ def probe(executable, output):
                     raise ValueError("Bundled resource escapes the probe directory")
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(archive.extract(name))
-        animations = ModuleType("animations")
-        animations.__file__ = str(root / "animations.py")
+        modules = {name: ModuleType(name) for name in ("animations", "thoughts", "event_log", "games")}
+        animations = modules["animations"]
         main = ModuleType("bundled_main")
         main.__file__ = str(root / "main.py")
-        with patch.dict(sys.modules, {"animations": animations}), patch.object(sys, "_MEIPASS", folder, create=True):
-            exec(archive.open_embedded_archive("PYZ.pyz").extract("animations"), animations.__dict__)
+        with patch.dict(sys.modules, modules), patch.object(sys, "_MEIPASS", folder, create=True):
+            for name, module in modules.items():
+                module.__file__ = str(root / f"{name}.py")
+                exec(archive.open_embedded_archive("PYZ.pyz").extract(name), module.__dict__)
             exec(marshal.loads(archive.extract("main")), main.__dict__)
             class Observed(main.NekoWidget):
                 def paintEvent(self, event):
@@ -60,6 +62,8 @@ def probe(executable, output):
                     cat.paints = []
                     cat.wake_paints = []
                     cat.stages = []
+                    cat.journal.entries.clear()
+                    cat.journal.save()
                     cat.show_neko()
                     cat.tick_timer.stop()
                     cat.invitation_timer.stop()
@@ -86,11 +90,20 @@ def probe(executable, output):
                               "wake_painted": sorted(set(cat.wake_paints)), "stages": cat.stages,
                               "counts_unchanged": (cat.companion.pets, cat.companion.naps) == counts,
                               "seconds": round(time.monotonic() - start, 3)}
+                    result["journal_states"] = [e["detail"].split(" · ")[0].upper() for e in cat.journal.entries if e["action"] == "state"]
+                    result["journal_matches_paints"] = result["journal_states"] == cat.stages
+                    result["journal_matches_disk"] = list(cat.journal.entries) == [json.loads(line) for line in cat.journal.path.read_text(encoding="utf-8").splitlines()]
+                    for i in range(60):
+                        cat.journal.add("System", "retention check", str(i))
+                    reloaded = modules["event_log"].EventLog(cat.journal.path)
+                    result["latest_50_only"] = ([e["detail"] for e in reloaded.entries] == [str(i) for i in range(10, 60)]
+                                                and len(cat.journal.path.read_text(encoding="utf-8").splitlines()) == 50)
                     wake_ok = (case not in ("sleeping", "falling_asleep") or
                                (result["wake_painted"] == sorted(set(animations.CLIPS["wake"].order))
                                 and cat.stages[-2:] == ["WAKING", "LEAVING"]))
                     result["passed"] = (result["painted"] == expected and result["closed"]
-                                        and result["home_restored"] and result["counts_unchanged"] and wake_ok)
+                                        and result["home_restored"] and result["counts_unchanged"] and wake_ok
+                                        and result["journal_matches_paints"] and result["journal_matches_disk"] and result["latest_50_only"])
                     results.append(result)
                     for timer in (cat.transition_timer, cat.animation_timer, cat.tick_timer, cat.invitation_timer, cat.save_timer):
                         timer.stop()
