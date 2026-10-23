@@ -1,5 +1,13 @@
 # Animation rebuild checklist
 
+## Approved idle refresh · 2026-10-23
+
+- [x] Record implementation approval, resting-first priority, permanent expression requirement and synchronized comparison requirement.
+- [x] Author/review resting idle first, then loaf/stretch and remaining unprotected idle gestures with connected acting/support. User's slow-blink feedback corrected to450ms.
+- [x] Import at canonical scale, preserve766 retained frames/54 unrelated clips including protected tails, and wire complete finite durations.
+- [x] Show eleven old/new native-size animation comparisons and ordered expression/transition frames.
+- [x] Run focused anomaly/runtime/package checks, update provenance/Frame Master/README and preserve flat current/previous release. [Evidence and limits](../docs/idle-refresh-validation.md).
+
 ## Journal coherence and retention · 2026-10-23
 
 - [x] Reproduce unpainted selection/word and ignored-pet discrepancies; move performed-action evidence to drawing/visibility paths.
@@ -21,7 +29,7 @@
 - [x] Reproduce/fix auto-game entry around cooldown; expose gate/zone/invitation reasons and allow live Journal monitoring.
 - [x] Add bounded persistent activity journal in Neko's nook for actual thoughts, gestures, sleep/care, lifecycle and game phases/decisions.
 - [x] Verify source, journal UI/native countdown/file parity and five package checks; retain current/previous executable. [Evidence and limits](../docs/idle-diagnostics-validation.md).
-- [ ] After user reviews the animation plan: prototype resting idle/loaf/stretch keys before replacement art.
+- [x] After user approval, prototype resting idle/loaf/stretch and implement the approved refresh. [Final comparisons and evidence](../docs/idle-refresh-validation.md).
 
 ## Drop-out correction — 2026-10-23
 

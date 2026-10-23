@@ -1214,7 +1214,8 @@ class NekoWidget(QWidget):
             NekoState.ARRIVING: "arrive", NekoState.LEAVING: "depart",
             NekoState.HELD: "pickup", NekoState.SETTING_DOWN: "set_down",
         }.get(self.companion.state, "idle")
-        if self.companion.state in PET_STATES:
+        if self.companion.state in PET_STATES or (CLIPS[self.current_clip].bank.startswith("idle-v2-")
+                                                  and not CLIPS[self.current_clip].loop):
             self.companion.pose_until = self.pose_started + sum(CLIPS[self.current_clip].durations) / 1000
         self.current_asset = {
             NekoState.SLEEPING: "sleep", NekoState.PEEKING: "peek",

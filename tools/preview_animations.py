@@ -13,12 +13,12 @@ from PySide6.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, IDLE_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
 from cursors import petting_cursors
 
 
-IDLES = [("idle", "Sitting / blink"), ("tail", "Tail swish"), ("ears", "Ear flick"),
-         ("sniff", "Sniffing"), ("stretch", "Seated stretch"), ("groom", "Grooming"),
+IDLES = [("idle", "Resting / breath / blink"), ("tail", "Tail swish"), ("ears", "Ear flick"),
+         ("sniff", "Sniffing"), ("stretch", "Front stretch"), ("groom", "Grooming"),
          ("yawn", "Yawning"), ("loaf", "Loaf"), ("peek", "Sleepy peek"),
          ("look_left", "Looking left"), ("look_right", "Looking right"),
          ("tail_chase", "Tail chase"), ("tail_catch", "Tail catch")]
@@ -51,7 +51,8 @@ def displayed(atlas, name, elapsed):
         else:
             # Keep the 50ms samples exact after subtracting the idle introduction.
             elapsed = round(elapsed - 0.8, 3)
-    slot = 8 if name == "loaf" else 6
+    slot = (sum(CLIPS[name].durations) / 1000 if CLIPS[name].bank.startswith("idle-v2-")
+            and not CLIPS[name].loop else 8 if name == "loaf" else 6)
     if name in {item[0] for item in IDLES} and elapsed >= slot:
         name, elapsed = "idle", elapsed - slot
     if name not in ("arrive", "depart"):
@@ -68,7 +69,7 @@ def frame_sheet(atlas, entries, destination, source=False):
     for row, (name, label) in enumerate(entries):
         draw.text((8, band * 160 + 12), label, fill="#514a43")
         clip = CLIPS[name]
-        indices = sorted(set(clip.order))
+        indices = list(dict.fromkeys(clip.order))
         for col, index in enumerate(indices):
             if source:
                 frame = pixels(atlas.frames[clip.bank, clip.row + index // 4, index % 4])
@@ -155,7 +156,7 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4 + 45 + 53
+    assert len(atlas.frames) == 839 - 73 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS)
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)

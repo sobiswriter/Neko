@@ -1,6 +1,6 @@
-# Idle refresh — review and proposal · 2026-10-23
+# Idle refresh — approved plan and implementation · 2026-10-23
 
-Animation changes await the user's review. The thought/timer/logging fixes are separately authorized now. Tail chase/catch artwork, cadence, transitions, selection weights and rest are protected throughout.
+The user authorized implementation on2026-10-23, explicitly making resting idle the first priority, requiring adequate expressions as a permanent rule and requesting old/new comparisons. Tail chase/catch artwork, cadence, transitions, selection weights and rest remain protected throughout.
 
 ## What exists
 
@@ -41,4 +41,4 @@ These are proposed budgets, not required sheet sizes or approved acting. Judge s
 5. Exercise pet/pickup interruption from the difficult poses using existing carry families/recoveries; nap/wake, hide/reduced motion, queued goodbye and game start wait for compatible support. Do not rebuild sleep/carry/game art as part of this scope.
 6. Verify source/baked equality, preserved tail bytes/clips and unrelated behavior, native pose coverage, contact/head landmarks, transparent margins and flat current/previous release. Update source prompts/selections, previews, README and Frame Master findings with each verified slice.
 
-No replacement sprites or animation playback changes are part of the current bug-fix release. Approval of this plan authorizes the later art work, not changes to the protected tail chase/catch.
+Implemented after the user's approval: [validation and final timings](idle-refresh-validation.md), [synchronized old/new comparisons](idle-refresh-compare.html). Proposed budgets above remain design history. Rest uses a6.8s loop with a450ms blink after the user rejected the initial slow blink. Tail chase/catch remain unchanged.

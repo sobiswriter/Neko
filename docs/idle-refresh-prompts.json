@@ -1,0 +1,3212 @@
+{
+  "rest": {
+    "prompt": "Create a production sprite sheet for the EXISTING white desktop kitten Neko, reference image is the exact character identity. This is hand-drawn stepped pixel-art animation, not a new character or illustration. Transparent RGBA background. ONE sheet, EXACTLY 4 columns by 3 rows, 12 complete chronological drawings, evenly spaced, generous clear margins in every cell. No labels, grid, shadows, floor, hearts, symbols, scenery or watermark. All sprites same camera, same physical head size, white fur, charcoal pixel outline, gray under-chin/chest shading, pink tiny nose and inner ears, big black eyes with little square highlights, compact seated body, attached curled tail on viewer right. Preserve the reference head-to-body ratio. Exactly two ears, one head, connected neck/torso, four anatomical legs with hidden hind legs occluded, two front paws planted at an identical baseline. Do NOT copy the black background.\nAction: priority RESTING IDLE, quiet affectionate presence. Draw the torso's subtle breathing with actual changing chest contour, NEVER scale/translate the entire kitten. Paws and haunches remain planted, head crown remains nearly level. The chest softly lifts then releases; ears and lids follow slightly later. Expressions must be legible across several connected drawings rather than a one-frame wink.\nReading order left to right then next row:\n0 exact calm attentive reference sit with both eyes open;\n1 first quiet inhale, chest gently fuller, relaxed open eyes;\n2 inhale settles, soft upper eyelids and tiny content mouth;\n3 lids lower smoothly to a warm half-close, shoulders easing;\n4 eyes close into soft content arcs, tiny relaxed mouth, no extra face symbols;\n5 hold the closed-eyed contentment with a slightly released chest and relaxed ears, same feet/head size;\n6 begin eyelid reopen naturally, chest returning;\n7 eyes half open, calm soft gaze, same support;\n8 both eyes open, one ear subtly angles outward while the other stays attentive;\n9 ear eases back, small curious-soft gaze with a tiny head inclination, body still planted;\n10 head returns almost to the exact reference angle, both eyes clear;\n11 exact same neutral pose and silhouette as drawing0 for a seamless loop.\nThe change is delicate but clearly drawn. Keep all 12 kittens at the SAME scale; no body wobble, no growing/shrinking head, no sliding paws, no detached tail/fragments, no cartoon motion marks. Thin hard pixel clusters rather than blurred illustration edges. All complete tails/ears/feet must fit each cell.",
+    "original": "references/idle-refresh/2026-10-23/rest-raw.png",
+    "rows": 3
+  },
+  "loaf": {
+    "prompt": "Production animation sprite sheet of the exact reference Neko white kitten. Reference is identity/style only; black backing is not content. TRUE transparent RGBA, EXACTLY 4 columns x 3 rows, 12 complete drawings in chronological reading order. Fixed frontal camera, consistent head volume and physical body scale, charcoal stepped pixel outlines, white fur/gray underchin, pink ears/nose, black square-highlight eyes. Same compact kitten throughout, generous clear cell separation and full attached tail/ears/paws. No labels, grid, floor, shadows, props, particles, hearts, words or watermark. Exactly four anatomical legs; occluded legs remain hidden; a tucking forepaw replaces its planted drawing, never extra paws.\nAction LOAF: a connected, grounded performance from the supplied neutral sit into a cozy loaf, then a fully drawn supported return to the SAME neutral sit. Borrow feline shoulder lowering and delayed pelvis/tail settling. Do not shrink the entire kitten into a loaf; keep the head size stable while the articulated torso lowers/widens. Tail attached on viewer right.\n0 exact reference neutral sit open eyes.\n1 glance softly down, lids soften, shoulders begin yielding with forepaws planted.\n2 elbows bend, chest lowers between forelegs, rear/haunch planted.\n3 viewer-left forepaw curls under the chest while the other forepaw supports her.\n4 second forepaw folds under, weight settles on breast/haunch, connected shoulders.\n5 complete cozy loaf, two tucked forepaws hidden by chest, large head unchanged, relaxed half-lids and content mouth.\n6 same supported loaf with warm closed slow-blink eyes, visibly pleased soft ears.\n7 reopen to a calm half-lidded loaf; tiny head/ear settling.\n8 first forepaw unfolds forward and plants, chest still low, eyes softly attentive.\n9 second forepaw plants, shoulders beginning to rise, rear remains supported.\n10 both forelegs push chest upward through an intermediate seated get-up, almost neutral head.\n11 exact reference neutral sit, completed support/height, same scale and camera as0.\nEvery pose complete and separate. Readable warm expression lasts across5/6/7, not one disconnected smile. Draw the anatomical transitions and keep clear negative spaces. No hopping, floating, extra limb, stretched head, disconnected fragments, painterly smoothing or background haze.",
+    "rows": 3,
+    "original": "references/idle-refresh/2026-10-23/loaf-raw.png"
+  },
+  "stretch": {
+    "prompt": "Draw one production sprite sheet for the EXISTING white Neko kitten from the supplied identity reference. EXACTLY four columns by four rows, 16 chronological full-body drawings with true transparent RGBA background, generous clear gaps and every ear/tail/paw fully inside its own cell. Same physical head volume and pixel-art construction throughout: charcoal stepped outline, white fur, gray underchin/chest, pink ears and little nose, large black eyes with square highlights. Frontal/slightly three-quarter character camera, no camera change, no perspective zoom. No lettering, grid, floor, shadow, effects, hearts, motion marks or props. Exactly four anatomical legs, two forelegs and two hindlegs; hidden legs stay hidden. One attached tail, one head, connected neck/spine/pelvis.\nAction: a graceful grounded FELINE FRONT STRETCH and a complete supported return to the original sit. Articulate chest and pelvis independently, preserve head size while torso lengthens; do NOT scale the whole animal into a pose. Foretoes stay planted during pressure. Shoulders yield between the forelegs while hips remain high. Expression squeezes with effort over several consecutive drawings, then relaxes.\nChronological poses:\n0 exact supplied neutral sit.\n1 eyes and nose look down, ears softly angle, shoulders anticipate.\n2 rise out of the sit into four-paw support, hips lift.\n3 one forepaw reaches forward while the other and hind paws support.\n4 other forepaw joins, foretoes planted, chest descending.\n5 long low chest between reaching front legs, hips high, softened effort eyelids.\n6 deepest connected spine stretch with both forepaws flat, eyes squeezed in cute effort, tiny relaxed open mouth.\n7 maintain front support, extend ONE hind leg gently behind the pelvis, eyes still effort-squeezed, no duplicated hindpaw.\n8 settle the stretch with extended hindleg and soft pleased closed eyes, attached tail curves naturally.\n9 hindleg gathers back underneath pelvis, forepaws planted, eyes beginning to reopen.\n10 shoulders start lifting, spine gently gathers.\n11 chest halfway raised with bent elbows, rear lowering.\n12 forepaws walk back closer to the body as haunch settles, all feet anatomically clear.\n13 supported almost-seated posture, eyes soft and relieved.\n14 nearly exact neutral sit, final head/ear settling with a pleased slow blink.\n15 exact original neutral sit and scale after the full recovery.\nKeep continuous weight transfer and stable paws, no jump or second stretch. Do not enlarge the head as she lowers it. No detached fragments, extra limbs, paws left behind, blur or background haze.",
+    "rows": 4,
+    "original": "references/idle-refresh/2026-10-23/stretch-raw.png"
+  },
+  "groom": {
+    "prompt": "Production sprite sheet of the exact supplied Neko reference, white pixel-art kitten, charcoal stepped outlines, gray underchin/chest shading, tiny pink nose and ears, black eyes with square highlights. TRUE transparent alpha, no black backing. EXACTLY 4 columns by 3 rows, 12 full-body chronological drawings, generous clear padding, consistent frontal camera and head size/body scale. One connected head/neck/torso, two ears, four anatomical legs with hidden legs occluded, one attached curled tail on viewer right. Keep planted support and physical volume; do not scale the entire cat or translate a rigid bitmap. No floor/shadow/grid/labels/effects/hearts/marks/props/watermark, no extra paws or detached pieces. First and last drawings are the EXACT supplied neutral sit. Expressions must develop through actual lid/ear/mouth drawings and stay readable over consecutive poses. Action: supported paw grooming, using ONLY viewer-left forepaw, other forepaw and haunch support the body. 0 neutral;1 look down at left paw, ears attentive;2 shift chest weight over planted right forepaw;3 lift the left paw to mouth, replacing its ground paw;4 tiny pink tongue touches that paw, soft squint;5 pleased closed-eye second lick, same lifted paw;6 that same paw sweeps across cheek below eye;7 same paw rises over cheek to ear base, head leans gently into it, closed pleased eyelids;8 paw eases down from cheek with eyes half reopening;9 paw lowers and plants, shoulders recenter;10 supported neutral-height satisfied slow blink, both paws down;11 exact neutral. A lifted forepaw must never leave its original ground paw behind. No swapping paw sides, duplicated limbs, instant head tilt or jump.",
+    "rows": 3,
+    "original": "references/idle-refresh/2026-10-23/groom-raw.png"
+  },
+  "yawn": {
+    "prompt": "Production sprite sheet of the exact supplied Neko reference, white pixel-art kitten, charcoal stepped outlines, gray underchin/chest shading, tiny pink nose and ears, black eyes with square highlights. TRUE transparent alpha, no black backing. EXACTLY 4 columns by 3 rows, 12 full-body chronological drawings, generous clear padding, consistent frontal camera and head size/body scale. One connected head/neck/torso, two ears, four anatomical legs with hidden legs occluded, one attached curled tail on viewer right. Keep planted support and physical volume; do not scale the entire cat or translate a rigid bitmap. No floor/shadow/grid/labels/effects/hearts/marks/props/watermark, no extra paws or detached pieces. First and last drawings are the EXACT supplied neutral sit. Expressions must develop through actual lid/ear/mouth drawings and stay readable over consecutive poses. Action: slow seated yawn with full connected jaw/lid/head transitions and stable body support. 0 neutral;1 upper eyelids get heavy;2 small chest inhale and tiny head lift, mouth barely parts;3 jaw begins opening, eyelids soften;4 mouth opening grows naturally downward without growing the head;5 full cozy yawn, eyes closed gently, pink mouth/tongue connected inside the jaw;6 full yawn held with small chest release and relaxed ears;7 jaw begins closing, eyes still contentedly closed;8 mouth nearly closed and face easing;9 closed-eye satisfied exhale and head levels;10 eyelids half reopen, almost neutral;11 exact neutral. No roaring teeth, stretching paws, floating mouth, giant resized head, disconnected tongue or body bob.",
+    "rows": 3,
+    "original": "references/idle-refresh/2026-10-23/yawn-raw.png"
+  },
+  "peek": {
+    "prompt": "Production sprite sheet of the exact supplied Neko reference, white pixel-art kitten, charcoal stepped outlines, gray underchin/chest shading, tiny pink nose and ears, black eyes with square highlights. TRUE transparent alpha, no black backing. EXACTLY 4 columns by 3 rows, 12 full-body chronological drawings, generous clear padding, consistent frontal camera and head size/body scale. One connected head/neck/torso, two ears, four anatomical legs with hidden legs occluded, one attached curled tail on viewer right. Keep planted support and physical volume; do not scale the entire cat or translate a rigid bitmap. No floor/shadow/grid/labels/effects/hearts/marks/props/watermark, no extra paws or detached pieces. First and last drawings are the EXACT supplied neutral sit. Expressions must develop through actual lid/ear/mouth drawings and stay readable over consecutive poses. Action: quiet SLEEPY PEEK gesture while upright seated, distinct from real curled sleep. 0 neutral;1 lids soften, ears relax;2 head lowers a little through the neck, half-lidded sleepy gaze;3 eyelids nearly close but body stays supported upright;4 both eyes fully softly closed, tiny calm mouth;5 one eye cracks open inquisitively while the other remains relaxed closed;6 one-eye peek a little clearer, one ear leads a small look to viewer left;7 small drawn head turn follows the attentive ear, soft curious eye, no whole-body shift;8 both eyes reopen gently at that slight angle;9 head eases halfway back through an intermediate turn;10 almost front neutral, relaxed lids;11 exact neutral. Maintain head volume and anatomical neck connection. No instant deep-loaf-to-sit jump, no winking symbols or extra eyes.",
+    "rows": 3,
+    "original": "references/idle-refresh/2026-10-23/peek-raw.png"
+  },
+  "ears": {
+    "prompt": "Draw a production sprite sheet for the exact Neko reference white kitten. Same pixel-art identity, physical head size and body volume throughout, fixed frontal camera, charcoal stepped outlines, white fur with gray underchin/chest, pink inner ears/tiny nose, dark eyes with square highlights. True transparent alpha (no black backing), generous clear cell padding and every full kitten fits inside its cell. Four chronological columns. Exactly four anatomical legs with hidden legs occluded, planted forepaws and haunch, one connected head/neck/spine, two ears, one attached tail on viewer right. No grid, labels, floor, shadows, props, symbols, effects, hearts, watermarks, detached fragments or blur. First and final pose of each action is the exact reference neutral sit. Expressions need drawn transitions and readable multi-pose acting. EXACTLY 4 columns x3 rows,12 drawings. Action a small independent EAR FLICK. Keep the torso and feet mostly still, not a whole-head bounce. 0neutral;1 one ear notices a sound while eyes glance that way;2 that ear angles outward at its base, other ear remains upright;3 it flicks back slightly, eyes softly alert;4 ear returns through intermediate angle with a tiny delayed head response;5 attentive pause, relaxed mouth;6 opposite ear adjusts gently, one lid softens;7 both ears settle, expression warm;8 pleased slow-blink half-lids;9 both eyes closed relaxed;10 reopen halfway with nearly neutral ears;11exact neutral. Keep complete attached ear shapes, no duplicated ears or dramatic ear jelly. Paws/head volume remain stable.",
+    "rows": 3,
+    "original": "references/idle-refresh/2026-10-23/ears-raw.png"
+  },
+  "sniff": {
+    "prompt": "Draw a production sprite sheet for the exact Neko reference white kitten. Same pixel-art identity, physical head size and body volume throughout, fixed frontal camera, charcoal stepped outlines, white fur with gray underchin/chest, pink inner ears/tiny nose, dark eyes with square highlights. True transparent alpha (no black backing), generous clear cell padding and every full kitten fits inside its cell. Four chronological columns. Exactly four anatomical legs with hidden legs occluded, planted forepaws and haunch, one connected head/neck/spine, two ears, one attached tail on viewer right. No grid, labels, floor, shadows, props, symbols, effects, hearts, watermarks, detached fragments or blur. First and final pose of each action is the exact reference neutral sit. Expressions need drawn transitions and readable multi-pose acting. EXACTLY 4 columns x3 rows,12 drawings. Action a curious NOSE SNIFF with tiny neck/chest follow, no moving feet. 0neutral;1 ears lead attentive notice;2 nose/head reaches gently forward and down, neck lengthens naturally;3 shoulders follow a little with planted paws;4 small sniff, eyes briefly squint and pink nose clear;5 second connected sniff expression, tiny mouth, same volume;6 curious small head tilt with attentive open eyes;7 tilt eases back, shoulders release;8 head eases halfway to center;9 pleased soft blink with head almost front;10 eyelids reopen and neck settles;11exact neutral. Do not make the body or head shrink, slide the torso or add smell marks. Keep the expression across4/5/6 readable.",
+    "rows": 3,
+    "original": "references/idle-refresh/2026-10-23/sniff-raw.png"
+  },
+  "look": {
+    "prompt": "Draw a production sprite sheet for the exact Neko reference white kitten. Same pixel-art identity, physical head size and body volume throughout, fixed frontal camera, charcoal stepped outlines, white fur with gray underchin/chest, pink inner ears/tiny nose, dark eyes with square highlights. True transparent alpha (no black backing), generous clear cell padding and every full kitten fits inside its cell. Four chronological columns. Exactly four anatomical legs with hidden legs occluded, planted forepaws and haunch, one connected head/neck/spine, two ears, one attached tail on viewer right. No grid, labels, floor, shadows, props, symbols, effects, hearts, watermarks, detached fragments or blur. First and final pose of each action is the exact reference neutral sit. Expressions need drawn transitions and readable multi-pose acting. EXACTLY 4 columns x4 rows,16 drawings. TWO matching directional head-look actions, top eight frames LEFT, bottom eight RIGHT. Tail stays on viewer right, body and paws planted. LEFT0 exact front neutral;1 pupils/ears lead to viewer LEFT;2 head begins a small drawn left turn, nose shifts left;3 deeper three-quarter left look with smaller delayed shoulder follow;4 interested pause/blink in that left-facing angle;5 turn halfway back through a real intermediate angle;6 almost frontal attentive face;7 exact neutral. RIGHT8 exact neutral;9 pupils/ears lead viewer RIGHT;10 small drawn right turn, nose shifts right;11 deeper three-quarter right look, shoulders follow slightly;12 interested blink at right-facing angle;13 halfway return through drawn angle;14 almost front;15 exact neutral. Maintain physical head volume while perspective narrows the face; do not stretch it to constant width or move a rigid head bitmap sideways. No body rotation, paws changing place, tail teleportation or different character between directions.",
+    "rows": 4,
+    "original": "references/idle-refresh/2026-10-23/look-raw.png"
+  },
+  "tail": {
+    "prompt": "Draw a production sprite sheet for the exact Neko reference white kitten. Same pixel-art identity, physical head size and body volume throughout, fixed frontal camera, charcoal stepped outlines, white fur with gray underchin/chest, pink inner ears/tiny nose, dark eyes with square highlights. True transparent alpha (no black backing), generous clear cell padding and every full kitten fits inside its cell. Four chronological columns. Exactly four anatomical legs with hidden legs occluded, planted forepaws and haunch, one connected head/neck/spine, two ears, one attached tail on viewer right. No grid, labels, floor, shadows, props, symbols, effects, hearts, watermarks, detached fragments or blur. First and final pose of each action is the exact reference neutral sit. Expressions need drawn transitions and readable multi-pose acting. EXACTLY 4 columns x3 rows,12 drawings. Action a quiet LAZY TAIL SWISH, NOT tail chase. Keep the supported seated body and head mostly still. 0exact neutral, tail curled on right;1 tail tip notices and loosens;2 tail base begins outward sweep;3 broad soft sweep to right while tip lags behind;4 tip curls after the base reaches its comfortable extreme, eyes relax;5 base starts easing back with soft half-lids;6 tail passes halfway back, connected S-curve, eyes content;7 tail gathers closer behind haunch with tip following;8 attached curled tail almost at rest, warm half-lidded gaze;9 closed contented slow blink with tail settled;10 eyes reopen halfway, near-neutral body;11exact neutral. One attached tail, no detached tip, no extra tail or moving haunch/paws. No side-to-side body rocking. Draw tail curvature and relaxed eyes rather than translating a whole bitmap.",
+    "rows": 3,
+    "original": "references/idle-refresh/2026-10-23/tail-raw.png"
+  },
+  "reference_images": [
+    "assets/neko_idle.png",
+    "references/motion/2026-10-23/video-pose-study.png",
+    "references/motion/2026-10-23/spine-flexion-study.jpg"
+  ],
+  "method": "Built-in image_gen, transparent RGBA; complete silhouettes, constant calibration per batch and support registration. No scripted anatomy/expression painting.",
+  "assembly": {
+    "rest": {
+      "source": "references/idle-refresh/2026-10-23/rest-raw.png",
+      "sha256": "b64c952be1d7bd133ad2e22911482f70d3138755d45d12a8006a820571b398b8",
+      "regions": [
+        [
+          80,
+          44,
+          337,
+          363,
+          60018
+        ],
+        [
+          435,
+          44,
+          698,
+          363,
+          62041
+        ],
+        [
+          787,
+          44,
+          1055,
+          363,
+          62507
+        ],
+        [
+          1137,
+          44,
+          1406,
+          363,
+          62175
+        ],
+        [
+          78,
+          393,
+          337,
+          714,
+          61894
+        ],
+        [
+          432,
+          397,
+          695,
+          714,
+          61744
+        ],
+        [
+          787,
+          397,
+          1057,
+          714,
+          62288
+        ],
+        [
+          1142,
+          395,
+          1407,
+          714,
+          61972
+        ],
+        [
+          61,
+          745,
+          342,
+          1063,
+          60296
+        ],
+        [
+          426,
+          744,
+          698,
+          1064,
+          59507
+        ],
+        [
+          787,
+          748,
+          1053,
+          1063,
+          61247
+        ],
+        [
+          1143,
+          749,
+          1407,
+          1064,
+          60859
+        ]
+      ],
+      "batch_scale": [
+        0.7948717948717948,
+        0.7256637168141593
+      ],
+      "asset": "assets/neko-idle-rest-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            72,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.6
+        },
+        {
+          "pose": 1,
+          "size": [
+            74,
+            82
+          ],
+          "xy": [
+            59,
+            48
+          ],
+          "head_width": 65.18,
+          "head_x": 91.19
+        },
+        {
+          "pose": 2,
+          "size": [
+            76,
+            82
+          ],
+          "xy": [
+            58,
+            48
+          ],
+          "head_width": 65.18,
+          "head_x": 90.19
+        },
+        {
+          "pose": 3,
+          "size": [
+            76,
+            82
+          ],
+          "xy": [
+            57,
+            48
+          ],
+          "head_width": 66.77,
+          "head_x": 89.99
+        },
+        {
+          "pose": 4,
+          "size": [
+            73,
+            83
+          ],
+          "xy": [
+            59,
+            47
+          ],
+          "head_width": 65.97,
+          "head_x": 91.59
+        },
+        {
+          "pose": 5,
+          "size": [
+            74,
+            81
+          ],
+          "xy": [
+            59,
+            49
+          ],
+          "head_width": 65.97,
+          "head_x": 91.59
+        },
+        {
+          "pose": 6,
+          "size": [
+            76,
+            81
+          ],
+          "xy": [
+            58,
+            49
+          ],
+          "head_width": 65.18,
+          "head_x": 90.19
+        },
+        {
+          "pose": 7,
+          "size": [
+            75,
+            82
+          ],
+          "xy": [
+            58,
+            48
+          ],
+          "head_width": 66.77,
+          "head_x": 90.99
+        },
+        {
+          "pose": 8,
+          "size": [
+            79,
+            81
+          ],
+          "xy": [
+            54,
+            49
+          ],
+          "head_width": 69.15,
+          "head_x": 88.18
+        },
+        {
+          "pose": 9,
+          "size": [
+            76,
+            82
+          ],
+          "xy": [
+            57,
+            48
+          ],
+          "head_width": 66.77,
+          "head_x": 90.78
+        },
+        {
+          "pose": 10,
+          "size": [
+            75,
+            81
+          ],
+          "xy": [
+            59,
+            49
+          ],
+          "head_width": 64.38,
+          "head_x": 90.79
+        },
+        {
+          "pose": 11,
+          "size": [
+            74,
+            81
+          ],
+          "xy": [
+            59,
+            49
+          ],
+          "head_width": 64.38,
+          "head_x": 90.79
+        }
+      ]
+    },
+    "loaf": {
+      "source": "references/idle-refresh/2026-10-23/loaf-raw.png",
+      "sha256": "53e43be4b2defd25aa0c6a57f25a23750eeaf9e7ca19a6e65a4108b2b6667fba",
+      "regions": [
+        [
+          80,
+          46,
+          355,
+          369,
+          63351
+        ],
+        [
+          420,
+          66,
+          720,
+          369,
+          63723
+        ],
+        [
+          780,
+          75,
+          1074,
+          370,
+          61845
+        ],
+        [
+          1135,
+          71,
+          1429,
+          370,
+          62250
+        ],
+        [
+          67,
+          433,
+          360,
+          683,
+          56409
+        ],
+        [
+          423,
+          435,
+          709,
+          682,
+          54745
+        ],
+        [
+          778,
+          432,
+          1061,
+          681,
+          54368
+        ],
+        [
+          1137,
+          424,
+          1423,
+          681,
+          56461
+        ],
+        [
+          63,
+          759,
+          379,
+          1041,
+          61953
+        ],
+        [
+          426,
+          750,
+          725,
+          1040,
+          61665
+        ],
+        [
+          779,
+          726,
+          1073,
+          1048,
+          65116
+        ],
+        [
+          1142,
+          727,
+          1423,
+          1051,
+          64644
+        ]
+      ],
+      "batch_scale": [
+        0.775,
+        0.7192982456140351
+      ],
+      "asset": "assets/neko-idle-loaf-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            75,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.61
+        },
+        {
+          "pose": 1,
+          "size": [
+            82,
+            77
+          ],
+          "xy": [
+            54,
+            53
+          ],
+          "head_width": 66.65,
+          "head_x": 86.94
+        },
+        {
+          "pose": 2,
+          "size": [
+            81,
+            75
+          ],
+          "xy": [
+            56,
+            55
+          ],
+          "head_width": 65.88,
+          "head_x": 88.55
+        },
+        {
+          "pose": 3,
+          "size": [
+            81,
+            76
+          ],
+          "xy": [
+            55,
+            54
+          ],
+          "head_width": 66.65,
+          "head_x": 87.94
+        },
+        {
+          "pose": 4,
+          "size": [
+            81,
+            63
+          ],
+          "xy": [
+            57,
+            67
+          ],
+          "head_width": 78.28,
+          "head_x": 95.75
+        },
+        {
+          "pose": 5,
+          "size": [
+            78,
+            63
+          ],
+          "xy": [
+            59,
+            67
+          ],
+          "head_width": 75.95,
+          "head_x": 96.59
+        },
+        {
+          "pose": 6,
+          "size": [
+            78,
+            63
+          ],
+          "xy": [
+            58,
+            67
+          ],
+          "head_width": 73.62,
+          "head_x": 94.43
+        },
+        {
+          "pose": 7,
+          "size": [
+            78,
+            65
+          ],
+          "xy": [
+            58,
+            65
+          ],
+          "head_width": 75.95,
+          "head_x": 95.59
+        },
+        {
+          "pose": 8,
+          "size": [
+            87,
+            72
+          ],
+          "xy": [
+            55,
+            58
+          ],
+          "head_width": 65.1,
+          "head_x": 87.16
+        },
+        {
+          "pose": 9,
+          "size": [
+            82,
+            74
+          ],
+          "xy": [
+            57,
+            56
+          ],
+          "head_width": 63.55,
+          "head_x": 88.39
+        },
+        {
+          "pose": 10,
+          "size": [
+            81,
+            82
+          ],
+          "xy": [
+            56,
+            48
+          ],
+          "head_width": 63.55,
+          "head_x": 87.39
+        },
+        {
+          "pose": 11,
+          "size": [
+            77,
+            83
+          ],
+          "xy": [
+            58,
+            47
+          ],
+          "head_width": 65.1,
+          "head_x": 90.16
+        }
+      ]
+    },
+    "stretch": {
+      "source": "references/idle-refresh/2026-10-23/stretch-raw.png",
+      "sha256": "6a276f8d5a6b1086db56f6b1a31353c28dccdb518d97b3d25f0cf6ed46a01abc",
+      "regions": [
+        [
+          73,
+          30,
+          294,
+          295,
+          41526
+        ],
+        [
+          399,
+          49,
+          637,
+          295,
+          38162
+        ],
+        [
+          722,
+          45,
+          979,
+          297,
+          46021
+        ],
+        [
+          1078,
+          47,
+          1346,
+          295,
+          46127
+        ],
+        [
+          42,
+          321,
+          317,
+          568,
+          42010
+        ],
+        [
+          382,
+          311,
+          674,
+          566,
+          42798
+        ],
+        [
+          721,
+          307,
+          1021,
+          569,
+          42888
+        ],
+        [
+          1066,
+          325,
+          1387,
+          568,
+          39133
+        ],
+        [
+          31,
+          599,
+          359,
+          834,
+          39906
+        ],
+        [
+          403,
+          608,
+          666,
+          835,
+          40869
+        ],
+        [
+          751,
+          595,
+          1006,
+          834,
+          43756
+        ],
+        [
+          1106,
+          600,
+          1364,
+          833,
+          43745
+        ],
+        [
+          68,
+          859,
+          306,
+          1094,
+          40929
+        ],
+        [
+          441,
+          859,
+          665,
+          1095,
+          36302
+        ],
+        [
+          783,
+          863,
+          1009,
+          1095,
+          36614
+        ],
+        [
+          1129,
+          858,
+          1344,
+          1096,
+          36497
+        ]
+      ],
+      "batch_scale": [
+        0.9253731343283582,
+        0.845360824742268
+      ],
+      "recovery_scale": [
+        0.9538461538461539,
+        0.9425287356321839
+      ],
+      "asset": "assets/neko-idle-stretch-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            75,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.54
+        },
+        {
+          "pose": 1,
+          "size": [
+            81,
+            76
+          ],
+          "xy": [
+            54,
+            54
+          ],
+          "head_width": 62.0,
+          "head_x": 84.54
+        },
+        {
+          "pose": 2,
+          "size": [
+            87,
+            78
+          ],
+          "xy": [
+            46,
+            52
+          ],
+          "head_width": 84.21,
+          "head_x": 88.57
+        },
+        {
+          "pose": 3,
+          "size": [
+            91,
+            77
+          ],
+          "xy": [
+            41,
+            53
+          ],
+          "head_width": 85.13,
+          "head_x": 84.03
+        },
+        {
+          "pose": 4,
+          "size": [
+            93,
+            76
+          ],
+          "xy": [
+            40,
+            54
+          ],
+          "head_width": 86.99,
+          "head_x": 85.81
+        },
+        {
+          "pose": 5,
+          "size": [
+            99,
+            79
+          ],
+          "xy": [
+            40,
+            51
+          ],
+          "head_width": 88.84,
+          "head_x": 89.51
+        },
+        {
+          "pose": 6,
+          "size": [
+            102,
+            81
+          ],
+          "xy": [
+            40,
+            49
+          ],
+          "head_width": 87.91,
+          "head_x": 92.75
+        },
+        {
+          "pose": 7,
+          "size": [
+            108,
+            75
+          ],
+          "xy": [
+            40,
+            55
+          ],
+          "head_width": 103.64,
+          "head_x": 95.99
+        },
+        {
+          "pose": 8,
+          "size": [
+            111,
+            73
+          ],
+          "xy": [
+            40,
+            57
+          ],
+          "head_width": 107.34,
+          "head_x": 96.91
+        },
+        {
+          "pose": 9,
+          "size": [
+            89,
+            70
+          ],
+          "xy": [
+            40,
+            60
+          ],
+          "head_width": 86.99,
+          "head_x": 83.96
+        },
+        {
+          "pose": 10,
+          "size": [
+            86,
+            74
+          ],
+          "xy": [
+            40,
+            56
+          ],
+          "head_width": 83.28,
+          "head_x": 81.18
+        },
+        {
+          "pose": 11,
+          "size": [
+            87,
+            72
+          ],
+          "xy": [
+            44,
+            58
+          ],
+          "head_width": 82.36,
+          "head_x": 86.57
+        },
+        {
+          "pose": 12,
+          "size": [
+            81,
+            73
+          ],
+          "xy": [
+            53,
+            57
+          ],
+          "head_width": 76.81,
+          "head_x": 90.94
+        },
+        {
+          "pose": 13,
+          "size": [
+            78,
+            81
+          ],
+          "xy": [
+            57,
+            49
+          ],
+          "head_width": 61.05,
+          "head_x": 87.05
+        },
+        {
+          "pose": 14,
+          "size": [
+            79,
+            80
+          ],
+          "xy": [
+            57,
+            50
+          ],
+          "head_width": 62.95,
+          "head_x": 88.0
+        },
+        {
+          "pose": 15,
+          "size": [
+            75,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.52
+        }
+      ]
+    },
+    "groom": {
+      "source": "references/idle-refresh/2026-10-23/groom-raw.png",
+      "sha256": "d46bb887ce5672f0b4c985f248bea54dda1a0f5ee185d4789df71106aaa9ef5c",
+      "regions": [
+        [
+          81,
+          37,
+          332,
+          356,
+          58090
+        ],
+        [
+          436,
+          52,
+          679,
+          356,
+          58015
+        ],
+        [
+          781,
+          51,
+          1045,
+          355,
+          58259
+        ],
+        [
+          1136,
+          37,
+          1384,
+          355,
+          56453
+        ],
+        [
+          80,
+          382,
+          337,
+          697,
+          60090
+        ],
+        [
+          435,
+          381,
+          697,
+          696,
+          59953
+        ],
+        [
+          790,
+          379,
+          1036,
+          697,
+          56627
+        ],
+        [
+          1130,
+          376,
+          1400,
+          697,
+          59131
+        ],
+        [
+          80,
+          728,
+          350,
+          1047,
+          61585
+        ],
+        [
+          430,
+          728,
+          698,
+          1046,
+          60964
+        ],
+        [
+          782,
+          728,
+          1044,
+          1046,
+          61642
+        ],
+        [
+          1131,
+          728,
+          1396,
+          1046,
+          60521
+        ]
+      ],
+      "batch_scale": [
+        0.8051948051948052,
+        0.7256637168141593
+      ],
+      "asset": "assets/neko-idle-groom-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            72,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.6
+        },
+        {
+          "pose": 1,
+          "size": [
+            69,
+            78
+          ],
+          "xy": [
+            62,
+            52
+          ],
+          "head_width": 67.64,
+          "head_x": 95.42
+        },
+        {
+          "pose": 2,
+          "size": [
+            75,
+            78
+          ],
+          "xy": [
+            58,
+            52
+          ],
+          "head_width": 64.42,
+          "head_x": 89.81
+        },
+        {
+          "pose": 3,
+          "size": [
+            71,
+            81
+          ],
+          "xy": [
+            60,
+            49
+          ],
+          "head_width": 61.19,
+          "head_x": 90.19
+        },
+        {
+          "pose": 4,
+          "size": [
+            73,
+            81
+          ],
+          "xy": [
+            59,
+            49
+          ],
+          "head_width": 66.03,
+          "head_x": 91.61
+        },
+        {
+          "pose": 5,
+          "size": [
+            75,
+            81
+          ],
+          "xy": [
+            57,
+            49
+          ],
+          "head_width": 66.83,
+          "head_x": 90.01
+        },
+        {
+          "pose": 6,
+          "size": [
+            70,
+            81
+          ],
+          "xy": [
+            61,
+            49
+          ],
+          "head_width": 64.42,
+          "head_x": 92.81
+        },
+        {
+          "pose": 7,
+          "size": [
+            76,
+            83
+          ],
+          "xy": [
+            55,
+            47
+          ],
+          "head_width": 68.44,
+          "head_x": 89.62
+        },
+        {
+          "pose": 8,
+          "size": [
+            76,
+            82
+          ],
+          "xy": [
+            57,
+            48
+          ],
+          "head_width": 64.42,
+          "head_x": 88.81
+        },
+        {
+          "pose": 9,
+          "size": [
+            76,
+            81
+          ],
+          "xy": [
+            56,
+            49
+          ],
+          "head_width": 65.22,
+          "head_x": 88.21
+        },
+        {
+          "pose": 10,
+          "size": [
+            75,
+            81
+          ],
+          "xy": [
+            58,
+            49
+          ],
+          "head_width": 66.83,
+          "head_x": 91.01
+        },
+        {
+          "pose": 11,
+          "size": [
+            76,
+            81
+          ],
+          "xy": [
+            57,
+            49
+          ],
+          "head_width": 65.22,
+          "head_x": 89.21
+        }
+      ]
+    },
+    "yawn": {
+      "source": "references/idle-refresh/2026-10-23/yawn-raw.png",
+      "sha256": "062f7e92a1a4d6eadddb7617662e5cba766e1ec2e7c0d1b95cbc70acc41bd310",
+      "regions": [
+        [
+          87,
+          28,
+          342,
+          350,
+          60369
+        ],
+        [
+          438,
+          27,
+          695,
+          350,
+          60698
+        ],
+        [
+          788,
+          25,
+          1046,
+          349,
+          60150
+        ],
+        [
+          1137,
+          27,
+          1396,
+          350,
+          60207
+        ],
+        [
+          83,
+          389,
+          351,
+          706,
+          62262
+        ],
+        [
+          431,
+          374,
+          700,
+          707,
+          64174
+        ],
+        [
+          782,
+          386,
+          1053,
+          706,
+          63224
+        ],
+        [
+          1138,
+          384,
+          1402,
+          706,
+          61670
+        ],
+        [
+          84,
+          740,
+          347,
+          1061,
+          62191
+        ],
+        [
+          436,
+          737,
+          699,
+          1061,
+          61856
+        ],
+        [
+          789,
+          738,
+          1050,
+          1061,
+          61912
+        ],
+        [
+          1138,
+          737,
+          1399,
+          1061,
+          61660
+        ]
+      ],
+      "batch_scale": [
+        0.7848101265822784,
+        0.7192982456140351
+      ],
+      "asset": "assets/neko-idle-yawn-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.61
+        },
+        {
+          "pose": 1,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.78,
+          "head_x": 91.0
+        },
+        {
+          "pose": 2,
+          "size": [
+            71,
+            83
+          ],
+          "xy": [
+            59,
+            47
+          ],
+          "head_width": 63.57,
+          "head_x": 90.39
+        },
+        {
+          "pose": 3,
+          "size": [
+            72,
+            82
+          ],
+          "xy": [
+            59,
+            48
+          ],
+          "head_width": 64.35,
+          "head_x": 90.78
+        },
+        {
+          "pose": 4,
+          "size": [
+            75,
+            81
+          ],
+          "xy": [
+            58,
+            49
+          ],
+          "head_width": 68.28,
+          "head_x": 91.75
+        },
+        {
+          "pose": 5,
+          "size": [
+            75,
+            85
+          ],
+          "xy": [
+            57,
+            45
+          ],
+          "head_width": 68.28,
+          "head_x": 90.75
+        },
+        {
+          "pose": 6,
+          "size": [
+            75,
+            81
+          ],
+          "xy": [
+            57,
+            49
+          ],
+          "head_width": 69.06,
+          "head_x": 91.14
+        },
+        {
+          "pose": 7,
+          "size": [
+            73,
+            82
+          ],
+          "xy": [
+            59,
+            48
+          ],
+          "head_width": 63.57,
+          "head_x": 90.39
+        },
+        {
+          "pose": 8,
+          "size": [
+            73,
+            82
+          ],
+          "xy": [
+            59,
+            48
+          ],
+          "head_width": 65.14,
+          "head_x": 91.18
+        },
+        {
+          "pose": 9,
+          "size": [
+            73,
+            83
+          ],
+          "xy": [
+            58,
+            47
+          ],
+          "head_width": 65.92,
+          "head_x": 90.57
+        },
+        {
+          "pose": 10,
+          "size": [
+            72,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 63.57,
+          "head_x": 91.39
+        },
+        {
+          "pose": 11,
+          "size": [
+            72,
+            83
+          ],
+          "xy": [
+            59,
+            47
+          ],
+          "head_width": 63.57,
+          "head_x": 90.39
+        }
+      ]
+    },
+    "peek": {
+      "source": "references/idle-refresh/2026-10-23/peek-raw.png",
+      "sha256": "57145de4f18d464e7e90f71352172dbe4fb7c4eb1881850333117e7cecccc3a4",
+      "regions": [
+        [
+          116,
+          34,
+          358,
+          342,
+          55585
+        ],
+        [
+          444,
+          41,
+          695,
+          342,
+          56190
+        ],
+        [
+          769,
+          55,
+          1030,
+          342,
+          55162
+        ],
+        [
+          1096,
+          58,
+          1364,
+          342,
+          55103
+        ],
+        [
+          97,
+          404,
+          361,
+          692,
+          55344
+        ],
+        [
+          448,
+          381,
+          699,
+          692,
+          55006
+        ],
+        [
+          794,
+          384,
+          1031,
+          692,
+          54504
+        ],
+        [
+          1117,
+          387,
+          1363,
+          692,
+          54787
+        ],
+        [
+          110,
+          725,
+          360,
+          1039,
+          55854
+        ],
+        [
+          456,
+          730,
+          702,
+          1039,
+          56115
+        ],
+        [
+          781,
+          729,
+          1030,
+          1042,
+          57182
+        ],
+        [
+          1113,
+          729,
+          1357,
+          1039,
+          56754
+        ]
+      ],
+      "batch_scale": [
+        0.8266666666666667,
+        0.7522935779816514
+      ],
+      "asset": "assets/neko-idle-peek-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.59
+        },
+        {
+          "pose": 1,
+          "size": [
+            74,
+            80
+          ],
+          "xy": [
+            58,
+            50
+          ],
+          "head_width": 64.48,
+          "head_x": 89.83
+        },
+        {
+          "pose": 2,
+          "size": [
+            76,
+            76
+          ],
+          "xy": [
+            55,
+            54
+          ],
+          "head_width": 67.79,
+          "head_x": 88.48
+        },
+        {
+          "pose": 3,
+          "size": [
+            79,
+            75
+          ],
+          "xy": [
+            54,
+            55
+          ],
+          "head_width": 69.44,
+          "head_x": 88.31
+        },
+        {
+          "pose": 4,
+          "size": [
+            77,
+            77
+          ],
+          "xy": [
+            55,
+            53
+          ],
+          "head_width": 68.61,
+          "head_x": 88.89
+        },
+        {
+          "pose": 5,
+          "size": [
+            74,
+            83
+          ],
+          "xy": [
+            58,
+            47
+          ],
+          "head_width": 62.0,
+          "head_x": 88.59
+        },
+        {
+          "pose": 6,
+          "size": [
+            69,
+            82
+          ],
+          "xy": [
+            63,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 94.41
+        },
+        {
+          "pose": 7,
+          "size": [
+            72,
+            81
+          ],
+          "xy": [
+            60,
+            49
+          ],
+          "head_width": 62.0,
+          "head_x": 91.41
+        },
+        {
+          "pose": 8,
+          "size": [
+            73,
+            84
+          ],
+          "xy": [
+            59,
+            46
+          ],
+          "head_width": 63.65,
+          "head_x": 90.41
+        },
+        {
+          "pose": 9,
+          "size": [
+            72,
+            82
+          ],
+          "xy": [
+            61,
+            48
+          ],
+          "head_width": 62.83,
+          "head_x": 92.0
+        },
+        {
+          "pose": 10,
+          "size": [
+            73,
+            84
+          ],
+          "xy": [
+            60,
+            46
+          ],
+          "head_width": 62.83,
+          "head_x": 91.0
+        },
+        {
+          "pose": 11,
+          "size": [
+            71,
+            83
+          ],
+          "xy": [
+            60,
+            47
+          ],
+          "head_width": 62.83,
+          "head_x": 91.0
+        }
+      ]
+    },
+    "ears": {
+      "source": "references/idle-refresh/2026-10-23/ears-raw.png",
+      "sha256": "d5b4c6f8d7d3fba34016250ea20109fe25a3d259a89fde68d7fd88f617115897",
+      "regions": [
+        [
+          97,
+          26,
+          362,
+          357,
+          65292
+        ],
+        [
+          438,
+          19,
+          696,
+          357,
+          60796
+        ],
+        [
+          786,
+          26,
+          1045,
+          357,
+          62338
+        ],
+        [
+          1125,
+          25,
+          1385,
+          357,
+          62043
+        ],
+        [
+          99,
+          388,
+          362,
+          718,
+          63821
+        ],
+        [
+          439,
+          388,
+          706,
+          718,
+          63631
+        ],
+        [
+          786,
+          390,
+          1051,
+          718,
+          65085
+        ],
+        [
+          1135,
+          390,
+          1395,
+          718,
+          62217
+        ],
+        [
+          100,
+          743,
+          362,
+          1072,
+          62102
+        ],
+        [
+          450,
+          740,
+          711,
+          1072,
+          62645
+        ],
+        [
+          791,
+          743,
+          1052,
+          1072,
+          63956
+        ],
+        [
+          1128,
+          740,
+          1400,
+          1072,
+          66384
+        ]
+      ],
+      "batch_scale": [
+        0.7294117647058823,
+        0.7008547008547008
+      ],
+      "asset": "assets/neko-idle-ears-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            69,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.64
+        },
+        {
+          "pose": 1,
+          "size": [
+            66,
+            84
+          ],
+          "xy": [
+            62,
+            46
+          ],
+          "head_width": 56.89,
+          "head_x": 90.08
+        },
+        {
+          "pose": 2,
+          "size": [
+            67,
+            82
+          ],
+          "xy": [
+            62,
+            48
+          ],
+          "head_width": 67.11,
+          "head_x": 95.19
+        },
+        {
+          "pose": 3,
+          "size": [
+            67,
+            82
+          ],
+          "xy": [
+            61,
+            48
+          ],
+          "head_width": 59.08,
+          "head_x": 90.18
+        },
+        {
+          "pose": 4,
+          "size": [
+            68,
+            82
+          ],
+          "xy": [
+            61,
+            48
+          ],
+          "head_width": 60.54,
+          "head_x": 90.91
+        },
+        {
+          "pose": 5,
+          "size": [
+            69,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 60.54,
+          "head_x": 89.91
+        },
+        {
+          "pose": 6,
+          "size": [
+            69,
+            81
+          ],
+          "xy": [
+            61,
+            49
+          ],
+          "head_width": 62.0,
+          "head_x": 91.64
+        },
+        {
+          "pose": 7,
+          "size": [
+            67,
+            81
+          ],
+          "xy": [
+            62,
+            49
+          ],
+          "head_width": 59.08,
+          "head_x": 91.18
+        },
+        {
+          "pose": 8,
+          "size": [
+            68,
+            81
+          ],
+          "xy": [
+            61,
+            49
+          ],
+          "head_width": 59.08,
+          "head_x": 90.18
+        },
+        {
+          "pose": 9,
+          "size": [
+            67,
+            82
+          ],
+          "xy": [
+            61,
+            48
+          ],
+          "head_width": 59.81,
+          "head_x": 90.54
+        },
+        {
+          "pose": 10,
+          "size": [
+            67,
+            81
+          ],
+          "xy": [
+            62,
+            49
+          ],
+          "head_width": 61.27,
+          "head_x": 92.27
+        },
+        {
+          "pose": 11,
+          "size": [
+            70,
+            82
+          ],
+          "xy": [
+            59,
+            48
+          ],
+          "head_width": 63.46,
+          "head_x": 90.36
+        }
+      ]
+    },
+    "sniff": {
+      "source": "references/idle-refresh/2026-10-23/sniff-raw.png",
+      "sha256": "8497509dbceff250c4e0605e1ce9a9855c0736739604fff651704cf8cff5cbbb",
+      "regions": [
+        [
+          80,
+          45,
+          330,
+          355,
+          56005
+        ],
+        [
+          443,
+          26,
+          692,
+          355,
+          56291
+        ],
+        [
+          789,
+          80,
+          1054,
+          354,
+          51877
+        ],
+        [
+          1151,
+          80,
+          1419,
+          354,
+          50765
+        ],
+        [
+          70,
+          436,
+          330,
+          716,
+          51723
+        ],
+        [
+          428,
+          440,
+          692,
+          716,
+          53251
+        ],
+        [
+          799,
+          382,
+          1053,
+          717,
+          56778
+        ],
+        [
+          1156,
+          396,
+          1416,
+          717,
+          56341
+        ],
+        [
+          86,
+          747,
+          333,
+          1066,
+          56162
+        ],
+        [
+          439,
+          761,
+          699,
+          1066,
+          56224
+        ],
+        [
+          791,
+          761,
+          1057,
+          1067,
+          57113
+        ],
+        [
+          1162,
+          757,
+          1417,
+          1066,
+          56081
+        ]
+      ],
+      "batch_scale": [
+        0.8157894736842105,
+        0.7454545454545455
+      ],
+      "asset": "assets/neko-idle-sniff-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            72,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.59
+        },
+        {
+          "pose": 1,
+          "size": [
+            72,
+            86
+          ],
+          "xy": [
+            60,
+            44
+          ],
+          "head_width": 62.0,
+          "head_x": 90.59
+        },
+        {
+          "pose": 2,
+          "size": [
+            77,
+            72
+          ],
+          "xy": [
+            56,
+            58
+          ],
+          "head_width": 64.45,
+          "head_x": 87.82
+        },
+        {
+          "pose": 3,
+          "size": [
+            78,
+            72
+          ],
+          "xy": [
+            56,
+            58
+          ],
+          "head_width": 63.63,
+          "head_x": 87.41
+        },
+        {
+          "pose": 4,
+          "size": [
+            75,
+            74
+          ],
+          "xy": [
+            57,
+            56
+          ],
+          "head_width": 63.63,
+          "head_x": 88.41
+        },
+        {
+          "pose": 5,
+          "size": [
+            76,
+            73
+          ],
+          "xy": [
+            56,
+            57
+          ],
+          "head_width": 66.08,
+          "head_x": 88.63
+        },
+        {
+          "pose": 6,
+          "size": [
+            73,
+            88
+          ],
+          "xy": [
+            60,
+            42
+          ],
+          "head_width": 70.16,
+          "head_x": 96.3
+        },
+        {
+          "pose": 7,
+          "size": [
+            75,
+            85
+          ],
+          "xy": [
+            57,
+            45
+          ],
+          "head_width": 66.08,
+          "head_x": 91.26
+        },
+        {
+          "pose": 8,
+          "size": [
+            71,
+            84
+          ],
+          "xy": [
+            62,
+            46
+          ],
+          "head_width": 67.71,
+          "head_x": 95.45
+        },
+        {
+          "pose": 9,
+          "size": [
+            75,
+            81
+          ],
+          "xy": [
+            59,
+            49
+          ],
+          "head_width": 64.45,
+          "head_x": 90.82
+        },
+        {
+          "pose": 10,
+          "size": [
+            77,
+            81
+          ],
+          "xy": [
+            57,
+            49
+          ],
+          "head_width": 65.26,
+          "head_x": 89.22
+        },
+        {
+          "pose": 11,
+          "size": [
+            73,
+            81
+          ],
+          "xy": [
+            60,
+            49
+          ],
+          "head_width": 62.0,
+          "head_x": 90.59
+        }
+      ]
+    },
+    "look": {
+      "source": "references/idle-refresh/2026-10-23/look-raw.png",
+      "sha256": "294f47527ba9be110fc01e6db1cf051c30c289565d067d8662575f09a4d5120b",
+      "regions": [
+        [
+          162,
+          21,
+          381,
+          258,
+          38816
+        ],
+        [
+          493,
+          20,
+          714,
+          257,
+          37913
+        ],
+        [
+          822,
+          20,
+          1046,
+          257,
+          37246
+        ],
+        [
+          1157,
+          20,
+          1379,
+          255,
+          34915
+        ],
+        [
+          163,
+          271,
+          381,
+          504,
+          35232
+        ],
+        [
+          502,
+          271,
+          714,
+          504,
+          35420
+        ],
+        [
+          832,
+          271,
+          1046,
+          504,
+          36563
+        ],
+        [
+          1169,
+          271,
+          1386,
+          504,
+          38129
+        ],
+        [
+          162,
+          524,
+          381,
+          758,
+          38340
+        ],
+        [
+          502,
+          522,
+          715,
+          758,
+          37668
+        ],
+        [
+          845,
+          522,
+          1046,
+          758,
+          37118
+        ],
+        [
+          1180,
+          522,
+          1380,
+          758,
+          35351
+        ],
+        [
+          180,
+          772,
+          381,
+          1008,
+          35219
+        ],
+        [
+          513,
+          772,
+          716,
+          1008,
+          36091
+        ],
+        [
+          844,
+          773,
+          1047,
+          1007,
+          37084
+        ],
+        [
+          1169,
+          773,
+          1386,
+          1008,
+          38540
+        ]
+      ],
+      "batch_scale": [
+        1.0,
+        1.0379746835443038
+      ],
+      "asset": "assets/neko-idle-look-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            73,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.5
+        },
+        {
+          "pose": 1,
+          "size": [
+            74,
+            82
+          ],
+          "xy": [
+            59,
+            48
+          ],
+          "head_width": 60.0,
+          "head_x": 89.5
+        },
+        {
+          "pose": 2,
+          "size": [
+            75,
+            82
+          ],
+          "xy": [
+            58,
+            48
+          ],
+          "head_width": 58.0,
+          "head_x": 86.5
+        },
+        {
+          "pose": 3,
+          "size": [
+            74,
+            81
+          ],
+          "xy": [
+            59,
+            49
+          ],
+          "head_width": 55.0,
+          "head_x": 86.0
+        },
+        {
+          "pose": 4,
+          "size": [
+            73,
+            81
+          ],
+          "xy": [
+            60,
+            49
+          ],
+          "head_width": 57.0,
+          "head_x": 88.0
+        },
+        {
+          "pose": 5,
+          "size": [
+            71,
+            81
+          ],
+          "xy": [
+            62,
+            49
+          ],
+          "head_width": 57.0,
+          "head_x": 90.0
+        },
+        {
+          "pose": 6,
+          "size": [
+            71,
+            81
+          ],
+          "xy": [
+            62,
+            49
+          ],
+          "head_width": 58.0,
+          "head_x": 90.5
+        },
+        {
+          "pose": 7,
+          "size": [
+            72,
+            81
+          ],
+          "xy": [
+            61,
+            49
+          ],
+          "head_width": 62.0,
+          "head_x": 91.5
+        },
+        {
+          "pose": 8,
+          "size": [
+            73,
+            81
+          ],
+          "xy": [
+            60,
+            49
+          ],
+          "head_width": 62.0,
+          "head_x": 90.5
+        },
+        {
+          "pose": 9,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            62,
+            48
+          ],
+          "head_width": 60.0,
+          "head_x": 91.5
+        },
+        {
+          "pose": 10,
+          "size": [
+            67,
+            82
+          ],
+          "xy": [
+            66,
+            48
+          ],
+          "head_width": 58.0,
+          "head_x": 95.5
+        },
+        {
+          "pose": 11,
+          "size": [
+            67,
+            82
+          ],
+          "xy": [
+            66,
+            48
+          ],
+          "head_width": 57.0,
+          "head_x": 96.0
+        },
+        {
+          "pose": 12,
+          "size": [
+            67,
+            82
+          ],
+          "xy": [
+            66,
+            48
+          ],
+          "head_width": 57.0,
+          "head_x": 94.0
+        },
+        {
+          "pose": 13,
+          "size": [
+            68,
+            82
+          ],
+          "xy": [
+            66,
+            48
+          ],
+          "head_width": 58.0,
+          "head_x": 94.5
+        },
+        {
+          "pose": 14,
+          "size": [
+            68,
+            81
+          ],
+          "xy": [
+            66,
+            49
+          ],
+          "head_width": 59.0,
+          "head_x": 95.0
+        },
+        {
+          "pose": 15,
+          "size": [
+            72,
+            81
+          ],
+          "xy": [
+            62,
+            49
+          ],
+          "head_width": 62.0,
+          "head_x": 92.5
+        }
+      ]
+    },
+    "tail": {
+      "source": "references/idle-refresh/2026-10-23/tail-raw.png",
+      "sha256": "b5c7d5585ed728a65ef7cd1704642ec8758fc24cd66baf140c5df2496becd077",
+      "regions": [
+        [
+          77,
+          43,
+          336,
+          359,
+          61403
+        ],
+        [
+          439,
+          43,
+          708,
+          360,
+          62140
+        ],
+        [
+          791,
+          43,
+          1084,
+          360,
+          63310
+        ],
+        [
+          1150,
+          43,
+          1435,
+          360,
+          62931
+        ],
+        [
+          77,
+          394,
+          383,
+          712,
+          65011
+        ],
+        [
+          439,
+          394,
+          726,
+          712,
+          63655
+        ],
+        [
+          792,
+          394,
+          1069,
+          712,
+          64142
+        ],
+        [
+          1148,
+          394,
+          1411,
+          713,
+          62952
+        ],
+        [
+          76,
+          745,
+          344,
+          1063,
+          62671
+        ],
+        [
+          437,
+          745,
+          704,
+          1062,
+          62600
+        ],
+        [
+          787,
+          745,
+          1057,
+          1062,
+          62498
+        ],
+        [
+          1150,
+          745,
+          1418,
+          1062,
+          62553
+        ]
+      ],
+      "batch_scale": [
+        0.7469879518072289,
+        0.7321428571428571
+      ],
+      "asset": "assets/neko-idle-tail-v2.png",
+      "metrics": [
+        {
+          "pose": 0,
+          "size": [
+            69,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.63
+        },
+        {
+          "pose": 1,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 2,
+          "size": [
+            78,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 3,
+          "size": [
+            75,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 4,
+          "size": [
+            81,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 5,
+          "size": [
+            75,
+            82
+          ],
+          "xy": [
+            61,
+            48
+          ],
+          "head_width": 60.51,
+          "head_x": 90.88
+        },
+        {
+          "pose": 6,
+          "size": [
+            73,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 7,
+          "size": [
+            69,
+            83
+          ],
+          "xy": [
+            60,
+            47
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 8,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.63
+        },
+        {
+          "pose": 9,
+          "size": [
+            70,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 10,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 61.25,
+          "head_x": 90.25
+        },
+        {
+          "pose": 11,
+          "size": [
+            71,
+            82
+          ],
+          "xy": [
+            60,
+            48
+          ],
+          "head_width": 62.0,
+          "head_x": 90.63
+        }
+      ]
+    }
+  },
+  "corrections": {
+    "rest": {
+      "excluded": [
+        8,
+        9
+      ],
+      "reason": "The larger ear/head tilts made the resting loop too busy. Keep calm breath/lid drawings and long canonical holds; independent ear/look gestures retain their own acting.",
+      "blink_feedback": {
+        "rejected_ms": 1550,
+        "corrected_ms": 450,
+        "order": [
+          3,
+          4,
+          6
+        ],
+        "durations_ms": [
+          150,
+          150,
+          150
+        ],
+        "reason": "User found the first blink unnatural/sluggish. Drop duplicate closed5; retain long open holds and breath. All selected frames painted at native100ms clock."
+      }
+    },
+    "loaf_measurement": "The upper-silhouette run joins head and haunch in low poses; its reported78px is not a literal head-width measurement. Do not fit the loaf down to this false seated-width estimate. Native color/silhouette review retains physical head scale and supported occlusion.",
+    "stretch": {
+      "recovery_group": [
+        13,
+        14,
+        15
+      ],
+      "reference": 15,
+      "reason": "The generated last row shrank. Its drawn neutral crown was7px too low. One constant head62/body82 calibration for the whole recovery group fixes it; no per-pose fitting.",
+      "support": "Anchor planted hind support initially; anchor foretoe during pressure4..9; retreat3/7px at10/11, then supported seated recovery. The initial draft reached the canvas edge when raw-resolution contacts were compared with runtime contacts. Sample source cells at128px before reading landmarks."
+    },
+    "look": {
+      "excluded": [
+        5,
+        6,
+        13,
+        14
+      ],
+      "reason": "5/13 turn toward the opposite direction and6/14 remain partially turned. Reverse the accepted entry angles into the drawn neutral7/15, then shared idle. Never use an opposite-direction return to fill a frame count."
+    },
+    "yawn": "Reuse open-mouth drawing4 on jaw closure before7; this bridges the large-to-small mouth transition without an abrupt skip.",
+    "tail": "Fixed physical batch scale with integer head registration keeps the quiet body/head stable as the tail changes width. Accepted chase/catch are untouched.",
+    "alpha": "Original look sheet stores gray RGB under zero-alpha pixels; assembled light/dark review has no gray rectangle. Preserve alpha and do not paint away or chroma-key the drawing."
+  },
+  "runtime": {
+    "idle": {
+      "bank": "idle-v2-rest",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        2200,
+        350,
+        400,
+        150,
+        150,
+        150,
+        500,
+        400,
+        300,
+        2200
+      ],
+      "loop": true
+    },
+    "loaf": {
+      "bank": "idle-v2-loaf",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        400,
+        250,
+        250,
+        250,
+        300,
+        900,
+        900,
+        500,
+        350,
+        300,
+        350,
+        300,
+        950
+      ],
+      "loop": false
+    },
+    "stretch": {
+      "bank": "idle-v2-stretch",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "durations_ms": [
+        400,
+        200,
+        200,
+        250,
+        250,
+        300,
+        450,
+        400,
+        500,
+        250,
+        250,
+        250,
+        250,
+        300,
+        350,
+        300,
+        450
+      ],
+      "loop": false
+    },
+    "groom": {
+      "bank": "idle-v2-groom",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        400,
+        200,
+        250,
+        250,
+        350,
+        450,
+        400,
+        450,
+        300,
+        250,
+        400,
+        300,
+        500
+      ],
+      "loop": false
+    },
+    "yawn": {
+      "bank": "idle-v2-yawn",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        4,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        400,
+        250,
+        200,
+        200,
+        250,
+        450,
+        450,
+        250,
+        250,
+        250,
+        300,
+        250,
+        300,
+        500
+      ],
+      "loop": false
+    },
+    "peek": {
+      "bank": "idle-v2-peek",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        400,
+        250,
+        250,
+        250,
+        450,
+        450,
+        450,
+        300,
+        250,
+        250,
+        300,
+        300,
+        600
+      ],
+      "loop": false
+    },
+    "ears": {
+      "bank": "idle-v2-ears",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        350,
+        200,
+        200,
+        250,
+        200,
+        350,
+        250,
+        250,
+        300,
+        350,
+        250,
+        250,
+        500
+      ],
+      "loop": false
+    },
+    "sniff": {
+      "bank": "idle-v2-sniff",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        350,
+        250,
+        250,
+        250,
+        350,
+        350,
+        450,
+        300,
+        250,
+        300,
+        300,
+        250,
+        500
+      ],
+      "loop": false
+    },
+    "look_left": {
+      "bank": "idle-v2-look",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        3,
+        2,
+        1,
+        7,
+        16
+      ],
+      "durations_ms": [
+        350,
+        250,
+        300,
+        350,
+        650,
+        300,
+        250,
+        250,
+        300,
+        500
+      ],
+      "loop": false
+    },
+    "look_right": {
+      "bank": "idle-v2-look",
+      "order": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        11,
+        10,
+        9,
+        15,
+        16
+      ],
+      "durations_ms": [
+        350,
+        250,
+        300,
+        350,
+        650,
+        300,
+        250,
+        250,
+        300,
+        500
+      ],
+      "loop": false
+    },
+    "tail": {
+      "bank": "idle-v2-tail",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "durations_ms": [
+        350,
+        200,
+        250,
+        300,
+        400,
+        300,
+        250,
+        250,
+        350,
+        400,
+        300,
+        300,
+        550
+      ],
+      "loop": false
+    }
+  },
+  "measurement_limit": "Head-width run estimates are valid for neutral frontal calibration, not low stretch/loaf silhouettes where torso/tail can join the scan. Final neutral checks use the actual seated endpoint; all source crops are complete connected drawings.",
+  "source_identities": {
+    "references/idle-refresh/2026-10-23/ears-raw.png": {
+      "bytes": 1048718,
+      "sha256": "d5b4c6f8d7d3fba34016250ea20109fe25a3d259a89fde68d7fd88f617115897"
+    },
+    "references/idle-refresh/2026-10-23/groom-raw.png": {
+      "bytes": 1049265,
+      "sha256": "d46bb887ce5672f0b4c985f248bea54dda1a0f5ee185d4789df71106aaa9ef5c"
+    },
+    "references/idle-refresh/2026-10-23/loaf-raw.png": {
+      "bytes": 1053673,
+      "sha256": "53e43be4b2defd25aa0c6a57f25a23750eeaf9e7ca19a6e65a4108b2b6667fba"
+    },
+    "references/idle-refresh/2026-10-23/look-raw.png": {
+      "bytes": 1520660,
+      "sha256": "294f47527ba9be110fc01e6db1cf051c30c289565d067d8662575f09a4d5120b"
+    },
+    "references/idle-refresh/2026-10-23/peek-raw.png": {
+      "bytes": 1001594,
+      "sha256": "57145de4f18d464e7e90f71352172dbe4fb7c4eb1881850333117e7cecccc3a4"
+    },
+    "references/idle-refresh/2026-10-23/rest-raw.png": {
+      "bytes": 1050064,
+      "sha256": "b64c952be1d7bd133ad2e22911482f70d3138755d45d12a8006a820571b398b8"
+    },
+    "references/idle-refresh/2026-10-23/sniff-raw.png": {
+      "bytes": 1040973,
+      "sha256": "8497509dbceff250c4e0605e1ce9a9855c0736739604fff651704cf8cff5cbbb"
+    },
+    "references/idle-refresh/2026-10-23/stretch-raw.png": {
+      "bytes": 1190989,
+      "sha256": "6a276f8d5a6b1086db56f6b1a31353c28dccdb518d97b3d25f0cf6ed46a01abc"
+    },
+    "references/idle-refresh/2026-10-23/tail-raw.png": {
+      "bytes": 1072475,
+      "sha256": "b5c7d5585ed728a65ef7cd1704642ec8758fc24cd66baf140c5df2496becd077"
+    },
+    "references/idle-refresh/2026-10-23/yawn-raw.png": {
+      "bytes": 1042822,
+      "sha256": "062f7e92a1a4d6eadddb7617662e5cba766e1ec2e7c0d1b95cbc70acc41bd310"
+    }
+  }
+}

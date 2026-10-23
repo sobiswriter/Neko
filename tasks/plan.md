@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Approved idle refresh · 2026-10-23
+
+Implement the reviewed idle plan, resting idle first. Rest: planted paws/haunch, drawn chest inhale/exhale, slow soft-lid→closed→reopen blink, tiny ear response and long still holds; about7s loop with canonical seams. Loaf/stretch follow with sequential support transfer and readable contentment/effort. Then grooming/yawn/peek and ear/sniff/look/swish connect actual neutral through full action and recovery. Use saved support/spine studies, preserve head volume/character and all accepted tail chase/catch pixels/timing/weights. Add expressions/readability and old/new comparison as standing rules. Review native-size color/silhouette keys and normal-speed old/new synchronized scenes, reject anomalies before importing. Verify affected frames/seams, source/baked equality and targeted interaction/timer paths only; no broad repeated regression/soak. Preserve the verified executable and build directly to the flat current/previous layout.
+
 ## Journal coherence and retention · 2026-10-23
 
 User reports logs disagree with actions and requires only the latest50 entries. Reproduce selected-but-unpainted poses/words and ignored pet reporting; observe performed state/actual clip, game phase and thought words at painting, separate model requests/waits/accepted interactions, and observe real visibility events. Keep existing art, timing and game rules. Replace500-entry memory/byte rotation with50-event memory and atomic saved-file snapshots, trimming legacy rows/rotation on startup and keeping visible disk-error recovery. Verify full source checks, independent native paint/log/file parity,50-entry reopen and packaged code; preserve the verified executable before the flat build. [Evidence](../docs/journal-coherence-validation.md).

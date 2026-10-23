@@ -793,6 +793,28 @@ class DesktopTests(unittest.TestCase):
                 self.neko.tick()
                 words.assert_called_once_with(self.neko.current_clip)
 
+    def test_refreshed_idle_deadlines_and_pickup_use_the_complete_drawn_story(self):
+        from animations import CLIPS
+        for state in IDLE_STATES:
+            if state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):
+                continue
+            start = time.monotonic()
+            self.neko.companion.state = state
+            self.neko.pose_started = start
+            self.neko.refresh_asset()
+            duration = sum(CLIPS[self.neko.current_clip].durations) / 1000
+            self.assertAlmostEqual(self.neko.companion.pose_until, start + duration)
+            self.assertEqual(self.neko.animation_timer.interval(), 100)
+            now = start + duration * .45
+            before = self.neko.current_frame(now).toImage()
+            with patch("main.time.monotonic", return_value=now):
+                self.neko.begin_pickup()
+                self.assertEqual(self.neko.current_frame(now).toImage(), before, state)
+                self.neko.release_pickup()
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + .01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "idle")
+
     def test_idle_thoughts_still_respect_quiet_and_visible_bubble(self):
         self.neko.companion.state = NekoState.TAIL_CHASE
         self.neko.set_quiet(True)
@@ -1091,9 +1113,9 @@ class DesktopTests(unittest.TestCase):
 
     def test_gesture_thought_cannot_linger_past_its_active_pose(self):
         self.neko.companion.state = NekoState.SNIFFING
-        self.neko.companion.pose_until = 104
+        self.neko.pose_started = 100
         self.neko.refresh_asset()
-        with patch("main.time.monotonic", return_value=102):
+        with patch("main.time.monotonic", return_value=self.neko.companion.pose_until - 2):
             self.assertTrue(self.neko.offline_line("sniff"))
         self.assertLessEqual(self.neko.bubble_timer.interval(), 2000)
         self.neko.dismiss_bubble()

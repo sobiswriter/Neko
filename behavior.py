@@ -154,7 +154,8 @@ class Companion:
         if self.state == NekoState.WAKING:
             return False
         self.next_comment = max(self.next_comment, now + 15)
-        if self.state in PET_STATES and now < self.pose_until:
+        if (self.state in PET_STATES or (self.state in IDLE_STATES
+                and self.state not in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH))) and now < self.pose_until:
             self.pet_pending = True
             return False
         self.start_pet(now)
@@ -229,6 +230,11 @@ class Companion:
 
         if self.state in PET_STATES:
             return self.finish_pet(now) if now >= self.pose_until else None
+        if self.state in IDLE_STATES and self.state not in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):
+            if now < self.pose_until:
+                return None
+            if self.pet_pending:
+                return self.finish_pet(now)
         if idle_seconds >= self.sleep_seconds and now >= self.next_nap:
             self.pending_window = None
             self.pose(NekoState.FALLING_ASLEEP, now, 2.6)

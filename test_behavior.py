@@ -6,6 +6,22 @@ from behavior import Companion, NekoState, PET_STATES, IDLE_STATES
 
 
 class CompanionTests(unittest.TestCase):
+    def test_refreshed_idle_finishes_before_a_due_nap_or_queued_pet(self):
+        for state in IDLE_STATES:
+            if state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):
+                continue
+            pet = Companion(0)
+            pet.pose(state, 179, 6)
+            self.assertIsNone(pet.tick(180, 180))
+            self.assertEqual(pet.state, state)
+            self.assertFalse(pet.pet(181))
+            self.assertTrue(pet.pet_pending)
+            self.assertIsNone(pet.tick(184, 184))
+            self.assertEqual(pet.tick(185, 185), "pet")
+            self.assertIn(pet.state, PET_STATES)
+            self.assertEqual(pet.pets, 1)
+            self.assertEqual(pet.naps, 0)
+
     def test_activity_types_share_one_configurable_cooldown_without_backlog(self):
         pet = Companion(0, idle_seconds=10000, chatter_seconds=10000)
         self.assertEqual(pet.tick(10, 0, window_event="open"), "curious")
@@ -123,9 +139,10 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(self.pet.state, NekoState.WAKING)
         self.assertEqual(self.pet.tick(until, 0), "idle")
 
-    def test_sleep_deadline_can_interrupt_another_animation(self):
+    def test_sleep_deadline_waits_for_the_idle_recovery(self):
         self.pet.pose(NekoState.GROOMING, 179, 6)
-        self.assertEqual(self.pet.tick(180, 180), "sleep")
+        self.assertIsNone(self.pet.tick(180, 180))
+        self.assertEqual(self.pet.tick(185, 185), "sleep")
 
     def test_app_context_selects_a_matching_animation_and_line_kind(self):
         self.assertEqual(self.pet.tick(10, 0, window_event="open", app_kind="music"), "curious")
@@ -183,6 +200,8 @@ class CompanionTests(unittest.TestCase):
 
     def test_sleep_delay_is_adjustable(self):
         pet = Companion(0, sleep_seconds=45)
+        pet.next_idle = 1000
+        pet.drowsy = True
         pet.tick(44, 44)
         self.assertNotEqual(pet.state, NekoState.SLEEPING)
         self.assertEqual(pet.tick(45, 45), "sleep")

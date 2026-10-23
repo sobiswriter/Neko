@@ -60,6 +60,12 @@ class PackagingTests(unittest.TestCase):
         self.assertNotIn("assets/neko-tailplay-v2.png", names)
         self.assertIn("assets/neko-lifecycle-v2.png", names)
         self.assertIn("assets/neko-tailswish-v1.png", names)
+        from animations import IDLE_ROWS
+        for bank in IDLE_ROWS:
+            asset = f"assets/neko-idle-{bank}-v2.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest(), asset)
         for bank in ("a", "b", "c"):
             self.assertIn(f"assets/neko-idleplay-{bank}-v1.png", names)
         self.assertNotIn("assets/neko-tailplay-v1.png", names)
@@ -187,9 +193,10 @@ class PackagingTests(unittest.TestCase):
     def test_bundled_menu_plays_goodbye_from_awake_and_sleep_states(self):
         import sys
         with tempfile.TemporaryDirectory() as folder:
+            # Five seven-second case limits also need import and retention-I/O time.
             result = subprocess.run([sys.executable, str(Path(__file__).parent / "tools/probe_bundled_goodbye.py"),
                                      str(self.exe), str(Path(folder) / "result.json")],
-                                    capture_output=True, text=True, timeout=30)
+                                     capture_output=True, text=True, timeout=60)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 

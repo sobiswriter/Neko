@@ -58,10 +58,11 @@ class Clip:
 
 
 CLIPS = {
-    "idle": Clip("idle", 0, (2500, 120, 160, 2400), loop=True),
-    "tail": Clip("tailswish", 0, (300, 220, 220, 350, 220, 220, 280, 450, 700), (0, 1, 2, 3, 4, 5, 6, 8, 7)),
-    "ears": Clip("idleplay-b", 2, (300, 250, 400, 250, 250, 350, 450, 700), tuple(range(8))),
-    "sniff": Clip("idleplay-b", 0, (300, 300, 350, 300, 450, 350, 450, 700), tuple(range(8))),
+    "idle": Clip("idle-v2-rest", 0, (2200, 350, 400, 150, 150, 150, 500, 400, 300, 2200),
+                 (0, 1, 2, 3, 4, 6, 7, 10, 11, 12), loop=True),
+    "tail": Clip("idle-v2-tail", 0, (350, 200, 250, 300, 400, 300, 250, 250, 350, 400, 300, 300, 550), tuple(range(13))),
+    "ears": Clip("idle-v2-ears", 0, (350, 200, 200, 250, 200, 350, 250, 250, 300, 350, 250, 250, 500), tuple(range(13))),
+    "sniff": Clip("idle-v2-sniff", 0, (350, 250, 250, 250, 350, 350, 450, 300, 250, 300, 300, 250, 500), tuple(range(13))),
     "tail_chase": Clip("tailplay", 0, (300, 180, 180, 100) + (50,) * 55 + (100, 180, 300, 600),
                        (16, 17, 18, 19) + tuple(range(11)) * 5 + (20, 21, 22, 23)),
     "tail_catch": Clip("tailplay", 0, (300, 180, 180, 100) + (50,) * 22 + (120, 350, 120, 150, 180, 300, 600),
@@ -101,18 +102,22 @@ CLIPS = {
     "ear_rub": Clip("pet-ear_rub", 0, (100, 100, 150, 150, 200, 200, 250, 200,
                                      250, 200, 200, 150, 150, 150, 150, 350), tuple(range(16))),
     "typing": Clip("activity", 0, (330, 330, 330, 330), loop=True),
-    "groom": Clip("idleplay-a", 0, (300, 250, 550, 650, 550, 300, 450, 600), tuple(range(8))),
-    "yawn": Clip("idleplay-c", 0, (300, 350, 350, 650, 350, 350, 450, 650), tuple(range(8))),
+    "groom": Clip("idle-v2-groom", 0, (400, 200, 250, 250, 350, 450, 400, 450, 300, 250, 400, 300, 500), tuple(range(13))),
+    "yawn": Clip("idle-v2-yawn", 0, (400, 250, 200, 200, 250, 450, 450, 250, 250, 250, 300, 250, 300, 500),
+                 (0, 1, 2, 3, 4, 5, 6, 4, 7, 8, 9, 10, 11, 12)),
     "fall_asleep": Clip("transitions", 0, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
     "wake": Clip("transitions", 2, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
     "sleep": Clip("transitions", 1, (1400, 1400), (2, 3), loop=True),
     "walk": Clip("game-walk", 0, (120,) * 8, tuple(range(4, 12)), loop=True),
-    "stretch": Clip("idleplay-a", 2, (300, 250, 400, 650, 450, 300, 400, 650), tuple(range(8))),
-    "look_left": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 1, 2, 3, 7)),
-    "look_right": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 4, 5, 6, 7)),
-    "loaf": Clip("idleplay-a", 4, (300, 300, 350, 1800, 350, 900, 500, 900), tuple(range(8))),
-    "peek": Clip("idleplay-c", 2, (300, 350, 450, 600, 350, 500, 450, 650), tuple(range(8))),
+    "stretch": Clip("idle-v2-stretch", 0, (400, 200, 200, 250, 250, 300, 450, 400, 500, 250, 250, 250, 250, 300, 350, 300, 450), tuple(range(17))),
+    "look_left": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 500), (0, 1, 2, 3, 4, 3, 2, 1, 7, 16)),
+    "look_right": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 500), (8, 9, 10, 11, 12, 11, 10, 9, 15, 16)),
+    "loaf": Clip("idle-v2-loaf", 0, (400, 250, 250, 250, 300, 900, 900, 500, 350, 300, 350, 300, 950), tuple(range(13))),
+    "peek": Clip("idle-v2-peek", 0, (400, 250, 250, 250, 450, 450, 450, 300, 250, 250, 300, 300, 600), tuple(range(13))),
 }
+
+IDLE_ROWS = {"rest": 3, "loaf": 3, "stretch": 4, "groom": 3, "yawn": 3,
+             "peek": 3, "ears": 3, "sniff": 3, "look": 4, "tail": 3}
 
 
 PET_ROWS = {"happy": 4, "nuzzle": 5, "knead": 6, "chin_scritch": 4, "roll": 6, "paw_offer": 5,
@@ -359,6 +364,26 @@ class SpriteAtlas:
         self.load_games(path)
         self.load_lifecycle(path)
         self.load_motion(path)
+        self.load_idles(path)
+
+    def load_idles(self, path):
+        imported = {}
+        idle = self.frames["idle", 0, 0]
+        for name, rows in IDLE_ROWS.items():
+            image = QPixmap(str(Path(path) / f"neko-idle-{name}-v2.png"))
+            if image.size().width() != CANVAS_WIDTH * 4 or image.height() != CANVAS_HEIGHT * rows:
+                return
+            bank = f"idle-v2-{name}"
+            for index in range(rows * 4):
+                imported[bank, index // 4, index % 4] = image.copy(index % 4 * CANVAS_WIDTH,
+                    index // 4 * CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT)
+            imported[bank, 0, 0] = idle
+            imported[bank, rows, 0] = idle
+            if name == "look":
+                imported[bank, 2, 0] = idle
+        self.frames = {key: frame for key, frame in self.frames.items()
+                       if key[0] not in ("idleplay-a", "idleplay-b", "idleplay-c", "tailswish")}
+        self.frames.update(imported)
 
     def load_motion(self, path):
         imported = {}

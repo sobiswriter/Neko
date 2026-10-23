@@ -6,7 +6,7 @@ import unittest
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QColor, QImage
 
-from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, departure_progress, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, IDLE_ROWS, SpriteAtlas, sprite_bounds, pet_landmarks, departure_progress, CANVAS_WIDTH, CANVAS_TOP, CANVAS_HEIGHT
 
 
 APP = QApplication.instance() or QApplication([])
@@ -29,6 +29,7 @@ class AnimationTests(unittest.TestCase):
         atlas = self.atlas
         banks = [(CLIPS[name].bank, rows * 4) for name, rows in PET_ROWS.items()]
         banks += [("motion-arrive", 20), ("motion-depart", 21), ("motion-bridge", 4), ("motion-sad", 8)]
+        banks += [(f"idle-v2-{name}", rows * 4) for name, rows in IDLE_ROWS.items()]
         for name, count in banks:
             for index in range(count):
                 image = atlas.frames[name, index // 4, index % 4].toImage()
@@ -93,16 +94,28 @@ class AnimationTests(unittest.TestCase):
         idle = atlas.frame("idle", 0).toImage()
         for name in ("groom", "stretch", "loaf", "sniff", "ears", "yawn", "peek", "look_left", "look_right"):
             clip = CLIPS[name]
-            self.assertTrue(clip.bank.startswith("idleplay-"), name)
+            self.assertTrue(clip.bank.startswith("idle-v2-"), name)
             self.assertGreaterEqual(len(set(clip.order)), 5, name)
             self.assertFalse(clip.loop, name)
             self.assertLess(sum(clip.durations), 8000 if name == "loaf" else 6000, name)
             self.assertEqual(atlas.frame(name, 0).toImage(), idle, name)
             self.assertEqual(atlas.frame(name, 999).toImage(), idle, name)
 
+    def test_refreshed_idle_drawn_neutrals_match_the_shared_head_and_crown(self):
+        reference = self.atlas.frame("idle", 0).toImage()
+        bounds = sprite_bounds(reference)
+        width, center, _, _ = pet_landmarks(reference.copy(bounds))
+        for name, rows in IDLE_ROWS.items():
+            frame = self.atlas.frames[f"idle-v2-{name}", rows - 1, 3].toImage()
+            box = sprite_bounds(frame)
+            hw, hc, _, _ = pet_landmarks(frame.copy(box))
+            self.assertAlmostEqual(box.left() + hc, bounds.left() + center, delta=2, msg=name)
+            self.assertAlmostEqual(box.top(), bounds.top(), delta=2, msg=name)
+            self.assertAlmostEqual(hw, width, delta=4, msg=name)
+
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
         atlas = self.atlas
-        self.assertEqual(len(atlas.frames), 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 2 + sum(GAME_ROWS.values()) * 4 + 45 + 53)
+        self.assertEqual(len(atlas.frames), 839 - 73 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS))
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))
@@ -264,7 +277,7 @@ class AnimationTests(unittest.TestCase):
     def test_new_source_poses_fit_without_clipping_their_silhouettes(self):
         atlas = self.atlas
         for key, frame in atlas.frames.items():
-            if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith(("idleplay-", "visitor-", "motion-")):
+            if key[0] not in ("arrival", "tailplay", "farewell") and not key[0].startswith(("idle-v2-", "visitor-", "motion-")):
                 continue
             image = frame.toImage()
             self.assertTrue(all(image.pixelColor(x, y).alpha() == 0
@@ -282,7 +295,7 @@ class AnimationTests(unittest.TestCase):
             centers.append((min(opaque) + max(opaque)) / 2)
         self.assertLessEqual(max(centers) - min(centers), 1)
         self.assertIn(8, CLIPS["tail"].order)
-        self.assertEqual(atlas.frames["tailswish", 2, 0].toImage(), atlas.frames["idle", 0, 2].toImage())
+        self.assertEqual(atlas.frame("tail", 999).toImage(), atlas.frame("idle", 0).toImage())
 
     def test_lifecycle_motion_continues_between_drawn_poses_and_has_clean_endpoints(self):
         atlas = self.atlas
@@ -336,8 +349,14 @@ class AnimationTests(unittest.TestCase):
     def test_idle_holds_then_blinks_and_loops(self):
         idle = CLIPS["idle"]
         self.assertEqual(idle.frame_index(0), 0)
-        self.assertEqual(idle.frame_index(2.6), 1)
+        self.assertGreaterEqual(idle.durations[0], 2000)
+        self.assertEqual(idle.frame_index(2.4), 1)
+        blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (3, 4, 5, 6))
+        self.assertGreaterEqual(blink_ms, 300)
+        self.assertLessEqual(blink_ms, 500)
+        self.assertNotIn(5, idle.order)  # A second closed-eye hold made the blink sluggish.
         self.assertEqual(idle.frame_index(sum(idle.durations) / 1000), 0)
+        self.assertEqual(self.atlas.frame("idle", 2.4, motion=False).toImage(), self.atlas.frames["idle", 0, 0].toImage())
 
     def test_one_shot_actions_end_without_looping(self):
         self.assertEqual(CLIPS["fall_asleep"].frame_index(999), 7)
