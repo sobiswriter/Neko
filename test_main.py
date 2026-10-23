@@ -500,13 +500,73 @@ class DesktopTests(unittest.TestCase):
             self.neko.animate()
         self.assertGreater(abs(self.neko.x() - origin.x()), abs(self.neko.y() - origin.y()))
 
-    def test_sleeping_quit_does_not_wake_her_for_a_performance(self):
+    def test_sleeping_menu_quit_wakes_then_says_goodbye_once(self):
+        from animations import CLIPS
         self.neko.companion.state = NekoState.SLEEPING
+        self.neko.companion.nap_started = time.monotonic() - 60
+        self.neko.refresh_asset()
+        counts = self.neko.companion.pets, self.neko.companion.naps
+        origin = self.neko.pos()
+        action = next(a for a in self.neko.menu.actions() if a.text() == "Let her go · quit")
+        with patch("main.QApplication.quit") as quit_app:
+            action.trigger()
+            self.assertEqual(self.neko.companion.state, NekoState.WAKING)
+            self.assertEqual(self.neko.current_clip, "wake")
+            self.assertTrue(self.neko.quit_pending)
+            self.assertIsNone(self.neko.companion.nap_started)
+            deadline = self.neko.companion.pose_until
+            self.assertAlmostEqual(deadline - self.neko.pose_started, sum(CLIPS["wake"].durations) / 1000)
+            action.trigger()
+            self.neko.pet_reaction()
+            self.neko.tick()
+            self.assertEqual(self.neko.companion.pose_until, deadline)
+            with patch("main.time.monotonic", return_value=deadline - 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "wake")
+            with patch("main.time.monotonic", return_value=deadline + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.companion.state, NekoState.LEAVING)
+            self.assertEqual(self.neko.current_clip, "depart")
+            self.assertEqual(self.neko.current_frame(self.neko.pose_started).toImage(), self.atlas.frame("depart", 0).toImage())
+            quit_app.assert_not_called()
+            self.neko.finish_transition()
+            quit_app.assert_called_once()
+        self.assertTrue(self.neko.closing)
+        self.assertEqual((self.neko.companion.pets, self.neko.companion.naps), counts)
+        self.assertEqual(self.neko.pos(), origin)
+
+    def test_quitting_during_wake_finishes_it_without_restarting(self):
+        from animations import CLIPS
+        self.neko.companion.wake(time.monotonic())
+        self.neko.pose_started = time.monotonic() - 1
+        self.neko.refresh_asset()
+        started = self.neko.pose_started
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertTrue(self.neko.quit_pending)
+            self.assertEqual(self.neko.pose_started, started)
+            self.assertAlmostEqual(self.neko.companion.pose_until, started + sum(CLIPS["wake"].durations) / 1000)
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "depart")
+            quit_app.assert_not_called()
+
+    def test_quitting_mid_curl_finishes_curl_then_wakes_before_goodbye(self):
+        self.neko.companion.state = NekoState.FALLING_ASLEEP
+        self.neko.pose_started = time.monotonic() - 0.2
         self.neko.refresh_asset()
         with patch("main.QApplication.quit") as quit_app:
             self.neko.quit_neko()
-            quit_app.assert_called_once()
-        self.assertTrue(self.neko.closing)
+            self.assertTrue(self.neko.quit_pending)
+            self.assertEqual(self.neko.current_clip, "fall_asleep")
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+                self.neko.animate()
+            self.assertTrue(self.neko.quit_pending)
+            self.assertEqual(self.neko.current_clip, "wake")
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "depart")
+            quit_app.assert_not_called()
 
     def test_menu_goodbye_finishes_an_awake_gesture_then_leaves_once(self):
         self.neko.companion.state = NekoState.TAIL_CHASE

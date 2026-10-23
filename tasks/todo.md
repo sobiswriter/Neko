@@ -1,5 +1,12 @@
 # Animation rebuild checklist
 
+## Sleeping goodbye · 2026-10-23
+
+- [x] Reproduce sleeping, partial wake and partial curl quit failures.
+- [x] Connect existing wake/recovery to sad goodbye and one diagonal leap; preserve interruption, counts and home.
+- [x] Verify source paths and assemble a production-controller preview without changing art/clip definitions.
+- [x] Verify final executable menu/timers and five package checks, then rotate the preserved predecessor. [Report](../docs/sleep-goodbye-validation.md).
+
 ## Idle review, thoughts and diagnostics · 2026-10-23
 
 - [x] Review production idle/canonical transitions and saved references; prepare current previews and [animation plan](../docs/idle-refresh-plan.md). Tail chase/catch excluded.

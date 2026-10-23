@@ -184,7 +184,7 @@ class PackagingTests(unittest.TestCase):
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
                     process.wait(timeout=5)
 
-    def test_bundled_menu_plays_goodbye_from_idle_gesture_and_visible_fullscreen(self):
+    def test_bundled_menu_plays_goodbye_from_awake_and_sleep_states(self):
         import sys
         with tempfile.TemporaryDirectory() as folder:
             result = subprocess.run([sys.executable, str(Path(__file__).parent / "tools/probe_bundled_goodbye.py"),

@@ -103,8 +103,11 @@ Soft sounds are optional and off until you enable them.
   window reactions midway through. Reduced motion skips the jumps; quitting
   while hidden is immediate. A visible fullscreen pet still says goodbye when
   fullscreen hiding is disabled. Awake gestures finish their drawn recovery before
-  goodbye, with new reactions paused. Sleeping, held and active game states close
-  immediately. Hide/Show remains immediate. [Preview and verification](docs/dropout-fix-validation.md).
+  goodbye, with new reactions paused. A sleeping kitten wakes and uncurls first,
+  then shows sadness and makes the same single leap. An ongoing curl finishes
+  before waking; an ongoing wake continues without restarting. Held and active
+  game states close immediately. Hide/Show remains immediate.
+  [Sleep goodbye preview and verification](docs/sleep-goodbye-validation.md).
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual

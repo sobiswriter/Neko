@@ -925,7 +925,7 @@ class NekoWidget(QWidget):
         now = time.monotonic()
         if self.quit_pending and now >= self.companion.pose_until:
             self.quit_pending = False
-            self.companion.state = NekoState.IDLE
+            self.companion.state = NekoState.SLEEPING if self.companion.state == NekoState.FALLING_ASLEEP else NekoState.IDLE
             self.quit_neko()
             return
         if self.game and self.companion.state in GAME_STATES:
@@ -1777,7 +1777,7 @@ class NekoWidget(QWidget):
     def quit_neko(self):
         if self.closing or self.quit_pending or self.companion.state == NekoState.LEAVING:
             return
-        compatible = self.companion.state not in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING) + CARRY_STATES + GAME_STATES
+        compatible = self.companion.state not in CARRY_STATES + GAME_STATES
         self.cancel_pickup()
         self.end_game(immediate=True, clear_mood=True)
         self.restore_arrival_position()
@@ -1790,6 +1790,11 @@ class NekoWidget(QWidget):
             self.menu.hide()
             if self.stats_window:
                 self.stats_window.close()
+            if self.companion.state == NekoState.SLEEPING:
+                now = time.monotonic()
+                self.companion.wake(now)
+                self.pose_started = now
+                self.refresh_asset()
             if self.companion.state not in (NekoState.IDLE, NekoState.ARRIVING):
                 # Let the authored recovery finish rather than snapping a moving pose to seated goodbye.
                 self.quit_pending = True

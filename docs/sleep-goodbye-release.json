@@ -1,0 +1,334 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "a3dcae9",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 125997607,
+      "sha256": "ec44a6e8a37e37603d218936dea9b63c3fc390b89e20230572493e196e1487da"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 125997627,
+      "sha256": "7b509135efa42a43d188bd38a23c528b7257bc2b4091da27bf05113c1787f9d5"
+    }
+  },
+  "source": {
+    "main.py": {
+      "bytes": 97524,
+      "sha256": "0d7d02cc2b89ffb4a75bdc819955a6eed44dfc2d8dbfff6d14982241363c068c"
+    },
+    "behavior.py": {
+      "bytes": 11203,
+      "sha256": "bde5d1f79f3674f441ad77be1c0089dcfa1db628396fa2ba6a3ad5abf07c6d33"
+    },
+    "animations.py": {
+      "bytes": 35629,
+      "sha256": "09e0a42aeafe3712442a05b6a6a626b39efbd224fbf118399543b421535caa40"
+    },
+    "test_main.py": {
+      "bytes": 69639,
+      "sha256": "86626d0df8b95d26e7b32cec9b0d468144ae5e0a7dc5b95d97daa6d6f2442073"
+    },
+    "test_packaging.py": {
+      "bytes": 10847,
+      "sha256": "c333467eab4562a892b155a692744108cfaaea57e071164c9230455f10a795d1"
+    },
+    "tools/probe_bundled_goodbye.py": {
+      "bytes": 6246,
+      "sha256": "0916c3d9b29b43766d6486fdaffb6961be07e9e49145435911baff5063158a63"
+    }
+  },
+  "checks": {
+    "source": 164,
+    "package": 5,
+    "bundled_menu_cases": 5
+  },
+  "unchanged_baked_resources": {
+    "assets/neko-runtime.png": true,
+    "assets/neko-runtime.json": true
+  },
+  "animation_bytecode_unchanged": true,
+  "atlas_entries": 839,
+  "clips": 65,
+  "native_menu": [
+    {
+      "case": "idle",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "wake_painted": [],
+      "stages": [
+        "LEAVING"
+      ],
+      "counts_unchanged": true,
+      "seconds": 2.278,
+      "passed": true
+    },
+    {
+      "case": "gesture",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "wake_painted": [],
+      "stages": [
+        "TAIL_CHASE",
+        "LEAVING"
+      ],
+      "counts_unchanged": true,
+      "seconds": 2.53,
+      "passed": true
+    },
+    {
+      "case": "visible_fullscreen",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "wake_painted": [],
+      "stages": [
+        "LEAVING"
+      ],
+      "counts_unchanged": true,
+      "seconds": 2.275,
+      "passed": true
+    },
+    {
+      "case": "sleeping",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "wake_painted": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "stages": [
+        "WAKING",
+        "LEAVING"
+      ],
+      "counts_unchanged": true,
+      "seconds": 4.682,
+      "passed": true
+    },
+    {
+      "case": "falling_asleep",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "wake_painted": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "stages": [
+        "FALLING_ASLEEP",
+        "WAKING",
+        "LEAVING"
+      ],
+      "counts_unchanged": true,
+      "seconds": 4.884,
+      "passed": true
+    }
+  ],
+  "ui_start": [
+    {
+      "exe": "DesktopNeko.exe",
+      "ui_ready_seconds": 2.758
+    }
+  ],
+  "scope": "Reuse existing wake, then sad goodbye and one diagonal leap. Finish partial curl; preserve partial wake clock. No art/clip changes.",
+  "limits": "Bundled main/animations run under installed Python/Qt; native bootloader checked separately. No physical pointer/mixed-DPI/multi-monitor/long-soak trial."
+}

@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Sleeping goodbye · 2026-10-23
+
+User explicitly requests waking before sadness and dropping out. Reuse the existing eight-drawing2.34s uncurl/wake and17-entry2.20s sad/load/push/single diagonal flight, keeping support and scale intact. Finish an in-progress curl before wake; retain an in-progress wake's clock. Pending quit suppresses competing reactions and duplicate quit, with motion-off/hiding/monitor changes retaining prompt close. No new source poses or changes to the idle proposal/protected tail actions. Reproduce the menu failure, check source and frozen menu/timer painting, preview the complete path, preserve the verified executable and build flat. [Evidence](../docs/sleep-goodbye-validation.md).
+
 ## Idle review and diagnostics · 2026-10-23
 
 User requests an animation review/plan first, explicitly protecting tail chase/catch. [Proposed idle refresh](../docs/idle-refresh-plan.md) records existing transitions, reference comparison, per-action support/expression/timing proposals and staged acceptance. No art/playback changes until reviewed. Separately fix independent general/gesture thought timing, automatic invitation boundary handling and persistent inspectable Nook activity logs now. Reproduce each bug, keep sleep/care/quiet/fresh-entry gates, verify source/packaged resources and preserve the flat release.
