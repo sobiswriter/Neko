@@ -1,5 +1,9 @@
 # Animation rebuild
 
+## Idle review and diagnostics · 2026-10-23
+
+User requests an animation review/plan first, explicitly protecting tail chase/catch. [Proposed idle refresh](../docs/idle-refresh-plan.md) records existing transitions, reference comparison, per-action support/expression/timing proposals and staged acceptance. No art/playback changes until reviewed. Separately fix independent general/gesture thought timing, automatic invitation boundary handling and persistent inspectable Nook activity logs now. Reproduce each bug, keep sleep/care/quiet/fresh-entry gates, verify source/packaged resources and preserve the flat release.
+
 ## Drop-out correction — 2026-10-23
 
 User approves the rest but reports missing goodbye in the exe and requests one graceful leap. Reproduce with the replaced executable's main/animation bytecode, assets and actual Qt menu action. Fix awake-gesture and deliberately visible fullscreen skip paths; preserve recovery before one sad goodbye, suppress competing actions and retain prompt interruption. Remove the flight tuck/re-extension/steep reversal through selection only. Preserve all839 frames and entrance. [Evidence and limits](../docs/dropout-fix-validation.md).

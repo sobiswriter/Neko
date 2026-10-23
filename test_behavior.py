@@ -164,11 +164,13 @@ class CompanionTests(unittest.TestCase):
         actions = [self.pet.tick(t, 0, quiet=True) for t in range(1, 2000)]
         self.assertNotIn("comment", actions)
 
-    def test_comments_use_the_configured_cooldown(self):
+    def test_due_comment_waits_for_the_ui_to_acknowledge_display(self):
         self.pet.next_idle = 99999
         self.pet.next_comment = 10
         self.assertEqual(self.pet.tick(10, 0), "comment")
-        self.assertGreaterEqual(self.pet.next_comment, 10 + self.pet.chatter_seconds * 0.8)
+        self.assertEqual(self.pet.next_comment, 10)
+        self.assertEqual(self.pet.tick(11, 0), "comment")
+        self.pet.next_comment = 11 + self.pet.chatter_seconds
         self.assertIsNone(self.pet.tick(11, 0))
 
     def test_pet_is_a_temporary_pose_and_delays_chatter(self):

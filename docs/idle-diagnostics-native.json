@@ -1,0 +1,201 @@
+{
+  "automatic_started": true,
+  "countdown_spans_seconds": [
+    1.041,
+    1.043,
+    1.042
+  ],
+  "journal_matches_file": true,
+  "nook_size": [
+    340,
+    674
+  ],
+  "entries": [
+    {
+      "time": "2026-10-23T10:11:18.684+05:30",
+      "category": "System",
+      "action": "session",
+      "detail": "Neko started"
+    },
+    {
+      "time": "2026-10-23T10:11:18.685+05:30",
+      "category": "Game",
+      "action": "configuration",
+      "detail": "automatic=True; interval=90 sec"
+    },
+    {
+      "time": "2026-10-23T10:11:23.962+05:30",
+      "category": "System",
+      "action": "visibility",
+      "detail": "show requested"
+    },
+    {
+      "time": "2026-10-23T10:11:24.051+05:30",
+      "category": "Game",
+      "action": "side area",
+      "detail": "outside; fresh approach can qualify"
+    },
+    {
+      "time": "2026-10-23T10:11:24.052+05:30",
+      "category": "Game",
+      "action": "waiting",
+      "detail": "cooldown"
+    },
+    {
+      "time": "2026-10-23T10:11:24.450+05:30",
+      "category": "Game",
+      "action": "queued",
+      "detail": "automatic"
+    },
+    {
+      "time": "2026-10-23T10:11:24.451+05:30",
+      "category": "Game",
+      "action": "waiting",
+      "detail": "fresh side entry"
+    },
+    {
+      "time": "2026-10-23T10:11:24.495+05:30",
+      "category": "Game",
+      "action": "side area",
+      "detail": "entered; checking stable hover"
+    },
+    {
+      "time": "2026-10-23T10:11:24.497+05:30",
+      "category": "Game",
+      "action": "waiting",
+      "detail": "stable hover"
+    },
+    {
+      "time": "2026-10-23T10:11:24.824+05:30",
+      "category": "Game",
+      "action": "invitation accepted",
+      "detail": "automatic"
+    },
+    {
+      "time": "2026-10-23T10:11:24.825+05:30",
+      "category": "Game",
+      "action": "started",
+      "detail": "automatic"
+    },
+    {
+      "time": "2026-10-23T10:11:24.825+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_ready"
+    },
+    {
+      "time": "2026-10-23T10:11:24.826+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: ready; result=pending"
+    },
+    {
+      "time": "2026-10-23T10:11:24.854+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_announce: tiny hunter reporting for a tiny chase."
+    },
+    {
+      "time": "2026-10-23T10:11:24.935+05:30",
+      "category": "Game",
+      "action": "waiting",
+      "detail": "game already active"
+    },
+    {
+      "time": "2026-10-23T10:11:25.666+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: three; result=pending"
+    },
+    {
+      "time": "2026-10-23T10:11:25.667+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_three"
+    },
+    {
+      "time": "2026-10-23T10:11:25.705+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_3\u2026: 3\u2026"
+    },
+    {
+      "time": "2026-10-23T10:11:26.707+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: two; result=pending"
+    },
+    {
+      "time": "2026-10-23T10:11:26.709+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_two"
+    },
+    {
+      "time": "2026-10-23T10:11:26.738+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_2\u2026: 2\u2026"
+    },
+    {
+      "time": "2026-10-23T10:11:27.750+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: one; result=pending"
+    },
+    {
+      "time": "2026-10-23T10:11:27.750+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_one"
+    },
+    {
+      "time": "2026-10-23T10:11:27.784+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_1\u2026: 1\u2026"
+    },
+    {
+      "time": "2026-10-23T10:11:28.792+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: go; result=pending"
+    },
+    {
+      "time": "2026-10-23T10:11:28.808+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_go"
+    },
+    {
+      "time": "2026-10-23T10:11:28.835+05:30",
+      "category": "Thought",
+      "action": "shown",
+      "detail": "game_go: Here I come! Pounce time!"
+    },
+    {
+      "time": "2026-10-23T10:11:29.190+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: run; result=pending"
+    },
+    {
+      "time": "2026-10-23T10:11:29.191+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_run"
+    },
+    {
+      "time": "2026-10-23T10:11:29.870+05:30",
+      "category": "Game",
+      "action": "phase",
+      "detail": "automatic: prepare; result=pending"
+    },
+    {
+      "time": "2026-10-23T10:11:29.871+05:30",
+      "category": "Game",
+      "action": "state",
+      "detail": "playing \u00b7 game_prepare"
+    }
+  ]
+}

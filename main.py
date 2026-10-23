@@ -18,7 +18,7 @@ from PySide6.QtCore import QEvent, QLockFile, QPoint, QRect, QRectF, QSettings, 
 from PySide6.QtGui import QColor, QCursor, QFont, QIcon, QMovie, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QDialog, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QMenu, QMessageBox,
-    QPushButton, QSpinBox, QFormLayout, QTabWidget, QSystemTrayIcon, QVBoxLayout, QWidget,
+    QPushButton, QSpinBox, QFormLayout, QTabWidget, QSystemTrayIcon, QVBoxLayout, QWidget, QPlainTextEdit, QComboBox,
 )
 
 from behavior import Companion, NekoState, PET_STATES, CARRY_STATES, GAME_STATES, IDLE_STATES
@@ -29,6 +29,7 @@ from animations import GAME_ROWS, SpriteAtlas, Clip, CLIPS, drop_progress, depar
 from dialogue import OfflineDialogue
 from cursors import petting_cursors
 from thoughts import ThoughtLabel
+from event_log import EventLog
 
 
 RESOURCE_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
@@ -40,6 +41,8 @@ TIMING_LIMITS = {"sleep_seconds": (180, 1, 3600),
                  "sleep_duration": (0, 0, 3600),
                  "chatter_seconds": (75, 15, 600), "idle_seconds": (14, 5, 120),
                  "reaction_seconds": (60, 15, 600)}
+GESTURE_THOUGHTS = {"tail", "ears", "sniff", "stretch", "groom", "yawn", "loaf", "peek",
+                    "look_left", "look_right", "tail_chase", "tail_catch"}
 
 
 def adjacent_position(anchor, size, area):
@@ -191,10 +194,29 @@ class StatsWindow(QDialog):
         layout.addWidget(self.mood)
         tabs = QTabWidget()
         layout.addWidget(tabs)
-        company, settings, play_tab = QWidget(), QWidget(), QWidget()
+        company, settings, play_tab, journal_tab = QWidget(), QWidget(), QWidget(), QWidget()
         tabs.addTab(company, "Company")
         tabs.addTab(play_tab, "Play")
         tabs.addTab(settings, "Settings")
+        tabs.addTab(journal_tab, "Journal")
+        self.tabs, self.journal_tab = tabs, journal_tab
+        journal_layout = QVBoxLayout(journal_tab)
+        self.log_filter = QComboBox()
+        self.log_filter.addItems(("All", "Thought", "Idle", "Sleep", "Care", "Activity", "Game", "Lifecycle", "System"))
+        self.log_filter.setAccessibleName("Filter activity log")
+        self.log_filter.currentTextChanged.connect(self.update_journal)
+        journal_layout.addWidget(self.log_filter)
+        self.activity_log = QPlainTextEdit()
+        self.activity_log.setReadOnly(True)
+        self.activity_log.setAccessibleName("Neko activity log")
+        self.activity_log.setMinimumHeight(180)
+        journal_layout.addWidget(self.activity_log)
+        copy_log = QPushButton("Copy log")
+        copy_log.clicked.connect(lambda: QApplication.clipboard().setText(self.activity_log.toPlainText()))
+        journal_layout.addWidget(copy_log)
+        self.log_status = QLabel()
+        self.log_status.setWordWrap(True)
+        journal_layout.addWidget(self.log_status)
         company_layout, settings_layout = QVBoxLayout(company), QVBoxLayout(settings)
         play_layout = QVBoxLayout(play_tab)
         self.focus = QCheckBox("Quiet company · no unprompted words")
@@ -239,6 +261,9 @@ class StatsWindow(QDialog):
         self.game_interval.valueChanged.connect(neko.set_game_interval)
         game_timing.addRow("Time between games", self.game_interval)
         play_layout.addLayout(game_timing)
+        self.game_status = QLabel()
+        self.game_status.setWordWrap(True)
+        play_layout.addWidget(self.game_status)
         instructions = QLabel("Bring the arrow beside her, a little away from her paws, to invite a chase. "
                               "She notices, counts down, then comes for it! A paw touch earns a celebration.\n\n"
                               "The cooldown arms automatic play; she waits for your next approach. "
@@ -262,7 +287,7 @@ class StatsWindow(QDialog):
             if key == "reaction_seconds":
                 spin.setToolTip("Minimum gap shared by typing, window/tab activity, cursor curiosity. Idle gestures have their own setting.")
             elif key == "chatter_seconds":
-                spin.setToolTip("Minimum gap between automatic lines, including idle and activity thoughts. Deliberate pets can still get a reply.")
+                spin.setToolTip("General idle thoughts use this timer. Gesture thoughts belong to their gestures and do not reset it. A visible thought finishes first.")
             spin.setMinimumWidth(100)
             spin.setSuffix(" sec")
             if key == "sleep_duration":
@@ -337,6 +362,9 @@ class StatsWindow(QDialog):
 
     def update_stats(self):
         n = self.neko
+        self.update_journal()
+        remaining = max(0, math.ceil(n.game_timer.due - time.monotonic())) if math.isfinite(n.game_timer.due) else 0
+        self.game_status.setText(f"Automatic play: {n.game_timer.reason or 'cooldown'}\nCooldown remaining: {remaining} sec")
         self.play.setText("End game" if n.game and n.game.phase not in ("curl", "comfort") else "Play · Catch the Cursor")
         self.keepsakes.setText(f"{n.total_pets + n.companion.pets} little pets   ·   "
                                f"{n.total_naps + n.companion.naps} cozy naps\n"
@@ -363,6 +391,20 @@ class StatsWindow(QDialog):
             NekoState.COMFORTING: "one more cuddle. feeling better already.",
         }.get(n.companion.state, "a little cat, doing little cat things."))
 
+    def update_journal(self):
+        if not hasattr(self, "activity_log"):
+            return
+        journal = self.neko.journal
+        text = journal.text(self.log_filter.currentText())
+        if text != self.activity_log.toPlainText():
+            scroll = self.activity_log.verticalScrollBar()
+            at_end, position = scroll.value() == scroll.maximum(), scroll.value()
+            self.activity_log.setPlainText(text)
+            scroll.setValue(scroll.maximum() if at_end else position)
+        self.log_status.setText("Log file unavailable; events remain visible here." if journal.error else
+                                "Local activity log · up to 500 recent events\nSaved as neko-events.jsonl")
+        self.log_status.setToolTip((journal.error + "\n" if journal.error else "") + str(journal.path))
+
     def change_startup(self, enabled):
         try:
             set_autostart(enabled)
@@ -379,12 +421,19 @@ class NekoWidget(QWidget):
     def __init__(self, settings=None):
         super().__init__()
         self.settings = settings if settings is not None else QSettings("DesktopNeko", "Neko")
+        log_root = (Path(self.settings.fileName()).parent if self.settings.format() == QSettings.IniFormat else
+                    Path(QStandardPaths.writableLocation(QStandardPaths.AppLocalDataLocation)))
+        self.journal = EventLog(log_root / "neko-events.jsonl")
+        self.journal.add("System", "session", "Neko started")
+        self.logged_state = self.logged_game = None
         self.companion = Companion(time.monotonic())
         try:
             interval = max(30, min(600, int(self.settings.value("game_interval", 90))))
         except (ValueError, TypeError, OverflowError):
             interval = 90
-        self.game_timer = GameTimer(time.monotonic(), self.settings.value("auto_games", True, type=bool), interval)
+        self.game_timer = GameTimer(time.monotonic(), self.settings.value("auto_games", True, type=bool), interval,
+                                    record=lambda action, detail: self.journal.add("Game", action, detail))
+        self.journal.add("Game", "configuration", f"automatic={self.game_timer.enabled}; interval={interval} sec")
         self.game = None
         self.game_interaction = None
         self.outcome_bags = {}
@@ -636,17 +685,22 @@ class NekoWidget(QWidget):
         now = time.monotonic()
         if key == "sleep_seconds" and self.companion.next_nap > now:
             self.companion.next_nap = now + self.companion.sleep_seconds
-        self.companion.next_comment = now + self.companion.chatter_seconds
-        self.companion.next_idle = now + self.companion.idle_seconds
+        if key == "chatter_seconds":
+            self.companion.next_comment = now + self.companion.chatter_seconds
+        if key == "idle_seconds":
+            self.companion.next_idle = now + self.companion.idle_seconds
+        self.journal.add("System", "timer changed", f"{key} = {getattr(self.companion, key)} sec")
         self.save_preferences()
 
     def set_auto_games(self, enabled):
         self.game_timer.configure(time.monotonic(), enabled, self.game_timer.interval)
+        self.journal.add("Game", "configuration", f"automatic={enabled}; interval={self.game_timer.interval} sec")
         self.auto_game_action.setChecked(enabled)
         self.save_preferences()
 
     def set_game_interval(self, value):
         self.game_timer.configure(time.monotonic(), self.game_timer.enabled, value)
+        self.journal.add("Game", "configuration", f"interval={self.game_timer.interval} sec")
         self.save_preferences()
 
     def request_game(self):
@@ -680,35 +734,45 @@ class NekoWidget(QWidget):
     def poll_game(self):
         now = time.monotonic()
         manual = self.game_timer.pending == "manual"
-        eligible = (self.game is None and not self.closing and not self.quit_pending and not self.is_manually_hidden
-                    and self.isVisible() and not self.fullscreen and not self.menu.isVisible()
-                    and not (self.stats_window and self.stats_window.isVisible())
-                    and self.companion.state in (NekoState.IDLE,) + IDLE_STATES and self.drag_origin is None
-                    and not QApplication.mouseButtons()
-                    and not any(ctypes.windll.user32.GetAsyncKeyState(key) & 0x8000 for key in (1, 2, 4, 5, 6))
-                    and now - self.last_keyboard >= 2
-                    and now - self.companion.last_interaction >= 2
-                    and (manual or not self.quiet))
+        nook_editing = (self.stats_window and self.stats_window.isVisible()
+                        and self.stats_window.tabs.currentWidget() != self.stats_window.journal_tab)
+        reason = next((text for blocked, text in (
+            (self.game is not None, "game already active"),
+            (self.closing or self.quit_pending, "closing"),
+            (self.is_manually_hidden or not self.isVisible(), "hidden"),
+            (self.fullscreen, "fullscreen"), (self.menu.isVisible(), "menu open"),
+            (nook_editing and not manual, "Nook controls open; Journal can monitor play"),
+            (self.companion.state not in (NekoState.IDLE,) + IDLE_STATES, self.companion.state.name.lower()),
+            (self.drag_origin is not None, "being held"),
+            (bool(QApplication.mouseButtons()) or any(ctypes.windll.user32.GetAsyncKeyState(key) & 0x8000 for key in (1, 2, 4, 5, 6)), "mouse button held"),
+            (now - self.last_keyboard < 2, "recent typing"),
+            (now - self.companion.last_interaction < 2, "recent cuddle"),
+            (self.quiet and not manual, "quiet company")) if blocked), "")
+        eligible = not reason
         if eligible and (self.game_timer.pending or now >= self.game_timer.due):
             idle, _, fullscreen = desktop_activity()
-            eligible = not fullscreen and (manual or idle < self.companion.sleep_seconds or now < self.companion.next_nap)
+            if fullscreen or (not manual and idle >= self.companion.sleep_seconds and now >= self.companion.next_nap):
+                eligible, reason = False, "fullscreen" if fullscreen else "nap due"
         cursor = QCursor.pos()
         in_zone = self.game_runway().invites((cursor.x(), cursor.y()), self.x(),
                     8 if self.game_timer.entered_at is not None else 0) if eligible else False
         if eligible and QApplication.screenAt(cursor) != QApplication.screenAt(self.geometry().center()):
-            in_zone = False
-        source = self.game_timer.tick(now, eligible, in_zone, can_start=self.companion.state == NekoState.IDLE)
+            eligible, in_zone, reason = False, False, "cursor on another monitor"
+        source = self.game_timer.tick(now, eligible, in_zone, can_start=self.companion.state == NekoState.IDLE,
+                                      blocked_reason=reason)
         if source:
             self.start_game(now, source)
 
 
     def start_game(self, now, source):
         if not self.game_art_ready():
+            self.journal.add("Game", "not started", "game artwork unavailable")
             self.game_timer.reset(now)
             return False
         area = (QApplication.screenAt(self.geometry().center()) or QApplication.primaryScreen()).availableGeometry()
         lift = min(110, self.y() - area.top()) if self.motion else 0
         if area.width() < 560 or (self.motion and lift < 16):
+            self.journal.add("Game", "not started", "not enough room for a safe runway")
             self.game_timer.reset(now)
             if source == "manual":
                 self.say("I need a little more room above me to jump. Move me lower?", prompted=True)
@@ -720,6 +784,7 @@ class NekoWidget(QWidget):
         self.companion.pending_window = None
         runway = Runway(area.left(), area.right() - self.width() + 1, self.y(), lift)
         self.game = CursorGame(now, (self.x(), self.y()), runway, self.motion, source)
+        self.journal.add("Game", "started", source)
         self.game.direction = -1 if QCursor.pos().x() < self.x() + self.width() // 2 else 1
         self.companion.pose(NekoState.PLAYING, now, math.inf)
         self.play_action.setText("End game")
@@ -770,6 +835,11 @@ class NekoWidget(QWidget):
         cursor = QCursor.pos()
         point = (cursor.x(), cursor.y())
         game.update(now, point, self.game_contact(now, point))
+        marker = id(game), game.phase, game.result
+        if marker != self.logged_game:
+            self.logged_game = marker
+            result = game.result or ("unscored" if game.phase == "done" else "pending")
+            self.journal.add("Game", "phase", f"{game.source}: {game.phase}; result={result}")
         self.move(round(game.x), round(game.y))
         if game.phase == "done":
             interaction, self.game_interaction = self.game_interaction, None
@@ -817,13 +887,15 @@ class NekoWidget(QWidget):
             game.outcome_seconds = sum(CLIPS[self.game_clip()].durations) / 1000
             self.current_clip = self.game_clip()
         self.update_game_stats()
+        self.record_state()
         line = game.take_line()
         if line and line.startswith("protest_") and QApplication.screenAt(cursor) != QApplication.screenAt(self.geometry().center()):
             line = "protest_monitor"
         if line and (line != "pursuit" or not self.bubble.isVisible()):
             countdown = line in ("3…", "2…", "1…")
             text = line if countdown else self.dialogue.pick("game_" + line)
-            shown = self.say(text, prompted=game.source == "manual", hold_ms=1000 if countdown else 800 if line == "announce" else None)
+            shown = self.say(text, prompted=game.source == "manual", hold_ms=1000 if countdown else 800 if line == "announce" else None,
+                             kind="game_" + line)
             if shown and (countdown or line in ("announce", "go")):
                 # Each beat starts after its label has actually been presented.
                 game.since = game.last = time.monotonic()
@@ -836,6 +908,7 @@ class NekoWidget(QWidget):
         game = self.game
         if game.phase in ("curl", "comfort") and not clear_mood:
             return
+        self.journal.add("Game", "stop requested", "immediate" if immediate else "finish supported recovery")
         now = time.monotonic()
         if immediate:
             game.x, game.y = game.origin
@@ -1039,7 +1112,7 @@ class NekoWidget(QWidget):
                 self.refresh_asset()
             if self.reactive and window_event and self.companion.activity_ready(now):
                 self.companion.pending_window = (window_event, now, self.app_context)
-                self.game_timer.log.append((now, "coalesced", "window reaction"))
+                self.game_timer.note(now, "coalesced", "window reaction")
             self.last_window = window
             return
         self.poll_game()
@@ -1059,10 +1132,7 @@ class NekoWidget(QWidget):
                                      keyboard_events=keyboard_events if self.reactive else 0, window_event=window_event if self.reactive else None,
                                      app_kind=self.app_context)
         self.last_window = window
-        if action == "comment":
-            if not (self.ai_enabled and self.trigger_ai_brain()):
-                self.random_dialogue()
-        elif action:
+        if action and action != "comment":
             self.pose_started = now
             if action == "curious":
                 self.look_direction = -1 if QCursor.pos().x() < self.geometry().center().x() else 1
@@ -1071,16 +1141,46 @@ class NekoWidget(QWidget):
                 self.ai_generation += 1
                 self.dismiss_bubble()
             elif action == "typing":
+                self.journal.add("Activity", "reaction", "typing burst")
                 self.offline_line("typing")
             elif action == "curious":
+                self.journal.add("Activity", "reaction", self.companion.reaction_kind)
                 self.offline_line(self.companion.reaction_kind)
             elif action == "fidget":
                 self.offline_line(self.current_clip)
+        self.poll_idle_thought(now)
+
+    def poll_idle_thought(self, now):
+        if now < self.companion.next_comment:
+            return
+        if (self.companion.state not in (NekoState.IDLE,) + IDLE_STATES or self.quiet
+                or self.fullscreen or self.is_manually_hidden or self.quit_pending
+                or now - self.companion.last_interaction < 15):
+            self.journal.add("Thought", "general idle waiting", self.companion.state.name.lower() if not self.quiet else "quiet company", changed=True)
+            return
+        if self.ai_enabled and self.brain_worker is not None:
+            self.journal.add("Thought", "general idle waiting", "AI observation pending", changed=True)
+            return
+        if not (self.ai_enabled and self.trigger_ai_brain()):
+            self.random_dialogue()
+
+    def record_state(self):
+        marker = self.companion.state, self.current_clip
+        if marker == self.logged_state:
+            return
+        self.logged_state = marker
+        state = self.companion.state
+        category = ("Sleep" if state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP, NekoState.WAKING) else
+                    "Idle" if state in (NekoState.IDLE,) + IDLE_STATES else
+                    "Game" if state in GAME_STATES else
+                    "Lifecycle" if state in (NekoState.ARRIVING, NekoState.LEAVING) else "Care")
+        self.journal.add(category, "state", f"{state.name.lower()} · {self.current_clip}")
 
     def refresh_asset(self):
         if self.game and self.companion.state in GAME_STATES:
             self.current_clip = self.game_clip()
             self.current_asset = "idle"
+            self.record_state()
             self.sync_animation()
             return
         self.current_clip = {
@@ -1110,6 +1210,7 @@ class NekoWidget(QWidget):
             NekoState.CURIOUS: "curious", NekoState.HAPPY: "happy",
             NekoState.GROOMING: "peek",
         }.get(self.companion.state, "idle")
+        self.record_state()
         self.sync_animation()
 
     def paintEvent(self, event):
@@ -1155,11 +1256,12 @@ class NekoWidget(QWidget):
             painter.setFont(QFont("Segoe UI Symbol", 12))
             painter.drawText(QRectF(78 + CANVAS_PADDING, 12 + CANVAS_TOP - (elapsed * 4 if self.motion else 0), 22, 24), "♡")
 
-    def say(self, text, prompted=False, hold_ms=None):
+    def say(self, text, prompted=False, hold_ms=None, kind="thought"):
         if (self.closing or self.is_manually_hidden or self.fullscreen
                 or not self.isVisible() or (self.quiet and not prompted)
                 or self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP,
                                             NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES):
+            self.journal.add("Thought", "suppressed", f"{kind}: quiet/hidden/fullscreen or incompatible pose", changed=True)
             return False
         text = " ".join(str(text).split())[:140]
         if not text:
@@ -1180,14 +1282,27 @@ class NekoWidget(QWidget):
         self.bubble.show()
         self.bubble_timer.start(hold_ms if hold_ms is not None else max(5500, min(10000, len(text) * 75)))
         self.companion.comments += 1
-        self.last_words = time.monotonic()
+        if kind not in GESTURE_THOUGHTS:
+            self.last_words = time.monotonic()
+        if kind in ("idle", "ai_idle"):
+            self.companion.next_comment = time.monotonic() + self.companion.chatter_seconds
+        channel = "gesture" if kind in GESTURE_THOUGHTS else "general idle" if kind in ("idle", "ai_idle") else kind
+        self.journal.add("Thought", "shown", f"{channel}: {text}")
         return True
 
     def offline_line(self, kind, prompted=False):
         pause = self.companion.chatter_seconds
-        if not prompted and (self.bubble.isVisible() or time.monotonic() - self.last_words < pause):
+        independent = kind == "idle" or kind in GESTURE_THOUGHTS
+        if kind in GESTURE_THOUGHTS and self.current_clip != kind:
+            self.journal.add("Thought", "expired gesture", kind)
             return False
-        if self.say(self.dialogue.pick(kind), prompted=prompted):
+        if not prompted and (self.bubble.isVisible() or (not independent and time.monotonic() - self.last_words < pause)):
+            self.journal.add("Thought", "deferred", f"{kind}: existing thought" if self.bubble.isVisible() else f"{kind}: activity cooldown", changed=True)
+            return False
+        hold = None
+        if kind in GESTURE_THOUGHTS:
+            hold = max(1, round(min(sum(CLIPS[kind].durations) / 1000, self.companion.pose_until - time.monotonic()) * 1000))
+        if self.say(self.dialogue.pick(kind), prompted=prompted, hold_ms=hold, kind=kind):
             self.ai_generation += 1
             if kind == "hello":
                 self.play_sound("chirp")
@@ -1195,11 +1310,12 @@ class NekoWidget(QWidget):
         return False
 
     def random_dialogue(self):
-        self.offline_line("idle")
+        return self.offline_line("idle")
 
     def pet_reaction(self):
         if self.quit_pending:
             return
+        self.journal.add("Care", "pet", "deliberate interaction")
         if self.game_interaction == "sleep":
             self.game_interaction = "pet"
         if self.game:
@@ -1248,11 +1364,13 @@ class NekoWidget(QWidget):
         self.brain_worker.finished_thinking.connect(self.on_brain_finished)
         self.brain_worker.finished.connect(self.release_brain)
         self.brain_worker.start()
+        self.journal.add("Thought", "AI requested", "optional observation; no title recorded in journal")
         return True
 
     def on_brain_finished(self, text, success):
         if self.closing:
             return
+        self.journal.add("Thought", "AI result", "received" if success else "unavailable; offline fallback")
         self.ai_status = ("AI is connected. Window titles only." if success else
                           "AI is unavailable. Check your API key or connection; offline company continues.")
         if (self.request_generation != self.ai_generation or not self.ai_enabled
@@ -1264,7 +1382,7 @@ class NekoWidget(QWidget):
         if desktop_activity()[2]:
             return
         if success:
-            self.say(text)
+            self.say(text, kind="ai_idle")
         else:
             self.random_dialogue()
 
@@ -1580,6 +1698,7 @@ class NekoWidget(QWidget):
             self.hide_neko()
 
     def hide_neko(self):
+        self.journal.add("System", "visibility", "hidden")
         self.cancel_pickup()
         self.companion.pet_pending = False
         self.reset_pet_cursor()
@@ -1605,6 +1724,7 @@ class NekoWidget(QWidget):
         if self.closing or self.quit_pending or self.companion.state == NekoState.LEAVING:
             return
         self.is_manually_hidden = False
+        self.journal.add("System", "visibility", "show requested")
         self.hide_action.setText("Hide Neko")
         self.companion.next_comment = time.monotonic() + self.companion.chatter_seconds
         self.fullscreen = desktop_activity()[2]
@@ -1746,6 +1866,8 @@ class NekoWidget(QWidget):
                 self.offline_line("hello")
 
     def finish_quit(self):
+        if not self.closing:
+            self.journal.add("Lifecycle", "quit", "finished")
         self.quit_pending = False
         self.reset_pet_cursor()
         self.restore_arrival_position()

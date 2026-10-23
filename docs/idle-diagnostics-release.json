@@ -1,0 +1,271 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "76ddccfe9b34a68448c7f54986834c61bc7a8964",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 125997627,
+      "sha256": "7b509135efa42a43d188bd38a23c528b7257bc2b4091da27bf05113c1787f9d5"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 125989578,
+      "sha256": "6b7f0ef78ec0453931464a2ae9b837eb02fc1978e7678a6af88f323b291ed249"
+    }
+  },
+  "source": {
+    "main.py": {
+      "bytes": 97294,
+      "sha256": "29fe769be49cc1f2c2c6c728e08734da322c6e49b0f30c1631f3f3475b960c99"
+    },
+    "games.py": {
+      "bytes": 13524,
+      "sha256": "c1658d21eda886027329f381f0bf21b5f1a16032a5f08a3e29d7d1c613cfc5a2"
+    },
+    "behavior.py": {
+      "bytes": 11203,
+      "sha256": "bde5d1f79f3674f441ad77be1c0089dcfa1db628396fa2ba6a3ad5abf07c6d33"
+    },
+    "event_log.py": {
+      "bytes": 2149,
+      "sha256": "81eb343d925421fa5fc9dcce186564c5918ce6557190ea4ab319a574cefef629"
+    },
+    "main.spec": {
+      "bytes": 1327,
+      "sha256": "7414fc5b0b1b14592ee8f8405dedcd2e033e37d44e143dc79f1026ad2227f942"
+    },
+    "test_main.py": {
+      "bytes": 66160,
+      "sha256": "0274a499534e6b0b4b2f6e816bff791025ef2f31249c803ea30b064db976af9c"
+    },
+    "test_invitation.py": {
+      "bytes": 4164,
+      "sha256": "ce3f2636fee3c48f006b636b981d16b4d1d07673423a64280239218186312046"
+    },
+    "test_game_desktop.py": {
+      "bytes": 19549,
+      "sha256": "07c0d7d53c283e622b5339e839773255c5a4a0bb4e9a18ea85d563ad04e5dccf"
+    },
+    "test_event_log.py": {
+      "bytes": 2080,
+      "sha256": "477b7cb7a716a968a26b6521fce7dce7f78012be7122f5eaf17784b3a0bfd20e"
+    },
+    "test_packaging.py": {
+      "bytes": 10860,
+      "sha256": "116dd3454f22fdeb0025383d5646d5e33961c9d2392863a975aba2ba3d63e3cd"
+    }
+  },
+  "checks": {
+    "discovery_run": 249,
+    "passed": 244,
+    "packaging_deferred_during_discovery": 5,
+    "targeted_final_journal": 24,
+    "targeted_ai": 7,
+    "final_package": 5
+  },
+  "ui_start": [
+    {
+      "exe": "DesktopNeko.exe",
+      "ui_ready_seconds": 2.181
+    }
+  ],
+  "invariants": {
+    "date": "2026-10-23",
+    "all_prior_frames_pixel_identical": 839,
+    "all_clip_definitions_identical": 65,
+    "idle_clips": [
+      {
+        "clip": "idle",
+        "ms": 5180,
+        "order": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "first_is_idle": true,
+        "last_is_idle": false,
+        "behavior_slot_ms": null
+      },
+      {
+        "clip": "tail",
+        "ms": 2960,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          8,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "ears",
+        "ms": 2950,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "sniff",
+        "ms": 3200,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "stretch",
+        "ms": 3400,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "groom",
+        "ms": 3650,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "yawn",
+        "ms": 3450,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "loaf",
+        "ms": 5400,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 8000
+      },
+      {
+        "clip": "peek",
+        "ms": 3650,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "look_left",
+        "ms": 2700,
+        "order": [
+          0,
+          1,
+          2,
+          3,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      },
+      {
+        "clip": "look_right",
+        "ms": 2700,
+        "order": [
+          0,
+          4,
+          5,
+          6,
+          7
+        ],
+        "first_is_idle": true,
+        "last_is_idle": true,
+        "behavior_slot_ms": 6000
+      }
+    ],
+    "note": "Full144px canvas, first-use chronological order including swish0..6,8,7. Artwork unchanged; proposed improvements are in idle-refresh-plan.md."
+  },
+  "native": {
+    "automatic_started": true,
+    "countdown_spans_seconds": [
+      1.041,
+      1.043,
+      1.042
+    ],
+    "journal_matches_file": true,
+    "nook_size": [
+      340,
+      674
+    ]
+  },
+  "scope": "Thought/timer/logging fixes; animation proposal only. All839 frames and65 clips, including protected tail chase/catch, unchanged.",
+  "limits": "Due time accelerated around a real native hover/countdown;90-second deadline covered by model checks. No physical mixed-DPI/multiple-monitor/reboot/soak or real AI requests."
+}

@@ -1,5 +1,14 @@
 # Animation rebuild checklist
 
+## Idle review, thoughts and diagnostics · 2026-10-23
+
+- [x] Review production idle/canonical transitions and saved references; prepare current previews and [animation plan](../docs/idle-refresh-plan.md). Tail chase/catch excluded.
+- [x] Fix general/gesture thought scheduling independently, with visible-bubble/quiet rules, due-display acknowledgment and optional-AI ownership regressions.
+- [x] Reproduce/fix auto-game entry around cooldown; expose gate/zone/invitation reasons and allow live Journal monitoring.
+- [x] Add bounded persistent activity journal in Neko's nook for actual thoughts, gestures, sleep/care, lifecycle and game phases/decisions.
+- [x] Verify source, journal UI/native countdown/file parity and five package checks; retain current/previous executable. [Evidence and limits](../docs/idle-diagnostics-validation.md).
+- [ ] After user reviews the animation plan: prototype resting idle/loaf/stretch keys before replacement art.
+
 ## Drop-out correction — 2026-10-23
 
 - [x] Reproduce zero goodbye paints in the previous executable's awake-gesture and visible-fullscreen menu paths; retain before records under ignored build storage.

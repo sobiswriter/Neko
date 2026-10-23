@@ -908,18 +908,96 @@ class DesktopTests(unittest.TestCase):
         self.neko.dismiss_bubble()
         self.assertFalse(self.neko.offline_line("cursor"))
 
-    def test_idle_and_activity_words_respect_the_full_thought_interval(self):
+    def test_activity_words_retain_their_shared_pause(self):
         self.neko.companion.chatter_seconds = 75
         with patch("main.time.monotonic", return_value=100):
             self.assertTrue(self.neko.offline_line("typing"))
         self.neko.dismiss_bubble()
         with patch("main.time.monotonic", return_value=174.99):
-            self.assertFalse(self.neko.offline_line("tail_chase"))
+            self.assertFalse(self.neko.offline_line("switch"))
         with patch("main.time.monotonic", return_value=175):
-            self.assertTrue(self.neko.offline_line("tail_chase"))
+            self.assertTrue(self.neko.offline_line("switch"))
         self.neko.dismiss_bubble()
         with patch("main.time.monotonic", return_value=176):
             self.assertTrue(self.neko.offline_line("pet", prompted=True))
+
+    def test_gesture_and_general_idle_thoughts_have_independent_clocks(self):
+        self.neko.companion.chatter_seconds = 75
+        with patch("main.time.monotonic", return_value=100):
+            self.assertTrue(self.neko.offline_line("idle"))
+        deadline = self.neko.companion.next_comment
+        self.neko.dismiss_bubble()
+        with patch("main.time.monotonic", return_value=110):
+            self.neko.companion.state = NekoState.SNIFFING
+            self.neko.companion.pose_until = 114
+            self.neko.refresh_asset()
+            self.assertTrue(self.neko.offline_line("sniff"))
+        self.assertEqual(self.neko.companion.next_comment, deadline)
+        self.neko.dismiss_bubble()
+        with patch("main.time.monotonic", return_value=175):
+            self.assertTrue(self.neko.offline_line("idle"))
+        self.assertEqual(self.neko.companion.next_comment, 250)
+
+    def test_due_general_thought_survives_a_visible_bubble_and_an_idle_gesture(self):
+        self.neko.companion.next_comment = 100
+        self.neko.companion.last_interaction = -1000
+        with patch("main.time.monotonic", return_value=100):
+            self.neko.say("already reading this")
+            self.neko.poll_idle_thought(100)
+        self.assertEqual(self.neko.companion.next_comment, 100)
+        self.neko.dismiss_bubble()
+        self.neko.companion.state = NekoState.SNIFFING
+        self.neko.refresh_asset()
+        with patch("main.time.monotonic", return_value=101):
+            self.neko.poll_idle_thought(101)
+        self.assertTrue(self.neko.bubble.isVisible())
+        self.assertEqual(self.neko.companion.next_comment, 101 + self.neko.companion.chatter_seconds)
+
+    def test_pending_ai_does_not_spend_the_general_deadline_or_show_a_second_line(self):
+        self.neko.ai_enabled = True
+        self.neko.companion.next_comment = 100
+        self.neko.companion.last_interaction = -1000
+        self.neko.brain_worker = object()
+        with patch("main.time.monotonic", return_value=100):
+            self.neko.poll_idle_thought(100)
+        self.assertEqual(self.neko.companion.next_comment, 100)
+        self.assertFalse(self.neko.bubble.isVisible())
+        self.neko.brain_worker = None
+        with patch("main.time.monotonic", return_value=101), patch.object(self.neko, "trigger_ai_brain", return_value=False):
+            self.neko.poll_idle_thought(101)
+        self.assertEqual(self.neko.companion.next_comment, 101 + self.neko.companion.chatter_seconds)
+
+    def test_journal_shows_actual_dialogue_and_state_changes_with_category_filter(self):
+        self.neko.companion.state = NekoState.FALLING_ASLEEP
+        self.neko.refresh_asset()
+        self.neko.companion.state = NekoState.IDLE
+        self.neko.refresh_asset()
+        self.neko.offline_line("idle")
+        words = self.neko.bubble.text()
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        nook = self.neko.stats_window
+        nook.log_filter.setCurrentText("Thought")
+        nook.update_journal()
+        self.assertIn(words, nook.activity_log.toPlainText())
+        self.assertNotIn("[Sleep]", nook.activity_log.toPlainText())
+        nook.log_filter.setCurrentText("Sleep")
+        self.assertIn("falling_asleep", nook.activity_log.toPlainText())
+        self.neko.journal.error = "disk unavailable"
+        nook.update_journal()
+        self.assertIn("unavailable", nook.log_status.text())
+
+    def test_gesture_thought_cannot_linger_past_its_active_pose(self):
+        self.neko.companion.state = NekoState.SNIFFING
+        self.neko.companion.pose_until = 104
+        self.neko.refresh_asset()
+        with patch("main.time.monotonic", return_value=102):
+            self.assertTrue(self.neko.offline_line("sniff"))
+        self.assertLessEqual(self.neko.bubble_timer.interval(), 2000)
+        self.neko.dismiss_bubble()
+        self.neko.companion.state = NekoState.IDLE
+        self.neko.refresh_asset()
+        self.assertFalse(self.neko.offline_line("sniff"))
 
     def test_ai_cannot_bypass_the_thought_cooldown(self):
         self.neko.ai_enabled = True

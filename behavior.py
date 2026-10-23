@@ -278,6 +278,5 @@ class Companion:
 
         if (not quiet and idle_seconds < self.sleep_seconds * 0.8 and now >= self.next_comment
                 and now - self.last_interaction >= 15):
-            self.next_comment = now + self.chatter_seconds * self.rng.uniform(0.8, 1.3)
             return "comment"
         return None

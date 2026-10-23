@@ -18,6 +18,24 @@ APP.setQuitOnLastWindowClosed(False)
 
 
 class DesktopGameTests(unittest.TestCase):
+    def test_automatic_game_can_be_observed_in_the_live_journal(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.n.open_stats_window()
+        nook = self.n.stats_window
+        self.n.game_timer.due = self.now - 1
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.poll_game()
+        self.assertIn("Nook controls", self.n.game_timer.reason)
+        nook.tabs.setCurrentWidget(nook.journal_tab)
+        for dt, point in ((0, QPoint(346, 420)), (.2, QPoint(650, 420)), (.5, QPoint(650, 420))):
+            with patch("main.time.monotonic", return_value=self.now + dt), patch("main.QCursor.pos", return_value=point):
+                self.n.poll_game()
+        self.assertIsNotNone(self.n.game)
+        self.assertEqual(self.n.game.source, "automatic")
+        nook.update_journal()
+        self.assertIn("invitation accepted", nook.activity_log.toPlainText())
+        self.assertIn("started: automatic", nook.activity_log.toPlainText())
+
     @classmethod
     def setUpClass(cls):
         cls.atlas = SpriteAtlas("assets")

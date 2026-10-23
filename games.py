@@ -37,7 +37,7 @@ class Runway:
 
 class GameTimer:
     """One coalesced intent; manual requests promote an automatic request."""
-    def __init__(self, now, enabled=True, interval=90):
+    def __init__(self, now, enabled=True, interval=90, record=None):
         self.enabled, self.interval = enabled, interval
         self.due = now + interval
         self.pending = None
@@ -45,24 +45,41 @@ class GameTimer:
         self.outside_since = None
         self.entered_at = None
         self.previous_due = self.due
+        self.record, self.reason = record, ""
+
+    def note(self, now, action, detail):
+        self.log.append((now, action, detail))
+        if self.record:
+            self.record(action, detail)
+
+    def waiting(self, now, reason):
+        if reason != self.reason:
+            self.reason = reason
+            self.note(now, "waiting", reason)
 
     def request(self, now, manual=False):
         source = "manual" if manual else "automatic"
         if manual or self.pending is None:
             self.pending = source
-            self.log.append((now, "queued", source))
+            self.note(now, "queued", source)
 
-    def tick(self, now, eligible, in_zone=False, can_start=True):
+    def tick(self, now, eligible, in_zone=False, can_start=True, blocked_reason="not eligible"):
         if self.enabled and now >= self.due and self.pending is None:
             self.request(now)
-        if not eligible or not self.pending:
+        if not self.enabled and self.pending is None:
             self.outside_since = self.entered_at = None
+            self.waiting(now, "automatic games disabled")
+            return None
+        if not eligible:
+            self.outside_since = self.entered_at = None
+            self.waiting(now, blocked_reason)
             return None
         invited = self.pending == "manual"
         if not invited:
             if not in_zone:
                 if self.outside_since is None or self.entered_at is not None:
                     self.outside_since = now
+                    self.note(now, "side area", "outside; fresh approach can qualify")
                 self.entered_at = None
             elif self.outside_since is not None:
                 if self.entered_at is None:
@@ -70,25 +87,36 @@ class GameTimer:
                         self.outside_since = None
                     else:
                         self.entered_at = now
-                invited = self.entered_at is not None and now - self.entered_at >= .25
+                        self.note(now, "side area", "entered; checking stable hover")
+                invited = (self.entered_at is not None and self.entered_at >= self.due
+                           and now - self.entered_at >= .25)
+        if not self.pending:
+            self.waiting(now, "cooldown" if self.enabled else "automatic games disabled")
+            return None
         if invited and can_start:
             source, self.pending = self.pending, None
             self.previous_due = self.due
             self.due = math.inf
             self.outside_since = self.entered_at = None
-            self.log.append((now, "started", source))
+            self.reason = "started"
+            self.note(now, "invitation accepted", source)
             return source
+        self.waiting(now, "gesture recovery" if invited else
+                     "stable hover" if self.entered_at is not None and self.entered_at >= self.due else "fresh side entry")
         return None
 
     def reset(self, now):
         self.pending = None
         self.due = now + self.interval
         self.outside_since = self.entered_at = None
+        self.waiting(now, "cooldown")
+        self.note(now, "cooldown", f"{self.interval} sec from completion/reset")
 
     def finish(self, now, started):
         self.reset(now)
         if not started:
             self.due = self.previous_due
+            self.note(now, "cooldown", "unplayed invitation; previous deadline restored")
 
     def configure(self, now, enabled, interval):
         self.enabled = enabled

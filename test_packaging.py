@@ -80,6 +80,7 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("cursors", modules)
         self.assertIn("thoughts", modules)
         self.assertIn("games", modules)
+        self.assertIn("event_log", modules)
         self.assertNotIn("game_overlay", modules)
         from animations import GAME_ROWS
         for bank in GAME_ROWS:

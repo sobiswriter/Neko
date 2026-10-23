@@ -124,8 +124,11 @@ Soft sounds are optional and off until you enable them.
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
-  All automatic words—including idle, activity and optional AI comments—respect
-  the full **Thoughts every** minimum (default 75 seconds) and never replace a visible bubble.
+  General idle thoughts use **Thoughts every** (default 75 seconds), independently
+  of gesture thoughts. A due general thought waits for a visible bubble to finish;
+  its next interval begins when it is shown. Gesture lines use their own action's
+  timing and disappear by the end of that action. Activity replies retain their
+  shared pause. Quiet/fullscreen/sleep/care and readable single-bubble rules apply.
   Every spontaneous idle attempts its own local thought, including “Look at meeee!”
   and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
   Thoughts use cream 16px semibold text with a small dark shadow and a compact,
@@ -163,6 +166,18 @@ Soft sounds are optional and off until you enable them.
   pet/nap and played/won counts live in one small window. Double-click the tray
   icon to find her again.
   Menus and the nook open beside her, with no periodic re-pinning over the controls.
+
+- **A local activity journal.** Neko's nook → **Journal** shows actual thoughts,
+  idle/sleep/care state changes, activity reactions, game phases/results and why
+  an automatic invitation is waiting or blocked. Filter by category or copy the
+  visible log. The Journal tab can monitor automatic play live; other Nook controls
+  pause automatic invitations while open. Deliberate Play works from the Nook.
+  Logs keep up to 500 recent entries in memory and rotate a local 512 KB JSONL file
+  with one predecessor. File-write trouble is shown in the Journal; no raw keys,
+  typed text, window titles or cursor trails are logged. [Verification](docs/idle-diagnostics-validation.md).
+
+The [idle-animation refresh plan](docs/idle-refresh-plan.md) is ready for review.
+Current artwork/playback, including the approved tail chase/catch, is unchanged.
 
 Quiet company stops unprompted words and sounds while keeping deliberate pet reactions.
 Hide really hides her: no surprise appearances, bubbles, or animation. Native

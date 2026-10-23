@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-23",
+  "all_prior_frames_pixel_identical": 839,
+  "all_clip_definitions_identical": 65,
+  "idle_clips": [
+    {
+      "clip": "idle",
+      "ms": 5180,
+      "order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "first_is_idle": true,
+      "last_is_idle": false,
+      "behavior_slot_ms": null
+    },
+    {
+      "clip": "tail",
+      "ms": 2960,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "ears",
+      "ms": 2950,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "sniff",
+      "ms": 3200,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "stretch",
+      "ms": 3400,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "groom",
+      "ms": 3650,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "yawn",
+      "ms": 3450,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "loaf",
+      "ms": 5400,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 8000
+    },
+    {
+      "clip": "peek",
+      "ms": 3650,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "look_left",
+      "ms": 2700,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    },
+    {
+      "clip": "look_right",
+      "ms": 2700,
+      "order": [
+        0,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_is_idle": true,
+      "last_is_idle": true,
+      "behavior_slot_ms": 6000
+    }
+  ],
+  "note": "Full144px canvas, first-use chronological order including swish0..6,8,7. Artwork unchanged; proposed improvements are in idle-refresh-plan.md."
+}
