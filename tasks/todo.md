@@ -411,3 +411,10 @@ Description: refine head pats (2.8 seconds), chin scritches (3.0 seconds) and ea
 - [x] Inspect all runtime frames plus native-size/enlarged playback previews; correct defects.
 - [x] Run regression suite, build executable and verify packaging, native Qt rendering and second-instance launch. Cold packaged startup deferred because the user's existing copy is running.
 - [x] Update prompts, animation catalogs and final validation notes.
+
+
+## Seated resting idle without breathing · 2026-10-23
+
+Replace the rejected breathing rest only. Study creator sitting-idle previews; retain generated iterations and exact prompts. Small foreleg/shoulder resettle, ear response and brisk happy blink; planted contacts, fixed head/scale and long quiet holds. Preserve all other art/clip definitions. Scope: rest source, assembly, idle timing, focused assertions, synchronized preview, native pose coverage, provenance/FrameMaster/README, flat current/previous release. Necessary source/native/package checks only; user judges appeal.
+
+Completed: four focused source cases, new-rest component/unchanged-art assertions, corrected native full sequence and three package checks pass. Built flat current/previous executables; prior verified release rotated only after success. Browser local-file playback is blocked; native-size synchronized GIF and keys are supplied for human review.

@@ -61,8 +61,8 @@ Soft sounds are optional and off until you enable them.
   Cursor chasing belongs to Catch the Cursor; ordinary idle following has been removed.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
   yawns and sleepy peeks share an atlas of 904 entries, including 212 game source slots and 98 current/historical lifecycle entries, with eight-frame transitions into
-  sleep and back to sitting. Resting idle uses eight newly drawn breathing/expression phases: a subtle local
-  chest/shoulder breath, tiny happy smile and quick300ms blink in a4s loop.
+  sleep and back to sitting. Resting idle uses eight seated gesture/expression phases: a small shoulder/foreleg
+  resettle, ear response and quick300ms happy blink in a5.8s loop, without breathing.
   Head height, planted paws, tail and physical scale stay anchored. Refreshed gestures last 3.5–6 seconds with drawn support changes
   and complete recovery before the next rest. Pet requests wait for that recovery.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
@@ -84,8 +84,8 @@ Soft sounds are optional and off until you enable them.
   Left/right looks use the updated glance/turn drawings, then a happy tilted smile
   held600ms and a drawn straighten-up; each lasts4.9s. Lazy tail swish keeps its original
   drawings/cadence, and tail chase/catch remain preserved.
-  [New resting before/after](docs/rest-breathing-compare.html) ·
-  [resting breath verification](docs/rest-breathing-validation.md) ·
+  [New resting before/after](docs/seated-idle-compare.html) ·
+  [seated idle verification](docs/seated-idle-validation.md) ·
   [current look/tilted-smile comparisons](docs/look-tilt-compare.html).
 - **A little tail trouble.** She runs low with closed eyes and a trailing tail through five quick
   turns, following the supplied GIF's eleven 50ms poses. The catch game takes two turns, then a small pounce and a

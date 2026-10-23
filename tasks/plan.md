@@ -304,3 +304,10 @@ Verify geometry/contact and scheduler first, one full manual path next, then out
 The user requested a thorough plan before any v2 gameplay/art changes. Read [the complete v2 proposal](../docs/cursor-play-v2-plan.md): replace walking and remove idle cursor-following; playful run/jump acting; three victory and three loss stories; sparse varied lines; remove the game overlay; default-90s cooldown arms a fresh left/right side-zone entry outside care space; actual staged 3/2/1 countdown; defer through sleep and wake recovery; persist played/Neko-win keepsakes in the ordinary menu/nook. All new animation/geometry numbers are proposed trial targets, not tested findings.
 
 Order after approval: V0 remove the play overlay → V1 invisible invitation/countdown → V2 walk/follow removal → V3 playful run/jump/contact → native review checkpoint → V4 outcomes/dialogue → V5 keepsake counters/menu copy → V6 verification/release. Existing release and historical findings remain the baseline. Startup repair and supplied-icon adoption are separately authorized maintenance, not approval to implement v2.
+
+
+## Seated resting idle without breathing · 2026-10-23
+
+Replace the rejected breathing rest only. Study creator sitting-idle previews; retain generated iterations and exact prompts. Small foreleg/shoulder resettle, ear response and brisk happy blink; planted contacts, fixed head/scale and long quiet holds. Preserve all other art/clip definitions. Scope: rest source, assembly, idle timing, focused assertions, synchronized preview, native pose coverage, provenance/FrameMaster/README, flat current/previous release. Necessary source/native/package checks only; user judges appeal.
+
+Completed: four focused source cases, new-rest component/unchanged-art assertions, corrected native full sequence and three package checks pass. Built flat current/previous executables; prior verified release rotated only after success. Browser local-file playback is blocked; native-size synchronized GIF and keys are supplied for human review.

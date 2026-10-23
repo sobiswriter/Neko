@@ -17,27 +17,27 @@ class AnimationTests(unittest.TestCase):
     def setUpClass(cls):
         cls.atlas = SpriteAtlas(Path(__file__).parent / "assets")
 
-    def test_resting_breath_keeps_support_and_scale_fixed_with_local_drawn_motion(self):
+    def test_seated_idle_keeps_contacts_and_head_fixed_while_foreleg_settles(self):
         reference = self.atlas.frames["idle", 0, 0].toImage()
         clip = CLIPS["idle"]
+        outlines = []
         for index in set(clip.order):
             frame = self.atlas.frames[clip.bank, index // 4, index % 4].toImage()
+            self.assertEqual(frame.copy(0,120,192,24), reference.copy(0,120,192,24), index)
+            self.assertEqual(frame.copy(119,98,73,46), reference.copy(119,98,73,46), index)
+            self.assertEqual(frame.copy(84,83,10,17), reference.copy(84,83,10,17), index)
+            self.assertEqual(sprite_bounds(frame).bottom(), sprite_bounds(reference).bottom())
+            outlines.append({(x,y) for y in range(104,120) for x in range(78,119)
+                             if frame.pixelColor(x,y).alpha() >= 128
+                             and max(frame.pixelColor(x,y).getRgb()[:3]) < 100})
             for y in range(CANVAS_HEIGHT):
                 for x in range(CANVAS_WIDTH):
-                    self.assertEqual(frame.pixelColor(x, y).alpha(), reference.pixelColor(x, y).alpha())
                     eyes = 73 <= y < 93 and (67 <= x < 84 or 94 <= x < 112)
-                    mouth = 83 <= x < 95 and 93 <= y < 99
-                    chest = 78 <= x < 108 and 104 <= y < 117
-                    if not (eyes or mouth or chest):
-                        self.assertEqual(frame.pixelColor(x, y), reference.pixelColor(x, y), (index, x, y))
-        inhale = self.atlas.frames[clip.bank, 0, 1].toImage()
-        crest = self.atlas.frames[clip.bank, 0, 2].toImage()
-        changed = 0
-        for x in range(78, 108):
-            for y in range(104, 117):
-                before, after = inhale.pixelColor(x, y).getRgb(), crest.pixelColor(x, y).getRgb()
-                changed += max(abs(a - b) for a, b in zip(before[:3], after[:3])) > 20
-        self.assertGreater(changed, 8)
+                    ear = 59 <= x < 82 and 46 <= y < 73
+                    torso = 78 <= x < 119 and 100 <= y < 120
+                    if not (eyes or ear or torso):
+                        self.assertEqual(frame.pixelColor(x,y), reference.pixelColor(x,y), (index,x,y))
+        self.assertGreater(len(set(map(frozenset,outlines))), 2, "Need drawn limb acting, not a color pulse")
 
     def test_updated_looks_finish_with_a_drawn_happy_tilt_and_quiet_swish_stays_original(self):
         for name, intro, happy, recovery in (("look_left", (0,1,2,3,4,3,2,1,7), 18, 19),
@@ -409,12 +409,12 @@ class AnimationTests(unittest.TestCase):
         idle = CLIPS["idle"]
         self.assertEqual(idle.frame_index(0), 0)
         self.assertGreaterEqual(idle.durations[-1], 1500)
-        self.assertEqual(idle.frame_index(2.4), 8)
-        blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (3, 4, 5))
+        self.assertEqual(idle.frame_index(3.5), 8)
+        blink_ms = sum(ms for index, ms in zip(idle.order, idle.durations) if index in (4, 5, 6))
         self.assertEqual(blink_ms, 300)
-        self.assertEqual(idle.frame_index(1.45), 3)
-        self.assertEqual(idle.frame_index(1.55), 4)
-        self.assertEqual(idle.frame_index(1.65), 5)
+        self.assertEqual(idle.frame_index(2.85), 4)
+        self.assertEqual(idle.frame_index(2.95), 5)
+        self.assertEqual(idle.frame_index(3.05), 6)
         self.assertEqual(idle.frame_index(sum(idle.durations) / 1000), 0)
         self.assertEqual(self.atlas.frame("idle", 2.4, motion=False).toImage(), self.atlas.frames["idle", 0, 0].toImage())
 

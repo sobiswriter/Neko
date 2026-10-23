@@ -1,0 +1,245 @@
+{
+  "date": "2026-10-23",
+  "mode": "built-in ImageGen",
+  "iterations": [
+    {
+      "original": "references/seated-idle/2026-10-23/draft-1.png",
+      "prompt": "Use case: precise-object-edit. Make a NEW production seated idle animation for the existing white pixel-art desktop kitten Neko. This is NOT a breathing animation. The user rejected a breathing/chest-shading pulse and a static-body eye-only loop. They want natural connected cat body movement while the animal stays planted in the same place.\nReference1 exact canonical kitten identity. Reference2 previous expressive sheet for familiar face/palette only, NOT its bobbing/tilting poses.\nONE transparent RGBA sheet, EXACTLY4 columns by2 rows,8 chronological complete kitten drawings, same camera/physical scale and generous margins. White fur, charcoal stepped outlines, gray chin/chest, pink ears/nose, dark eyes and square highlights. Crisp clean pixel clusters. No labels, text, grid, shadow, floor, hearts, haze, props or loose fragments.\nMechanics informed by compact sitting-cat idle examples: one small seated weight-settle, not a walk, not breathing, not rhythmic up/down bouncing. Both front paws and the haunches remain planted at IDENTICAL coordinates and ground baseline in every drawing. The tail stays attached and mostly quiet on viewer right. The pelvis stays centered over the same seated footprint. Neck/chest/forelegs articulate coherently: one shoulder eases toward its supporting foreleg by only1\u20132 final desktop pixels, the elbow softens, then the shoulder returns. The other foreleg supports and stays straight. Do not translate, scale, shrink or stretch the whole animal. Do not move paw positions, lift the body, or slide the haunches. Head crown/eye line stay at the same HEIGHT throughout; the head can follow the tiny shoulder settle sideways by at most1 final pixel. No head tilt here (that already has a separate gesture).\nSource sequence row-major:\n0 exact neutral canonical sit, awake eyes, relaxed ears, tiny quiet mouth.\n1 a small alert ear pivot (one ear, not both flapping), eyes attend calmly; body still supported.\n2 beginning of the small weight-settle: viewer-left shoulder eases sideways1 pixel, its foreleg bends slightly at elbow while its paw stays EXACTLY planted; hips/pelvis unchanged. Neck follows shoulder, not a floating head. Mouth quiet, ears soft.\n3 settled weight on that same foreleg: shoulder shift no more than2 desktop pixels, opposite shoulder/foreleg counter-support; head same height and size, eyelids gently soften. NO chest inflating or shading pulse.\n4 warm half-lids as shoulders start returning toward center; tiny content smile, ears relaxed.\n5 quick happy closed-eye arcs, body returning through a connected intermediate support pose. NO long sleepy closure.\n6 eyes reopening through partial lids, shoulders and forelegs almost neutral again; head height fixed.\n7 complete drawn neutral recovery matching0, both eyes open, level head, all paws and haunch in their starting places.\nPlayback draft: neutral holds2100ms, ear response200ms, settle entry200ms, supported settle350ms, half-close100ms, closed100ms, reopen100ms, recovery250ms, then quiet neutral2400ms. Brisk blink300ms; a natural one-off settle separated by real stillness. Don't animate every body part at the same time. Make the body motion readable through true connected contour/limb drawing, not patchy changing chest texture. Keep the seated head width62px/body height82px physical ratio from the reference. Avoid per-frame line wobble or redraw noise in the face and paws. Every extreme and in-between must preserve identity, volume and planted support. We will use one constant calibration and exact support registration, reject any size drift, and review at native desktop scale. This whole sequence must be authored as coherent full-body poses; do not present a static body with only blinking eyes.",
+      "review": "Reject inconsistent paw contacts and extra closed-eye poses; revise chronology and support."
+    },
+    {
+      "original": "references/seated-idle/2026-10-23/draft-2.png",
+      "prompt": "Edit the eight-cell Neko seated-idle sheet (image1). Image2 is exact canonical runtime identity/scale. Keep4columns\u00d72rows and true transparent background. This is the second iteration after motion review. Preserve the useful connected seated foreleg/shoulder movement, but correct these failures:\nA. Paws and haunch must not slide. ALL8 poses have exactly identical planted forepaw coordinates and haunch ground contact. Do not extend a forepaw forward or apart. Only the shoulder and elbow articulate gently over those anchored contacts.\nB. The head must stay the same physical size and same HEIGHT. Do not raise/lower it, squash it, or change face spacing. One-pixel sideways following of the shoulder is enough; no bob.\nC. No breathing at all: no chest inflation, no repeated shading pulse, no torso scaling. One small sideways supported weight-settle, then stop. Torso/forelegs must stay coherently connected rather than being separate wiggling patches.\nD. Fix eyelid chronology. Current sheet closes the eyes for too many phases. New source0,1,2,3 MUST have both eyes fully OPEN (calm attentive, no half lids yet). Source4 MUST show a clear half-close with small visible black eye shapes/highlights. Source5 ONLY has both eyes fully closed into little happy arcs. Source6 MUST show half-open lids with visible eye shapes. Source7 eyes fully open and neutral.\nE. Source7 must be a complete drawn neutral that matches source0 in body/face/position; no undersized ending and no last-frame jump.\nKeep exact familiar white/pink/charcoal/gray pixel-art kitten, head-to-body ratio, fixed camera, two forepaws, seated hind legs and one attached quiet curled tail on viewer right. No symbols, text, grid, shadows, scenery or loose fragments.\nChronology:0 neutral;1 one ear gently notices;2 small viewer-left shoulder/elbow settle while both paws stay planted;3 supported mild lean no more than2 final desktop pixels, awake eyes;4 half-close as shoulders ease back;5 happy closed arcs and tiny smile;6 half-open as body finishes returning;7 exact level neutral recovery. Neck follows the local shoulder movement by at most1px sideways; ears rest again by7. Head height and physical scale never change. Play the blink4\u21925\u21926 in100ms per drawing. We will lock the actual support contacts and use one common calibration in assembly, so don't make exaggerated poses. Whole coherent authored sitting poses, not an eye-only frozen body.",
+      "review": "Candidate for support-anchored assembly and native review; source3 still has lowered lids, so use source2 open eyes during that supported hold."
+    }
+  ],
+  "selected_source": "references/seated-idle/2026-10-23/draft-2.png",
+  "reference_images": [
+    "references/idle-stability/2026-10-23/canonical.png",
+    "references/idle-refresh/2026-10-23/rest-raw.png"
+  ],
+  "intent": "No breathing. Connected shoulder/foreleg settling above fixed paws and haunches, one ear response, brisk blink, real quiet holds.",
+  "assembly": {
+    "source_boxes": [
+      [
+        94,
+        58,
+        325,
+        386
+      ],
+      [
+        530,
+        52,
+        328,
+        392
+      ],
+      [
+        955,
+        57,
+        340,
+        387
+      ],
+      [
+        1393,
+        57,
+        334,
+        387
+      ],
+      [
+        91,
+        475,
+        329,
+        385
+      ],
+      [
+        530,
+        477,
+        325,
+        383
+      ],
+      [
+        955,
+        476,
+        340,
+        384
+      ],
+      [
+        1392,
+        476,
+        334,
+        384
+      ]
+    ],
+    "batch_scale": [
+      0.22142857142857142,
+      0.21243523316062177
+    ],
+    "support_target": 91.82857142857142,
+    "registration": [
+      {
+        "source": 1,
+        "support_offset": [
+          59,
+          47
+        ],
+        "face_offset": [
+          58,
+          52
+        ]
+      },
+      {
+        "source": 2,
+        "support_offset": [
+          57,
+          48
+        ],
+        "face_offset": [
+          58,
+          53
+        ]
+      },
+      {
+        "source": 3,
+        "support_offset": [
+          58,
+          48
+        ],
+        "face_offset": [
+          58,
+          53
+        ]
+      },
+      {
+        "source": 4,
+        "support_offset": [
+          59,
+          48
+        ],
+        "face_offset": [
+          58,
+          53
+        ]
+      },
+      {
+        "source": 5,
+        "support_offset": [
+          59,
+          49
+        ],
+        "face_offset": [
+          58,
+          53
+        ]
+      },
+      {
+        "source": 6,
+        "support_offset": [
+          57,
+          48
+        ],
+        "face_offset": [
+          57,
+          52
+        ]
+      },
+      {
+        "source": 7,
+        "support_offset": [
+          57,
+          48
+        ],
+        "face_offset": [
+          57,
+          52
+        ]
+      }
+    ],
+    "torso_foreleg_region": [
+      78,
+      100,
+      119,
+      120
+    ],
+    "contact_lock_y": 120,
+    "quiet_tail_lock_x": 119,
+    "eyes": [
+      [
+        67,
+        73,
+        84,
+        93
+      ],
+      [
+        94,
+        73,
+        112,
+        93
+      ]
+    ],
+    "ear_region": [
+      59,
+      46,
+      82,
+      73
+    ],
+    "output": "assets/neko-idle-rest-v2.png",
+    "method": "Whole authored torso/foreleg poses over exact planted contacts, stable head scaffold with authored eye/ear acting. No chest-only shading window, no breathing/scaling, no global animated translation."
+  },
+  "runtime": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "durations_ms": [
+      2100,
+      200,
+      200,
+      300,
+      100,
+      100,
+      100,
+      300,
+      2400
+    ],
+    "blink_ms": 300,
+    "loop_ms": 5800,
+    "neutral_alias": 8
+  },
+  "assembly_iterations": [
+    {
+      "rejected": "Full x68..118 torso import at fixed y120 contacts",
+      "reason": "Outer foreleg/wrist join kinks against the retained planted paw. Preserve the canonical outer supporting foreleg; use x78..118 instead."
+    },
+    {
+      "rejected": "350ms settle hold,250ms recovery",
+      "reason": "Native100ms timer skipped closing index4; aligned300ms hold/recovery paints complete sequence0..8."
+    }
+  ],
+  "expression_brief": {
+    "eyes": "awake and attentive during settle, then100ms half-close/100ms happy arcs/100ms reopen; source3 uses source2 open eyes",
+    "ears": "one200ms authored ear response, then quiet supported ears",
+    "mouth": "canonical tiny quiet mouth held throughout; contentment reads in happy lids",
+    "head": "canonical supported head/nose, no translation/tilt/bob; other look clips keep their requested tilts"
+  },
+  "sources": {
+    "references\\seated-idle\\2026-10-23\\draft-1.png": {
+      "bytes": 941765,
+      "sha256": "2b9c059f3ab19df9c361eae317461dfa985ff13f03efc559dde561e0810d0600"
+    },
+    "references\\seated-idle\\2026-10-23\\draft-2.png": {
+      "bytes": 920091,
+      "sha256": "2f8a08bafb92e5f6ab5d2abd06e18b4b09afa657bba32f68b34fd46cf61c9c74"
+    },
+    "assets\\neko-idle-rest-v2.png": {
+      "bytes": 41204,
+      "sha256": "3802085e1c7d2688886f9353a4d4444b500020208600b7a19ebaaee8a48e15db"
+    }
+  }
+}
