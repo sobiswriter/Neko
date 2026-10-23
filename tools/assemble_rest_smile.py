@@ -13,7 +13,7 @@ def assemble():
     assert base.size == donor.size == (768,288)
     frames = [base.crop((i%4*192,i//4*144,i%4*192+192,i//4*144+144)) for i in range(8)]
     frames += [frames[0].copy() for _ in range(4)]
-    for index, source in ((5,4),(6,5),(7,5),(8,5),(9,4)):
+    for index, source in ((5,4),(6,4),(7,4),(8,4),(9,4)):
         x,y = source%4*192,source//4*144
         patch = donor.crop(tuple(value+(x if n%2==0 else y) for n,value in enumerate(MOUTH)))
         patch.putalpha(frames[index].crop(MOUTH).getchannel("A"))
@@ -29,11 +29,12 @@ def assemble():
               "base":"references/rest-smile/2026-10-23/seated-base.png",
               "donor":"references/rest-smile/2026-10-23/smile-donor.png",
               "donor_provenance":"docs/rest-breathing-prompts.json",
-              "mouth_region":MOUTH,"source_cells":{"half_smile":4,"small_smile":5},
-              "selection":{"5":4,"6":5,"7":5,"8":5,"9":4},
-              "acting":"Neutral first2.9s; drawn smile onset100ms, full smile2700ms, release100ms. Eye/ear/head/body acting remains pixel-identical at matching times. Mouth only; no breathing imported.",
+              "mouth_region":MOUTH,"source_cells":{"user_selected_smile":4},
+              "selection":{"5":4,"6":4,"7":4,"8":4,"9":4},
+              "acting":"Neutral first2.9s; exact tiny smile from the user-selected release frame held for2900ms. Eye/ear/head/body acting remains pixel-identical at matching times. Mouth only; no breathing imported.",
+              "user_reference":"references/simple-smile/2026-10-23/user-smile.png",
               "spares":[10,11],"shared_neutral_alias":12,"canvas":[192,144]}
-    (ROOT / "docs/rest-smile-assembly.json").write_text(json.dumps(record,indent=2),encoding="utf-8")
+    (ROOT / "docs/simple-smile-assembly.json").write_text(json.dumps(record,indent=2),encoding="utf-8")
 
 
 if __name__ == "__main__":

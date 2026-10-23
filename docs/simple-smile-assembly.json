@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-23",
+  "mode": "Reuse existing built-in ImageGen authored drawings; no new generation",
+  "base": "references/rest-smile/2026-10-23/seated-base.png",
+  "donor": "references/rest-smile/2026-10-23/smile-donor.png",
+  "donor_provenance": "docs/rest-breathing-prompts.json",
+  "mouth_region": [
+    83,
+    93,
+    95,
+    99
+  ],
+  "source_cells": {
+    "user_selected_smile": 4
+  },
+  "selection": {
+    "5": 4,
+    "6": 4,
+    "7": 4,
+    "8": 4,
+    "9": 4
+  },
+  "acting": "Neutral first2.9s; exact tiny smile from the user-selected release frame held for2900ms. Eye/ear/head/body acting remains pixel-identical at matching times. Mouth only; no breathing imported.",
+  "user_reference": "references/simple-smile/2026-10-23/user-smile.png",
+  "spares": [
+    10,
+    11
+  ],
+  "shared_neutral_alias": 12,
+  "canvas": [
+    192,
+    144
+  ],
+  "runtime": {
+    "loop_ms": 5800,
+    "smile_ms": 2900,
+    "clip_timing_unchanged": true
+  },
+  "identities": {
+    "assets\\neko-idle-rest-v2.png": {
+      "bytes": 53700,
+      "sha256": "0985979c5ac4ac0d694e6c62a8b8be57eea99dc638317b3153acdda6f24e1b8d"
+    },
+    "references\\simple-smile\\2026-10-23\\user-smile.png": {
+      "bytes": 11021,
+      "sha256": "83ceed9c7cffe73f1ca2d153d9dc14ecec9f3fb2499ac340fd406db71b2f16c0"
+    },
+    "references\\simple-smile\\2026-10-23\\before.png": {
+      "bytes": 54028,
+      "sha256": "db455d20a96aa1e660882755559d0ed6fd7231035447f7fb69472f969cc2c5d2"
+    }
+  },
+  "unused_generated_candidate": "references/simple-smile/README.md"
+}

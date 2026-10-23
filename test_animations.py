@@ -40,7 +40,7 @@ class AnimationTests(unittest.TestCase):
                         self.assertEqual(frame.pixelColor(x,y), reference.pixelColor(x,y), (index,x,y))
         self.assertGreater(len(set(map(frozenset,outlines))), 2, "Need drawn limb acting, not a color pulse")
 
-    def test_resting_smile_lasts_half_the_loop_with_drawn_entry_and_release(self):
+    def test_resting_smile_matches_user_selected_frame_for_half_the_loop(self):
         clip = CLIPS["idle"]
         self.assertEqual(sum(clip.durations), 5800)
         self.assertEqual(sum(ms for i,ms in zip(clip.order,clip.durations) if i in (5,6,7,8,9)), 2900)
@@ -49,7 +49,9 @@ class AnimationTests(unittest.TestCase):
         self.assertTrue(all(mouth(i) == mouth(6) for i in (7,8)))
         self.assertEqual(mouth(5),mouth(9))
         self.assertNotEqual(mouth(5),mouth(0))
-        self.assertNotEqual(mouth(5),mouth(6))
+        self.assertEqual(mouth(5),mouth(6))
+        reference = QImage(str(Path(__file__).parent / "references/simple-smile/2026-10-23/before.png"))
+        self.assertEqual(mouth(6), reference.copy(192+83,288+93,12,6).convertToFormat(mouth(6).format()))
         self.assertEqual(self.atlas.frames[clip.bank,3,0].toImage(),self.atlas.frames["idle",0,0].toImage())
 
     def test_updated_looks_finish_with_a_drawn_happy_tilt_and_quiet_swish_stays_original(self):

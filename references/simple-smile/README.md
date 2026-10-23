@@ -1,0 +1,9 @@
+# Exact user-selected resting smile · 2026-10-23
+
+The user supplied `2026-10-23/user-smile.png`, showing the prior release/soft-mouth pose. The final runtime reuses that exact mouth: cell9 of `before.png`, equivalent to authored donor4 in the existing rest-smile source. No new body, eyes, head, ears or movement are imported.
+
+Before that clarification, built-in ImageGen produced `2026-10-23/smile-raw.png`. It is retained as an unused candidate only. The user's screenshot supersedes the proposed new curve. The final selection and verification are in [the current report](../../docs/simple-smile-validation.md).
+
+## Unused candidate prompt
+
+Use case: precise-object-edit. Edit the reference pixel-art white kitten for a tiny mouth-only production sprite detail. The user's exact correction is 'a simple smile :) 😊'. They want ONE small closed-mouth upward-curving smile, like the simple happy emoji mouth, not a W/cat muzzle, not an open mouth, not a filled black U/blob, no tongue/teeth. Preserve kitten identity/camera/physical size/eyes/nose/body/ears/tail/position. Make a transparent sheet with EXACTLY FOUR equal cells in ONE HORIZONTAL ROW: 0 neutral tiny flat mouth matching reference; 1 a very slight shallow smile forming; 2 a clear simple thin closed upward smile (one single shallow curved charcoal line whose corners are above its center, around6 final desktop pixels wide and2-3px tall, at most1px stroke in the62px-wide head); 3 slight shallow smile releasing, matching1. Head and everything else identical in all4 cells, no head tilt or blink, no cheeks/blush, no extras. Render crisp clean pixel clusters and transparent background, generous margins. The only new art used will be the small mouth region; body and eyes are preserved from existing accepted animation. No text, label, grid, background, floor or shadow.

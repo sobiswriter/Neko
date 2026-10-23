@@ -318,3 +318,10 @@ Completed: four focused source cases, new-rest component/unchanged-art assertion
 User chooses half-loop smile. Reuse existing authored mouth entry/hold/release; preserve accepted body and all synchronized non-mouth pixels. Keep5.8s loop/300ms blink. Scope: mouth composite/rest source count, idle quiet-hold split, focused tests/comparison/provenance/FrameMaster/README and flat current/previous build. No unrelated acting or settings.
 
 Completed: three focused source cases, full-loop synchronized mouth-only comparison, connected components, complete native0..9 sequence and three final package checks pass. Current build and verified immediate predecessor are retained in the flat release folder.
+
+
+## Exact user-selected tiny smile · 2026-10-23
+
+Use the mouth from the supplied release-frame screenshot throughout the existing half-loop smile. Replace only mouths6/7/8 with the already-authored soft mouth; all movement/timing remains unchanged. Two targeted source cases and synchronized mouth-only comparisons; rebuild and package-asset checks, preserve flat current/previous. No repeated native timing or broad tests.
+
+Completed: two source cases, exact three-mouth diff/905 unchanged frames/all65 unchanged clips, complete synchronized outside-mouth comparison, component assertions and both package checks pass. Flat current/verified previous executable retained.
