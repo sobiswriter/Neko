@@ -62,6 +62,7 @@ GAME_TITLES = {"catch": "Catch the Cursor"}
 # Phases in which the player is actively playing (menu pauses, arrow cursor, harder drag).
 PLAY_PHASES = frozenset(ACTIVE_PHASES)
 OUTCOME_VARIANTS = {"win": 4, "loss": 3}   # Triple hop, sproing, victory roll, sproing (2nd take).
+TRIPLE_HOP_SHARE = 0.8                      # Wins that use the triple hop; the rest share the rare ones.
 RESTLESS_LIMITS = (1, 120)  # minutes
 # Deliberate moments (a pet, a game beat) may speak again after a short gap; unprompted sounds
 # keep the long pause so she never becomes noisy.
@@ -1184,7 +1185,20 @@ class NekoWidget(QWidget):
             game.win_counted = True
             setattr(self, won, getattr(self, won) + 1)
             self.save_preferences()
-        if game.phase in ("win", "loss") and game.variant is None:
+        if game.phase == "win" and game.variant is None:
+            # The triple hop is her signature win (80 %); the new celebrations are rare treats,
+            # and the same rare one never comes twice in a row.
+            rng = self.companion.rng
+            if rng.random() < TRIPLE_HOP_SHARE:
+                game.variant = 0
+            else:
+                rare = [v for v in range(1, OUTCOME_VARIANTS["win"]) if v != self.last_outcome.get("rare")]
+                game.variant = self.last_outcome["rare"] = rng.choice(rare)
+            self.last_outcome["win"] = game.variant
+            game.outcome_seconds = sum(CLIPS[self.game_clip()].durations) / 1000
+            self.current_clip = self.game_clip()
+            self.play_sound("trill", prompted=True)
+        if game.phase == "loss" and game.variant is None:
             bag = self.outcome_bags.setdefault(game.phase, [])
             if not bag:
                 bag.extend(range(OUTCOME_VARIANTS[game.phase]))

@@ -247,22 +247,32 @@ class DesktopGameTests(unittest.TestCase):
         self.n.prepare_menu()
         self.assertEqual((self.n.games_played, self.n.games_won), (1, 1))
 
-    def test_outcome_bags_show_all_three_and_never_repeat_at_seam(self):
-        # Four celebrations (triple hop, sproing, victory roll, sproing second take); three sulks.
-        for outcome, count in (("win", 4), ("loss", 3)):
-            selected = []
-            for _ in range(count * 3):
-                self.start()
-                g = self.n.game
-                g.started = True
-                g.result = outcome
-                g.enter(outcome, self.now)
-                self.step(.02, (650, 400))
-                selected.append(g.variant)
-                self.n.end_game(immediate=True, clear_mood=True)
-            for index in range(0, count * 3, count):
-                self.assertEqual(set(selected[index:index + count]), set(range(count)))
-            self.assertTrue(all(a != b for a, b in zip(selected, selected[1:])))
+    def outcome(self, outcome):
+        self.start()
+        g = self.n.game
+        g.started = True
+        g.result = outcome
+        g.enter(outcome, self.now)
+        self.step(.02, (650, 400))
+        variant = g.variant
+        self.n.end_game(immediate=True, clear_mood=True)
+        return variant
+
+    def test_loss_bag_shows_all_three_sulks_and_never_repeats_at_seam(self):
+        selected = [self.outcome("loss") for _ in range(9)]
+        for index in range(0, 9, 3):
+            self.assertEqual(set(selected[index:index + 3]), {0, 1, 2})
+        self.assertTrue(all(a != b for a, b in zip(selected, selected[1:])))
+
+    def test_triple_hop_is_most_wins_and_the_new_ones_are_rare(self):
+        self.n.companion.rng.seed(7)
+        wins = [self.outcome("win") for _ in range(200)]
+        hops = wins.count(0) / len(wins)
+        self.assertGreater(hops, 0.7)
+        self.assertLess(hops, 0.9)
+        rare = [v for v in wins if v]
+        self.assertEqual(set(rare), {1, 2, 3})                    # Each still shows up now and then.
+        self.assertTrue(all(a != b for a, b in zip(rare, rare[1:])))   # Never the same rare one twice.
 
     def test_invalid_counters_migrate_without_exceeding_played(self):
         for played, won, expected in (("bad", 4, (0, 0)), (-1, -8, (0, 0)), (3, 99, (3, 3))):

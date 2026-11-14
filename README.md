@@ -19,8 +19,9 @@ single-instance lock with them, so quit one before starting another.
   she warns you three times (the last one is a "last chance!") and forfeits and curls up only
   after nine seconds outside. Bringing the arrow back resets the warnings. A little **!** over her
   head shows when a game is ready and she is waiting for the arrow to come by.
-- **Pixel-art victories.** Catch wins rotate through four celebrations: the much-loved
-  **triple hop**, two takes of a **sproing** (stiff-legged, arched-back happy bounces) and a
+- **Pixel-art victories.** About 80% of Catch wins use the much-loved **triple hop**; the rest
+  are rare treats, never the same one twice in a row:
+  two takes of a **sproing** (stiff-legged, arched-back happy bounces) and a
   **victory roll** (belly-up wiggles, a fluffy shake and a proud paw). The three new ones are
   finished at her native size in her own palette, with hard edges and crisp, continuous black
   line art like the original drawings (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
@@ -91,7 +92,7 @@ prepared by `tools/prepare_sounds.py`.
   is. If the arrow never comes over she calls you three times, then says "maybe later" and
   goes home with no loss or sulk.
   There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
-  wins one of four celebrations: the triple hop, two sproings or a victory roll.
+  wins a celebration: usually the triple hop, now and then a sproing or a victory roll.
   Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
   sulks give her more life. Each chase lasts up to 45 seconds; nine continuous seconds
   outside her reachable band ends it, after three warnings.
