@@ -12,66 +12,58 @@ Neko 1.2 builds to its own file, `dist\DesktopNeko-1.2.exe`, beside the stable
 `DesktopNeko.exe` and `DesktopNeko-previous.exe`. It shares settings, counts and the
 single-instance lock with them, so quit one before starting another.
 
-- **Dodge the Cursor.** A second game, and this time she starts it herself: with the
-  mouse moving on her monitor she spots the arrow (**!**), announces the game, plays a
-  teasing bow, counts **3… 2… 1…** and then plays tag. She creeps toward the arrow to get
-  its attention, play-bows when it hangs back, and bolts when it rushes her. Before every
-  escape there is a 250–350 ms warning lean (your chance), then one side-step hop, duck or
-  dash, then a recovery beat so she can't chain perfect dodges. **Three real tags in 30
-  seconds** catch her. A tag needs the arrow on her painted fur for 0.12 s; quick brushes,
-  tail and ear tips don't count ("that one doesn't count!"), and after each tag she gets
-  1.2 s to flee ("you just got lucky!"). If you catch her she flops over laughing, a good
-  sport; if she survives the clock she celebrates. **Fouls are fails:** touching her
-  during the announcement or countdown, or running the arrow far away or onto another
-  monitor for four seconds, makes her sad. She plays a sad drawing, says why
-  ("you started before go… that's not fair") and curls up under her rain cloud until
-  you pet her. A motionless arrow for eight seconds just ends the round. Afterwards she
-  always goes home. Pet, carry, hide, fullscreen and End game cancel neutrally; her menu
-  pauses play. Dodge has its own counters (played · Neko escapes).
-- **Games take turns.** Automatic invitations alternate between Catch and Dodge (Catch
-  first). Play tab → **Catch** / **Dodge** toggles choose which may invite; each has a
-  Play button, also in her menu.
-- **Livelier victories.** Catch and Dodge wins rotate through four celebrations: the
-  much-loved **triple hop**, two takes of a **sproing** (stiff-legged, arched-back happy
-  bounces) and a **victory roll** (pounce on the prize, belly-up wiggles and bicycle kicks,
-  a fluffy shake and a proud paw). The old "prize hug" and "proud sit" wins are retired.
+- **Bigger Catch area, with hop-downs.** She can now pounce up to 140 px above her ground
+  (was 110) and, when the arrow is just below her reach, hop down a little (24 to 80 px) to
+  get at it. After a hop-down a pounce can carry her back up to her home ground, and on the
+  way home she climbs back up first. The area is still bounded: if the arrow stays outside it
+  she protests, and after four seconds she forfeits and curls up. A little **!** over her
+  head shows when a game is ready and she is waiting for the arrow to come by.
+- **Pixel-art victories.** Catch wins rotate through four celebrations: the much-loved
+  **triple hop**, two takes of a **sproing** (stiff-legged, arched-back happy bounces) and a
+  **victory roll** (belly-up wiggles, a fluffy shake and a proud paw). The three new ones are
+  redrawn on her 2 px pixel grid in her own palette with a solid outline, so they read as the
+  same chunky kitten (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
+  "proud sit" wins are retired.
 - **Restless kitten** (on by default; Company tab → **Restless when ignored** and
-  **Restless after**, 5–120 min, default 20). If you're at the computer but haven't petted,
-  played with or carried her for that long, she gets restless and roams her monitor:
-  - *restless*: sighs, glances at you, wanders a little;
+  **Restless after**, 1–120 min, default 20; set 1 minute to try it). If you're at the
+  computer but haven't petted, played a game with or carried her for that long, she gets
+  restless and roams her monitor using only her original drawings (stroll, chase gallop and
+  the Catch crouch-and-pounce):
+  - *restless*: yawns, wanders a little and comes back;
   - *pouncy*: bursts of bouncy pounce-hops or a gallop, then she stops, says something
     and relaxes before the next burst;
-  - *jealous*: dashes and leaps toward the arrow (never closer than 140 px), glares at it
-    and huffs ("what does that arrow have that i don't?");
-  - *demanding*: keeps pouncing near the arrow with short pauses, begging and head-butting
-    ("pet. me. now.");
+  - *jealous*: hops and leaps toward the arrow (never closer than 140 px) and stares it down
+    in her hunting crouch ("what does that arrow have that i don't?");
+  - *demanding*: keeps coming to the arrow with short pauses, offering a paw ("pet. me. now.");
   - after ten unanswered minutes of demanding she curls up and sulks under her rain cloud
     until petted.
 
-  It takes 1, 2, 3, 4 or 5 pets (by stage) to calm her; she tells you how it's going
-  ("…okay, that's one. keep going."), then forgives you with a happy melt and hearts and
-  walks or bounds home. Carrying her pauses the mood but isn't a pet ("hey! that's not a
-  pet!"); playing a game calms her by one stage. Big height changes take several
-  kitten-sized leaps (at most 200 px each). She never moves while a mouse button is held
-  or you're typing. It never starts while you're away, in fullscreen, in Quiet company or
-  with the switch off; if you step away she goes home quietly and naps, and when you're
-  back ("oh! you're back. i was… totally fine.") she resumes a minute later. Hiding,
-  fullscreen, quitting and monitor changes put her straight back home. Journal → **Mood**
-  shows each stage, pet and reason.
-- **Dizzy drawings.** The head-spinning reaction now uses its own drawn performance:
-  following the windows, spiral eyes, a wobbly head circle, a steadying paw, a head shake
-  and a relieved sigh. The circling stars show only while her eyes are spirals.
-- **Real kitten sounds** (still off until you enable them): ten cues with three to eight
-  takes each, chosen at random and never the same file twice in a row. Mews, a purr that
-  loops for exactly as long as a cuddle, chirps, happy trills on wins and forgiveness,
-  curious "mrr?" for dizziness, yawns at bedtime, cute protests ("put me down", fouls,
-  "no fair"), sad mews on losses, demanding meows when restless and giggly chatter in
-  Dodge. Quiet company, fullscreen, media apps and the 45-second pause for unprompted
-  sounds still apply. Sources: [sound credits](docs/sound-credits.md).
+  The Company tab shows a countdown ("Restless in about 42 sec…"). The clock only runs
+  while you're using the computer, she's awake and not being played with, petted or carried,
+  and Quiet company is off; when it runs out she starts once she's idle and you haven't typed
+  for two seconds. It takes 1, 2, 3, 4 or
+  5 pets (by stage) to calm her; she tells you how it's going, then forgives you with a
+  nuzzle and hearts and goes home. Carrying her pauses the mood but isn't a pet; playing a
+  game calms her by one stage. Big height changes take several kitten-sized leaps (at most
+  120 px each). She never moves while a mouse button is held or you're typing. It never
+  starts while you're away, in fullscreen, in Quiet company or with the switch off; if you
+  step away she goes home quietly and naps. Hiding, fullscreen, quitting and monitor changes
+  put her straight back home. Journal → **Mood** shows each stage, pet and reason.
+- **Soft kitten sounds** (still off until you enable them): ten cues with four takes each
+  (eight purrs), chosen at random and never the same file twice in a row. Every take is
+  filtered (140 Hz–4.2 kHz), levelled to a quiet −37 to −40 dBFS and given soft fades.
+  Mews, a purr that loops for exactly as long as a pet, chirps when a game is announced,
+  trills on "go", wins and forgiveness, giggles during the chase and tail chase, a curious
+  "mrr?" for sniffs, glances and dizziness, yawns at bedtime and wake-up, protests when the
+  arrow leaves her area, sad mews on losses and goodbyes, and demanding meows when restless.
+  Some idle gestures make a sound about half the time; those, like all unprompted sounds,
+  wait at least 45 seconds after the last one, and Quiet company, fullscreen and media apps
+  silence them. Sources: [sound credits](docs/sound-credits.md).
 - **Better rain cloud** for sulks: one soft, shaded storybook cloud with slanted rain.
 
-The 1.2 art came from the user's 19 generated sheets (12 drawings each), labelled, cut and
-calibrated by `tools/assemble_v12.py`; see [assembly record](docs/v1.2-assembly.json),
+The 1.2 victories came from the user's generated sheets (12 drawings each), labelled, cut
+and calibrated by `tools/assemble_v12.py` and redrawn as pixel art by `pixelate.py`. The
+other generated sheets are not played for now. See the [assembly record](docs/v1.2-assembly.json),
 [prompts](docs/v1.2-art-prompts.md) and [plan](docs/next-updates-plan.md). Sounds were
 prepared by `tools/prepare_sounds.py`.
 
@@ -88,7 +80,7 @@ prepared by `tools/prepare_sounds.py`.
   1.8 seconds so you can read it, then gives a real **3… 2… 1… Here I come!**, then
   runs and pounces. Moving the arrow away during the declaration calls it off quietly.
   There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
-  wins one of three celebrations: happy hops, a proud hug or champion paws.
+  wins one of four celebrations: the triple hop, two sproings or a victory roll.
   Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
   sulks give her more life. Each chase lasts up to 45 seconds; four continuous seconds
   outside her reachable band ends it, with a little protest first.
@@ -232,7 +224,7 @@ prepared by `tools/prepare_sounds.py`.
   while she sulks, a huffy cross mark when she's held too long and sleepy z's once she
   gives up and dozes in your hand. With Gentle motion off they stay still. They live in
   [effects.py](effects.py).
-- **Offline personality.** 531 short lines, including more personal questions and
+- **Offline personality.** 460 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. The last 40 built-in lines she said, across every group,
@@ -278,7 +270,7 @@ prepared by `tools/prepare_sounds.py`.
   deliberate pets and naps still work normally.
 
   To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
-  contains all 531 phrases in 73 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  contains all 460 phrases in 56 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
   Edit or add one phrase per line inside the existing triple-quoted groups; keep the
   section names/quotes and aim for at most 110 characters per phrase. Source launches
   use your edits on restart; the packaged executable needs rebuilding. Optional AI

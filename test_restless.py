@@ -1,7 +1,7 @@
 import random
 import unittest
 
-from restless import ACT_SECONDS, CURSOR_GAP, BODY, LEAP_SECONDS, RestlessMood, STAGES
+from restless import ACT_SECONDS, CURSOR_GAP, BODY, RestlessMood, STAGES
 
 AREA = (0, 0, 1700, 900)
 HOME = (1500, 900)
@@ -22,15 +22,13 @@ class RestlessTests(unittest.TestCase):
                 lines.append(line)
         return now, lines
 
-    def test_clip_lengths_match_the_drawn_acting(self):
+    def test_acting_uses_her_original_drawings_with_real_lengths(self):
         from animations import CLIPS
-        names = {"sigh": "restless_sigh", "jealous": "restless_jealous", "demand": "restless_demand",
-                 "forgive": "restless_forgive", "calm": "restless_calm", "stop": "roam_stop", "turn": "roam_turn",
-                 "ready": "roam_ready"}
-        for key, clip in names.items():
-            self.assertAlmostEqual(sum(CLIPS[clip].durations) / 1000, ACT_SECONDS[key], places=2, msg=key)
-        for way in ("up", "down"):
-            self.assertAlmostEqual(sum(CLIPS[f"roam_leap_{way}"].durations) / 1000, LEAP_SECONDS[way], places=2)
+        from restless import ACTS
+        for key, (clip, seconds) in ACTS.items():
+            self.assertFalse(CLIPS[clip].bank.startswith("v12-"), key)
+            expected = seconds if seconds is not None else sum(CLIPS[clip].durations) / 1000
+            self.assertAlmostEqual(ACT_SECONDS[key], expected, places=3, msg=key)
 
     def test_escalates_through_every_stage_then_curls_until_petted(self):
         mood = self.mood()
@@ -45,7 +43,10 @@ class RestlessTests(unittest.TestCase):
         self.assertIn("start", lines)
         for line in ("pouncy", "jealous", "demanding", "sulk"):
             self.assertIn(line, lines)
-        x, y = mood.x, mood.y
+        while mood.step[0] != "sulk":          # She finishes a hop or leap already under way…
+            now, _ = self.run_until(mood, now + 0.1)
+        x, y = mood.x, mood.y                    # …then curls up where she landed.
+        self.assertEqual(y, mood.ground)
         self.run_until(mood, now + 600)
         self.assertEqual((mood.x, mood.y, mood.step[0]), (x, y, "sulk"))   # Stays curled.
         self.assertEqual(mood.effect, "sulk")

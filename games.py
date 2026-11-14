@@ -14,6 +14,12 @@ WALK_HOME_WITHIN = 120  # Closer than this, she walks.
 RUN_SPEED, RUN_ACCELERATION, WALK_SPEED = 210, 700, 180
 
 
+# The play area: she can jump this high above her home ground and hop this far down below it.
+MAX_LIFT = 140
+MAX_DROP = 80
+REACH_LOW = 124   # Lowest arrow she can touch from a ground (her landing paw, below the ground line).
+
+
 @dataclass(frozen=True)
 class Runway:
     left: float
@@ -21,6 +27,7 @@ class Runway:
     y: float
     lift: float
     paw: tuple = (49, 80)
+    drop: float = 0   # How far below home ground (y) she may hop down.
 
     def invites(self, cursor, origin_x, tolerance=0):
         left = (self.left + self.paw[0], origin_x - 40)
@@ -31,16 +38,22 @@ class Runway:
         x, y = cursor
         return (self.left + self.paw[0] - tolerance <= x <= self.right + 191 - self.paw[0] + tolerance
                 and self.y + self.paw[1] - self.lift - tolerance <= y
-                <= self.y + 124 + tolerance)
+                <= self.y + REACH_LOW + self.drop + tolerance)
 
-    def jump(self, x, cursor, direction):
+    def jump(self, x, cursor, direction, ground=None, landing=None):
+        """A pounce from `ground` to `landing` (window y of her feet line) whose paw meets the arrow.
+        Returns (end_x, height) or None. Heights are measured above the straight take-off/landing line."""
+        g0 = self.y if ground is None else ground
+        g1 = g0 if landing is None else landing
+        top = self.y - self.lift   # The highest the arc may reach (the play area's top).
         for fraction, paw in ((.5, self.paw), (.8, (59, 124))):
             px = paw[0] if direction < 0 else 191 - paw[0]
             dx = cursor[0] - x - px
-            height = (self.y + paw[1] - cursor[1]) / (4 * fraction * (1 - fraction))
+            line = g0 + (g1 - g0) * fraction
+            height = (line + paw[1] - cursor[1]) / (4 * fraction * (1 - fraction))
             end = x + dx / fraction
-            if (abs(end - x) <= 140 and 0 <= height <= self.lift
-                    and self.left <= end <= self.right):
+            apex = (g0 + g1) / 2 - height   # Window y at the top of the arc.
+            if abs(end - x) <= 150 and 0 <= height and apex >= top and self.left <= end <= self.right:
                 return end, height
         return None
 
@@ -80,9 +93,7 @@ class GameTimer:
             self.pending = source
             self.note(now, "queued", source)
 
-    def tick(self, now, eligible, in_zone=False, can_start=True, blocked_reason="not eligible", direct=False):
-        """direct: the next automatic game starts on its own (Dodge) instead of waiting for an
-        approach into her side area (Catch)."""
+    def tick(self, now, eligible, in_zone=False, can_start=True, blocked_reason="not eligible"):
         if self.enabled and now >= self.due and self.pending is None:
             self.request(now)
         if not self.enabled and self.pending is None:
@@ -93,7 +104,7 @@ class GameTimer:
             self.outside_since = self.entered_at = None
             self.waiting(now, blocked_reason)
             return None
-        invited = self.pending == "manual" or (direct and self.pending is not None)
+        invited = self.pending == "manual"
         if not invited:
             if not in_zone:
                 if self.outside_since is None or self.entered_at is not None:
@@ -173,6 +184,9 @@ class CursorGame:
         self.line = "announce"
         self.history = deque(maxlen=4)
         self.end_x, self.height, self.start_x = self.x, 0, self.x
+        # Ground she is standing on (window y). She starts on her home ground and may hop down a
+        # little (runway.drop) to reach a low arrow, then hops back up before going home.
+        self.ground = self.start_ground = self.end_ground = runway.y
         self.after_landing = None
         self.comfort_requested = False
         self.phase = "declare"
@@ -233,8 +247,25 @@ class CursorGame:
         if self.phase != "jump":
             return self.x, self.y
         t = max(0, min(1, (now - self.since) / .64))
-        return (self.start_x + (self.end_x - self.start_x) * t,
-                self.runway.y - 4 * self.height * t * (1 - t))
+        line = self.start_ground + (self.end_ground - self.start_ground) * t
+        return (self.start_x + (self.end_x - self.start_x) * t, line - 4 * self.height * t * (1 - t))
+
+    def plan_hop(self, end_x, height, landing, then=None):
+        """Prepare a pounce/hop from the current ground to `landing`."""
+        self.start_x, self.end_x, self.height = self.x, end_x, height
+        self.start_ground, self.end_ground = self.ground, landing
+        self.after_landing = then
+        self.velocity = 0
+
+    def climb_home(self, now):
+        """Lowered after a hop down: a small hop back up to her home ground first."""
+        if not self.motion or self.ground <= self.runway.y + 1:
+            return False
+        step = self.direction * 40 if self.direction else 40
+        end = max(self.runway.left, min(self.runway.right, self.x + step))
+        self.plan_hop(end, 14, self.runway.y, then=self.phase if self.phase in ("home", "return") else "home")
+        self.enter("prepare", now)
+        return True
 
     def update(self, now, cursor, contact=False):
         dt = now - self.last
@@ -245,7 +276,7 @@ class CursorGame:
                 self.last = now
                 self.cancel(now)
                 self.after_landing = None
-                self.y = self.runway.y
+                self.x, self.y = self.x, self.ground
                 self.enter("home", now)
             else:
                 self.hold(now)
@@ -278,12 +309,12 @@ class CursorGame:
             outside_time = 0 if self.outside is None else now - self.outside
             if outside_time >= 1.5 and not self.protested and now - self.last_protest >= 8:
                 self.line = ("protest_high" if cursor[1] < self.runway.y + self.runway.paw[1] - self.runway.lift
-                             else "protest_low" if cursor[1] > self.runway.y + 124 else "protest_side")
+                             else "protest_low" if cursor[1] > self.runway.y + REACH_LOW + self.runway.drop
+                             else "protest_side")
                 self.protested = True
                 self.last_protest = now
                 if self.phase in ("run", "turn", "miss"):
-                    self.start_x = self.end_x = self.x
-                    self.height = min(50, self.runway.lift) if self.motion else 0
+                    self.plan_hop(self.x, min(50, self.runway.lift) if self.motion else 0, self.ground)
                     self.enter("prepare", now)
                     return
             if inside:
@@ -314,12 +345,23 @@ class CursorGame:
                 self.enter("turn", now)
                 return
             self.direction = desired
-            solution = self.runway.jump(self.x, target, self.direction)
+            # Lowered and the arrow is back up at home height: the pounce lands back up there.
+            landing = (self.runway.y if self.ground > self.runway.y and target[1] < self.runway.y + REACH_LOW
+                       else self.ground)
+            solution = self.runway.jump(self.x, target, self.direction, self.ground, landing)
             if not self.motion:
                 solution = (self.x, 0) if abs(target[0] - (self.x + (self.runway.paw[0] if desired < 0 else 191 - self.runway.paw[0]))) < 14 and abs(target[1] - self.runway.y - self.runway.paw[1]) < 14 else None
+                landing = self.ground
             if solution:
-                self.start_x, (self.end_x, self.height) = self.x, solution
-                self.velocity = 0
+                self.plan_hop(solution[0], solution[1], landing)
+                self.enter("prepare", now)
+            elif (self.motion and target[1] > self.ground + REACH_LOW - 6
+                  and self.ground < self.runway.y + self.runway.drop - 8
+                  and abs(target[0] - (self.x + 96)) < 220):
+                # The arrow is just below her reach: hop down a little toward it.
+                lower = min(self.runway.y + self.runway.drop, max(self.ground + 24, target[1] - REACH_LOW + 30))
+                step = max(self.runway.left, min(self.runway.right, self.x + self.direction * 50))
+                self.plan_hop(step, 16, lower)
                 self.enter("prepare", now)
             elif self.motion:
                 self.velocity = min(210, self.velocity + 700 * dt)
@@ -336,6 +378,7 @@ class CursorGame:
             t = min(1, elapsed / .64)
             self.x, self.y = self.position_at(now)
             if t >= 1:
+                self.ground = self.y = self.end_ground
                 phase = self.after_landing or "miss"
                 self.enter(phase, now, phase if phase in ("win", "loss") else None)
                 self.after_landing = None
@@ -344,7 +387,9 @@ class CursorGame:
         elif self.phase == "win" and elapsed >= self.outcome_seconds:
             self.enter("home", now)
         elif self.phase == "return":
-            self.y = self.runway.y
+            if self.climb_home(now):
+                return
+            self.y = self.ground = self.runway.y
             delta = self.origin[0] - self.x
             self.direction = -1 if delta < 0 else 1
             self.velocity = min(RUN_SPEED, self.velocity + RUN_ACCELERATION * dt)
@@ -352,7 +397,9 @@ class CursorGame:
             if abs(self.origin[0] - self.x) <= WALK_HOME_WITHIN:
                 self.enter("home", now)
         elif self.phase == "home":
-            self.y = self.runway.y
+            if self.climb_home(now):
+                return
+            self.y = self.ground = self.runway.y
             delta = self.origin[0] - self.x
             if self.motion and abs(delta) > RUN_HOME_FROM:
                 self.velocity = 0

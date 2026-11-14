@@ -191,7 +191,7 @@ class AnimationTests(unittest.TestCase):
         atlas = self.atlas
         from animations import V12_BANKS
         v12 = sum(len(parts) * 12 + 1 for parts in V12_BANKS.values())  # drawings plus the idle endpoint
-        self.assertEqual(v12, 256)
+        self.assertEqual(v12, 75)
         self.assertEqual(len(atlas.frames), 839 - 64 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS) + v12)
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))

@@ -4,7 +4,12 @@ Status: **approved direction, plan for build**. Dated 2026-11-14; it supersedes 
 drafts of this file.
 - Implemented so far: the dizzy reaction (interim drawings), expression marks, and the new
   rain cloud.
-- Everything else here is still to build.
+- **Play-test revision (2026-11-14):** Dodge the Cursor is **removed and on hold** (code,
+  dialogue, settings and nook UI). Of the generated 1.2 art only the three victories stay,
+  redrawn on her 2 px pixel grid; the restless mood and the dizzy reaction use her original
+  drawings. Restless can be set from 1 minute. Sounds were softened and spread across
+  gestures. Catch gained a bigger area (140 px up, hop-downs of up to 80 px). The Dodge and
+  generated-art sections below are kept for when that work resumes.
 - Art prompts: [v1.2-art-prompts.md](v1.2-art-prompts.md). Sound brief:
   [v1.2-sound-brief.md](v1.2-sound-brief.md).
 

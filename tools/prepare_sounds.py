@@ -32,13 +32,18 @@ CUES = (
     ("demand-meow", "demand"),
     ("giggle-chatter", "giggle"),
 )
-# Target loudness of the voiced part (dBFS RMS) and the peak ceiling. Purr sits under the voice.
-LOUDNESS = {"purr": -31.0}
-DEFAULT_LOUDNESS, PEAK_CEILING = -25.0, -5.0
+# Soft, kitten-sized levels (dBFS RMS of the sound) with a low peak ceiling, so nothing is ever
+# startling at a normal speaker volume. Purr sits underneath; bright or insistent cues sit lower.
+LOUDNESS = {"purr": -40.0, "mew": -37.5, "demand": -39.0, "protest": -38.5, "giggle": -39.0,
+            "chirp": -37.5, "trill": -37.5}
+DEFAULT_LOUDNESS, PEAK_CEILING = -37.0, -18.0
+# Softening: roll off the harsh top end and any rumble; ease into and out of every sound.
+FILTER = "highpass=f=140,lowpass=f=4200,lowpass=f=6000"
+FADE_IN_MS, FADE_OUT_MS = 25, 140
 
 
 def decode(path):
-    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-f", "s16le", "-ac", "1",
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-af", FILTER, "-f", "s16le", "-ac", "1",
                           "-ar", str(RATE), "-"], check=True, capture_output=True).stdout
     return array("h", raw)
 
@@ -70,7 +75,7 @@ def level(samples, cue, voiced):
     return array("h", (max(-32767, min(32767, round(s * gain))) for s in samples))
 
 
-def fade(samples, out_ms=40, in_ms=4):
+def fade(samples, out_ms=FADE_OUT_MS, in_ms=FADE_IN_MS):
     n_out, n_in = RATE * out_ms // 1000, RATE * in_ms // 1000
     out = array("h", samples)
     for i in range(min(n_in, len(out))):

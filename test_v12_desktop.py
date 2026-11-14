@@ -13,13 +13,11 @@ from PySide6.QtWidgets import QApplication
 from animations import CLIPS, SpriteAtlas, sprite_bounds
 from behavior import NekoState
 from dialogue import LINES
-from dodge import OPENING, TAG_HOLD
 from games import Runway
 from main import NekoWidget
 
 APP = QApplication.instance() or QApplication([])
 APP.setQuitOnLastWindowClosed(False)
-START = sum(seconds for seconds, _, _ in OPENING.values()) + 0.4
 
 
 class V12DesktopTests(unittest.TestCase):
@@ -69,97 +67,33 @@ class V12DesktopTests(unittest.TestCase):
             with patch("main.time.monotonic", return_value=self.now), patch("main.QCursor.pos", return_value=QPoint(*point)):
                 self.n.animate()
 
-    def dodge(self):
-        with patch("main.time.monotonic", return_value=self.now):
-            self.assertTrue(self.n.start_game(self.now, "manual", "dodge"))
-        self.n.animation_timer.stop()
-        self.n.game.runway = Runway(0, 608, 400, 110)
-        return self.n.game
-
-    def test_dodge_art_is_complete_and_every_clip_returns_to_idle(self):
-        self.assertTrue(self.n.game_art_ready("dodge"))
+    def test_only_the_pixelated_victories_use_new_art(self):
+        from pixelate import BLOCK
         idle = self.atlas.frame("idle", 0).toImage()
-        for name in ("dodge_caught", "restless_sigh", "restless_demand", "restless_forgive", "game_win_1",
-                     "game_win_2", "game_win_3", "dizzy"):
+        v12 = {clip.bank for clip in CLIPS.values() if clip.bank.startswith("v12-")}
+        self.assertEqual(v12, {"v12-sproing", "v12-sproing2", "v12-roll"})
+        for name in ("game_win_1", "game_win_2", "game_win_3"):
             self.assertEqual(self.atlas.frame(name, 100).toImage(), idle, name)
-        for name, clip in CLIPS.items():
-            if clip.bank.startswith("v12-"):
-                for i in clip.order:
-                    frame = self.atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage()
-                    bounds = sprite_bounds(frame)
-                    self.assertGreater(bounds.height(), 25, (name, i))  # the pancake-flat duck is low
-                    self.assertLessEqual(bounds.bottom(), 131, (name, i))
-                    self.assertGreaterEqual(bounds.left(), 1, (name, i))
-                    self.assertLessEqual(bounds.right(), 190, (name, i))
-
-    def test_a_dodge_round_announces_counts_down_and_says_its_lines(self):
-        game = self.dodge()
-        self.assertEqual(self.n.companion.state, NekoState.PLAYING)
-        self.assertIn(self.n.bubble.text(), LINES["dodge_notice"])
-        self.step(START, (790, 300))
-        self.assertTrue(game.started)
-        self.assertEqual(self.n.dodge_played, 1)
-        self.assertEqual(self.n.games_played, 0)       # Catch's counter is separate.
-        self.assertEqual(self.n.current_clip, self.n.game_clip())
-
-    def test_touching_her_during_the_countdown_is_a_sad_foul_until_comforted(self):
-        game = self.dodge()
-        self.step(3.5, (790, 300))
-        with patch.object(self.n, "body_contact", return_value=True):
-            self.step(TAG_HOLD + 0.1, (game.x + 96, game.y + 92))
-        self.assertEqual((game.phase, game.result), ("loss", "foul"))
-        self.assertIn(self.n.bubble.text(), LINES["dodge_foul"])
-        self.step(9, (790, 300))
-        self.assertEqual(self.n.companion.state, NekoState.DISAPPOINTED)
-        self.assertEqual(self.n.current_effect(self.now)[0], "sulk")
-        with patch("main.time.monotonic", return_value=self.now):
-            self.n.pet_reaction()
-        self.step(12, (790, 300))
-        self.assertIsNone(self.n.game)
-        self.assertEqual(self.n.companion.pets, 1)
-        self.assertEqual(self.n.pos(), QPoint(300, 400))
-        self.assertEqual(self.n.dodge_won, 0)
-
-    def test_three_tags_win_for_the_player_and_she_comes_home(self):
-        game = self.dodge()
-        self.step(START, (790, 300))
-        with patch.object(self.n, "body_contact", return_value=True):
-            self.step(10, lambda: (round(game.x) + 96, round(game.y) + 92))
-        self.assertEqual(game.tags, 3)
-        self.assertEqual(game.result, "caught")
-        self.step(20, (790, 300))
-        self.assertIsNone(self.n.game)
-        self.assertEqual(self.n.pos(), QPoint(300, 400))
-        self.assertEqual((self.n.dodge_played, self.n.dodge_won), (1, 0))
-
-    def test_real_body_contact_ignores_padding_and_counts_fur(self):
-        game = self.dodge()
-        self.step(START + 1, (790, 300))
-        frame = self.n.current_frame(self.now).toImage()
-        bounds = sprite_bounds(frame)
-        centre = (round(game.x) + bounds.center().x(), round(game.y) + bounds.center().y())
-        self.assertTrue(self.n.body_contact(self.now, centre))
-        self.assertFalse(self.n.body_contact(self.now, (round(game.x) + 2, round(game.y) + 2)))
-
-    def test_automatic_games_alternate_and_dodge_starts_on_its_own(self):
-        self.assertEqual(self.n.automatic_kind(), "catch")
-        self.n.next_kind = "dodge"
-        self.n.game_timer.due = self.now - 1
-        for dt, point in ((0, QPoint(780, 200)), (0.2, QPoint(785, 205))):   # Just moving the mouse.
-            with patch("main.time.monotonic", return_value=self.now + dt), patch("main.QCursor.pos", return_value=point):
-                self.n.poll_game()
-        self.assertIsNotNone(self.n.game)
-        self.assertEqual(self.n.game.kind, "dodge")
-        self.assertEqual(self.n.next_kind, "catch")
-        self.n.end_game(immediate=True, clear_mood=True)
-        self.n.set_auto_kind("dodge", False)
-        self.n.next_kind = "dodge"
-        self.assertEqual(self.n.automatic_kind(), "catch")
-        self.assertFalse(self.settings.value("auto_dodge", type=bool))
+            clip = CLIPS[name]
+            for i in clip.order[:-1]:
+                frame = self.atlas.frames[clip.bank, clip.row + i // 4, i % 4].toImage()
+                bounds = sprite_bounds(frame)
+                self.assertGreater(bounds.height(), 25, (name, i))
+                self.assertLessEqual(bounds.bottom(), 131, (name, i))
+                # Pixel art: hard alpha and a handful of flat tones, like the original kitten.
+                alphas = {frame.pixelColor(x, y).alpha() for y in range(bounds.top(), bounds.bottom() + 1)
+                          for x in range(bounds.left(), bounds.right() + 1)}
+                self.assertTrue(alphas <= {0, 255}, (name, i))
+                colours = {frame.pixelColor(x, y).rgb() for y in range(bounds.top(), bounds.bottom() + 1)
+                           for x in range(bounds.left(), bounds.right() + 1) if frame.pixelColor(x, y).alpha()}
+                self.assertLessEqual(len(colours), 9, (name, i))
+        for clip in ("dizzy", "yawn", "paw_offer", "nuzzle", "game_jump"):
+            self.assertFalse(CLIPS[clip].bank.startswith("v12-"), clip)
 
     def test_restless_starts_after_the_set_time_and_pets_calm_her_home(self):
-        self.n.set_restless_minutes(5)
-        self.n.ignored_seconds = 5 * 60 - 1
+        self.n.set_restless_minutes(1)
+        self.assertEqual(self.n.restless_minutes, 1)
+        self.n.ignored_seconds = 60 - 1
         self.n.last_ignore_tick = self.now - 1.5
         with patch("main.time.monotonic", return_value=self.now):
             self.n.watch_ignored(self.now, 0)
