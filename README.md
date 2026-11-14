@@ -16,7 +16,8 @@ single-instance lock with them, so quit one before starting another.
   (was 110) and, when the arrow is just below her reach, hop down a little (24 to 80 px) to
   get at it. After a hop-down a pounce can carry her back up to her home ground, and on the
   way home she climbs back up first. The area is still bounded: if the arrow stays outside it
-  she protests, and after four seconds she forfeits and curls up. A little **!** over her
+  she warns you three times (the last one is a "last chance!") and forfeits and curls up only
+  after nine seconds outside. Bringing the arrow back resets the warnings. A little **!** over her
   head shows when a game is ready and she is waiting for the arrow to come by.
 - **Pixel-art victories.** Catch wins rotate through four celebrations: the much-loved
   **triple hop**, two takes of a **sproing** (stiff-legged, arched-back happy bounces) and a
@@ -72,9 +73,11 @@ prepared by `tools/prepare_sounds.py`.
 - **Catch the Cursor.** Right-click Neko or use her tray menu → **Play · Catch the Cursor**.
   The nook's **Play** tab has the same control and **Automatic cursor games**, enabled
   by default, with **90 seconds** between opportunities (adjustable from 30–600 seconds).
-  The cooldown arms play; then bringing the arrow into the invisible reachable area beside
-  her (outside her petting space), or moving it there if it is already beside her, starts a
-  game after a short hover. A parked, motionless cursor never triggers it.
+  The cooldown arms play; then bringing the arrow from a little farther away into the
+  invisible area beside her starts a game after a short hover. That area reaches about 320 px
+  out from either side of her, outside her petting space, at a height she can pounce to;
+  coming from farther to the side, from above or from below all count. An arrow that just
+  stays or wiggles beside her never triggers it.
   Naps, carrying, care, menus, typing and fullscreen take priority; Quiet company pauses it.
   A fresh side approach during an idle gesture waits for that gesture to finish.
   She spots the arrow (a little **!**), declares the game and holds that thought for
@@ -82,12 +85,12 @@ prepared by `tools/prepare_sounds.py`.
   runs and pounces. In an automatic game, moving the arrow away during the declaration calls
   it off quietly. A game you ask for (menu, tray or nook **Play**) always happens: she wakes
   up if napping, gets up from a post-loss curl for a rematch, waits for the arrow (with a
-  nudge, up to 20 seconds) and keeps counting down even if the arrow wanders off.
+  nudge every few seconds, for up to a minute) and keeps counting down even if the arrow wanders off.
   There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
   wins one of four celebrations: the triple hop, two sproings or a victory roll.
   Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
-  sulks give her more life. Each chase lasts up to 45 seconds; four continuous seconds
-  outside her reachable band ends it, with a little protest first.
+  sulks give her more life. Each chase lasts up to 45 seconds; nine continuous seconds
+  outside her reachable band ends it, after three warnings.
   After a loss she curls up, a little disappointed. A pet comforts her through a drawn get-up;
   if left unattended, she can settle for her configured nap instead of sulking forever.
   Moving her preserves that mood and never counts as a nap.
@@ -228,7 +231,7 @@ prepared by `tools/prepare_sounds.py`.
   while she sulks, a huffy cross mark when she's held too long and sleepy z's once she
   gives up and dozes in your hand. With Gentle motion off they stay still. They live in
   [effects.py](effects.py).
-- **Offline personality.** 465 short lines, including more personal questions and
+- **Offline personality.** 469 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. The last 40 built-in lines she said, across every group,
@@ -274,7 +277,7 @@ prepared by `tools/prepare_sounds.py`.
   deliberate pets and naps still work normally.
 
   To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
-  contains all 465 phrases in 57 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  contains all 469 phrases in 58 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
   Edit or add one phrase per line inside the existing triple-quoted groups; keep the
   section names/quotes and aim for at most 110 characters per phrase. Source launches
   use your edits on restart; the packaged executable needs rebuilding. Optional AI

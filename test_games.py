@@ -118,7 +118,7 @@ class GameTests(unittest.TestCase):
     def test_loss_curl_is_persistent_and_pet_comfort_is_single(self):
         game = self.game()
         self.step(game, D + 4.2)
-        self.step(game, D + 14, (2000, -100))
+        self.step(game, D + 20, (2000, -100))
         self.assertEqual(game.phase, "curl")
         self.step(game, 60, (2000, -100))
         self.assertEqual(game.phase, "curl")

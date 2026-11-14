@@ -589,7 +589,6 @@ class NekoWidget(QWidget):
                                         "Game", action, detail, changed=action in ("waiting", "side area")))
         self.journal.add("Game", "configuration", f"automatic={self.game_timer.enabled}; interval={interval} sec")
         self.game = None
-        self.invite_cursor = None        # Last arrow position seen by the play scheduler.
         self.rematch_requested = False   # Play was asked for while she was curled up after a loss.
         self.game_interaction = None
         self.outcome_bags = {}
@@ -998,10 +997,6 @@ class NekoWidget(QWidget):
             if fullscreen or (not manual and idle >= self.companion.sleep_seconds and now >= self.companion.next_nap):
                 eligible, reason = False, "fullscreen" if fullscreen else "nap due"
         cursor = QCursor.pos()
-        # A hand on the mouse (about 100 px/s or more) rather than a parked arrow, seen across two
-        # eligible polls, so a drag in another app or a move during a blocker never counts.
-        previous, self.invite_cursor = self.invite_cursor, cursor if eligible else None
-        moving = eligible and previous is not None and (cursor - previous).manhattanLength() >= 10
         in_zone = (self.game_runway().invites((cursor.x(), cursor.y()), self.x(),
                    8 if self.game_timer.entered_at is not None else 0) if eligible else False)
         if (eligible and not manual
@@ -1011,7 +1006,7 @@ class NekoWidget(QWidget):
         can_start = (self.companion.state == NekoState.IDLE
                      or (self.companion.state == NekoState.RESTLESS and self.mood is not None and self.mood.resting))
         source = self.game_timer.tick(now, eligible, in_zone, can_start=can_start,
-                                      blocked_reason=reason, moving=moving)
+                                      blocked_reason=reason)
         if source:
             self.start_game(now, source)
 
@@ -1156,7 +1151,8 @@ class NekoWidget(QWidget):
             self.play_sound("trill" if game.phase == "win" else "sad", prompted=True)
         self.update_game_stats()
         line = game.take_line()
-        if line and line.startswith("protest_") and QApplication.screenAt(cursor) != QApplication.screenAt(self.geometry().center()):
+        if (line and line.startswith("protest_") and line != "protest_last"
+                and QApplication.screenAt(cursor) != QApplication.screenAt(self.geometry().center())):
             line = "protest_monitor"
         if line:
             self.game_line(game, line)
@@ -1174,6 +1170,7 @@ class NekoWidget(QWidget):
         shown = self.say(text, prompted=game.source == "manual", hold_ms=hold, kind=group)
         sound = {"announce": "chirp", "go": "trill", "pursuit": "giggle", "protest_high": "protest",
                  "protest_low": "protest", "protest_side": "protest", "protest_monitor": "protest",
+                 "protest_last": "protest",
                  "comfort": "purr_short", "bring": "mew"}.get(line)
         if sound and shown:
             self.play_sound(sound, prompted=True)

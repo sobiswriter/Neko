@@ -61,7 +61,7 @@ class CatchReachTests(unittest.TestCase):
         game = self.game()
         self.step(game, START + 0.2, (740, 330))
         lines = []
-        end = START + 6
+        end = START + 10
         while game.last < end:
             self.step(game, game.last + 0.1, (2000, -400))
             line = game.take_line()

@@ -128,7 +128,7 @@ class DesktopGameTests(unittest.TestCase):
     def test_loss_survives_hide_carry_and_only_one_pet_comforts(self):
         self.start()
         self.step(DECLARE_SECONDS + 4.2, (650, 400))
-        self.step(9, (2000, -100))
+        self.step(14, (2000, -100))
         self.assertEqual(self.n.game.phase, "curl")
         self.assertEqual(self.n.companion.state, NekoState.DISAPPOINTED)
         self.n.hide_neko()

@@ -8,8 +8,12 @@ ACTIVE_PHASES = ("declare", "ready", "three", "two", "one", "go", "run", "turn",
 # She announces the game, holds that thought long enough to read, then starts the countdown.
 DECLARE_SECONDS = 1.8
 # Manual play waits for the arrow: a nudge after NUDGE_AFTER s (repeated every NUDGE_EVERY s),
-# and she quietly gives up after MANUAL_WAIT s with no arrow in her area.
-NUDGE_AFTER, NUDGE_EVERY, MANUAL_WAIT = 3, 6, 20
+# and she quietly gives up only after MANUAL_WAIT s with no arrow in her area.
+NUDGE_AFTER, NUDGE_EVERY, MANUAL_WAIT = 3, 8, 60
+# During the chase, an arrow outside her area gets warnings at these continuous times (the last
+# one is a "last chance"); she forfeits only at FORFEIT_AFTER seconds.
+WARNINGS = (1.5, 4.0, 6.5)
+FORFEIT_AFTER = 9.0
 # Trips home: a bounding run (the chase's own gallop) covers the distance, then she walks the
 # last stretch at the authored stroll so the walk cycle and its settle keep their place.
 RUN_HOME_FROM = 160   # Farther than this, she runs.
@@ -21,6 +25,10 @@ RUN_SPEED, RUN_ACCELERATION, WALK_SPEED = 210, 700, 180
 MAX_LIFT = 140
 MAX_DROP = 80
 REACH_LOW = 124   # Lowest arrow she can touch from a ground (her landing paw, below the ground line).
+# The invitation area: beside her (not on her), within INVITE_REACH px of her canvas and at the
+# classic height band. Bringing the arrow into it from a little farther away starts play.
+INVITE_REACH = 320
+INVITE_LIFT = 110
 
 
 @dataclass(frozen=True)
@@ -33,9 +41,14 @@ class Runway:
     drop: float = 0   # How far below home ground (y) she may hop down.
 
     def invites(self, cursor, origin_x, tolerance=0):
-        left = (self.left + self.paw[0], origin_x - 40)
-        right = (origin_x + 192 + 40, self.right + 191 - self.paw[0])
-        return self.contains(cursor, tolerance) and any(b - a >= 120 and a - tolerance <= cursor[0] <= b + tolerance for a, b in (left, right))
+        """The arrow has come to play: beside her canvas (outside her 40 px petting margin), no
+        farther than INVITE_REACH, at a height she could pounce to."""
+        x, y = cursor
+        left = (max(self.left + self.paw[0], origin_x - INVITE_REACH), origin_x - 40)
+        right = (origin_x + 192 + 40, min(self.right + 191 - self.paw[0], origin_x + 192 + INVITE_REACH))
+        band = (self.y + self.paw[1] - min(self.lift, INVITE_LIFT) - tolerance <= y
+                <= self.y + REACH_LOW + tolerance)
+        return band and any(b - a >= 120 and a - tolerance <= x <= b + tolerance for a, b in (left, right))
 
     def contains(self, cursor, tolerance=0):
         x, y = cursor
@@ -96,9 +109,7 @@ class GameTimer:
             self.pending = source
             self.note(now, "queued", source)
 
-    def tick(self, now, eligible, in_zone=False, can_start=True, blocked_reason="not eligible", moving=False):
-        """moving: the arrow is actively moving inside the side area (a hand on the mouse, not a
-        parked cursor), which counts as an approach even if it never left the area."""
+    def tick(self, now, eligible, in_zone=False, can_start=True, blocked_reason="not eligible"):
         if self.enabled and now >= self.due and self.pending is None:
             self.request(now)
         if not self.enabled and self.pending is None:
@@ -124,10 +135,6 @@ class GameTimer:
                         else:
                             self.entered_at = now
                             self.note(now, "side area", "entered; checking stable hover", journal=self.armed(now))
-                    elif moving and now >= self.due:
-                        self.entered_at = now
-                        self.note(now, "side area", "arrow moving beside her; checking stable hover",
-                                  journal=self.armed(now))
                 invited = (self.entered_at is not None and self.entered_at >= self.due
                            and now - self.entered_at >= .25)
         if not self.pending:
@@ -182,6 +189,7 @@ class CursorGame:
         self.velocity = 0.0
         self.outside = None
         self.protested = False
+        self.warnings = 0               # Warnings given during the current trip outside her area.
         self.last_protest = -math.inf
         self.result = None
         self.started = False
@@ -336,22 +344,27 @@ class CursorGame:
             inside = self.runway.contains(cursor, 8 if self.outside is None else 0)
             self.outside = None if inside else (self.outside if self.outside is not None else now)
             outside_time = 0 if self.outside is None else now - self.outside
-            if outside_time >= 1.5 and not self.protested and now - self.last_protest >= 8:
-                self.line = ("protest_high" if cursor[1] < self.runway.y + self.runway.paw[1] - self.runway.lift
+            if self.warnings < len(WARNINGS) and outside_time >= WARNINGS[self.warnings]:
+                # Each trip outside gets its own warnings, the last a "last chance", before a forfeit.
+                last = self.warnings == len(WARNINGS) - 1
+                self.line = ("protest_last" if last else
+                             "protest_high" if cursor[1] < self.runway.y + self.runway.paw[1] - self.runway.lift
                              else "protest_low" if cursor[1] > self.runway.y + REACH_LOW + self.runway.drop
                              else "protest_side")
+                self.warnings += 1
                 self.protested = True
                 self.last_protest = now
-                if self.phase in ("run", "turn", "miss"):
+                if self.warnings == 1 and self.phase in ("run", "turn", "miss"):
                     self.plan_hop(self.x, min(50, self.runway.lift) if self.motion else 0, self.ground)
                     self.enter("prepare", now)
                     return
             if inside:
                 self.protested = False
+                self.warnings = 0
             # A real visible contact wins the same instant as a deadline.
             if self.phase == "jump" and contact and self.result is None:
                 self.result, self.after_landing = "win", "win"
-            if self.result is None and (now >= self.deadline or outside_time >= 4):
+            if self.result is None and (now >= self.deadline or outside_time >= FORFEIT_AFTER):
                 self.result = "loss"
                 if self.phase == "jump":
                     self.after_landing = "loss"

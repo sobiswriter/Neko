@@ -473,6 +473,12 @@ no fair, my paws are on this monitor!
 the arrow has left the kitten kingdom.
 come back to my side of the desktop!
 """,
+    "game_protest_last": """
+last chance! bring it back or i give up!
+okay, one more second and i'm calling it…
+arrow?? come back or i'm going to sulk!
+i'm counting… bring it back here!
+""",
     "game_bring": """
 bring the arrow over here, beside me!
 where's the arrow? i'm ready!

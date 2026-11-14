@@ -13,18 +13,23 @@ app = QApplication.instance() or QApplication([])
 
 from animations import SpriteAtlas
 from behavior import NekoState
-from games import DECLARE_SECONDS, MANUAL_WAIT, NUDGE_AFTER, CursorGame, GameTimer, Runway
+from games import (DECLARE_SECONDS, FORFEIT_AFTER, INVITE_REACH, MANUAL_WAIT, NUDGE_AFTER, WARNINGS,
+                   CursorGame, GameTimer, Runway)
 import main
 from main import NekoWidget
 
 
 class TimerTriggerTests(unittest.TestCase):
-    def test_moving_arrow_already_beside_her_counts_as_an_approach(self):
-        t = GameTimer(0)
-        self.assertIsNone(t.tick(89, True, True, moving=True))     # Before the cooldown: nothing.
-        self.assertIsNone(t.tick(90.1, True, True))                 # Parked at expiry: nothing.
-        self.assertIsNone(t.tick(95, True, True, moving=True))      # A hand on the mouse...
-        self.assertEqual(t.tick(95.3, True, True), "automatic")     # ...and a short hover starts it.
+    def test_invitation_area_is_beside_her_and_a_little_farther_counts_as_away(self):
+        r = Runway(0, 1600, 400, 140, drop=80)
+        origin = 700
+        for point in ((600, 450), (400, 450), (950, 450), (1200, 450), (950, 380)):
+            self.assertTrue(r.invites(point, origin), point)
+        for point in ((700, 450), (680, 450),                    # On her or in her petting margin.
+                      (origin - INVITE_REACH - 20, 450),          # A little farther away.
+                      (origin + 192 + INVITE_REACH + 20, 450),
+                      (950, 330), (950, 560)):                    # Above or below the band.
+            self.assertFalse(r.invites(point, origin), point)
 
     def test_parked_arrow_never_starts_play(self):
         t = GameTimer(0)
@@ -57,6 +62,43 @@ class ManualWaitTests(unittest.TestCase):
         game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="automatic")
         self.step(game, DECLARE_SECONDS, (2000, 2000))
         self.assertEqual(game.result, "cancel")
+
+
+class ChaseWarningTests(unittest.TestCase):
+    def test_several_warnings_before_a_forfeit(self):
+        game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="manual")
+        lines = []
+        t = 0.0
+        while game.phase != "go" and t < 10:
+            t = round(t + .02, 6)
+            game.update(t, (450, 330))
+            line = game.take_line()
+        start = t
+        while game.result is None and t < start + 20:
+            t = round(t + .02, 6)
+            game.update(t, (450, -400))           # Far above her area.
+            line = game.take_line()
+            if line and line.startswith("protest_"):
+                lines.append((round(t - start, 1), line))
+        self.assertEqual(len(lines), len(WARNINGS), lines)
+        self.assertEqual(lines[-1][1], "protest_last")
+        self.assertEqual(game.result, "loss")
+        self.assertGreaterEqual(t - start, FORFEIT_AFTER)
+
+    def test_coming_back_resets_the_warnings(self):
+        game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="manual")
+        t = 0.0
+        while game.phase != "go":
+            t = round(t + .02, 6)
+            game.update(t, (450, 330))
+        for _ in range(3):                          # Three trips out of 5 s each, back in between.
+            for _ in range(250):
+                t = round(t + .02, 6)
+                game.update(t, (450, -400))
+            for _ in range(25):
+                t = round(t + .02, 6)
+                game.update(t, (game.x + 260, 330))
+        self.assertNotEqual(game.result, "loss")
 
 
 class DesktopTriggerTests(unittest.TestCase):
@@ -98,10 +140,13 @@ class DesktopTriggerTests(unittest.TestCase):
         with patch("main.time.monotonic", return_value=self.now), patch("main.QCursor.pos", return_value=point):
             self.n.poll_game()
 
-    def test_arrow_moving_inside_her_area_starts_automatic_play(self):
+    def test_arrow_brought_from_a_little_farther_starts_automatic_play(self):
         self.n.game_timer.due = self.now - 5
         self.n.companion.state = NekoState.IDLE
-        for x in (650, 662, 674, 676, 676):          # Already beside her, but a hand on the mouse.
+        for x in (660, 670, 655, 665, 660):          # Just wiggling beside her: no game.
+            self.poll(.1, QPoint(x, 420))
+        self.assertIsNone(self.n.game)
+        for x in (790, 790, 650, 650, 650, 650):     # A little farther away, then back beside her.
             self.poll(.1, QPoint(x, 420))
         self.assertIsNotNone(self.n.game)
         self.assertEqual(self.n.game.source, "automatic")
@@ -119,7 +164,7 @@ class DesktopTriggerTests(unittest.TestCase):
         self.n.mood.stage = 1
         self.n.mood.step = ("rest", None, self.now, 30)
         self.n.game_timer.due = self.now - 5
-        for x in (650, 662, 674, 676, 676):
+        for x in (790, 790, 650, 650, 650, 650):
             self.poll(.1, QPoint(x, 420))
         self.assertIsNotNone(self.n.game)
         self.assertEqual(self.n.game.source, "automatic")
