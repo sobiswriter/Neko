@@ -183,6 +183,112 @@ CLIPS.update({
 })
 
 
+# ---------------------------------------------------------------------------------------------
+# Neko 1.2 artwork (user-generated sheets, packed by tools/assemble_v12.py). Each runtime bank is
+# one or two 12-drawing sheets stacked: rows 0-2 = first sheet, rows 3-5 = its continuation.
+V12_BANKS = {
+    "sproing": ("win-sproing-a", "win-sproing-b"),
+    "sproing2": ("win-sproing-c", "win-sproing-b"),
+    "roll": ("win-roll-a", "win-roll-b"),
+    "dizzy": ("dizzy-a", "dizzy-b"),
+    "tease": ("dodge-tease",), "sidestep": ("dodge-sidestep",), "duck": ("dodge-duck",),
+    "tagged": ("dodge-tagged",), "caught": ("dodge-caught",),
+    "sigh": ("restless-sigh",), "jealous": ("restless-jealous",), "demand": ("restless-demand",),
+    "forgive": ("restless-forgive",),
+    "leap-up": ("move-leap-up",), "leap-down": ("move-leap-down",), "hop": ("move-pouncehop",),
+}
+# Index of each bank's seated neutral, whose head is matched to idle's 62px.
+V12_SEATED = {"sproing": 0, "sproing2": 0, "roll": 0, "dizzy": 0, "tagged": 0, "caught": 11,
+              "sigh": 0, "jealous": 0, "demand": 0, "forgive": 11, "tease": 0}
+# Seated/front banks register the near forepaw (left ground contact) to idle's; side views centre
+# their silhouette, like the existing gallop.
+V12_SIDE = {"sidestep", "duck", "leap-up", "leap-down", "hop"}
+# Engine bounce heights (px) for the airborne Sproing drawings, baked into the frame.
+V12_LIFT = {("sproing", 4): 4, ("sproing", 5): 16, ("sproing", 6): 8, ("sproing", 8): 5,
+            ("sproing", 9): 20, ("sproing", 10): 9, ("sproing", 13): 4, ("sproing", 14): 12,
+            ("sproing2", 4): 4, ("sproing2", 5): 16, ("sproing2", 6): 8, ("sproing2", 8): 5,
+            ("sproing2", 9): 20, ("sproing2", 10): 9, ("sproing2", 13): 4, ("sproing2", 14): 12,
+            ("roll", 2): 6}
+V12_IDLE = 24  # index appended after the final drawing: the actual idle
+
+
+def _v12(bank, timeline, loop=False):
+    """Clip from (index, ms) pairs; index 'idle' means the actual canonical idle drawing."""
+    order = tuple(V12_IDLE if i == "idle" else i for i, _ in timeline)
+    return Clip(f"v12-{bank}", 0, tuple(ms for _, ms in timeline), order, loop)
+
+
+CLIPS.update({
+    # Catch/Dodge victories. The triple hop (game_win_0) stays; these replace grasp and proud.
+    "game_win_1": _v12("sproing", (
+        (1, 350), (2, 120), (3, 140), (4, 90), (5, 160), (6, 100), (7, 110), (8, 90), (9, 180),
+        (10, 100), (11, 120), (12, 110), (13, 90), (14, 160), (15, 120), (16, 140), (17, 160),
+        (18, 600), (19, 140), (20, 300), (21, 300), (22, 200), (23, 300), ("idle", 300))),
+    "game_win_2": _v12("roll", (
+        (1, 220), (2, 100), (3, 300), (4, 180), (5, 180), (6, 140), (7, 140), (6, 140), (7, 140),
+        (8, 160), (9, 160), (7, 140), (9, 160), (10, 500), (11, 160), (12, 200), (13, 180),
+        (14, 200), (15, 160), (16, 220), (17, 200), (18, 220), (19, 500), (20, 300), (21, 200),
+        (22, 200), (23, 300), ("idle", 300))),
+    "game_win_3": _v12("sproing2", (
+        (1, 350), (2, 120), (3, 140), (4, 90), (5, 160), (6, 100), (7, 110), (8, 90), (9, 180),
+        (10, 100), (11, 120), (12, 110), (13, 90), (14, 160), (15, 120), (16, 140), (17, 160),
+        (18, 600), (19, 140), (20, 300), (21, 300), (22, 200), (23, 300), ("idle", 300))),
+    # Dizzy: head follows the windows, spiral-eyed circle, then shakes it off.
+    "dizzy": _v12("dizzy", (
+        ("idle", 150), (1, 220), (2, 180), (3, 150), (4, 300), (5, 220), (6, 160), (7, 160),
+        (8, 160), (9, 200), (10, 200), (11, 600), (12, 300), (13, 200), (14, 300), (15, 110),
+        (16, 110), (17, 200), (18, 220), (19, 160), (20, 250), (21, 400), (22, 300), (23, 300),
+        ("idle", 200))),
+    # Dodge the Cursor.
+    "dodge_notice": _v12("tease", (("idle", 150), (1, 450))),
+    "dodge_count": _v12("tease", ((2, 220), (3, 200), (4, 200), (5, 160), (6, 130), (7, 130),
+                                  (6, 130), (7, 130)), loop=True),
+    "dodge_go": _v12("tease", ((8, 350),)),
+    "dodge_prowl": _v12("tease", ((10, 600), (11, 500), (10, 400), (11, 700)), loop=True),
+    "dodge_bow": _v12("tease", ((9, 450), (10, 300), (11, 250))),
+    "dodge_tell": _v12("sidestep", ((1, 160), (2, 140))),
+    "dodge_sidestep": _v12("sidestep", ((3, 70), (4, 80), (5, 70), (6, 80), (7, 120), (8, 450),
+                                        (9, 250), (10, 150), (11, 150))),
+    "dodge_duck": _v12("duck", ((1, 120), (2, 70), (3, 300), (4, 200), (5, 150), (6, 120),
+                                (7, 120), (8, 150), (9, 150), (10, 250), (11, 150))),
+    "dodge_tagged": _v12("tagged", ((1, 80), (2, 80), (3, 150), (4, 500), (5, 300), (6, 200),
+                                    (7, 150), (8, 150), (9, 400), (10, 150), (11, 150))),
+    "dodge_caught": _v12("caught", ((0, 150), (1, 300), (2, 200), (3, 140), (4, 160), (5, 500),
+                                    (6, 250), (7, 400), (8, 160), (9, 250), (10, 400), (11, 300),
+                                    ("idle", 300))),
+    # Restless kitten.
+    "restless_sigh": _v12("sigh", (("idle", 150), (1, 400), (2, 500), (3, 300), (4, 300),
+                                   (5, 600), (6, 300), (7, 700), (8, 700), (9, 250), (10, 250),
+                                   (11, 300), ("idle", 200))),
+    "restless_jealous": _v12("jealous", (("idle", 120), (1, 150), (2, 500), (3, 600), (4, 700),
+                                         (5, 300), (6, 300), (7, 150), (8, 150), (7, 150), (8, 150),
+                                         (9, 250), (10, 150), (11, 300))),
+    "restless_demand": _v12("demand", (("idle", 120), (1, 500), (2, 250), (3, 150), (4, 150),
+                                       (3, 120), (4, 150), (3, 120), (4, 200), (5, 400), (6, 200),
+                                       (7, 220), (8, 220), (9, 400), (10, 300), (11, 300), ("idle", 200))),
+    "restless_calm": _v12("forgive", (("idle", 100), (0, 450), (1, 400), (2, 500), (1, 150))),
+    "dodge_creep": _v12("tease", ((3, 220), (4, 220)), loop=True),
+    "restless_forgive": _v12("forgive", ((0, 300), (1, 250), (2, 400), (3, 500), (4, 300),
+                                         (5, 900), (6, 500), (7, 400), (8, 250), (9, 300), (10, 250),
+                                         (11, 300), ("idle", 300))),
+    # Roaming moves (all side views face left; the engine mirrors them for rightward travel).
+    "roam_hop": _v12("hop", ((1, 80), (2, 80), (3, 90), (4, 80), (5, 90)), loop=True),
+    "roam_ready": _v12("hop", ((0, 400),)),
+    "roam_stop": _v12("hop", ((6, 150), (7, 500))),
+    "roam_turn": _v12("hop", ((8, 110), (9, 110), (10, 110), (11, 150))),
+    "roam_leap_up": _v12("leap-up", ((0, 150), (1, 300), (2, 200), (3, 70), (4, 70), (5, 80),
+                                     (6, 90), (7, 90), (8, 100), (9, 150), (10, 300), (11, 150))),
+    "roam_leap_down": _v12("leap-down", ((0, 150), (1, 300), (2, 150), (3, 80), (4, 70), (5, 70),
+                                         (6, 90), (7, 90), (8, 100), (9, 200), (10, 300), (11, 150))),
+})
+# Flight window (ms from clip start) for the leaps: world travel happens only while airborne.
+LEAP_FLIGHT = {"roam_leap_up": (650, 960), "roam_leap_down": (600, 900)}
+# Travel window of a side-step (ms) and of the hop cycle.
+SIDESTEP_FLIGHT = (0, 300)
+# Still poses used when Gentle motion is off.
+V12_STILL = {"game_win_1": 18, "game_win_2": 19, "game_win_3": 18}
+
+
 def held_clip(elapsed, sleeping=False):
     if sleeping:
         return "held_sleepy", elapsed
@@ -372,6 +478,71 @@ class SpriteAtlas:
         self.load_lifecycle(path)
         self.load_motion(path)
         self.load_idles(path)
+        self.load_v12(path)
+
+    def load_v12(self, path):
+        """All-or-nothing 1.2 import: one shared physical scale, support-registered, idle endpoints."""
+        cell, baseline = 448, 436
+        sheets = {}
+        for name in {sheet for parts in V12_BANKS.values() for sheet in parts}:
+            image = QImage(str(Path(path) / f"neko-v12-{name}.png"))
+            try:
+                sizes = json.loads((Path(path) / f"neko-v12-{name}.json").read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                return
+            if image.width() != 4 * cell or image.height() != 3 * cell or len(sizes) != 12:
+                return
+            crops = []
+            for i, (width, height) in enumerate(sizes):
+                # Packed centred on the cell's shared baseline by tools/assemble_v12.py.
+                crops.append(image.copy(i % 4 * cell + (cell - width) // 2,
+                                        i // 4 * cell + baseline - height, width, height))
+            sheets[name] = crops
+        idle = self.frames["idle", 0, 0]
+        idle_image = idle.toImage()
+        idle_bounds = sprite_bounds(idle_image)
+        idle_landmarks = pet_landmarks(idle_image.copy(idle_bounds))
+        idle_paw = idle_bounds.left() + idle_landmarks[2]
+        idle_head = idle_bounds.left() + idle_landmarks[1]
+        imported = {}
+        for bank, parts in V12_BANKS.items():
+            placed = []  # (sprite, horizontal shift) for every drawing of the bank, in order
+            for part_index, part in enumerate(parts):
+                crops = sheets[part]
+                # Each generated sheet has its own pixel size, so each sheet is calibrated once from
+                # its neutral: seated fronts to idle's 62px head, side/standing views to ~56px.
+                # A continuation sheet ("part b") calibrates on its closing neutral (drawing 12).
+                neutral = (V12_SEATED[bank] if part_index == 0 else 11) if bank in V12_SEATED else 0
+                scale = (62 if bank in V12_SEATED else 56) / carry_head(crops[neutral])[0]
+                sprites = [crop.scaled(max(1, round(crop.width() * scale)), max(1, round(crop.height() * scale)),
+                                       Qt.IgnoreAspectRatio, Qt.SmoothTransformation) for crop in crops]
+                shift = 0
+                if bank in V12_SEATED:
+                    # Feet stay planted from drawing to drawing (left ground contact); one constant
+                    # shift per sheet puts its neutral's head exactly over idle's, so the hand-off to
+                    # idle doesn't jump sideways.
+                    _, head, paw, _ = pet_landmarks(sprites[neutral])
+                    shift = round(idle_head - (idle_paw - paw + head))
+                placed += [(sprite, shift) for sprite in sprites]
+            for index, (sprite, shift) in enumerate(placed):
+                width, height = sprite.width(), sprite.height()
+                lift = V12_LIFT.get((bank, index), 0)
+                if bank in V12_SIDE:
+                    left = (CANVAS_WIDTH - width) // 2
+                else:
+                    left = round(idle_paw - pet_landmarks(sprite)[2]) + shift
+                left = max(2, min(CANVAS_WIDTH - width - 2, left))
+                top = 130 - lift - height
+                if top < 2 or width > CANVAS_WIDTH - 4:
+                    return
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawImage(left, top, sprite)
+                painter.end()
+                imported[f"v12-{bank}", index // 4, index % 4] = frame
+            imported[f"v12-{bank}", V12_IDLE // 4, V12_IDLE % 4] = idle
+        self.frames.update(imported)
 
     def load_idles(self, path):
         imported = {}

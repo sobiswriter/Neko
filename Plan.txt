@@ -2,10 +2,11 @@ DESKTOP NEKO — QUIET COMPANY
 
 Intent
   A curious little presence at the edge of your work. Pleasant to notice,
-  perfectly happy to be ignored. Keep the original pixel cat and a tiny footprint.
+  quiet by default. An opt-out restless mood (1.2) may ask for attention, never while you are away,
+  in fullscreen or in Quiet company. Keep the original pixel cat and a tiny footprint.
 
 Interaction rules
-  Visual reactions before words. No attention debt, chores, streaks, or guilt.
+  Visual reactions before words. No chores, streaks, or guilt; a restless kitten is calmed by a few pets, then forgets it.
   Drawn sequences and connected reactions; optional short cursor walks and soft sounds.
   Petting is deliberate: a click, not a drag or an accidental hover.
   Hover uses an open palm; holding uses a closed hand; a click adds a 630ms palm stroke.
@@ -32,7 +33,7 @@ Interaction rules
   Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
   shows mild sadness then the accepted small hop before quitting. Arrival travels from the monitor top; only the landing position is saved.
   Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
-  423 offline lines in dialogue.py use 46 context shuffle bags, with personal questions and app rituals.
+  531 offline lines in dialogue.py use 73 context shuffle bags, with personal questions and app rituals.
   The last 40 built-in lines said go to the back of fresh bags and persist across launches.
   A gesture's words wait 150 seconds before returning; gesture thoughts keep a 30-second gap.
   Activity replies keep their own pause; general idle chatter cannot use it up. One phrase per line inside its named triple-quoted groups; source edits need restart and packaged edits need a rebuild.
@@ -47,7 +48,7 @@ Interaction rules
   Rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS, with precise pet/carry timers; arrival/departure use 30 FPS.
   Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
-  Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
+  Hand-picked kitten sounds (10 cues, several takes each, no back-to-back repeats) are opt-in. Include a Listen button and stop toggle.
   Automatic sound has a 45-second pause; quiet/fullscreen/media suppress it.
   Hiding is absolute. Fullscreen hiding is optional; native pinning never steals focus.
   Fullscreen activity always suppresses unsolicited speech and activity reactions.
@@ -74,7 +75,7 @@ Optional AI
 
 Deliberately excluded
   Voice/chat UI, hunger systems, notifications, task reminders, cloud memory,
-  roaming across windows, new accounts, plugin systems, and new art dependencies.
+  perching on windows (1.2 movement stays on her monitor's work area), new accounts, plugin systems, and new art dependencies.
   Browser extensions and exact background-tab tracking stay out of this pass.
 
 Validation

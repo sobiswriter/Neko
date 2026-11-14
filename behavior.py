@@ -42,6 +42,7 @@ class NekoState(Enum):
     DISAPPOINTED = auto()
     COMFORTING = auto()
     DIZZY = auto()
+    RESTLESS = auto()
 
 
 PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
@@ -166,7 +167,7 @@ class Companion:
         self.next_idle = max(self.next_idle, now + self.idle_seconds)
 
     def pet(self, now):
-        if self.state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES:
+        if self.state in (NekoState.ARRIVING, NekoState.LEAVING, NekoState.RESTLESS) + CARRY_STATES:
             return False
         self.pets += 1
         self.last_interaction = now
@@ -216,7 +217,7 @@ class Companion:
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
              window_changed=False, keyboard_events=0, window_event=None, app_kind=None, window_switches=0):
         self.note_switches(now, window_switches)
-        if self.state in GAME_STATES:
+        if self.state in GAME_STATES or self.state == NekoState.RESTLESS:
             self.pending_window = None
             return None
         if self.state in CARRY_STATES:

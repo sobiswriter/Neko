@@ -978,7 +978,7 @@ class DesktopTests(unittest.TestCase):
         self.assertTrue(nook.sound_test.isEnabled())
         with patch("main.winsound.PlaySound") as play:
             nook.sound_test.click()
-        self.assertTrue(play.call_args.args[0].endswith("mew.wav"))
+        self.assertRegex(Path(play.call_args.args[0]).name, r"^mew(-\d+)?\.wav$")
         self.assertFalse(self.neko.ai_enabled)
 
     def test_title_fingerprint_catches_a_tab_change_in_the_same_app(self):

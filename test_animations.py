@@ -189,7 +189,10 @@ class AnimationTests(unittest.TestCase):
 
     def test_atlas_has_all_drawings_without_retired_or_malformed_frames(self):
         atlas = self.atlas
-        self.assertEqual(len(atlas.frames), 839 - 64 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS))
+        from animations import V12_BANKS
+        v12 = sum(len(parts) * 12 + 1 for parts in V12_BANKS.values())  # drawings plus the idle endpoint
+        self.assertEqual(v12, 256)
+        self.assertEqual(len(atlas.frames), 839 - 64 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS) + v12)
         self.assertFalse(any(key[0] in ("pets", "affection", "petting-a", "petting-b")
                              for key in atlas.frames))
         self.assertFalse(any(key[0] == "petting" or key[:2] in (("pets", 2), ("affection", 2), ("idle", 1))

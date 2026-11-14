@@ -512,6 +512,168 @@ still dangling… this is my life now.
 if you won't put me down, i'm closing my eyes.
 i've accepted my fate as a hanging kitten.
 """,
+    "dodge_notice": """
+ooh. there you are, little arrow.
+hey… you look chaseable.
+i see you over there.
+psst. arrow. over here.
+""",
+    "dodge_announce": """
+betcha can't catch me!
+let's play tag! three tags and you win.
+try to boop me. i'm extremely fast.
+you vs. me. thirty seconds. ready?
+i'm the fastest kitten on this desktop. prove me wrong!
+tag! you're it! …well, you will be.
+""",
+    "dodge_go": """
+go go go!
+catch me if you can!
+come get me!
+""",
+    "dodge_not_yet": """
+hey! i didn't say go yet!
+no touching before go!
+wait for it… wait for it…
+""",
+    "dodge_brush": """
+that one doesn't count!
+barely touched me! no tag.
+a whisker doesn't count!
+nuh-uh, that was just my fur.
+too quick! didn't count.
+""",
+    "dodge_foul": """
+hey! you started before go… that's not fair.
+you touched me early. i don't wanna play like that…
+no fair, you cheated…
+that's a foul. you made me sad.
+""",
+    "dodge_runaway_warn": """
+not fair! you're running away!
+come back! that's way too far!
+hey, the game is over here!
+""",
+    "dodge_runaway": """
+you ran away… i thought we were playing.
+you left me all alone in the game…
+not fair. you just ran off.
+""",
+    "dodge_tease": """
+over here~
+i'm right heeere.
+too scared to come closer?
+nyeh nyeh, can't get me.
+yoo-hoo! i'm waiting.
+""",
+    "dodge_escape": """
+missed me!
+too slow!
+whoosh!
+nope!
+almost! but no.
+hehe, wrong spot!
+""",
+    "dodge_tagged": """
+eep! okay, that's one.
+you just got lucky!
+hmph. beginner's luck.
+that was a fluke!
+okay, you're not bad…
+""",
+    "dodge_last_chance": """
+one more and you win… but you won't!
+last one! i'm getting serious now.
+two?! okay, no more mister nice kitten.
+""",
+    "dodge_time": """
+tick tock! time's running out!
+almost there… for me!
+not much time left, slowpoke!
+""",
+    "dodge_win": """
+i win! did you see my moves?
+untouchable! the fastest kitten ever!
+hehe, nobody catches me.
+victory dance time!
+better luck next time, slowpoke.
+i'm too quick for you!
+""",
+    "dodge_caught": """
+okay okay, you got me! good game!
+you caught me fair and square.
+aww, you win this time.
+i let you win. obviously.
+that was fun! rematch later?
+""",
+    "dodge_bored": """
+…are you still playing?
+guess you got busy. game over!
+hello? the arrow fell asleep.
+""",
+    "dodge_comfort": """
+…okay. i forgive you.
+just play fair next time, okay?
+a pet makes it better. a little.
+fine. we're friends again.
+""",
+    "restless_start": """
+hmm… it's very quiet over here.
+is anyone going to pet me today?
+i'm just… sitting. alone. it's fine.
+you've been busy for aaages.
+""",
+    "restless_pouncy": """
+okay. i'm going to do something about this.
+time for some very noticeable pouncing.
+if you won't play, i'll play by myself.
+""",
+    "restless_pounce": """
+pounce! …did you see that?
+look! i'm doing things over here!
+boing. boing. notice me yet?
+i could do this all day. i might.
+hmm. still nothing.
+""",
+    "restless_jealous": """
+what does that arrow have that i don't?
+you look at the arrow more than me.
+hmph. that arrow gets all the attention.
+i'm cuter than a cursor. objectively.
+fine. go click things. see if i care.
+""",
+    "restless_demand": """
+pet. me. now.
+hello?! kitten emergency over here!
+one pet. that's all i ask. okay, five.
+i will not stop until i get pets.
+excuse me. your kitten requires attention.
+""",
+    "restless_carried": """
+hey! that's not a pet!
+carrying isn't cuddling, you know.
+""",
+    "restless_calm_progress": """
+…okay, that's one. keep going.
+a bit more behind the ears, please.
+still a little upset with you.
+mm. better. don't stop.
+almost forgiven…
+""",
+    "restless_calm_done": """
+fine. you're forgiven. purrr.
+okay… i missed you, that's all.
+that's better. i'll stop pouncing now.
+you may continue working. i am content.
+""",
+    "restless_sulk": """
+fine. i'll just sulk here, then.
+nobody pets me. i'm a sad little loaf.
+i'm not moving until someone pets me.
+""",
+    "restless_away": """
+oh! you're back. i was… totally fine.
+""",
     "game_comfort": """
 oh… you came to check on me.
 okay. one little cuddle helps.

@@ -80,7 +80,9 @@ class GameTimer:
             self.pending = source
             self.note(now, "queued", source)
 
-    def tick(self, now, eligible, in_zone=False, can_start=True, blocked_reason="not eligible"):
+    def tick(self, now, eligible, in_zone=False, can_start=True, blocked_reason="not eligible", direct=False):
+        """direct: the next automatic game starts on its own (Dodge) instead of waiting for an
+        approach into her side area (Catch)."""
         if self.enabled and now >= self.due and self.pending is None:
             self.request(now)
         if not self.enabled and self.pending is None:
@@ -91,7 +93,7 @@ class GameTimer:
             self.outside_since = self.entered_at = None
             self.waiting(now, blocked_reason)
             return None
-        invited = self.pending == "manual"
+        invited = self.pending == "manual" or (direct and self.pending is not None)
         if not invited:
             if not in_zone:
                 if self.outside_since is None or self.entered_at is not None:
@@ -146,6 +148,10 @@ class GameTimer:
 
 
 class CursorGame:
+    kind = "catch"
+    round_seconds = 45
+    FIXED_FACING = ("loss", "loss_finish", "curl", "comfort", "win")
+
     def __init__(self, now, origin, runway, motion=True, source="manual"):
         self.origin, self.runway, self.motion, self.source = origin, runway, motion, source
         self.x, self.y = origin
