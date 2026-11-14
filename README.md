@@ -22,8 +22,8 @@ single-instance lock with them, so quit one before starting another.
 - **Pixel-art victories.** Catch wins rotate through four celebrations: the much-loved
   **triple hop**, two takes of a **sproing** (stiff-legged, arched-back happy bounces) and a
   **victory roll** (belly-up wiggles, a fluffy shake and a proud paw). The three new ones are
-  finished at her native size in her own palette, with hard edges and a thin 2 px black
-  outline like the original drawings (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
+  finished at her native size in her own palette, with hard edges and crisp, continuous black
+  line art like the original drawings (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
   "proud sit" wins are retired.
 - **Restless kitten** (on by default; Company tab → **Restless when ignored** and
   **Restless after**, 1–120 min, default 20; set 1 minute to try it). If you're at the

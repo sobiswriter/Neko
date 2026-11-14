@@ -20,6 +20,30 @@ APP = QApplication.instance() or QApplication([])
 APP.setQuitOnLastWindowClosed(False)
 
 
+def dark_specks(image, largest=3):
+    """Dark (ink) islands of at most `largest` pixels, 8-connected."""
+    w, h = image.width(), image.height()
+    dark = {(x, y) for y in range(h) for x in range(w)
+            if image.pixelColor(x, y).alpha() and image.pixelColor(x, y).lightness() < 90}
+    seen, specks = set(), 0
+    for start in dark:
+        if start in seen:
+            continue
+        stack, size = [start], 0
+        seen.add(start)
+        while stack:
+            x, y = stack.pop()
+            size += 1
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    n = (x + dx, y + dy)
+                    if n in dark and n not in seen:
+                        seen.add(n)
+                        stack.append(n)
+        specks += size <= largest
+    return specks
+
+
 def outline_rings(image, depth):
     """Colours of opaque pixels by chessboard distance (1 = touching transparency), up to depth."""
     w, h = image.width(), image.height()
@@ -86,7 +110,6 @@ class V12DesktopTests(unittest.TestCase):
                 self.n.animate()
 
     def test_only_the_pixelated_victories_use_new_art(self):
-        from pixelate import OUTLINE
         idle = self.atlas.frame("idle", 0).toImage()
         v12 = {clip.bank for clip in CLIPS.values() if clip.bank.startswith("v12-")}
         self.assertEqual(v12, {"v12-sproing", "v12-sproing2", "v12-roll"})
@@ -105,13 +128,11 @@ class V12DesktopTests(unittest.TestCase):
                 colours = {frame.pixelColor(x, y).rgb() for y in range(bounds.top(), bounds.bottom() + 1)
                            for x in range(bounds.left(), bounds.right() + 1) if frame.pixelColor(x, y).alpha()}
                 self.assertLessEqual(len(colours), 9, (name, i))
-                # A thin outline like the original's: the outer ring is solid black, and the ring just
-                # inside the outline is mostly fur (eyes and inner lines may touch it).
-                rings = outline_rings(frame, OUTLINE + 1)
-                self.assertTrue(all(c == (0, 0, 0) or sum(c) < 60 for c in rings[1]), (name, i))
-                inner = rings[OUTLINE + 1]
-                dark = sum(1 for c in inner if sum(c) < 150) / max(1, len(inner))
-                self.assertLess(dark, 0.3, (name, i, round(dark, 2)))
+                # Closed black outline, and line art that stays continuous: no scatter of tiny
+                # loose dark specks (the "threads" a thresholded soft line breaks into).
+                rings = outline_rings(frame, 1)
+                self.assertTrue(all(sum(c) < 60 for c in rings[1]), (name, i))
+                self.assertLessEqual(dark_specks(frame), 4, (name, i))
         for clip in ("dizzy", "yawn", "paw_offer", "nuzzle", "game_jump"):
             self.assertFalse(CLIPS[clip].bank.startswith("v12-"), clip)
 
