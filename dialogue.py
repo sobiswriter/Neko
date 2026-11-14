@@ -473,6 +473,13 @@ no fair, my paws are on this monitor!
 the arrow has left the kitten kingdom.
 come back to my side of the desktop!
 """,
+    "game_bring": """
+bring the arrow over here, beside me!
+where's the arrow? i'm ready!
+arrow, come here… i won't bite. much.
+put the arrow next to me and we can start!
+i'm waiting for the arrow~
+""",
     "game_loss": """
 oh… my paws were so sure.
 i almost had it. almost counts a little?

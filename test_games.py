@@ -76,7 +76,7 @@ class GameTests(unittest.TestCase):
             self.step(game, moment + 3)
             self.assertEqual(game.phase, "done")
             self.assertEqual(game.result, "cancel")
-        game = self.game()
+        game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="automatic")
         self.step(game, D + 2, (2000, -100))
         self.assertFalse(game.started)
         self.assertEqual(game.result, "cancel")

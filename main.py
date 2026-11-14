@@ -589,6 +589,8 @@ class NekoWidget(QWidget):
                                         "Game", action, detail, changed=action in ("waiting", "side area")))
         self.journal.add("Game", "configuration", f"automatic={self.game_timer.enabled}; interval={interval} sec")
         self.game = None
+        self.invite_cursor = None        # Last arrow position seen by the play scheduler.
+        self.rematch_requested = False   # Play was asked for while she was curled up after a loss.
         self.game_interaction = None
         self.outcome_bags = {}
         self.last_outcome = {}
@@ -930,16 +932,20 @@ class NekoWidget(QWidget):
         if self.game:
             if self.game.phase not in ("curl", "comfort"):
                 self.end_game()
-            elif self.game.phase == "curl":
-                self.say("A little cuddle first?", prompted=True)
+                return
+            # Curled up after a loss: asking to play cheers her up. She gets up with her drawn
+            # comfort recovery, then the rematch starts.
+            now = time.monotonic()
+            self.rematch_requested = True
+            self.journal.add("Game", "rematch requested", "manual request after a loss")
+            if self.game.phase == "curl" and self.game.comfort(now):
+                self.companion.state = NekoState.COMFORTING
+                self.advance_game(now)
             return
         if not self.game_art_ready():
             self.say("My play drawings are missing. I can still keep you company.", prompted=True)
             return
         self.game_timer.request(time.monotonic(), manual=True)
-        if self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP):
-            self.tray_icon.showMessage("Catch the Cursor", "Play is waiting. Pet Neko to wake her, or let her nap.",
-                                       QSystemTrayIcon.Information, 4000)
         # Menu callbacks complete before eligibility is checked; the nook may stay open for manual play.
         if self.stats_window:
             self.stats_window.close()
@@ -962,6 +968,13 @@ class NekoWidget(QWidget):
     def poll_game(self):
         now = time.monotonic()
         manual = self.game_timer.pending == "manual"
+        if (manual and self.game is None and self.companion.state == NekoState.SLEEPING
+                and not self.fullscreen and self.isVisible() and not self.menu.isVisible()):
+            # You asked to play: she wakes up (her drawn wake-up), then the game starts.
+            self.journal.add("Game", "waking for play", "manual request")
+            self.companion.wake(now)
+            self.pose_started = now
+            self.refresh_asset()
         nook_editing = (self.stats_window and self.stats_window.isVisible()
                         and self.stats_window.tabs.currentWidget() != self.stats_window.journal_tab)
         reason = next((text for blocked, text in (
@@ -970,7 +983,9 @@ class NekoWidget(QWidget):
             (self.is_manually_hidden or not self.isVisible(), "hidden"),
             (self.fullscreen, "fullscreen"), (self.menu.isVisible(), "menu open"),
             (nook_editing and not manual, "Nook controls open; Journal can monitor play"),
-            (self.mood is not None and not manual, "restless; a manual game counts as attention"),
+            # A restless kitten would love a game (it counts as attention), unless she is sulking
+            # for a pet or already forgiven and heading home.
+            (self.mood is not None and not self.mood.playful, "restless; sulking or heading home"),
             (self.companion.state not in (NekoState.IDLE, NekoState.RESTLESS) + IDLE_STATES, self.companion.state.name.lower()),
             (self.drag_origin is not None, "being held"),
             (bool(QApplication.mouseButtons()) or any(ctypes.windll.user32.GetAsyncKeyState(key) & 0x8000 for key in (1, 2, 4, 5, 6)), "mouse button held"),
@@ -983,13 +998,20 @@ class NekoWidget(QWidget):
             if fullscreen or (not manual and idle >= self.companion.sleep_seconds and now >= self.companion.next_nap):
                 eligible, reason = False, "fullscreen" if fullscreen else "nap due"
         cursor = QCursor.pos()
+        # A hand on the mouse (about 100 px/s or more) rather than a parked arrow, seen across two
+        # eligible polls, so a drag in another app or a move during a blocker never counts.
+        previous, self.invite_cursor = self.invite_cursor, cursor if eligible else None
+        moving = eligible and previous is not None and (cursor - previous).manhattanLength() >= 10
         in_zone = (self.game_runway().invites((cursor.x(), cursor.y()), self.x(),
                    8 if self.game_timer.entered_at is not None else 0) if eligible else False)
-        if eligible and QApplication.screenAt(cursor) != QApplication.screenAt(self.geometry().center()):
+        if (eligible and not manual
+                and QApplication.screenAt(cursor) != QApplication.screenAt(self.geometry().center())):
+            # Only automatic play needs the arrow on her monitor; a requested game waits for it.
             eligible, in_zone, reason = False, False, "cursor on another monitor"
-        source = self.game_timer.tick(now, eligible, in_zone,
-                                      can_start=self.companion.state in (NekoState.IDLE, NekoState.RESTLESS),
-                                      blocked_reason=reason)
+        can_start = (self.companion.state == NekoState.IDLE
+                     or (self.companion.state == NekoState.RESTLESS and self.mood is not None and self.mood.resting))
+        source = self.game_timer.tick(now, eligible, in_zone, can_start=can_start,
+                                      blocked_reason=reason, moving=moving)
         if source:
             self.start_game(now, source)
 
@@ -1093,6 +1115,10 @@ class NekoWidget(QWidget):
             self.companion.next_idle = now + self.companion.idle_seconds
             self.companion.next_comment = now + self.companion.chatter_seconds
             self.game_timer.finish(now, game.started)
+            if self.rematch_requested:
+                self.rematch_requested = False
+                if interaction is None:
+                    self.game_timer.request(now, manual=True)   # Comforted for a rematch: play again.
             self.pose_started = now
             self.dismiss_bubble()
             self.refresh_asset()
@@ -1138,7 +1164,7 @@ class NekoWidget(QWidget):
     def game_line(self, game, line):
         """Speak a game beat. Countdown beats start only once their words are actually shown."""
         prefix = "game_"
-        if line in ("pursuit", "tease", "escape", "brush", "time") and self.bubble.isVisible():
+        if line in ("pursuit", "tease", "escape", "brush", "time", "bring") and self.bubble.isVisible():
             return  # Sparse asides never replace a visible line.
         countdown = line in ("3…", "2…", "1…")
         group = prefix + line if prefix + line in LINES else "game_" + line
@@ -1148,7 +1174,7 @@ class NekoWidget(QWidget):
         shown = self.say(text, prompted=game.source == "manual", hold_ms=hold, kind=group)
         sound = {"announce": "chirp", "go": "trill", "pursuit": "giggle", "protest_high": "protest",
                  "protest_low": "protest", "protest_side": "protest", "protest_monitor": "protest",
-                 "comfort": "purr_short"}.get(line)
+                 "comfort": "purr_short", "bring": "mew"}.get(line)
         if sound and shown:
             self.play_sound(sound, prompted=True)
         if shown and (countdown or line in ("announce", "go")):
@@ -1165,6 +1191,7 @@ class NekoWidget(QWidget):
         self.journal.add("Game", "stop requested", "immediate" if immediate else "finish supported recovery")
         now = time.monotonic()
         if immediate:
+            self.rematch_requested = False   # Hidden, fullscreen or quitting: no queued rematch.
             game.x, game.y = game.origin
             game.enter("done", now)
             game.last = now

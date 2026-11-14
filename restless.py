@@ -79,6 +79,16 @@ class RestlessMood:
     def pets_needed(self):
         return STAGES[self.stage][2]
 
+    @property
+    def playful(self):
+        """She'd still love a game: not sulking (a pet first), not already forgiven and heading home."""
+        return not (self.done or self.forgiven or self.stage_name == "sulk")
+
+    @property
+    def resting(self):
+        """Seated between bursts on her current ground, so a game can start without a pose jump."""
+        return self.playful and self.step is not None and self.step[0] == "rest"
+
     def hold(self, now):
         dt = max(0, now - self.last)
         self.stage_since += dt

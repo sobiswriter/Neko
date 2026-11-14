@@ -277,7 +277,7 @@ class DesktopGameTests(unittest.TestCase):
                 n.bubble.deleteLater()
                 n.deleteLater()
 
-    def test_nook_refreshes_timer_preferences_and_sleeping_request_explains_wait(self):
+    def test_nook_refreshes_timer_preferences_and_sleeping_request_wakes_her_to_play(self):
         with patch("main.autostart_enabled", return_value=False):
             self.n.open_stats_window()
         self.n.stats_window.close()
@@ -287,11 +287,11 @@ class DesktopGameTests(unittest.TestCase):
         self.assertFalse(self.n.stats_window.auto_games.isChecked())
         self.assertEqual(self.n.stats_window.game_interval.value(), 120)
         self.n.companion.state = NekoState.SLEEPING
-        with patch.object(self.n.tray_icon, "showMessage") as message:
-            self.n.request_game()
-        message.assert_called_once()
-        self.assertEqual(self.n.companion.state, NekoState.SLEEPING)
+        self.n.request_game()
         self.assertEqual(self.n.game_timer.pending, "manual")
+        self.n.poll_game()
+        self.assertEqual(self.n.companion.state, NekoState.WAKING)   # Woken by the request, not ignored.
+        self.assertEqual(self.n.game_timer.pending, "manual")         # The game follows her wake-up.
 
     def test_gentle_game_has_no_translation_and_can_win(self):
         self.n.motion = False
