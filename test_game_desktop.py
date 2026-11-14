@@ -10,7 +10,7 @@ from PySide6.QtCore import QEvent, QPoint, QSettings, Qt
 from PySide6.QtWidgets import QApplication
 from animations import GAME_ROWS, SpriteAtlas, CLIPS, sprite_bounds, pet_landmarks
 from behavior import NekoState
-from games import Runway
+from games import DECLARE_SECONDS, Runway
 from main import NekoWidget
 
 APP = QApplication.instance() or QApplication([])
@@ -127,7 +127,7 @@ class DesktopGameTests(unittest.TestCase):
 
     def test_loss_survives_hide_carry_and_only_one_pet_comforts(self):
         self.start()
-        self.step(4.2, (650, 400))
+        self.step(DECLARE_SECONDS + 4.2, (650, 400))
         self.step(9, (2000, -100))
         self.assertEqual(self.n.game.phase, "curl")
         self.assertEqual(self.n.companion.state, NekoState.DISAPPOINTED)

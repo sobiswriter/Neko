@@ -15,7 +15,9 @@ Soft sounds are optional and off until you enable them.
   beside her, outside her petting space. A stationary cursor cannot trigger it at expiry.
   Naps, carrying, care, menus, typing and fullscreen take priority; Quiet company pauses it.
   A fresh side approach during an idle gesture waits for that gesture to finish.
-  She notices the arrow, gives a real **3… 2… 1… Here I come!**, then runs and pounces.
+  She spots the arrow (a little **!**), declares the game and holds that thought for
+  1.8 seconds so you can read it, then gives a real **3… 2… 1… Here I come!**, then
+  runs and pounces. Moving the arrow away during the declaration calls it off quietly.
   There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
   wins one of three celebrations: happy hops, a proud hug or champion paws.
   Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
@@ -25,6 +27,17 @@ Soft sounds are optional and off until you enable them.
   if left unattended, she can settle for her configured nap instead of sulking forever.
   Moving her preserves that mood and never counts as a nap.
   **End game** lives in her ordinary menu/nook; petting, holding, hide and fullscreen can cancel neutrally.
+  A click during play stops her where she is (after any landing) for her pet. Dragging her
+  ends play on the spot and lifts her from her current pose; while she plays, a drag needs
+  three times the usual distance, so a click with a moving hand still counts as a pet.
+  Moving her or her monitor during a sulk keeps the sulk at the new place.
+  Her right-click menu pauses the chase, so reading it never costs a protest or a loss.
+  The arrow stays an arrow over her while she chases it. Going home, she bounds back in
+  her chase gallop when it's more than 160px away, then switches to her walk for the
+  last 120px and settles (900px takes about 4.5 seconds). A system stall, such as
+  a lock screen, calls off active play but never changes a finished win or loss.
+  While an invitation is armed, cursor-curiosity sniffs and new idle gestures wait,
+  so they cannot swallow your approach.
   Gentle motion off uses a stationary paw target. The real pointer is never moved,
   hidden or captured. **Games played** and **Neko wins** are saved locally in her menu and nook.
   Abandoned countdowns do not count as games.
@@ -47,7 +60,12 @@ Soft sounds are optional and off until you enable them.
 - **Pick her up.** Dragging starts a lift immediately; a stationary click-hold starts
   after 250ms. She dangles with little paw/tail movements, going from excited to
   calm after three seconds, mildly unimpressed after ten, then sleepy after twenty.
-  A little yawn happens once before her sleepy loop. Release at any point—even
+  A little yawn happens once before her sleepy loop. She speaks up too: sometimes a
+  “wheee!” as she's lifted, a polite “could you put me down now?” after ten seconds and
+  a resigned “fine. i'll just nap up here” after twenty (Quiet company silences these;
+  each waits two minutes before returning). The words travel with her while you carry
+  her. Released from a full hold, she drops a short way (up to 22px, room permitting)
+  and lands on her feet; that landing spot is what's saved. Release at any point—even
   mid-lift or mid-yawn—and she settles at the chosen location and returns to idle.
   Re-grabbing follows the visible pose back into the hold and preserves her expression.
   Holding never counts as petting; quick clicks still do. Real naps stay asleep
@@ -116,6 +134,13 @@ Soft sounds are optional and off until you enable them.
   before waking; an ongoing wake continues without restarting. Held and active
   game states close immediately. Hide/Show remains immediate.
   [Sleep goodbye preview and verification](docs/sleep-goodbye-validation.md).
+- **Head spinning.** Switch the main window six times within 12 seconds and her head
+  follows the windows left and right, faster each sweep, with little stars circling
+  above her and a line like “woah woah… my head's spinning!”. The Alt+Tab switcher,
+  taskbar and desktop don't count. It has its own three-minute cooldown, separate from
+  the shared reaction gap, and follows the **Notice typing and window activity**,
+  fullscreen and Quiet company rules. Her dedicated dizzy drawings are planned; until
+  they exist she uses her accepted head-turn drawings without the happy smile.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual
@@ -131,17 +156,33 @@ Soft sounds are optional and off until you enable them.
   and timed naps use the same gentle waking transition. After waking she stays
   awake for at least the inactivity delay before another nap.
   Ignoring her never creates chores or penalties.
-- **Offline personality.** 346 short lines, including more personal questions and
+- **Little expression marks.** Painted beside her head (never on her face), with a white
+  outline so they read on light and dark desktops: drifting **Zzz** while she sleeps,
+  rising **hearts** while she's petted, music notes when she swishes to a music app, a
+  **!** when she spots the arrow, twinkling sparkles when she wins, a tiny rain cloud
+  while she sulks, a huffy cross mark when she's held too long and sleepy z's once she
+  gives up and dozes in your hand. With Gentle motion off they stay still. They live in
+  [effects.py](effects.py).
+- **Offline personality.** 423 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
-  context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
+  context's bag is exhausted. The last 40 built-in lines she said, across every group,
+  go to the back of each fresh bag and are remembered between launches, so a restart
+  or a small bag does not echo them. AI comments she just said are never repeated either.
+  Ambient thoughts default to about 75 seconds apart.
   General idle thoughts use **Thoughts every** (default 75 seconds), independently
   of gesture thoughts. A due general thought waits for a visible bubble to finish;
   its next interval begins when it is shown. Gesture lines use their own action's
-  timing and disappear by the end of that action. Activity replies retain their
-  shared pause. Quiet/fullscreen/sleep/care and readable single-bubble rules apply.
+  timing and disappear by the end of that action. Activity replies (typing, apps,
+  windows, the cursor) keep their own shared pause, which general idle chatter does not
+  use up. If a general or gesture thought is still showing, the reply waits for it and
+  speaks while her reaction is still playing. Quiet/fullscreen/sleep/care and readable
+  single-bubble rules apply.
   Every spontaneous idle attempts its own local thought, including “Look at meeee!”
-  and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
+  and “Round.. around... around...” for tail chasing. The same gesture's words return
+  after at least 150 seconds, and any two gesture thoughts are at least 30 seconds apart,
+  so frequent gestures stay lively without repeating their small line banks.
+  Quiet/fullscreen rules still apply.
   Thoughts use cream 16px semibold text with a small dark shadow and a compact,
   rounded glass backdrop with a faint rim, a nearly clear tint and gentler frosting.
   The desktop behind it blurs while the lettering stays
@@ -155,6 +196,12 @@ Soft sounds are optional and off until you enable them.
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
   their own lines and matching gestures. These are app hints, not content analysis.
+  162 executables and 16 browsers are recognised in [app_context.py](app_context.py), including
+  VS Code, Kiro, Cursor, JetBrains IDEs, Spotify, Windows Media Player, PotPlayer and
+  Windows Terminal. Store apps hosted by `ApplicationFrameHost.exe` resolve to the real
+  app. Browsers count only when a title *segment* names a site (`… - YouTube`,
+  `… | Netflix`, `… - GitHub`), so merely mentioning a site does not. While you stay
+  in a recognised app, about half of her general idle thoughts talk about it.
   Typing, window/tab events, cursor curiosity and following share one minimum
   reaction gap: **60 seconds** by default, adjustable from **15–600 seconds** through
   **Neko's nook → Company → Activity reactions every**. Events during that gap
@@ -162,7 +209,7 @@ Soft sounds are optional and off until you enable them.
   deliberate pets and naps still work normally.
 
   To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
-  contains all 346 phrases in 33 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  contains all 423 phrases in 46 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
   Edit or add one phrase per line inside the existing triple-quoted groups; keep the
   section names/quotes and aim for at most 110 characters per phrase. Source launches
   use your edits on restart; the packaged executable needs rebuilding. Optional AI
@@ -187,6 +234,12 @@ Soft sounds are optional and off until you enable them.
   and reduced-motion poses. Thoughts log the words painted and when they hide;
   requests, blocked decisions and accepted pets are identified separately.
   Only the latest **50 entries** remain in memory and the saved JSONL file.
+  So those rows tell the real story, status rows that flip back and forth (waiting,
+  deferred, skipped) repeat at most once a minute, and play blockers such as typing are
+  only journaled once an invitation is actually armed. A damaged row or byte-order mark
+  costs only that row; if the file cannot be read at startup, it is merged back in later
+  instead of being overwritten. Saves are flushed to disk and retried once when Windows
+  briefly locks the file.
   Older rows and the former rotated file are removed automatically, including
   on startup. File-write trouble is shown in the Journal; no raw keys,
   typed text, window titles or cursor trails are logged. [Verification](docs/journal-coherence-validation.md).
@@ -198,9 +251,15 @@ Quiet company stops unprompted words and sounds while keeping deliberate pet rea
 Hide really hides her: no surprise appearances, bubbles, or animation. Native
 topmost positioning keeps her above normal windows without stealing focus.
 **Tuck away during fullscreen apps** is a separate, opt-in choice in the nook.
+Fullscreen is detected by comparing the window with its monitor in native pixels, so
+display scaling above 100% no longer mistakes a large window for fullscreen; maximized
+windows with a title bar never count.
 Fullscreen activity always suppresses automatic words and typing/window reactions,
 even when she remains visible. Exclusive-fullscreen games and other topmost overlays
-can still cover desktop windows. Only one copy runs at a time.
+can still cover desktop windows. Only one copy runs at a time. Launching her again
+while she runs (even hidden) brings the running Neko back instead of exiting silently;
+a copy that is still quitting gets a few seconds to finish, and quitting never waits
+more than 1.5 seconds for an optional AI request.
 
 Typing and window reactions work locally and can be switched off. Keyboard
 detection requests only raw-input headers: key identities, text and passwords are
@@ -238,9 +297,17 @@ shared executable, application-window, nook and tray icon. See the
 
 The pet works offline. AI is off by default. To enable it:
 
-1. Set `GEMINI_API_KEY` in the environment **before launching Neko**, or copy
-   `config.example.json` to `config.json` and fill in your own key.
-2. Open the nook and enable **AI observations**.
+1. Open the nook → **Settings**, paste a Gemini API key from Google AI Studio and
+   press **Save key**. It is stored in your account's Windows Credential Manager
+   (`DesktopNeko/GeminiApiKey`), never in Neko's settings, journal or builds, and
+   **Remove key** deletes it. Alternatively set `GEMINI_API_KEY` in the environment
+   before launching (this takes priority), or put it in `config.json` (used last).
+2. Enable **AI observations** in the same tab.
+
+AI thoughts are occasional fill-ins: a general idle thought may ask Gemini only when
+the app in front of her has no lines of its own (VLC, music, code editors and other
+recognised apps always use her offline lines), at most once every ten minutes. With
+AI on but no key, nothing is sent and the nook says a key is missing.
 
 For a packaged executable, `config.json` belongs beside the executable. Keys are
 never included in a build. If a key was committed in an older revision, rotate it:
@@ -273,7 +340,7 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
-Packaging prepares all 904 calibrated animation frames once with
+Packaging prepares all 908 calibrated animation frames once with
 `tools/bake_atlas.py`. The executable loads those finished frames directly,
 avoiding source-sheet silhouette analysis on every launch. Source launches keep
 the original importer; source artwork and custom asset overrides are retained.

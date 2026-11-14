@@ -15,7 +15,7 @@ from PySide6.QtWidgets import QApplication
 from behavior import NekoState, IDLE_STATES
 from dialogue import LINES
 from animations import CANVAS_PADDING, CANVAS_TOP
-from main import NekoWidget, set_autostart, adjacent_position
+from main import DROP_PIXELS, NekoWidget, set_autostart, adjacent_position
 
 
 APP = QApplication.instance() or QApplication([])
@@ -60,7 +60,10 @@ class DesktopTests(unittest.TestCase):
         with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
             self.neko.animate()
         self.assertEqual(self.neko.companion.state, NekoState.IDLE)
-        self.assertEqual(self.neko.pos(), origin)
+        # Released from a full hold, she drops a little (screen room permitting) onto her feet.
+        self.assertEqual(self.neko.x(), origin.x())
+        self.assertTrue(0 <= self.neko.y() - origin.y() <= DROP_PIXELS)
+        self.assertEqual(self.settings.value("position", type=QPoint), self.neko.pos() + QPoint(40, 32))
 
     def test_release_starts_with_the_actual_visible_pose_in_every_mood(self):
         samples = [i * 0.05 + 0.025 for i in range(8)]

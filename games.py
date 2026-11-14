@@ -3,6 +3,16 @@ from collections import deque
 from dataclasses import dataclass
 import math
 
+# Declaration, countdown and pursuit: the phases where the user is actually playing.
+ACTIVE_PHASES = ("declare", "ready", "three", "two", "one", "go", "run", "turn", "prepare", "jump", "miss")
+# She announces the game, holds that thought long enough to read, then starts the countdown.
+DECLARE_SECONDS = 1.8
+# Trips home: a bounding run (the chase's own gallop) covers the distance, then she walks the
+# last stretch at the authored stroll so the walk cycle and its settle keep their place.
+RUN_HOME_FROM = 160   # Farther than this, she runs.
+WALK_HOME_WITHIN = 120  # Closer than this, she walks.
+RUN_SPEED, RUN_ACCELERATION, WALK_SPEED = 210, 700, 180
+
 
 @dataclass(frozen=True)
 class Runway:
@@ -47,15 +57,22 @@ class GameTimer:
         self.previous_due = self.due
         self.record, self.reason = record, ""
 
-    def note(self, now, action, detail):
+    def note(self, now, action, detail, journal=True):
         self.log.append((now, action, detail))
-        if self.record:
+        if self.record and journal:
             self.record(action, detail)
+
+    def armed(self, now):
+        """An invitation is (or is about to be) waiting for a fresh approach."""
+        return self.pending is not None or (self.enabled and now >= self.due)
 
     def waiting(self, now, reason):
         if reason != self.reason:
             self.reason = reason
-            self.note(now, "waiting", reason)
+            # Before the cooldown ends, blockers such as typing or a held button cannot delay play,
+            # so they stay in the internal diagnostics instead of flooding the user's journal.
+            self.note(now, "waiting", reason,
+                      journal=self.armed(now) or reason in ("cooldown", "automatic games disabled"))
 
     def request(self, now, manual=False):
         source = "manual" if manual else "automatic"
@@ -79,7 +96,7 @@ class GameTimer:
             if not in_zone:
                 if self.outside_since is None or self.entered_at is not None:
                     self.outside_since = now
-                    self.note(now, "side area", "outside; fresh approach can qualify")
+                    self.note(now, "side area", "outside; fresh approach can qualify", journal=self.armed(now))
                 self.entered_at = None
             elif self.outside_since is not None:
                 if self.entered_at is None:
@@ -87,7 +104,7 @@ class GameTimer:
                         self.outside_since = None
                     else:
                         self.entered_at = now
-                        self.note(now, "side area", "entered; checking stable hover")
+                        self.note(now, "side area", "entered; checking stable hover", journal=self.armed(now))
                 invited = (self.entered_at is not None and self.entered_at >= self.due
                            and now - self.entered_at >= .25)
         if not self.pending:
@@ -151,7 +168,9 @@ class CursorGame:
         self.history = deque(maxlen=4)
         self.end_x, self.height, self.start_x = self.x, 0, self.x
         self.after_landing = None
-        self.log = deque([(now, "ready")], maxlen=50)
+        self.comfort_requested = False
+        self.phase = "declare"
+        self.log = deque([(now, "declare")], maxlen=50)
 
     def enter(self, phase, now, line=None):
         self.phase, self.since = phase, now
@@ -159,23 +178,43 @@ class CursorGame:
         if line:
             self.line = line
 
+    def hold(self, now):
+        """Freeze the game clock (a menu is open or the app stalled) without changing any outcome."""
+        dt = max(0, now - self.last)
+        self.since += dt
+        if math.isfinite(self.deadline):
+            self.deadline += dt
+        if self.outside is not None:
+            self.outside += dt
+        self.last_aside += dt
+        self.last_protest += dt
+        self.last = now
+
     def take_line(self):
         line, self.line = self.line, None
         return line
 
     def cancel(self, now):
-        self.result = "cancel"
         self.line = None
-        if self.phase in ("ready", "three", "two", "one"):
+        if self.phase in ("win", "settle", "return", "home", "curl", "comfort", "done", "ready_cancel"):
+            # Already recovering or celebrating; keep the real result.
+            return
+        if self.phase in ("loss", "loss_finish"):
+            # Finish the supported folding, then accept comfort instead of sulking.
+            self.comfort_requested = True
+            return
+        if self.phase == "jump" and self.result == "win":
+            return  # The paw already touched the arrow: celebrate, then recover.
+        self.result = "cancel"
+        if self.phase == "declare":
+            self.enter("done", now)  # Still seated: nothing to unwind.
+        elif self.phase in ("ready", "three", "two", "one"):
             stage = ("ready", "three", "two", "one").index(self.phase)
             self.cancel_index = stage * 4 + min(3, int((now - self.since) / (.2 if stage == 0 else .25)))
             self.enter("ready_cancel", now)
         elif self.phase == "jump":
             self.after_landing = "home"
-        elif self.phase in ("win", "loss", "loss_finish"):
-            # Finish supported hops/folding before a queued deliberate interaction.
-            return
-        elif self.phase not in ("curl", "comfort", "done"):
+        else:
             self.enter("home", now)
 
     def comfort(self, now):
@@ -192,23 +231,32 @@ class CursorGame:
                 self.runway.y - 4 * self.height * t * (1 - t))
 
     def update(self, now, cursor, contact=False):
-        dt, self.last = now - self.last, now
-        if self.phase == "curl":
-            return
+        dt = now - self.last
         if dt < 0 or dt > 0.5:
-            self.cancel(now)
-            self.y = self.runway.y
-            self.enter("home", now)
+            # A stall (lock screen, suspend, a busy system) cannot score or punish. Active play is
+            # called off; celebrations, sulks and recoveries simply resume where they were.
+            if self.phase in ACTIVE_PHASES:
+                self.last = now
+                self.cancel(now)
+                self.after_landing = None
+                self.y = self.runway.y
+                self.enter("home", now)
+            else:
+                self.hold(now)
+            return
+        self.last = now
+        if self.phase == "curl":
             return
         elapsed = now - self.since
         self.history.append(cursor)
-        if self.phase in ("ready", "three", "two", "one"):
+        if self.phase in ("declare", "ready", "three", "two", "one"):
             inside = self.runway.contains(cursor, 8)
             self.outside = None if inside else (self.outside if self.outside is not None else now)
             if self.outside is not None and now - self.outside >= .6:
                 self.cancel(now)
                 return
-            stages = {"ready": (.8, "three", "3…"), "three": (1, "two", "2…"),
+            stages = {"declare": (DECLARE_SECONDS, "ready", None),
+                      "ready": (.8, "three", "3…"), "three": (1, "two", "2…"),
                       "two": (1, "one", "1…"), "one": (1, "go", "go")}
             duration, next_phase, cue = stages[self.phase]
             if elapsed >= duration:
@@ -289,11 +337,23 @@ class CursorGame:
             self.enter("run", now)
         elif self.phase == "win" and elapsed >= self.outcome_seconds:
             self.enter("home", now)
-        elif self.phase == "home":
+        elif self.phase == "return":
             self.y = self.runway.y
             delta = self.origin[0] - self.x
             self.direction = -1 if delta < 0 else 1
-            self.x += math.copysign(min(abs(delta), 180 * dt), delta) if delta and self.motion else delta
+            self.velocity = min(RUN_SPEED, self.velocity + RUN_ACCELERATION * dt)
+            self.x += math.copysign(min(abs(delta), self.velocity * dt), delta) if delta else 0
+            if abs(self.origin[0] - self.x) <= WALK_HOME_WITHIN:
+                self.enter("home", now)
+        elif self.phase == "home":
+            self.y = self.runway.y
+            delta = self.origin[0] - self.x
+            if self.motion and abs(delta) > RUN_HOME_FROM:
+                self.velocity = 0
+                self.enter("return", now)
+                return
+            self.direction = -1 if delta < 0 else 1
+            self.x += math.copysign(min(abs(delta), WALK_SPEED * dt), delta) if delta and self.motion else delta
             if abs(self.x - self.origin[0]) < 1:
                 self.enter("settle", now)
         elif self.phase == "settle" and elapsed >= .72:
@@ -301,6 +361,6 @@ class CursorGame:
         elif self.phase == "loss" and elapsed >= self.outcome_seconds:
             self.enter("loss_finish", now)
         elif self.phase == "loss_finish" and elapsed >= .84:
-            self.enter("comfort" if self.result == "cancel" else "curl", now)
+            self.enter("comfort" if self.comfort_requested else "curl", now)
         elif self.phase == "comfort" and elapsed >= 2:
             self.enter("home", now)

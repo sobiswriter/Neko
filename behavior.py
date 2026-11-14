@@ -1,5 +1,6 @@
 """The quiet part of Neko: timing and moods, independent of the desktop UI."""
 
+from collections import deque
 from enum import Enum, auto
 import random
 
@@ -40,6 +41,7 @@ class NekoState(Enum):
     PLAYING = auto()
     DISAPPOINTED = auto()
     COMFORTING = auto()
+    DIZZY = auto()
 
 
 PET_STATES = (NekoState.HAPPY, NekoState.CHEEK_RUB, NekoState.KNEADING,
@@ -57,6 +59,11 @@ APP_MOODS = {"music": NekoState.TAIL_SWISH, "video": NekoState.LOAFING,
              "writing": NekoState.TYPING, "chat": NekoState.CHEEK_RUB,
              "game": NekoState.PEEKING, "files": NekoState.SNIFFING,
              "terminal": NekoState.EAR_FLICK}
+
+
+# Switching the main window this often makes her head spin. It answers the whole burst, so it has
+# its own cooldown instead of the shared activity gap.
+DIZZY_SWITCHES, DIZZY_WINDOW, DIZZY_COOLDOWN = 6, 12, 180
 
 
 class Companion:
@@ -88,6 +95,16 @@ class Companion:
         self.comments = 0
         self.carry_rest = None
         self.carry_started = 0
+        self.switch_times = deque(maxlen=32)
+        self.last_dizzy = float("-inf")
+
+    def note_switches(self, now, count):
+        self.switch_times.extend([now] * max(0, count))
+        while self.switch_times and self.switch_times[0] < now - DIZZY_WINDOW:
+            self.switch_times.popleft()
+
+    def dizzy_due(self, now):
+        return len(self.switch_times) >= DIZZY_SWITCHES and now - self.last_dizzy >= DIZZY_COOLDOWN
 
     def begin_carry(self, now):
         if self.state in (NekoState.ARRIVING, NekoState.LEAVING):
@@ -135,6 +152,11 @@ class Companion:
         self.state = NekoState.IDLE
         self.next_nap = now + self.sleep_seconds
         return "idle"
+
+    def note_gesture(self, state):
+        """A reaction that reuses an idle gesture counts as the latest idle, so it is not repeated next."""
+        if state in IDLE_STATES:
+            self.last_idle = state
 
     def pose(self, state, now, seconds):
         if state not in PET_STATES:
@@ -192,7 +214,8 @@ class Companion:
         return now - self.last_activity_reaction >= self.reaction_seconds
 
     def tick(self, now, idle_seconds, quiet=False, cursor_near=False,
-             window_changed=False, keyboard_events=0, window_event=None, app_kind=None):
+             window_changed=False, keyboard_events=0, window_event=None, app_kind=None, window_switches=0):
+        self.note_switches(now, window_switches)
         if self.state in GAME_STATES:
             self.pending_window = None
             return None
@@ -247,6 +270,14 @@ class Companion:
                 return "idle"
             return None
 
+        if self.dizzy_due(now):
+            self.last_dizzy = self.last_activity_reaction = now
+            self.switch_times.clear()
+            self.pending_window = None
+            self.reaction_kind = "dizzy"
+            self.pose(NekoState.DIZZY, now, 5)
+            return "curious"
+
         if keyboard_events >= 6 and self.activity_ready(now):
             self.last_activity_reaction = now
             self.pending_window = None
@@ -261,17 +292,20 @@ class Companion:
             self.last_activity_reaction = now
             state = APP_MOODS.get(context, NekoState.PEEKING if self.reaction_kind == "close" else NekoState.CURIOUS)
             self.pose(state, now, 6)
+            self.note_gesture(state)
             return "curious"
 
         if cursor_near and self.activity_ready(now):
             self.reaction_kind = "cursor"
             self.last_activity_reaction = now
             self.pose(NekoState.SNIFFING, now, 5.5)
+            self.note_gesture(NekoState.SNIFFING)
             return "curious"
 
         if idle_seconds >= self.sleep_seconds * 0.55 and not self.drowsy:
             self.drowsy = True
             self.pose(NekoState.YAWNING, now, 5.5)
+            self.note_gesture(NekoState.YAWNING)
             return "fidget"
 
         if now >= self.next_idle:

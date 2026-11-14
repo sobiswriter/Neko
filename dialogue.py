@@ -483,6 +483,35 @@ i'm folding up my paws for now.
 that pounce looked better in my head.
 hmph. a cuddle might fix this.
 """,
+    "dizzy": """
+woah woah… my head's spinning!
+wait, which window are we in now?
+so many switches… the room is going round.
+slow down! my eyes are doing loops.
+left, right, left… i'm all twirly now.
+hold on, let me find which way is up.
+""",
+    "held_up": """
+wheee! i'm flying!
+oh! up we go.
+the view is very good from up here.
+tiny cat, big altitude.
+careful, i'm a very important cargo.
+""",
+    "held_long": """
+um. could you put me down now?
+my paws would like the floor back, please.
+okay, that's enough flying for one kitten.
+please put me down? gently?
+i think my legs miss the ground.
+you can set me down any time now.
+""",
+    "held_longer": """
+fine. i'll just nap up here, then.
+still dangling… this is my life now.
+if you won't put me down, i'm closing my eyes.
+i've accepted my fate as a hanging kitten.
+""",
     "game_comfort": """
 oh… you came to check on me.
 okay. one little cuddle helps.
@@ -498,12 +527,26 @@ LINES = {kind: tuple(line.strip() for line in text.splitlines() if line.strip())
          for kind, text in LINES.items()}
 
 
+RECENT_LIMIT = 40
+KNOWN = frozenset(line for lines in LINES.values() for line in lines)
+
+
 class OfflineDialogue:
-    def __init__(self, rng=None):
+    def __init__(self, rng=None, history=()):
         self.rng = rng if rng is not None else random.Random()
         self.bags = {}
         self.last = {}
-        self.recent = deque(maxlen=6)
+        # Lines said recently (across every group, and across restarts when a history is supplied)
+        # go to the back of each fresh bag, so a relaunch or a small bag does not echo them.
+        self.recent = deque((line for line in history if line in KNOWN), maxlen=RECENT_LIMIT)
+
+    def history(self):
+        """Only built-in lines are kept between launches; AI comments stay in memory."""
+        return [line for line in self.recent if line in KNOWN]
+
+    def remember(self, line):
+        """Record words said outside the offline bags (for example AI comments)."""
+        self.recent.append(line)
 
     def pick(self, kind):
         kind = kind if kind in LINES else "idle"

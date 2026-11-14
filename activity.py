@@ -12,6 +12,11 @@ from PySide6.QtCore import QAbstractNativeEventFilter
 from PySide6.QtWidgets import QApplication
 
 
+# Desktop, taskbar and the Alt+Tab / Task View switchers are not "app" windows.
+SHELL_CLASSES = ("Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "MultitaskingViewFrame",
+                 "XamlExplorerHostIslandWindow", "ForegroundStaging", "TaskSwitcherWnd")
+
+
 class RawInputHeader(ctypes.Structure):
     _fields_ = [("kind", wintypes.DWORD), ("size", wintypes.DWORD),
                 ("device", wintypes.HANDLE), ("parameter", wintypes.WPARAM)]
@@ -41,9 +46,8 @@ KERNEL32.QueryFullProcessImageNameW.argtypes = [wintypes.HANDLE, wintypes.DWORD,
 KERNEL32.QueryFullProcessImageNameW.restype = wintypes.BOOL
 
 
-def foreground_executable(hwnd):
+def process_executable(pid):
     try:
-        pid = win32process.GetWindowThreadProcessId(hwnd)[1]
         handle = win32api.OpenProcess(0x1000, False, pid)
         try:
             buffer = ctypes.create_unicode_buffer(32768)
@@ -57,6 +61,39 @@ def foreground_executable(hwnd):
     return ""
 
 
+def hosted_app_pid(hwnd, host_pid):
+    """Store apps (Media Player, Netflix, ...) draw inside an ApplicationFrameHost frame."""
+    found = []
+
+    def visit(child, _):
+        try:
+            pid = win32process.GetWindowThreadProcessId(child)[1]
+        except win32api.error:
+            return True
+        if pid and pid != host_pid:
+            found.append(pid)
+            return False
+        return True
+    try:
+        win32gui.EnumChildWindows(hwnd, visit, None)
+    except win32gui.error:
+        pass  # Stopping enumeration early is reported as an error by pywin32.
+    return found[0] if found else None
+
+
+def foreground_executable(hwnd):
+    try:
+        pid = win32process.GetWindowThreadProcessId(hwnd)[1]
+    except win32api.error:
+        return ""
+    name = process_executable(pid)
+    if name == "applicationframehost.exe":
+        hosted = hosted_app_pid(hwnd, pid)
+        if hosted:
+            name = process_executable(hosted) or name
+    return name
+
+
 class ActivityMonitor(QAbstractNativeEventFilter):
     def __init__(self):
         super().__init__()
@@ -67,6 +104,8 @@ class ActivityMonitor(QAbstractNativeEventFilter):
         self.installed = False
         self.enabled = True
         self.windows = {win32gui.GetForegroundWindow()}
+        self.switches = 0  # Foreground changes between real app windows since the last take.
+        self.last_foreground = win32gui.GetForegroundWindow()
         self.callback = WinEventProc(self.on_window_event)
 
     def start(self, hwnd):
@@ -76,7 +115,10 @@ class ActivityMonitor(QAbstractNativeEventFilter):
         self.registered = bool(USER32.RegisterRawInputDevices(ctypes.byref(device), 1, ctypes.sizeof(device)))
         QApplication.instance().installNativeEventFilter(self)
         self.installed = True
-        for first, last in ((0x0003, 0x000B), (0x8000, 0x800C)):
+        # Only the events used below: a wider range would include LOCATIONCHANGE, which fires a
+        # Python callback for every system-wide pointer and caret movement.
+        for first, last in ((0x0003, 0x0003), (0x000B, 0x000B), (0x8001, 0x8002),
+                            (0x8006, 0x8009), (0x800C, 0x800C)):
             hook = USER32.SetWinEventHook(first, last, None, self.callback, 0, 0, 2)
             if hook:
                 self.hooks.append(hook)
@@ -116,8 +158,11 @@ class ActivityMonitor(QAbstractNativeEventFilter):
         try:
             if (not win32gui.IsWindowVisible(hwnd) or win32gui.GetAncestor(hwnd, 2) != hwnd
                     or win32gui.GetWindowLong(hwnd, -20) & 0x80
-                    or win32gui.GetClassName(hwnd) in ("Progman", "WorkerW", "Shell_TrayWnd")):
+                    or win32gui.GetClassName(hwnd) in SHELL_CLASSES):
                 return
+            if event == 0x0003 and hwnd != self.last_foreground:
+                self.last_foreground = hwnd
+                self.switches += 1
             if len(self.windows) >= 128:
                 self.windows.clear()
             self.windows.add(hwnd)
@@ -138,6 +183,10 @@ class ActivityMonitor(QAbstractNativeEventFilter):
             self.keyboard.clear()
             return 0, None
         return count, event
+
+    def take_switches(self):
+        count, self.switches = self.switches, 0
+        return count if self.enabled else 0
 
     def close(self):
         for hook in self.hooks:

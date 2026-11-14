@@ -12,4 +12,5 @@ When animation work produces a verified discovery, update the relevant section o
 
 Build directly to `dist/DesktopNeko.exe`; do not create release subfolders inside `dist`.
 Keep only the current executable and its immediate predecessor, `dist/DesktopNeko-previous.exe`.
+Exception (user request, 2026-11-14): the experimental Neko 1.2 line builds to the single flat file `dist/DesktopNeko-1.2.exe`, replaced in place on each 1.2 build; it never replaces or rotates the stable pair.
 Preserve the verified current release before replacing it, and clean older outputs only after the new build passes its checks. Keep intermediate build files outside `dist`.

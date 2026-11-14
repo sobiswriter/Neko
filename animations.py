@@ -113,6 +113,12 @@ CLIPS = {
                       (0, 1, 2, 3, 4, 3, 2, 1, 7, 16, 17, 18, 17, 16, 19, 24)),
     "look_right": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 150, 150, 600, 150, 150, 200, 500),
                        (8, 9, 10, 11, 12, 11, 10, 9, 15, 20, 21, 22, 21, 20, 23, 24)),
+    # Interim dizzy reaction until its dedicated sheet exists: the accepted head-turn drawings
+    # follow imaginary windows left/right, faster each sweep, without the look's happy smile.
+    "dizzy": Clip("idle-v2-look", 0,
+                  (200,) * 8 + (150,) * 8 + (110,) * 6 + (90,) * 6 + (900,),
+                  (0, 1, 2, 3, 4, 3, 2, 1, 8, 9, 10, 11, 12, 11, 10, 9,
+                   0, 1, 2, 3, 2, 1, 8, 9, 10, 11, 10, 9, 24)),
     "loaf": Clip("idle-v2-loaf", 0, (400, 250, 250, 250, 300, 900, 900, 500, 350, 300, 350, 300, 950), tuple(range(13))),
     "peek": Clip("idle-v2-peek", 0, (400, 250, 250, 250, 450, 450, 450, 300, 250, 250, 300, 300, 600), tuple(range(13))),
 }
