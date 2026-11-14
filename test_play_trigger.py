@@ -13,7 +13,7 @@ app = QApplication.instance() or QApplication([])
 
 from animations import SpriteAtlas
 from behavior import NekoState
-from games import (DECLARE_SECONDS, FORFEIT_AFTER, INVITE_REACH, MANUAL_WAIT, NUDGE_AFTER, WARNINGS,
+from games import (DECLARE_SECONDS, FORFEIT_AFTER, INVITE_REACH, WARNINGS,
                    CursorGame, GameTimer, Runway)
 import main
 from main import NekoWidget
@@ -37,26 +37,36 @@ class TimerTriggerTests(unittest.TestCase):
             self.assertIsNone(t.tick(now, True, True))
 
 
-class ManualWaitTests(unittest.TestCase):
+class ManualPlayTests(unittest.TestCase):
     def step(self, game, end, cursor):
+        lines = []
         while game.last < end - 1e-6:
             game.update(min(end, round(game.last + .02, 6)), cursor)
+            line = game.take_line()
+            if line:
+                lines.append(line)
+        return lines
 
-    def test_requested_game_waits_for_the_arrow_and_nudges(self):
+    def test_requested_game_counts_down_wherever_the_arrow_is(self):
         game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="manual")
-        self.step(game, NUDGE_AFTER + 1, (2000, 2000))
-        self.assertEqual(game.phase, "declare")
-        self.assertEqual(game.line, "bring")
-        self.step(game, NUDGE_AFTER + 1.5, (450, 330))   # The arrow arrives: the countdown begins.
-        self.assertEqual(game.phase, "ready")
-        self.step(game, NUDGE_AFTER + 3, (2000, 2000))    # Leaving during the countdown doesn't call it off.
+        self.step(game, DECLARE_SECONDS + 4, (2000, 2000))   # The arrow is off in the nook.
+        self.assertTrue(game.started)
         self.assertNotEqual(game.result, "cancel")
-        self.assertIn(game.phase, ("three", "two", "one"))
 
-    def test_requested_game_gives_up_quietly_after_a_long_wait(self):
+    def test_arrow_that_never_comes_ends_neutrally_after_calling_you_over(self):
         game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="manual")
-        self.step(game, MANUAL_WAIT + .5, (2000, 2000))
-        self.assertEqual((game.phase, game.result, game.started), ("done", "cancel", False))
+        lines = self.step(game, DECLARE_SECONDS + 4 + FORFEIT_AFTER + 1, (2000, 2000))
+        self.assertIn("bring", lines)
+        self.assertIn("no_show", lines)
+        self.assertEqual(game.result, "cancel")      # No loss, no sulk.
+        self.assertNotIn(game.phase, ("loss", "curl"))
+
+    def test_outside_clock_starts_with_the_chase(self):
+        game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="manual")
+        self.step(game, DECLARE_SECONDS + 3.5, (450, 330))    # Arrow beside her during declaration...
+        self.step(game, DECLARE_SECONDS + 4.6, (2000, -400))  # ...then away for the end of the countdown.
+        lines = self.step(game, DECLARE_SECONDS + 4.6 + WARNINGS[0] - .4, (2000, -400))
+        self.assertFalse(any(l.startswith("protest_") for l in lines), lines)
 
     def test_automatic_game_still_calls_off_when_the_arrow_leaves(self):
         game = CursorGame(0, (400, 300), Runway(0, 1000, 300, 110), source="automatic")
@@ -168,6 +178,32 @@ class DesktopTriggerTests(unittest.TestCase):
             self.poll(.1, QPoint(x, 420))
         self.assertIsNotNone(self.n.game)
         self.assertEqual(self.n.game.source, "automatic")
+
+    def test_requested_game_cuts_an_idle_gesture_or_app_reaction_short(self):
+        for state in (NekoState.SNIFFING, NekoState.TYPING, NekoState.DIZZY, NekoState.CHEEK_RUB):
+            self.n.end_game(immediate=True)
+            self.n.companion.state = state
+            self.n.companion.pose_until = self.now + 6
+            self.n.companion.last_interaction = -1e9   # A reaction, not a pet.
+            self.n.request_game()
+            self.poll(.1, QPoint(2000, 2000))
+            self.assertIsNotNone(self.n.game, state)
+            self.assertEqual(self.n.game.source, "manual")
+
+    def test_requested_game_ignores_recent_typing(self):
+        self.n.companion.state = NekoState.IDLE
+        self.n.last_keyboard = self.now
+        self.n.request_game()
+        self.poll(.1, QPoint(650, 420))
+        self.assertIsNotNone(self.n.game)
+
+    def test_a_real_pet_in_progress_finishes_first(self):
+        self.n.companion.state = NekoState.CHEEK_RUB
+        self.n.companion.last_interaction = self.now
+        self.n.request_game()
+        self.poll(.1, QPoint(650, 420))
+        self.assertIsNone(self.n.game)
+        self.assertEqual(self.n.game_timer.pending, "manual")
 
     def test_play_after_a_loss_comforts_her_then_rematches(self):
         self.n.companion.state = NekoState.IDLE

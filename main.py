@@ -20,7 +20,7 @@ from PySide6.QtGui import QColor, QCursor, QFont, QIcon, QMovie, QPainter, QPixm
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QDialog, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QMenu, QMessageBox,
     QPushButton, QSpinBox, QFormLayout, QTabWidget, QSystemTrayIcon, QVBoxLayout, QWidget, QPlainTextEdit, QComboBox,
-    QLineEdit,
+    QLineEdit, QSlider,
 )
 
 from behavior import Companion, NekoState, PET_STATES, CARRY_STATES, GAME_STATES, IDLE_STATES
@@ -289,6 +289,7 @@ class StatsWindow(QDialog):
         self.restless.toggled.connect(neko.set_restless)
         company_layout.addWidget(self.restless)
         self.restless_status = QLabel()
+        self.restless_status.setWordWrap(True)   # The countdown line is longer than the nook is wide.
         self.restless_status.setStyleSheet("font-size: 11px; color: #746b65; padding-left: 22px;")
         company_layout.addWidget(self.restless_status)
         self.restless_minutes = QSpinBox()
@@ -318,6 +319,26 @@ class StatsWindow(QDialog):
         self.sounds.toggled.connect(self.sound_test.setEnabled)
         sound_row.addWidget(self.sound_test)
         settings_layout.addLayout(sound_row)
+        volume_row = QHBoxLayout()
+        volume_row.addWidget(QLabel("Volume"))
+        self.volume = QSlider(Qt.Horizontal)
+        self.volume.setRange(sounds.VOLUME_MIN, sounds.VOLUME_MAX)
+        self.volume.setSingleStep(5)
+        self.volume.setPageStep(25)
+        self.volume.setValue(neko.voice.volume)
+        self.volume.setAccessibleName("Sound volume")
+        self.volume.setToolTip("Her voice volume. 100% is the default soft level; 0% mutes her.")
+        self.volume_label = QLabel(f"{neko.voice.volume}%")
+        self.volume_label.setMinimumWidth(40)
+        self.volume.valueChanged.connect(lambda value: self.volume_label.setText(f"{value}%"))
+        self.volume.valueChanged.connect(neko.set_volume)
+        # Preview the new level once the slider is let go (not on every step while dragging).
+        self.volume.sliderReleased.connect(lambda: neko.play_sound("mew", prompted=True))
+        self.volume.setEnabled(neko.sounds_enabled)
+        self.sounds.toggled.connect(self.volume.setEnabled)
+        volume_row.addWidget(self.volume, 1)
+        volume_row.addWidget(self.volume_label)
+        settings_layout.addLayout(volume_row)
         self.reactivity = QCheckBox("Notice typing and window activity")
         self.reactivity.setChecked(neko.reactive)
         self.reactivity.toggled.connect(neko.set_reactivity)
@@ -643,6 +664,8 @@ class NekoWidget(QWidget):
         self.sounds_enabled = self.settings.value("sounds_enabled", False, type=bool)
         self.last_sound = -math.inf
         self.voice = sounds.Voice(ASSET_ROOT / "sounds", self.companion.rng)
+        self.voice.volume = max(sounds.VOLUME_MIN, min(sounds.VOLUME_MAX,
+                                self.settings.value("sound_volume", 100, type=int)))
         self.purring = False
         self.reactive = self.settings.value("reactive", True, type=bool)
         self.hide_fullscreen = self.settings.value("hide_fullscreen", False, type=bool)
@@ -854,6 +877,13 @@ class NekoWidget(QWidget):
             self.stop_sound()
         self.save_preferences()
 
+    def set_volume(self, percent):
+        """Her voice volume, as a percent of the prepared soft level (0 mutes, 300 is loudest)."""
+        self.voice.volume = max(sounds.VOLUME_MIN, min(sounds.VOLUME_MAX, int(percent)))
+        if self.voice.volume == 0:
+            self.stop_sound()
+        self.save_preferences()
+
     def stop_sound(self):
         self.purring = False
         try:
@@ -871,7 +901,7 @@ class NekoWidget(QWidget):
                 or (not prompted and (self.quiet or self.app_context in ("music", "video")))
                 or now - self.last_sound < (SOUND_GAP_PROMPTED if prompted else SOUND_GAP_AUTOMATIC)):
             return False
-        path = self.voice.pick(cue)
+        path = self.voice.at_volume(self.voice.pick(cue))
         if path is None:
             return False
         flags = winsound.SND_FILENAME | winsound.SND_ASYNC | winsound.SND_NODEFAULT
@@ -974,6 +1004,23 @@ class NekoWidget(QWidget):
             self.companion.wake(now)
             self.pose_started = now
             self.refresh_asset()
+        if (manual and self.game is None and not self.fullscreen and self.isVisible()
+                and not self.menu.isVisible() and self.drag_origin is None):
+            # You asked to play: an idle gesture or an app/window reaction (sniff, typing along,
+            # dizzy, a chat-app cheek rub...) is cut short so play starts now. A real pet in
+            # progress still finishes.
+            state = self.companion.state
+            petted = state in PET_STATES and now - self.companion.last_interaction < 6
+            if state in IDLE_STATES + PET_STATES + (NekoState.TYPING, NekoState.DIZZY) and not petted:
+                self.journal.add("Game", "gesture ended", f"{state.name.lower()} for requested play")
+                self.companion.state = NekoState.IDLE
+                self.companion.pose_until = now
+                self.companion.pet_pending = False
+                self.companion.pending_window = None
+                self.pose_started = now
+                self.refresh_asset()
+            if self.mood is not None and self.mood.playful and not self.mood.resting:
+                self.mood.settle_soon()   # Finish the current hop or leap, then sit for the game.
         nook_editing = (self.stats_window and self.stats_window.isVisible()
                         and self.stats_window.tabs.currentWidget() != self.stats_window.journal_tab)
         reason = next((text for blocked, text in (
@@ -988,8 +1035,8 @@ class NekoWidget(QWidget):
             (self.companion.state not in (NekoState.IDLE, NekoState.RESTLESS) + IDLE_STATES, self.companion.state.name.lower()),
             (self.drag_origin is not None, "being held"),
             (bool(QApplication.mouseButtons()) or any(ctypes.windll.user32.GetAsyncKeyState(key) & 0x8000 for key in (1, 2, 4, 5, 6)), "mouse button held"),
-            (now - self.last_keyboard < 2, "recent typing"),
-            (now - self.companion.last_interaction < 2, "recent cuddle"),
+            (now - self.last_keyboard < 2 and not manual, "recent typing"),
+            (now - self.companion.last_interaction < 2 and not manual, "recent cuddle"),
             (self.quiet and not manual, "quiet company")) if blocked), "")
         eligible = not reason
         if eligible and (self.game_timer.pending or now >= self.game_timer.due):
@@ -1160,7 +1207,7 @@ class NekoWidget(QWidget):
     def game_line(self, game, line):
         """Speak a game beat. Countdown beats start only once their words are actually shown."""
         prefix = "game_"
-        if line in ("pursuit", "tease", "escape", "brush", "time", "bring") and self.bubble.isVisible():
+        if line in ("pursuit", "tease", "escape", "brush", "time") and self.bubble.isVisible():
             return  # Sparse asides never replace a visible line.
         countdown = line in ("3…", "2…", "1…")
         group = prefix + line if prefix + line in LINES else "game_" + line
@@ -1171,7 +1218,7 @@ class NekoWidget(QWidget):
         sound = {"announce": "chirp", "go": "trill", "pursuit": "giggle", "protest_high": "protest",
                  "protest_low": "protest", "protest_side": "protest", "protest_monitor": "protest",
                  "protest_last": "protest",
-                 "comfort": "purr_short", "bring": "mew"}.get(line)
+                 "comfort": "purr_short", "bring": "mew", "no_show": "mew"}.get(line)
         if sound and shown:
             self.play_sound(sound, prompted=True)
         if shown and (countdown or line in ("announce", "go")):
@@ -2486,7 +2533,7 @@ class NekoWidget(QWidget):
     def save_preferences(self):
         self.settings.remove("follow_mouse")
         for key, value in {"quiet": self.quiet, "motion": self.motion,
-                           "sounds_enabled": self.sounds_enabled,
+                           "sounds_enabled": self.sounds_enabled, "sound_volume": self.voice.volume,
                            "games_played": self.games_played, "games_won": self.games_won,
                            "auto_games": self.game_timer.enabled, "game_interval": self.game_timer.interval,
                            "sleep_seconds": self.companion.sleep_seconds,

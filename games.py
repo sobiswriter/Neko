@@ -7,9 +7,6 @@ import math
 ACTIVE_PHASES = ("declare", "ready", "three", "two", "one", "go", "run", "turn", "prepare", "jump", "miss")
 # She announces the game, holds that thought long enough to read, then starts the countdown.
 DECLARE_SECONDS = 1.8
-# Manual play waits for the arrow: a nudge after NUDGE_AFTER s (repeated every NUDGE_EVERY s),
-# and she quietly gives up only after MANUAL_WAIT s with no arrow in her area.
-NUDGE_AFTER, NUDGE_EVERY, MANUAL_WAIT = 3, 8, 60
 # During the chase, an arrow outside her area gets warnings at these continuous times (the last
 # one is a "last chance"); she forfeits only at FORFEIT_AFTER seconds.
 WARNINGS = (1.5, 4.0, 6.5)
@@ -207,8 +204,7 @@ class CursorGame:
         self.ground = self.start_ground = self.end_ground = runway.y
         self.after_landing = None
         self.comfort_requested = False
-        self.wait_since = None          # Manual play: when she started waiting for the arrow.
-        self.nudged_at = -math.inf
+        self.engaged = False            # The arrow has been inside her play area this game.
         self.phase = "declare"
         self.log = deque([(now, "declare")], maxlen=50)
 
@@ -309,24 +305,11 @@ class CursorGame:
         if self.phase in ("declare", "ready", "three", "two", "one"):
             inside = self.runway.contains(cursor, 8)
             self.outside = None if inside else (self.outside if self.outside is not None else now)
-            if self.source == "manual":
-                # You asked to play, so she waits for the arrow instead of calling it off: the
-                # declaration holds until the arrow is in her area (with a nudge), and the
-                # countdown carries on regardless. Only a long wait with no arrow ends it quietly.
-                if self.phase == "declare" and not inside:
-                    if self.wait_since is None:
-                        self.wait_since = now
-                    waited = now - self.wait_since
-                    if waited >= MANUAL_WAIT:
-                        self.cancel(now)
-                        return
-                    if waited >= NUDGE_AFTER and now - self.nudged_at >= NUDGE_EVERY:
-                        self.nudged_at = now
-                        self.line = "bring"
-                    return   # The declaration can't finish until the arrow arrives.
-                if self.phase == "declare":
-                    self.wait_since = None
-            elif self.outside is not None and now - self.outside >= .6:
+            if inside:
+                self.engaged = True
+            # You asked to play: the declaration and countdown always run on their clock, wherever
+            # the arrow is. Only an automatic invitation is called off when the arrow leaves.
+            if self.source != "manual" and self.outside is not None and now - self.outside >= .6:
                 self.cancel(now)
                 return
             stages = {"declare": (DECLARE_SECONDS, "ready", None),
@@ -339,15 +322,21 @@ class CursorGame:
                     self.started = True
                     self.deadline = now + 45
                     self.last_aside = now
+                    # The outside clock and warnings start fresh with the chase itself.
+                    self.outside = None
+                    self.warnings = 0
             return
         if self.phase in ("run", "turn", "prepare", "jump", "miss"):
             inside = self.runway.contains(cursor, 8 if self.outside is None else 0)
             self.outside = None if inside else (self.outside if self.outside is not None else now)
             outside_time = 0 if self.outside is None else now - self.outside
+            if inside:
+                self.engaged = True
             if self.warnings < len(WARNINGS) and outside_time >= WARNINGS[self.warnings]:
                 # Each trip outside gets its own warnings, the last a "last chance", before a forfeit.
+                # If you asked to play but the arrow never came over, she calls you over instead.
                 last = self.warnings == len(WARNINGS) - 1
-                self.line = ("protest_last" if last else
+                self.line = ("bring" if not self.engaged else "protest_last" if last else
                              "protest_high" if cursor[1] < self.runway.y + self.runway.paw[1] - self.runway.lift
                              else "protest_low" if cursor[1] > self.runway.y + REACH_LOW + self.runway.drop
                              else "protest_side")
@@ -364,6 +353,11 @@ class CursorGame:
             # A real visible contact wins the same instant as a deadline.
             if self.phase == "jump" and contact and self.result is None:
                 self.result, self.after_landing = "win", "win"
+            if self.result is None and not self.engaged and outside_time >= FORFEIT_AFTER:
+                # The arrow never came to play: no loss and no sulk, she just heads home.
+                self.cancel(now)
+                self.line = "no_show"
+                return
             if self.result is None and (now >= self.deadline or outside_time >= FORFEIT_AFTER):
                 self.result = "loss"
                 if self.phase == "jump":

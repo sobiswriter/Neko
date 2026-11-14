@@ -89,6 +89,10 @@ class RestlessMood:
         """Seated between bursts on her current ground, so a game can start without a pose jump."""
         return self.playful and self.step is not None and self.step[0] == "rest"
 
+    def settle_soon(self):
+        """A game was asked for: finish the current move, then sit and wait for it."""
+        self.plan = [("rest", 30)]
+
     def hold(self, now):
         dt = max(0, now - self.last)
         self.stage_since += dt

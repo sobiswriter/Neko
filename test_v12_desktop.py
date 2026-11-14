@@ -20,6 +20,24 @@ APP = QApplication.instance() or QApplication([])
 APP.setQuitOnLastWindowClosed(False)
 
 
+def outline_rings(image, depth):
+    """Colours of opaque pixels by chessboard distance (1 = touching transparency), up to depth."""
+    w, h = image.width(), image.height()
+    solid = {(x, y) for y in range(h) for x in range(w) if image.pixelColor(x, y).alpha()}
+    rings = {d: [] for d in range(1, depth + 1)}
+    frontier = {p for p in solid if any((p[0] + dx, p[1] + dy) not in solid
+                                        for dx in (-1, 0, 1) for dy in (-1, 0, 1))}
+    seen = set(frontier)
+    for d in range(1, depth + 1):
+        for x, y in frontier:
+            c = image.pixelColor(x, y)
+            rings[d].append((c.red(), c.green(), c.blue()))
+        frontier = {(x + dx, y + dy) for x, y in frontier for dx in (-1, 0, 1) for dy in (-1, 0, 1)
+                    if (x + dx, y + dy) in solid and (x + dx, y + dy) not in seen}
+        seen |= frontier
+    return rings
+
+
 class V12DesktopTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -68,7 +86,7 @@ class V12DesktopTests(unittest.TestCase):
                 self.n.animate()
 
     def test_only_the_pixelated_victories_use_new_art(self):
-        from pixelate import BLOCK
+        from pixelate import OUTLINE
         idle = self.atlas.frame("idle", 0).toImage()
         v12 = {clip.bank for clip in CLIPS.values() if clip.bank.startswith("v12-")}
         self.assertEqual(v12, {"v12-sproing", "v12-sproing2", "v12-roll"})
@@ -87,6 +105,13 @@ class V12DesktopTests(unittest.TestCase):
                 colours = {frame.pixelColor(x, y).rgb() for y in range(bounds.top(), bounds.bottom() + 1)
                            for x in range(bounds.left(), bounds.right() + 1) if frame.pixelColor(x, y).alpha()}
                 self.assertLessEqual(len(colours), 9, (name, i))
+                # A thin outline like the original's: the outer ring is solid black, and the ring just
+                # inside the outline is mostly fur (eyes and inner lines may touch it).
+                rings = outline_rings(frame, OUTLINE + 1)
+                self.assertTrue(all(c == (0, 0, 0) or sum(c) < 60 for c in rings[1]), (name, i))
+                inner = rings[OUTLINE + 1]
+                dark = sum(1 for c in inner if sum(c) < 150) / max(1, len(inner))
+                self.assertLess(dark, 0.3, (name, i, round(dark, 2)))
         for clip in ("dizzy", "yawn", "paw_offer", "nuzzle", "game_jump"):
             self.assertFalse(CLIPS[clip].bank.startswith("v12-"), clip)
 

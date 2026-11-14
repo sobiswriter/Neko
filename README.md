@@ -22,8 +22,8 @@ single-instance lock with them, so quit one before starting another.
 - **Pixel-art victories.** Catch wins rotate through four celebrations: the much-loved
   **triple hop**, two takes of a **sproing** (stiff-legged, arched-back happy bounces) and a
   **victory roll** (belly-up wiggles, a fluffy shake and a proud paw). The three new ones are
-  redrawn on her 2 px pixel grid in her own palette with a solid outline, so they read as the
-  same chunky kitten (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
+  finished at her native size in her own palette, with hard edges and a thin 2 px black
+  outline like the original drawings (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
   "proud sit" wins are retired.
 - **Restless kitten** (on by default; Company tab → **Restless when ignored** and
   **Restless after**, 1–120 min, default 20; set 1 minute to try it). If you're at the
@@ -59,7 +59,9 @@ single-instance lock with them, so quit one before starting another.
   arrow leaves her area, sad mews on losses and goodbyes, and demanding meows when restless.
   Some idle gestures make a sound about half the time; those, like all unprompted sounds,
   wait at least 45 seconds after the last one, and Quiet company, fullscreen and media apps
-  silence them. Sources: [sound credits](docs/sound-credits.md).
+  silence them. Settings tab → **Volume** sets her voice from 0% (muted) to 300%; 100% is
+  the default soft level, and letting go of the slider plays a sample mew.
+  Sources: [sound credits](docs/sound-credits.md).
 - **Better rain cloud** for sulks: one soft, shaded storybook cloud with slanted rain.
 
 The 1.2 victories came from the user's generated sheets (12 drawings each), labelled, cut
@@ -83,9 +85,11 @@ prepared by `tools/prepare_sounds.py`.
   She spots the arrow (a little **!**), declares the game and holds that thought for
   1.8 seconds so you can read it, then gives a real **3… 2… 1… Here I come!**, then
   runs and pounces. In an automatic game, moving the arrow away during the declaration calls
-  it off quietly. A game you ask for (menu, tray or nook **Play**) always happens: she wakes
-  up if napping, gets up from a post-loss curl for a rematch, waits for the arrow (with a
-  nudge every few seconds, for up to a minute) and keeps counting down even if the arrow wanders off.
+  it off quietly. A game you ask for (menu, tray or nook **Play**) starts right away: she
+  wakes up if napping, cuts an idle gesture or app reaction short (a pet in progress still
+  finishes), gets up from a post-loss curl for a rematch, and counts down wherever the arrow
+  is. If the arrow never comes over she calls you three times, then says "maybe later" and
+  goes home with no loss or sulk.
   There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
   wins one of four celebrations: the triple hop, two sproings or a victory roll.
   Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
@@ -231,7 +235,7 @@ prepared by `tools/prepare_sounds.py`.
   while she sulks, a huffy cross mark when she's held too long and sleepy z's once she
   gives up and dozes in your hand. With Gentle motion off they stay still. They live in
   [effects.py](effects.py).
-- **Offline personality.** 469 short lines, including more personal questions and
+- **Offline personality.** 472 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. The last 40 built-in lines she said, across every group,
@@ -277,7 +281,7 @@ prepared by `tools/prepare_sounds.py`.
   deliberate pets and naps still work normally.
 
   To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
-  contains all 469 phrases in 58 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  contains all 472 phrases in 59 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
   Edit or add one phrase per line inside the existing triple-quoted groups; keep the
   section names/quotes and aim for at most 110 characters per phrase. Source launches
   use your edits on restart; the packaged executable needs rebuilding. Optional AI

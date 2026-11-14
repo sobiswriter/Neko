@@ -479,11 +479,16 @@ okay, one more second and i'm calling it…
 arrow?? come back or i'm going to sulk!
 i'm counting… bring it back here!
 """,
+    "game_no_show": """
+okay, maybe later. i'll be right here!
+no arrow? that's fine… we'll play next time.
+aw. we can play another time.
+""",
     "game_bring": """
 bring the arrow over here, beside me!
 where's the arrow? i'm ready!
 arrow, come here… i won't bite. much.
-put the arrow next to me and we can start!
+bring the arrow down here so i can reach it!
 i'm waiting for the arrow~
 """,
     "game_loss": """
