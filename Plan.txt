@@ -33,7 +33,7 @@ Interaction rules
   Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
   shows mild sadness then the accepted small hop before quitting. Arrival travels from the monitor top; only the landing position is saved.
   Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
-  498 offline lines in dialogue.py use 65 context shuffle bags, with personal questions and app rituals.
+  526 offline lines in dialogue.py use 67 context shuffle bags, with personal questions and app rituals.
   The last 40 built-in lines said go to the back of fresh bags and persist across launches.
   A gesture's words wait 150 seconds before returning; gesture thoughts keep a 30-second gap.
   Activity replies keep their own pause; general idle chatter cannot use it up. One phrase per line inside its named triple-quoted groups; source edits need restart and packaged edits need a rebuild.

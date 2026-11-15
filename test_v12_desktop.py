@@ -183,6 +183,31 @@ class V12DesktopTests(unittest.TestCase):
         self.step(60, (300, 300))
         self.assertIsNone(self.n.mood)
 
+    def test_the_same_words_never_show_again_within_the_cooldown(self):
+        from dialogue import LINE_COOLDOWN
+        shown = []
+        self.n.bubble.shown.connect(shown.append)
+        texts = []
+        for i in range(40):                       # Pets, gestures and idle chatter, back to back.
+            self.now += 3
+            with patch("main.time.monotonic", return_value=self.now):
+                self.n.dismiss_bubble()
+                kind = ("pet", "idle", "tail", "cursor")[i % 4]
+                if self.n.say(self.n.dialogue.pick(kind), prompted=True, kind=kind):
+                    texts.append((self.now, self.n.bubble.text()))
+            with patch("main.time.monotonic", return_value=self.now):
+                self.assertFalse(self.n.say(texts[-1][1], prompted=True))   # Asked again: refused.
+        seen = {}
+        for at, text in texts:
+            self.assertGreaterEqual(at - seen.get(text, -LINE_COOLDOWN), LINE_COOLDOWN, text)
+            seen[text] = at
+        self.assertEqual(len(texts), len(set(t for _, t in texts)))
+        self.assertIn("said recently", self.n.journal.text("Thought"))
+        self.now += LINE_COOLDOWN + 1
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.dismiss_bubble()
+            self.assertTrue(self.n.say(texts[0][1], prompted=True))   # After the cooldown it may return.
+
     def test_level_setting_persists_and_reaches_the_mood(self):
         self.n.set_restless_level_minutes(2)
         self.assertEqual(self.settings.value("restless_level_minutes", type=int), 2)

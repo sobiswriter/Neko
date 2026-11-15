@@ -8,10 +8,14 @@ Soft sounds are optional and off until you enable them.
 
 ## New in Neko 1.3
 
-Neko 1.3 builds to its own file, `dist\DesktopNeko-1.3.exe`, beside the stable
-`DesktopNeko.exe` and `DesktopNeko-previous.exe` (and the earlier `DesktopNeko-1.2.exe`). It
-shares settings, counts and the single-instance lock with them, so quit one before starting
-another.
+Neko 1.3 is the default build, `dist\DesktopNeko.exe`; the release before it (1.1) is kept as
+`dist\DesktopNeko-previous.exe`. Both share settings, counts and the single-instance lock, so
+quit one before starting the other.
+
+- **No repeated words.** Once she has said something, those exact words can't come back for
+  10 minutes, whatever triggers them (gestures, pets, games, the restless mood, AI thoughts,
+  across a relaunch too). When every line of a small group is still cooling down she simply
+  stays quiet. The only exception is Catch's "3… 2… 1…" countdown.
 
 - **Restless levels.** Company tab → **Restless when ignored**, **Restless after** (1–120 min,
   default 20) and **More restless every** (1–15 min, default 5). If you're at the computer but
@@ -57,7 +61,7 @@ another.
 ## New in Neko 1.2
 
 
-Neko 1.2 built to `dist\DesktopNeko-1.2.exe`; everything below is also in 1.3.
+Neko 1.2 was an experimental build; everything below is also in 1.3.
 
 - **Bigger Catch area, with hop-downs.** She can now pounce up to 140 px above her ground
   (was 110) and, when the arrow is just below her reach, hop down a little (24 to 80 px) to
@@ -259,7 +263,7 @@ prepared by `tools/prepare_sounds.py`.
   while she sulks, a huffy cross mark when she's held too long and sleepy z's once she
   gives up and dozes in your hand. With Gentle motion off they stay still. They live in
   [effects.py](effects.py).
-- **Offline personality.** 498 short lines, including more personal questions and
+- **Offline personality.** 526 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. The last 40 built-in lines she said, across every group,
@@ -305,7 +309,7 @@ prepared by `tools/prepare_sounds.py`.
   deliberate pets and naps still work normally.
 
   To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
-  contains all 498 phrases in 65 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  contains all 526 phrases in 67 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
   Edit or add one phrase per line inside the existing triple-quoted groups; keep the
   section names/quotes and aim for at most 110 characters per phrase. Source launches
   use your edits on restart; the packaged executable needs rebuilding. Optional AI

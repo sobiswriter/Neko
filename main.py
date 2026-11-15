@@ -64,6 +64,7 @@ PLAY_PHASES = frozenset(ACTIVE_PHASES)
 OUTCOME_VARIANTS = {"win": 4, "loss": 3}   # Triple hop, sproing, victory roll, sproing (2nd take).
 TRIPLE_HOP_SHARE = 0.8                      # Wins that use the triple hop; the rest share the rare ones.
 RESTLESS_LIMITS = (1, 120)  # minutes
+COUNTDOWN_WORDS = frozenset(("3…", "2…", "1…"))   # Catch's countdown: the only words that may repeat.
 RESTLESS_LEVEL_LIMITS = (1, 15)  # minutes at each restless level before the next
 # Deliberate moments (a pet, a game beat) may speak again after a short gap; unprompted sounds
 # keep the long pause so she never becomes noisy.
@@ -673,7 +674,7 @@ class NekoWidget(QWidget):
         self.companion.next_idle = time.monotonic() + self.companion.idle_seconds
         history = self.settings.value("recent_lines", [])
         history = [history] if isinstance(history, str) else history if isinstance(history, (list, tuple)) else []
-        self.dialogue = OfflineDialogue(history=[str(line) for line in history])
+        self.dialogue = OfflineDialogue(history=[str(line) for line in history], clock=lambda: time.monotonic())
         self.last_words = -math.inf
         self.last_activity_words = -math.inf
         self.gesture_words = {}
@@ -995,7 +996,7 @@ class NekoWidget(QWidget):
 
     def request_game(self, checked=False):
         if self.mood is not None and self.mood.stage == SAD and not self.mood.forgiven:
-            self.say("i'm too sad to play… a pet first, please?", prompted=True)
+            self.say(self.dialogue.pick("play_sad"), prompted=True, kind="play_sad")
             return
         if self.game:
             if self.game.phase not in ("curl", "comfort"):
@@ -1109,7 +1110,7 @@ class NekoWidget(QWidget):
             self.journal.add("Game", "not started", "not enough room for a safe runway")
             self.game_timer.reset(now)
             if source == "manual":
-                self.say("I need a little more room above me to jump. Move me lower?", prompted=True)
+                self.say(self.dialogue.pick("play_room"), prompted=True, kind="play_room")
             return False
         if self.mood is not None:
             # A game counts as attention: the mood waits, then calms by a stage after the round.
@@ -1956,8 +1957,15 @@ class NekoWidget(QWidget):
                                                              NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES)):
             self.journal.add("Thought", "suppressed", f"{kind}: quiet/hidden/fullscreen or incompatible pose", changed=True)
             return False
+        if text is None:
+            return False                     # Every line of that group is cooling down.
         text = " ".join(str(text).split())[:140]
         if not text:
+            return False
+        now = time.monotonic()
+        if text not in COUNTDOWN_WORDS and self.dialogue.cooling(text, now):
+            # The same words never come back before their cooldown, whoever asks for them.
+            self.journal.add("Thought", "suppressed", f"{kind}: said recently", changed=True)
             return False
         self.bubble.hide()
         self.bubble.setText(text)
@@ -1969,6 +1977,8 @@ class NekoWidget(QWidget):
         self.bubble.prepare_backdrop(plain=self.on_the_move())
         self.thought_channel = "gesture" if kind in GESTURE_THOUGHTS else "general idle" if kind in ("idle", "ai_idle") else kind
         self.bubble.show()
+        if text not in COUNTDOWN_WORDS:
+            self.dialogue.said(text, now)
         self.bubble_timer.start(hold_ms if hold_ms is not None else max(5500, min(10000, len(text) * 75)))
         self.companion.comments += 1
         if kind not in GESTURE_THOUGHTS:
