@@ -660,6 +660,7 @@ class NekoWidget(QWidget):
         except (TypeError, ValueError):
             self.restless_level_minutes = LEVEL_SECONDS // 60
         self.mood = None
+        self.mood_memory = None          # (level index, seconds at it) of an interrupted restless spell
         self.mood_resume_away = False
         self.ignored_seconds = 0.0
         self.last_ignore_tick = time.monotonic()
@@ -1069,8 +1070,9 @@ class NekoWidget(QWidget):
             (self.is_manually_hidden or not self.isVisible(), "hidden"),
             (self.fullscreen, "fullscreen"), (self.menu.isVisible(), "menu open"),
             (nook_editing and not manual, "Nook controls open; Journal can monitor play"),
-            # A restless kitten would love a game (it counts as attention), unless she is sulking
-            # for a pet or already forgiven and heading home.
+            # The restless mood comes first: no automatic games. A game you ask for counts as
+            # attention, unless she is sad (a pet first) or already forgiven and heading home.
+            (self.mood is not None and not manual, "restless; only a requested game"),
             (self.mood is not None and not self.mood.playful, "restless; sad or heading home"),
             (self.companion.state not in (NekoState.IDLE, NekoState.RESTLESS) + IDLE_STATES, self.companion.state.name.lower()),
             (self.drag_origin is not None, "being held"),
@@ -1316,8 +1318,10 @@ class NekoWidget(QWidget):
 
     # Restless kitten ------------------------------------------------------------------------------
     def note_attention(self, now=None):
-        """A pet, a game or a carry: the ignored-for clock starts again."""
+        """A pet or a played game: the ignored-for clock starts again and an interrupted restless
+        spell is forgotten."""
         self.ignored_seconds = 0.0
+        self.mood_memory = None
 
     def restless_summary(self):
         if not self.restless_enabled:
@@ -1337,6 +1341,9 @@ class NekoWidget(QWidget):
             return "Paused in Quiet company."
         left = max(0, self.restless_minutes * 60 - self.ignored_seconds)
         when = f"{math.ceil(left / 60)} min" if left >= 60 else f"{math.ceil(left)} sec"
+        if self.mood_memory is not None:
+            return (f"Paused at level {self.mood_memory[0] + 1} of 4; she carries on in about {when} "
+                    "(a pet or a game calms her).")
         return f"Restless in about {when} without pets or play (counts while you're at the computer)."
 
     def mood_area(self):
@@ -1362,10 +1369,13 @@ class NekoWidget(QWidget):
         self.mood_resume_away = False
         self.dismiss_bubble()
         self.reset_pet_cursor()
+        memory, self.mood_memory = self.mood_memory, None
         self.mood = RestlessMood(now, (self.x(), self.y()), self.mood_area(), self.motion, self.companion.rng,
-                                 level_seconds=self.restless_level_minutes * 60)
+                                 level_seconds=self.restless_level_minutes * 60, resume=memory)
         if away:
             self.mood.line = "away"
+        if memory is not None:
+            self.journal.add("Mood", "resumed", f"carrying on at level {self.mood.level} ({self.mood.stage_name})")
         self.companion.pose(NekoState.RESTLESS, now, math.inf)
         self.pose_started = now
         self.journal.add("Mood", "restless", f"ignored for {round(self.ignored_seconds / 60)} min; pet her to calm her")
@@ -1374,12 +1384,11 @@ class NekoWidget(QWidget):
 
     def advance_mood(self, now):
         mood = self.mood
-        typing = now - self.last_keyboard < 1.5
         held = bool(QApplication.mouseButtons()) or any(
             ctypes.windll.user32.GetAsyncKeyState(key) & 0x8000 for key in (1, 2, 4))
         stage = mood.stage_name
         cursor = QCursor.pos()
-        mood.update(now, (cursor.x(), cursor.y()), paused=typing or held or self.menu.isVisible())
+        mood.update(now, (cursor.x(), cursor.y()), paused=held or self.menu.isVisible())
         if mood.stage_name != stage:
             self.journal.add("Mood", "stage", f"{stage} → {mood.stage_name}")
         self.move(round(mood.x), round(mood.y))
@@ -1394,7 +1403,7 @@ class NekoWidget(QWidget):
         if cue:
             self.play_sound(cue)   # Unprompted: obeys the 45 s pause.
         if mood.done:
-            self.end_mood(now)
+            self.end_mood(now, remember=mood.remember)
 
     def pet_mood(self):
         now = time.monotonic()
@@ -1428,20 +1437,29 @@ class NekoWidget(QWidget):
         self.companion.pose(NekoState.RESTLESS, now, math.inf)
         self.refresh_asset()
 
-    def end_mood(self, now=None, instant=False):
-        """Back to ordinary company. instant: hiding/fullscreen/quit/monitor changes snap her home."""
+    def end_mood(self, now=None, instant=False, remember=False):
+        """Back to ordinary company. instant: hiding/fullscreen/quit/monitor changes snap her home.
+        remember: the spell was only interrupted (you stepped away, fullscreen, hiding, a monitor
+        change); she carries on at the same level a minute after things are back to normal."""
         mood, self.mood = self.mood, None
         if mood is None:
             return
+        now = time.monotonic() if now is None else now
+        memory = mood.snapshot(now) if remember else None
         if instant:
             self.move(*mood.home)
         if self.companion.state == NekoState.RESTLESS:
             self.companion.state = NekoState.IDLE
-        now = time.monotonic() if now is None else now
         self.companion.next_idle = now + self.companion.idle_seconds
         self.pose_started = now
-        self.note_attention(now)
-        self.journal.add("Mood", "calm", "forgiven" if mood.forgiven else "ended")
+        if memory is not None:
+            self.mood_memory = memory
+            self.mood_resume_away = True
+            self.ignored_seconds = max(0.0, self.restless_minutes * 60 - 60)
+            self.journal.add("Mood", "paused", f"level {memory[0] + 1} remembered; she carries on later")
+        else:
+            self.note_attention(now)
+            self.journal.add("Mood", "calm", "forgiven" if mood.forgiven else "ended")
         self.refresh_asset()
         self.save_preferences()
 
@@ -1656,9 +1674,17 @@ class NekoWidget(QWidget):
             self.last_words = now
             keyboard_events, window_event = 0, None
             if fullscreen and self.mood is not None:
-                self.end_mood(now, instant=True)  # Fullscreen always wins; she is quiet company again.
+                # Fullscreen always wins; she is quiet company again, and carries on afterwards.
+                self.end_mood(now, instant=True, remember=True)
             self.setVisible(not (fullscreen and self.hide_fullscreen))
             self.sync_animation()
+        if (self.mood_memory is not None and idle < 2 and not fullscreen and not self.quiet
+                and self.companion.state in (NekoState.SLEEPING, NekoState.FALLING_ASLEEP)):
+            # She only napped while you were away; you're back, so she wakes and carries on.
+            self.journal.add("Mood", "you're back", "she wakes to carry on being restless")
+            self.companion.wake(now)
+            self.pose_started = now
+            self.refresh_asset()
         self.watch_ignored(now, idle)
         if fullscreen and self.hide_fullscreen:
             self.last_window = window
@@ -1690,10 +1716,9 @@ class NekoWidget(QWidget):
         if self.mood is not None:
             if idle >= self.companion.sleep_seconds and not self.mood.forgiven:
                 # You stepped away: she goes home quietly and naps; she'll remember on your return.
-                self.journal.add("Mood", "away", "you stepped away; she goes home")
-                self.mood.go_home(now)
-                self.ignored_seconds = max(0.0, self.restless_minutes * 60 - 60)
-                self.mood_resume_away = True
+                self.journal.add("Mood", "away", f"you stepped away; she goes home and will carry on at "
+                                                 f"level {self.mood.level} when you're back")
+                self.mood.go_home(now, remember=True)
             self.poll_game()
             self.last_window = window
             return
@@ -1827,6 +1852,12 @@ class NekoWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        # Start every frame from a fully transparent canvas. Qt normally clears a translucent
+        # window before painting, but not always (after some display events the old frames stayed
+        # and piled up on top of each other); never rely on it.
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(self.rect(), Qt.transparent)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         if self.lifecycle_area is not None:
             painter.setClipRect(self.lifecycle_area.translated(-self.x(), -self.y()))
         painter.setRenderHint(QPainter.Antialiasing)
@@ -2508,7 +2539,7 @@ class NekoWidget(QWidget):
         self.journal.add("System", "visibility", "hidden")
 
     def screen_changed(self, *args):
-        self.end_mood(instant=True)
+        self.end_mood(instant=True, remember=True)
         self.end_game(immediate=True)
         self.cancel_pickup()
         self.clamp_position()
@@ -2521,9 +2552,14 @@ class NekoWidget(QWidget):
         if (self.closing or self.quit_pending or self.drag_origin is not None
                 or self.companion.state in (NekoState.ARRIVING, NekoState.LEAVING) + CARRY_STATES):
             return
-        self.end_mood(instant=True)
         self.end_game(immediate=True)
         self.clamp_position()
+        if self.mood is not None:
+            # The taskbar or resolution changed: she keeps her mood inside the new work area.
+            mood = self.mood
+            mood.area = self.mood_area()
+            mood.home = (mood.clamp_x(mood.home[0]), mood.clamp_y(mood.home[1]))
+            mood.moved(self.x(), self.y(), time.monotonic())
 
     def position_to_bottom_right(self):
         self.end_game(immediate=True)
@@ -2571,7 +2607,7 @@ class NekoWidget(QWidget):
             self.hide_neko()
 
     def hide_neko(self):
-        self.end_mood(instant=True)
+        self.end_mood(instant=True, remember=True)
         self.cancel_pickup()
         self.companion.pet_pending = False
         self.reset_pet_cursor()

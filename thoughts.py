@@ -62,6 +62,10 @@ class ThoughtLabel(QLabel):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        # Start from a transparent bubble every time, so an earlier thought can never show through.
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(self.rect(), Qt.transparent)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.setRenderHint(QPainter.Antialiasing)
         shape = QPainterPath()
         shape.addRoundedRect(QRectF(self.rect()), 20, 20)

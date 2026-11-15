@@ -12,6 +12,9 @@ Neko 1.3 is the default build, `dist\DesktopNeko.exe`; the release before it (1.
 `dist\DesktopNeko-previous.exe`. Both share settings, counts and the single-instance lock, so
 quit one before starting the other.
 
+- **No more stacked frames.** After a while on the desktop her old frames could pile up on
+  top of each other (a smeared, doubled outline and a dark shadow). Every frame is now drawn
+  on a fully cleared canvas, so that can't happen.
 - **No repeated words.** Once she has said something, those exact words can't come back for
   10 minutes, whatever triggers them (gestures, pets, games, the restless mood, AI thoughts,
   across a relaunch too). When every line of a small group is still cooling down she simply
@@ -38,15 +41,20 @@ quit one before starting the other.
   her line, pet again. A quick extra pet doesn't count (Journal → Care shows "pet too soon").
   Her words go from sad to happy, the rain cloud clears after the second pet, and on the
   fifth she gets up, nuzzles you and goes home. A pet also stops her climbing a level for a
-  minute. Playing a game calms her by a level (from level 1 she forgives you); Play is
-  refused only while she's curled up and sad.
+  minute. Playing a game you asked for calms her by a level (from level 1 she forgives you);
+  Play is refused only while she's curled up and sad.
   The Company tab shows the countdown before she gets restless, then her level, pets so far
-  and time to the next level. The clock only runs while you're using the computer, she's
-  awake and not being played with, petted or carried, and Quiet company is off. She never
-  moves while a mouse button is held or you're typing. Stepping away, Quiet company, the
-  switch, fullscreen, hiding and monitor changes send her home (from a curl she gets up
-  first). Carrying her pauses the mood but isn't a pet; carried while curled up, she stays
-  sad where you put her. Journal → **Mood** shows each level, pet and reason.
+  and time to the next level. The countdown only runs while you're using the computer, she's
+  awake and not being played with, petted or carried, and Quiet company is off.
+  **Once she's restless, the mood comes first.** Typing doesn't pause her or her level
+  clock, and no automatic Catch game starts (a game you ask for still does). She only waits
+  where she is while a mouse button is held or her menu is open, and the level clock keeps
+  running then too. Stepping away, fullscreen, hiding her and monitor changes send her home,
+  but she **remembers her level**: about a minute after you're back (she wakes from her nap
+  for it) she carries on where she left off and tells you so. Only a pet, a game you play
+  with her, Quiet company or switching the mood off ends it for good. Carrying her pauses
+  the mood but isn't a pet; carried while curled up, she stays sad where you put her.
+  Journal → **Mood** shows each level, pet, pause and reason.
 - **Playful laughter.** A new sound, used for excited moments: tail chases and catches,
   bouncy pets (happy hop, roll, side flop, back arch) instead of the purr some of the time,
   the chase in Catch, triple-hop wins now and then, restless runs and bounces, and when she

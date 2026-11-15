@@ -42,6 +42,7 @@ BOUND = PREPARE + FLIGHT
 MAX_LEAP = 120             # Height of one pounce (px); bigger changes take several pounces.
 LEAP_REACH = 100           # Sideways distance covered by one pounce.
 PET_PAUSE = 60             # After a pet she won't climb a level for this long.
+STALL = 0.5                # A longer gap between updates means the computer slept or the app stalled.
 LISTEN_SECONDS = 2.6       # Curled up: the next pet counts once she has said her line.
 GUILT_FIRST, GUILT_EVERY = (14, 22), (32, 50)
 BURST_LINES, BURST_LINE_GAP = ("pounce", "jealous", "demand"), 14
@@ -75,7 +76,9 @@ MOVES = ("travel", "leap")
 
 
 class RestlessMood:
-    def __init__(self, now, home, area, motion=True, rng=None, level_seconds=LEVEL_SECONDS):
+    def __init__(self, now, home, area, motion=True, rng=None, level_seconds=LEVEL_SECONDS, resume=None):
+        """resume: (level index, seconds already spent at it) from an earlier restless spell that was
+        interrupted (you stepped away, fullscreen, hiding): she carries on where she left off."""
         self.rng = rng or random.Random()
         self.home = home
         self.area = area                     # (left, top, right, bottom) allowed window positions
@@ -99,8 +102,16 @@ class RestlessMood:
         self.sound = None                    # A one-off sound cue for the desktop to play.
         self.forgiven = False
         self.quietly = False
+        self.remember = False                # Going home only for now: resume this level later.
+        self.memory = None                   # (level index, seconds at it) when she left
         self.done = False
         self.log = [(now, "restless")]
+        if resume is not None:
+            stage, elapsed = resume
+            self.stage = max(0, min(SAD, int(stage)))
+            self.stage_since = now - max(0.0, min(float(elapsed), level_seconds))
+            self.line = "away"
+            self.log.append((now, f"resumed at {self.stage_name}"))
         self.rest(now, 2.0)
 
     # Clock and level ---------------------------------------------------------------------------
@@ -143,7 +154,24 @@ class RestlessMood:
         """A game was asked for: finish the current move, then sit and wait for it."""
         self.plan = [("rest", 30)]
 
+    def snapshot(self, now):
+        """(level index, seconds at it) to carry on with later, or None once she is calm."""
+        if self.memory is not None:
+            return self.memory
+        if self.forgiven:
+            return None
+        return self.stage, max(0.0, now - self.stage_since)
+
+    def freeze(self, now):
+        """She waits where she is (a button is held, her menu is open); the level clock runs on."""
+        dt = max(0, now - self.last)
+        if self.step:
+            kind, data, started, seconds = self.step
+            self.step = (kind, data, started + dt, seconds)
+        self.last = now
+
     def hold(self, now):
+        """Nothing happened for her either (the computer slept): every clock stops."""
         dt = max(0, now - self.last)
         self.stage_since += dt
         self.listen_until += dt
@@ -228,8 +256,12 @@ class RestlessMood:
         self.next_step(now)
         self.log.append((now, "forgiven"))
 
-    def go_home(self, now):
-        """You stepped away: she quietly heads home without forgiving you (no words)."""
+    def go_home(self, now, remember=False):
+        """She quietly heads home without forgiving you (no words). remember: you only stepped
+        away, so she carries on at this level when you're back."""
+        if remember:
+            self.memory = self.snapshot(now)
+            self.remember = self.memory is not None
         self.forgiven = self.quietly = True
         self.line = None
         self.plan = self._getting_up() + self._trip_home()
@@ -434,13 +466,18 @@ class RestlessMood:
 
     # Update -----------------------------------------------------------------------------------
     def update(self, now, cursor, paused=False):
-        """paused: a mouse button is held or the user is typing; she waits where she is."""
+        """paused: a mouse button is held or her menu is open; she waits where she is."""
         if self.done:
             return
         self.cursor = cursor
         dt = now - self.last
-        if paused or dt < 0 or dt > 0.5:
+        if dt < 0 or dt > STALL:
             self.hold(now)
+            return
+        if paused:
+            # She waits where she is, but she keeps getting more restless: the level clock runs.
+            self.freeze(now)
+            self.escalate(now)
             return
         self.last = now
         self.escalate(now)

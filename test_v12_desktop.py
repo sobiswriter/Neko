@@ -62,6 +62,9 @@ def outline_rings(image, depth):
     return rings
 
 
+LINE_COOLDOWN_FOR_TESTS = 700   # Past the dialogue cooldown, so each pass may say a line again.
+
+
 class V12DesktopTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -207,6 +210,77 @@ class V12DesktopTests(unittest.TestCase):
         with patch("main.time.monotonic", return_value=self.now):
             self.n.dismiss_bubble()
             self.assertTrue(self.n.say(texts[0][1], prompted=True))   # After the cooldown it may return.
+
+    def test_every_frame_starts_from_a_clear_canvas(self):
+        """Old frames can never pile up: painting over a dirty surface gives the same picture as
+        painting over a clean one."""
+        from PySide6.QtGui import QColor, QImage, QRegion
+        from PySide6.QtWidgets import QWidget
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.start_mood(self.now)
+        self.step(3, (300, 300))
+        for widget in (self.n,):
+            pictures = []
+            for fill in (QColor(0, 0, 0, 0), QColor(200, 30, 30, 255)):
+                image = QImage(widget.size(), QImage.Format_ARGB32_Premultiplied)
+                image.fill(fill)
+                with patch("main.time.monotonic", return_value=self.now):
+                    widget.render(image, QPoint(), QRegion(), QWidget.RenderFlag.DrawChildren)
+                pictures.append(image)
+            self.assertEqual(pictures[0], pictures[1], type(widget).__name__)
+
+    def test_she_wakes_from_her_away_nap_when_you_are_back_and_carries_on(self):
+        self.n.mood_memory = (2, 30)
+        self.n.companion.state = NekoState.SLEEPING
+        with patch("main.time.monotonic", return_value=self.now), \
+                patch("main.desktop_activity", return_value=(0.5, 0, False)):
+            self.n.tick()
+        self.assertEqual(self.n.companion.state, NekoState.WAKING)
+        self.assertIn("carries on in about", self.n.restless_summary())
+
+    def test_typing_does_not_stop_her_climbing_levels(self):
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.start_mood(self.now)
+        self.n.mood.level_seconds = 60
+        for _ in range(int(130 / 0.5)):
+            self.n.last_keyboard = self.now               # You're typing the whole time.
+            self.step(0.5, (300, 300))
+        self.assertEqual(self.n.mood.stage_name, "demanding")
+
+    def test_stepping_away_fullscreen_and_hiding_keep_her_level(self):
+        from restless import SAD
+        for interrupt in ("away", "fullscreen", "hide"):
+            with patch("main.time.monotonic", return_value=self.now):
+                self.n.start_mood(self.now)
+            self.n.mood.stage = 2
+            self.n.mood.stage_since = self.now - 40
+            if interrupt == "away":
+                self.n.mood.go_home(self.now, remember=True)
+                self.step(30, (300, 300))
+            elif interrupt == "fullscreen":
+                with patch("main.time.monotonic", return_value=self.now):
+                    self.n.end_mood(self.now, instant=True, remember=True)
+            else:
+                self.n.hide_neko()
+                self.n.show_neko()
+                self.n.finish_transition()
+            self.assertIsNone(self.n.mood, interrupt)
+            self.assertEqual(self.n.mood_memory[0], 2, interrupt)
+            self.assertIn("remembered", self.n.journal.text("Mood"))
+            self.assertGreaterEqual(self.n.ignored_seconds, self.n.restless_minutes * 60 - 60)
+            self.n.companion.state = NekoState.IDLE
+            with patch("main.time.monotonic", return_value=self.now):
+                self.n.start_mood(self.now)
+            self.assertEqual(self.n.mood.stage_name, "demanding", interrupt)   # She carries on.
+            self.assertIn(self.n.bubble.text(), LINES["restless_away"])
+            self.n.end_mood(instant=True)
+            self.n.mood_memory = None
+            self.now += LINE_COOLDOWN_FOR_TESTS
+        # A pet while she's home forgets the spell.
+        self.n.mood_memory = (SAD, 10)
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.pet_reaction()
+        self.assertIsNone(self.n.mood_memory)
 
     def test_level_setting_persists_and_reaches_the_mood(self):
         self.n.set_restless_level_minutes(2)

@@ -196,14 +196,37 @@ class RestlessTests(unittest.TestCase):
         self.run_until(mood, 10 + LEVEL - 5)
         self.assertEqual(mood.stage_name, "pouncy")
 
-    def test_paused_while_a_button_is_held_or_typing(self):
+    def test_a_held_button_freezes_her_but_not_her_level_clock(self):
         mood = self.mood()
         mood.stage, mood.stage_since = 1, 0
         self.run_until(mood, 30)
-        x, stage_since = mood.x, mood.stage_since
+        x, y, stage_since = mood.x, mood.y, mood.stage_since
         self.run_until(mood, 60, paused=True)
-        self.assertEqual(mood.x, x)
-        self.assertAlmostEqual(mood.stage_since, stage_since + 30, delta=0.1)
+        self.assertEqual((mood.x, mood.y), (x, y))
+        self.assertEqual(mood.stage_since, stage_since)         # The level clock kept running…
+        self.run_until(mood, LEVEL + 1, paused=True)
+        self.assertEqual(mood.stage_name, "demanding")          # …so she climbs even while paused.
+
+    def test_a_long_gap_stops_every_clock(self):
+        mood = self.mood()
+        self.run_until(mood, 10)
+        mood.update(2000, (400, 700))                            # The computer slept.
+        self.assertAlmostEqual(mood.stage_since, 1990, delta=0.1)
+        self.assertEqual(mood.stage, 0)
+
+    def test_she_resumes_an_interrupted_spell_at_the_same_level(self):
+        mood = self.mood()
+        mood.stage, mood.stage_since = 2, 0
+        mood.go_home(100, remember=True)
+        self.assertEqual(mood.snapshot(150), (2, 100))          # Frozen when she left.
+        again = RestlessMood(500, HOME, AREA, True, random.Random(1), level_seconds=LEVEL, resume=(2, 100))
+        self.assertEqual(again.stage_name, "demanding")
+        self.assertAlmostEqual(again.seconds_to_next_level(500), LEVEL - 100)
+        self.assertEqual(again.take_line(), "away")
+        mood = self.mood()
+        mood.pet(5)
+        mood.pet(6)                                             # Forgiven: nothing to remember.
+        self.assertIsNone(mood.snapshot(7))
 
     def test_stepping_away_sends_her_home_quietly_even_from_the_curl(self):
         for curled in (False, True):

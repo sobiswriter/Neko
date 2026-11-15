@@ -168,16 +168,20 @@ class DesktopTriggerTests(unittest.TestCase):
         self.assertIsNotNone(self.n.game)
         self.assertEqual(self.n.game.source, "manual")
 
-    def test_restless_kitten_accepts_a_game_while_resting(self):
+    def test_restless_kitten_takes_only_a_requested_game(self):
         with patch("main.time.monotonic", return_value=self.now):
             self.n.start_mood(self.now)
         self.n.mood.stage = 1
         self.n.mood.step = ("rest", None, self.now, 30)
         self.n.game_timer.due = self.now - 5
-        for x in (790, 790, 650, 650, 650, 650):
+        for x in (790, 790, 650, 650, 650, 650):            # The arrow comes beside her…
             self.poll(.1, QPoint(x, 420))
+        self.assertIsNone(self.n.game)                      # …but the mood comes first.
+        self.assertEqual(self.n.mood.stage, 1)
+        self.n.request_game()
+        self.poll(.1, QPoint(650, 420))
         self.assertIsNotNone(self.n.game)
-        self.assertEqual(self.n.game.source, "automatic")
+        self.assertEqual(self.n.game.source, "manual")
 
     def test_requested_game_cuts_an_idle_gesture_or_app_reaction_short(self):
         for state in (NekoState.SNIFFING, NekoState.TYPING, NekoState.DIZZY, NekoState.CHEEK_RUB):
