@@ -1,4 +1,4 @@
-"""Prepare the user's hand-picked kitten sounds for Neko 1.2.
+"""Prepare the user's hand-picked kitten sounds for Neko 1.2 and 1.3.
 
 Input: ``assets-incoming/sounds/`` (the generator kept the start of each brief description as
 the filename). Output: ``assets/sounds/<cue>-<n>.wav``: 44.1 kHz, 16-bit mono, leading silence
@@ -31,11 +31,12 @@ CUES = (
     ("sad-mew", "sad"),
     ("demand-meow", "demand"),
     ("giggle-chatter", "giggle"),
+    ("playful,_kitten_laug", "laugh"),           # Neko 1.3: "playful kitten laughter"
 )
 # Soft, kitten-sized levels (dBFS RMS of the sound) with a low peak ceiling, so nothing is ever
 # startling at a normal speaker volume. Purr sits underneath; bright or insistent cues sit lower.
 LOUDNESS = {"purr": -40.0, "mew": -37.5, "demand": -39.0, "protest": -38.5, "giggle": -39.0,
-            "chirp": -37.5, "trill": -37.5}
+            "chirp": -37.5, "trill": -37.5, "laugh": -39.5}
 DEFAULT_LOUDNESS, PEAK_CEILING = -37.0, -18.0
 # Softening: roll off the harsh top end and any rumble; ease into and out of every sound.
 FILTER = "highpass=f=140,lowpass=f=4200,lowpass=f=6000"
@@ -124,7 +125,7 @@ def main():
                      round(len(samples) / RATE, 2)))
         print(f"{name:14} {len(samples) / RATE:5.2f}s  <- {path.name}")
     lines = ["# Sound credits", "",
-             "Neko 1.2's kitten sounds were hand-picked by the project owner (Sobi) and supplied in",
+             "Neko's kitten sounds (1.2, plus the 1.3 laughter) were hand-picked by the project owner (Sobi) and supplied in",
              "`assets-incoming/sounds/`. `tools/prepare_sounds.py` trims, levels and (for purrs) loops",
              "them; it does not otherwise alter the recordings. The earlier synthesized `mew.wav`,",
              "`purr.wav` and `chirp.wav` (from `tools/make_sounds.py`) remain only as a fallback.", "",

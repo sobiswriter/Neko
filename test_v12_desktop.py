@@ -146,9 +146,9 @@ class V12DesktopTests(unittest.TestCase):
         self.assertIsNotNone(self.n.mood)
         self.assertEqual(self.n.companion.state, NekoState.RESTLESS)
         self.assertIn(self.n.bubble.text(), LINES["restless_start"])
-        self.n.mood.stage = 2                      # Jealous: three pets.
+        self.n.mood.stage = 2                      # Demanding: four pets.
         self.step(20, (300, 300))
-        for _ in range(3):
+        for _ in range(4):
             self.n.dismiss_bubble()
             with patch("main.time.monotonic", return_value=self.now):
                 self.n.pet_reaction()
@@ -158,8 +158,49 @@ class V12DesktopTests(unittest.TestCase):
         self.assertIsNone(self.n.mood)
         self.assertEqual(self.n.companion.state, NekoState.IDLE)
         self.assertEqual(self.n.pos(), QPoint(300, 400))
-        self.assertEqual(self.n.companion.pets, 3)
+        self.assertEqual(self.n.companion.pets, 4)
         self.assertIn("forgiven", self.n.journal.text("Mood"))
+
+    def test_sad_kitten_takes_one_pet_per_line_and_cheers_up_in_words(self):
+        from restless import LISTEN_SECONDS, SAD
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.start_mood(self.now)
+        self.n.mood.stage = SAD
+        self.n.mood.curl(self.now)
+        self.assertIn("level 4 of 4", self.n.restless_summary().lower())
+        said = []
+        for i in range(5):
+            with patch("main.time.monotonic", return_value=self.now):
+                self.n.pet_reaction()
+                self.n.pet_reaction()                 # A quick second pet doesn't count.
+            said.append(self.n.bubble.text())
+            self.step(LISTEN_SECONDS + 0.2, (300, 300))
+        self.assertEqual(self.n.companion.pets, 5)
+        for i, text in enumerate(said[:4]):
+            self.assertIn(text, LINES[f"restless_sad_{i + 1}"])
+        self.assertIn(said[4], LINES["restless_sad_done"])
+        self.assertIn("pet too soon", self.n.journal.text("Care"))
+        self.step(60, (300, 300))
+        self.assertIsNone(self.n.mood)
+
+    def test_level_setting_persists_and_reaches_the_mood(self):
+        self.n.set_restless_level_minutes(2)
+        self.assertEqual(self.settings.value("restless_level_minutes", type=int), 2)
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.start_mood(self.now)
+        self.assertEqual(self.n.mood.level_seconds, 120)
+        self.n.set_restless_level_minutes(99)
+        self.assertEqual(self.n.mood.level_seconds, 15 * 60)
+
+    def test_requested_play_is_refused_only_while_she_is_sad(self):
+        from restless import SAD
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.start_mood(self.now)
+        self.n.mood.stage = SAD
+        self.n.mood.curl(self.now)
+        self.n.request_game()
+        self.assertIsNone(self.n.game_timer.pending)
+        self.assertIn("sad", self.n.bubble.text())
 
     def test_restless_respects_its_switch_quiet_fullscreen_and_absence(self):
         self.n.ignored_seconds = 10 ** 6

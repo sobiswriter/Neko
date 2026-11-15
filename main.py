@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
 
 from behavior import Companion, NekoState, PET_STATES, CARRY_STATES, GAME_STATES, IDLE_STATES
 from games import ACTIVE_PHASES, DECLARE_SECONDS, MAX_DROP, MAX_LIFT, CursorGame, GameTimer, Runway
-from restless import RestlessMood
+from restless import LEVEL_SECONDS, SAD, RestlessMood
 import sounds
 from activity import ActivityMonitor, foreground_executable
 from app_context import app_kind
@@ -38,7 +38,7 @@ from event_log import EventLog
 from llm_brain import api_key_source, load_api_key, save_api_key
 
 
-APP_VERSION = "1.2"
+APP_VERSION = "1.3"
 RESOURCE_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
 ASSET_ROOT = RESOURCE_ROOT / "assets"
 ICON_PATH = RESOURCE_ROOT / "neko_sleep.ico"
@@ -64,17 +64,22 @@ PLAY_PHASES = frozenset(ACTIVE_PHASES)
 OUTCOME_VARIANTS = {"win": 4, "loss": 3}   # Triple hop, sproing, victory roll, sproing (2nd take).
 TRIPLE_HOP_SHARE = 0.8                      # Wins that use the triple hop; the rest share the rare ones.
 RESTLESS_LIMITS = (1, 120)  # minutes
+RESTLESS_LEVEL_LIMITS = (1, 15)  # minutes at each restless level before the next
 # Deliberate moments (a pet, a game beat) may speak again after a short gap; unprompted sounds
 # keep the long pause so she never becomes noisy.
 SOUND_GAP_PROMPTED, SOUND_GAP_AUTOMATIC = 1.5, 45
 # Soft voices for her idle gestures (only sometimes, and never more than once per 45 s).
-GESTURE_SOUNDS = {"tail_chase": "giggle", "tail_catch": "trill", "yawn": "yawn", "stretch": "yawn",
+# A tuple is a choice: one of them, picked at random.
+GESTURE_SOUNDS = {"tail_chase": ("giggle", "laugh"), "tail_catch": ("trill", "laugh"), "yawn": "yawn", "stretch": "yawn",
                   "sniff": "question", "peek": "mew", "look_left": "question", "look_right": "question",
                   "ears": "chirp", "loaf": "purr_short", "dizzy": "question"}
 GESTURE_SOUND_CHANCE = 0.55
-MOOD_SOUNDS = {"start": "question", "away": "question", "pouncy": "chirp", "pounce": "chirp", "jealous": "protest",
-               "demanding": "demand", "demand": "demand", "sulk": "sad", "calm_progress": "purr_short",
-               "calm_done": "trill", "carried": "protest"}
+MOOD_SOUNDS = {"start": "question", "away": "question", "pouncy": "chirp", "pounce": ("chirp", "laugh"),
+               "jealous": "protest", "demanding": "demand", "demand": "demand", "sad": "sad", "guilt": "sad",
+               "sad_1": "mew", "sad_2": "mew", "sad_3": "purr_short", "sad_4": "purr_short",
+               "sad_done": "laugh", "calm_progress": "purr_short", "calm_done": "trill", "carried": "protest"}
+# Excited pets that come with a playful laugh instead of the purr, some of the time.
+EXCITED_PETS_LAUGH = 0.6
 # Words while held, keyed to the held expressions: excited lift (sometimes), unimpressed (10s),
 # sleepy after the yawn (20s). Each waits HELD_REPEAT_SECONDS before it can return.
 HELD_THOUGHTS = {"held_up": 1.0, "held_long": 11.0, "held_longer": 21.5}
@@ -304,6 +309,18 @@ class StatsWindow(QDialog):
         self.restless_minutes.valueChanged.connect(neko.set_restless_minutes)
         self.restless_minutes.setEnabled(neko.restless_enabled)
         self.restless.toggled.connect(self.restless_minutes.setEnabled)
+        self.restless_levels = QSpinBox()
+        self.restless_levels.setMinimumWidth(100)
+        self.restless_levels.setRange(*RESTLESS_LEVEL_LIMITS)
+        self.restless_levels.setSuffix(" min")
+        self.restless_levels.setKeyboardTracking(False)
+        self.restless_levels.setValue(neko.restless_level_minutes)
+        self.restless_levels.setAccessibleName("Minutes at each restless level before the next")
+        self.restless_levels.setToolTip("Once restless, she climbs a level this often: agitated, pouncy, "
+                                        "demanding, then curled up and sad.")
+        self.restless_levels.valueChanged.connect(neko.set_restless_level_minutes)
+        self.restless_levels.setEnabled(neko.restless_enabled)
+        self.restless.toggled.connect(self.restless_levels.setEnabled)
         self.motion = QCheckBox("Gentle motion")
         self.motion.setChecked(neko.motion)
         self.motion.toggled.connect(neko.set_motion)
@@ -405,6 +422,7 @@ class StatsWindow(QDialog):
             self.timing[key] = spin
             timing.addRow(label, spin)
         timing.addRow("Restless after", self.restless_minutes)
+        timing.addRow("More restless every", self.restless_levels)
         company_layout.addLayout(timing)
         note = QLabel("Choose a timed nap or ‘Until petted’.\nTyping and window activity let her sleep.")
         note.setWordWrap(True)
@@ -484,6 +502,7 @@ class StatsWindow(QDialog):
             widget.setChecked(value)
             widget.blockSignals(False)
         self.restless_minutes.setEnabled(self.neko.restless_enabled)
+        self.restless_levels.setEnabled(self.neko.restless_enabled)
         self.key_message = ""
         self.update_key_status()
         self.update_stats()
@@ -526,7 +545,8 @@ class StatsWindow(QDialog):
             NekoState.DISAPPOINTED: "a little disappointed. a pet would help.",
             NekoState.COMFORTING: "one more cuddle. feeling better already.",
             NekoState.DIZZY: "the room is going round…",
-            NekoState.RESTLESS: (f"restless ({n.mood.stage_name}). {n.mood.pets}/{n.mood.pets_needed} pets to calm her."
+            NekoState.RESTLESS: (("curled up and sad. pet me after each thing i say…" if n.mood.stage == SAD
+                                  else f"restless, level {n.mood.level} ({n.mood.stage_name}).")
                                  if n.mood is not None else "restless."),
         }.get(n.companion.state, "a little cat, doing little cat things."))
 
@@ -597,7 +617,11 @@ class NekoWidget(QWidget):
         self.settings = settings if settings is not None else QSettings("DesktopNeko", "Neko")
         log_root = (Path(self.settings.fileName()).parent if self.settings.format() == QSettings.IniFormat else
                     Path(QStandardPaths.writableLocation(QStandardPaths.AppLocalDataLocation)))
-        self.journal = EventLog(log_root / "neko-events.jsonl")
+        self.journal = EventLog(log_root / "neko-events.jsonl", autosave=False)
+        self.journal_timer = QTimer(self)
+        self.journal_timer.timeout.connect(self.journal.flush)
+        self.journal_timer.start(1000)
+        QApplication.instance().aboutToQuit.connect(self.journal.flush)
         self.journal.add("System", "session", "Neko started")
         self.logged_state = self.logged_game = None
         self.pending_reaction = None
@@ -629,6 +653,11 @@ class NekoWidget(QWidget):
                                                                 int(self.settings.value("restless_minutes", 20))))
         except (TypeError, ValueError, OverflowError):
             self.restless_minutes = 20
+        try:
+            self.restless_level_minutes = max(RESTLESS_LEVEL_LIMITS[0], min(RESTLESS_LEVEL_LIMITS[1], int(
+                self.settings.value("restless_level_minutes", LEVEL_SECONDS // 60))))
+        except (TypeError, ValueError):
+            self.restless_level_minutes = LEVEL_SECONDS // 60
         self.mood = None
         self.mood_resume_away = False
         self.ignored_seconds = 0.0
@@ -665,8 +694,8 @@ class NekoWidget(QWidget):
         self.sounds_enabled = self.settings.value("sounds_enabled", False, type=bool)
         self.last_sound = -math.inf
         self.voice = sounds.Voice(ASSET_ROOT / "sounds", self.companion.rng)
-        self.voice.volume = max(sounds.VOLUME_MIN, min(sounds.VOLUME_MAX,
-                                self.settings.value("sound_volume", 100, type=int)))
+        self.voice.set_level(max(sounds.VOLUME_MIN, min(sounds.VOLUME_MAX,
+                                 self.settings.value("sound_volume", 100, type=int))))
         self.purring = False
         self.reactive = self.settings.value("reactive", True, type=bool)
         self.hide_fullscreen = self.settings.value("hide_fullscreen", False, type=bool)
@@ -880,7 +909,7 @@ class NekoWidget(QWidget):
 
     def set_volume(self, percent):
         """Her voice volume, as a percent of the prepared soft level (0 mutes, 300 is loudest)."""
-        self.voice.volume = max(sounds.VOLUME_MIN, min(sounds.VOLUME_MAX, int(percent)))
+        self.voice.set_level(max(sounds.VOLUME_MIN, min(sounds.VOLUME_MAX, int(percent))))
         if self.voice.volume == 0:
             self.stop_sound()
         self.save_preferences()
@@ -895,6 +924,8 @@ class NekoWidget(QWidget):
     def play_sound(self, kind, prompted=False):
         """Play one take of a cue. "purr" loops while she is petted; "purr_short" plays once."""
         now = time.monotonic()
+        if isinstance(kind, tuple):
+            kind = random.choice(kind)
         loop = kind == "purr"
         cue = "purr" if kind == "purr_short" else kind
         if (cue not in sounds.CUES or not self.sounds_enabled
@@ -945,6 +976,13 @@ class NekoWidget(QWidget):
                                                   f"after {self.restless_minutes} min")
         self.save_preferences()
 
+    def set_restless_level_minutes(self, value):
+        self.restless_level_minutes = max(RESTLESS_LEVEL_LIMITS[0], min(RESTLESS_LEVEL_LIMITS[1], value))
+        if self.mood is not None:
+            self.mood.level_seconds = self.restless_level_minutes * 60
+        self.journal.add("Mood", "configuration", f"more restless every {self.restless_level_minutes} min")
+        self.save_preferences()
+
     def set_restless_minutes(self, value):
         self.restless_minutes = max(RESTLESS_LIMITS[0], min(RESTLESS_LIMITS[1], value))
         self.journal.add("Mood", "configuration", f"restless after {self.restless_minutes} min")
@@ -956,8 +994,8 @@ class NekoWidget(QWidget):
         self.save_preferences()
 
     def request_game(self, checked=False):
-        if self.mood is not None and self.mood.stage_name == "sulk":
-            self.say("i'm sulking. a pet first, please.", prompted=True)
+        if self.mood is not None and self.mood.stage == SAD and not self.mood.forgiven:
+            self.say("i'm too sad to play… a pet first, please?", prompted=True)
             return
         if self.game:
             if self.game.phase not in ("curl", "comfort"):
@@ -1032,7 +1070,7 @@ class NekoWidget(QWidget):
             (nook_editing and not manual, "Nook controls open; Journal can monitor play"),
             # A restless kitten would love a game (it counts as attention), unless she is sulking
             # for a pet or already forgiven and heading home.
-            (self.mood is not None and not self.mood.playful, "restless; sulking or heading home"),
+            (self.mood is not None and not self.mood.playful, "restless; sad or heading home"),
             (self.companion.state not in (NekoState.IDLE, NekoState.RESTLESS) + IDLE_STATES, self.companion.state.name.lower()),
             (self.drag_origin is not None, "being held"),
             (bool(QApplication.mouseButtons()) or any(ctypes.windll.user32.GetAsyncKeyState(key) & 0x8000 for key in (1, 2, 4, 5, 6)), "mouse button held"),
@@ -1197,7 +1235,7 @@ class NekoWidget(QWidget):
             self.last_outcome["win"] = game.variant
             game.outcome_seconds = sum(CLIPS[self.game_clip()].durations) / 1000
             self.current_clip = self.game_clip()
-            self.play_sound("trill", prompted=True)
+            self.play_sound("laugh" if game.variant == 0 and random.random() < 0.4 else "trill", prompted=True)
         if game.phase == "loss" and game.variant is None:
             bag = self.outcome_bags.setdefault(game.phase, [])
             if not bag:
@@ -1229,7 +1267,7 @@ class NekoWidget(QWidget):
         hold = (1000 if countdown else round((DECLARE_SECONDS + .8) * 1000) if line == "announce" and game.kind == "catch"
                 else 2000 if line == "announce" else 2200 if line in ("brush", "escape", "tease", "not_yet") else None)
         shown = self.say(text, prompted=game.source == "manual", hold_ms=hold, kind=group)
-        sound = {"announce": "chirp", "go": "trill", "pursuit": "giggle", "protest_high": "protest",
+        sound = {"announce": "chirp", "go": "trill", "pursuit": random.choice(("giggle", "laugh")), "protest_high": "protest",
                  "protest_low": "protest", "protest_side": "protest", "protest_monitor": "protest",
                  "protest_last": "protest",
                  "comfort": "purr_short", "bring": "mew", "no_show": "mew"}.get(line)
@@ -1286,7 +1324,14 @@ class NekoWidget(QWidget):
         if self.mood is not None:
             if self.mood.forgiven:
                 return "Calm again, heading home."
-            return f"Restless now ({self.mood.stage_name}): {self.mood.pets}/{self.mood.pets_needed} pets to calm her."
+            mood = self.mood
+            if mood.stage == SAD:
+                return (f"Level 4 of 4: curled up and sad. {mood.pets}/{mood.pets_needed} pets; "
+                        "pet her once after each thing she says.")
+            left = mood.seconds_to_next_level(time.monotonic())
+            nxt = f" Next level in {math.ceil(left / 60)} min." if left is not None and left >= 60 else (
+                f" Next level in {math.ceil(left)} sec." if left is not None else "")
+            return f"Level {mood.level} of 4 ({mood.stage_name}): {mood.pets}/{mood.pets_needed} pets to calm her.{nxt}"
         if self.quiet:
             return "Paused in Quiet company."
         left = max(0, self.restless_minutes * 60 - self.ignored_seconds)
@@ -1316,7 +1361,8 @@ class NekoWidget(QWidget):
         self.mood_resume_away = False
         self.dismiss_bubble()
         self.reset_pet_cursor()
-        self.mood = RestlessMood(now, (self.x(), self.y()), self.mood_area(), self.motion, self.companion.rng)
+        self.mood = RestlessMood(now, (self.x(), self.y()), self.mood_area(), self.motion, self.companion.rng,
+                                 level_seconds=self.restless_level_minutes * 60)
         if away:
             self.mood.line = "away"
         self.companion.pose(NekoState.RESTLESS, now, math.inf)
@@ -1339,8 +1385,13 @@ class NekoWidget(QWidget):
         line = mood.take_line()
         if line:
             group = "restless_" + {"demanding": "demand"}.get(line, line)
-            if group in LINES and self.say(self.dialogue.pick(group), prompted=line.startswith("calm"), kind=group):
-                self.play_sound(MOOD_SOUNDS.get(line, "mew"), prompted=line.startswith("calm"))
+            answer = line.startswith(("calm", "sad_"))   # Replies to your pets are prompted.
+            hold = 6500 if line.startswith("sad_") or line == "guilt" else None
+            if group in LINES and self.say(self.dialogue.pick(group), prompted=answer, hold_ms=hold, kind=group):
+                self.play_sound(MOOD_SOUNDS.get(line, "mew"), prompted=answer)
+        cue = mood.take_sound()
+        if cue:
+            self.play_sound(cue)   # Unprompted: obeys the 45 s pause.
         if mood.done:
             self.end_mood(now)
 
@@ -1349,12 +1400,16 @@ class NekoWidget(QWidget):
         mood = self.mood
         if mood.forgiven:
             return
-        self.companion.pets += 1
-        before = mood.stage_name
+        before, sad = mood.stage_name, mood.stage == SAD
         result = mood.pet(now)
+        if result == "wait":
+            # Curled up, she takes one pet per thing she says; a quick extra pet doesn't count.
+            self.journal.add("Care", "pet too soon", "she's still talking; pet again after her line", changed=True)
+            return
+        self.companion.pets += 1
         self.journal.add("Care", "pet accepted", f"restless ({before}): {mood.pets}/{mood.pets_needed}"
                          if result == "progress" else f"restless ({before}): forgiven")
-        if result == "forgiven":
+        if result == "forgiven" and not sad:
             self.play_sound("purr", prompted=True)
         self.dismiss_bubble()
         self.advance_mood(now)
@@ -1684,6 +1739,8 @@ class NekoWidget(QWidget):
             elif action == "fidget":
                 self.offline_line(self.current_clip)
                 cue = GESTURE_SOUNDS.get(self.current_clip)
+                if isinstance(cue, tuple):
+                    cue = random.choice(cue)
                 if cue and random.random() < GESTURE_SOUND_CHANCE:
                     self.play_sound(cue)   # Unprompted: obeys the 45 s pause, quiet, media and fullscreen.
             elif action == "wake":
@@ -1885,6 +1942,12 @@ class NekoWidget(QWidget):
             self.bubble.backdrop = QPixmap()
             self.place_bubble()
 
+    def on_the_move(self):
+        if self.mood is not None and self.companion.state == NekoState.RESTLESS:
+            return self.mood.moving or bool(self.mood.plan and self.mood.plan[0][0] in ("travel", "leap"))
+        return (self.game is not None and self.game.phase in
+                ("go", "run", "turn", "prepare", "jump", "miss", "return", "home"))
+
     def say(self, text, prompted=False, hold_ms=None, kind="thought"):
         carried = self.companion.state == NekoState.HELD and kind in HELD_THOUGHTS
         if (self.closing or self.is_manually_hidden or self.fullscreen
@@ -1900,7 +1963,10 @@ class NekoWidget(QWidget):
         self.bubble.setText(text)
         self.bubble.adjustSize()
         self.place_bubble()
-        self.bubble.prepare_backdrop()
+        # The frosted glass samples the screen behind the bubble (a screen grab, tens of ms). While
+        # she is running or pouncing the bubble travels with her and the sample is dropped at once,
+        # so skip it and keep the plain glass: no hitch mid-motion.
+        self.bubble.prepare_backdrop(plain=self.on_the_move())
         self.thought_channel = "gesture" if kind in GESTURE_THOUGHTS else "general idle" if kind in ("idle", "ai_idle") else kind
         self.bubble.show()
         self.bubble_timer.start(hold_ms if hold_ms is not None else max(5500, min(10000, len(text) * 75)))
@@ -2010,8 +2076,13 @@ class NekoWidget(QWidget):
         self.journal.add("Care", "pet accepted", "wake" if was_sleeping else "queued" if self.companion.pet_pending else self.companion.state.name.lower())
         self.note_attention(now)
         if not self.purring:
-            # Mostly a purr that lasts the whole pet, sometimes a happy little mew; a sleepy yawn on waking.
-            self.play_sound("yawn" if was_sleeping else "purr" if random.random() < 0.7 else "mew", prompted=True)
+            # Mostly a purr that lasts the whole pet, sometimes a happy little mew; a sleepy yawn on
+            # waking; a playful laugh for the bouncy, rolly pets.
+            excited = started and self.companion.state in (NekoState.HAPPY_HOP, NekoState.ROLLING,
+                                                           NekoState.SIDE_FLOP, NekoState.BACK_ARCH)
+            self.play_sound("yawn" if was_sleeping else
+                            "laugh" if excited and random.random() < EXCITED_PETS_LAUGH else
+                            "purr" if random.random() < 0.7 else "mew", prompted=True)
         if not started:
             return
         self.pose_started = now
@@ -2558,6 +2629,7 @@ class NekoWidget(QWidget):
                            "reactive": self.reactive, "hide_fullscreen": self.hide_fullscreen,
                            "ai_enabled": self.ai_enabled,
                            "restless_enabled": self.restless_enabled, "restless_minutes": self.restless_minutes,
+                           "restless_level_minutes": self.restless_level_minutes,
                            "position": (QPoint(round(self.game.origin[0]), round(self.game.origin[1])) if self.game else
                                         QPoint(*self.mood.home) if self.mood is not None else
                                         self.arrival_target if self.arrival_target is not None else
@@ -2689,6 +2761,9 @@ class NekoWidget(QWidget):
         if self.stats_window:
             self.stats_window.close()
         self.save_preferences()
+        # Closing: write the journal now, and every later row straight away.
+        self.journal.flush()
+        self.journal.autosave = True
         if self.brain_worker is not None:
             self.brain_worker.requestInterruption()
             # A network request cannot be interrupted; never keep a hidden process holding the

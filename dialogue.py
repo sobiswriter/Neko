@@ -579,10 +579,48 @@ okay… i missed you, that's all.
 that's better. i'll stop pouncing now.
 you may continue working. i am content.
 """,
-    "restless_sulk": """
-fine. i'll just sulk here, then.
-nobody pets me. i'm a sad little loaf.
-i'm not moving until someone pets me.
+    "restless_sad": """
+fine… i'll just curl up right here, next to you.
+okay. i'll be sad right here where you can see me.
+i came all this way… and nothing.
+i'll just be a sad little loaf. right here.
+""",
+    "restless_guilt": """
+it's okay… i'll just wait here. by myself.
+i made myself small so i wouldn't be in the way.
+maybe the arrow will pet me… no? okay.
+i'm not crying. it's just… dusty in here.
+do you still like me? just checking.
+i saved you a spot next to me. it's still empty.
+tiny paws… very big feelings.
+even the rain cloud keeps me company. unlike some people.
+i'll be right here when you're done. still a little sad.
+one pet would fix everything. just saying.
+""",
+    "restless_sad_1": """
+…oh. was that a pet? for me?
+you noticed me…
+…one pet. i'm still a little sad, though.
+""",
+    "restless_sad_2": """
+mm… the rain cloud is going away.
+…okay. that helped a tiny bit.
+keep going… please?
+""",
+    "restless_sad_3": """
+i'm starting to feel a bit better…
+my tail is thinking about wagging.
+…okay, i might smile soon.
+""",
+    "restless_sad_4": """
+almost… one more and i'm all better!
+i can feel the purr coming back~
+okay okay, i'm almost happy again!
+""",
+    "restless_sad_done": """
+you came back for me! i knew you would~
+all better! i love you, you know.
+yay! i'm not sad anymore. thank you!
 """,
     "restless_away": """
 oh! you're back. i was… totally fine.

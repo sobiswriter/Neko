@@ -6,11 +6,58 @@ Soft sounds are optional and off until you enable them.
 
 ![Neko's petting animations](docs/neko-pet-catalog.gif)
 
-## New in Neko 1.2 (experimental)
+## New in Neko 1.3
 
-Neko 1.2 builds to its own file, `dist\DesktopNeko-1.2.exe`, beside the stable
-`DesktopNeko.exe` and `DesktopNeko-previous.exe`. It shares settings, counts and the
-single-instance lock with them, so quit one before starting another.
+Neko 1.3 builds to its own file, `dist\DesktopNeko-1.3.exe`, beside the stable
+`DesktopNeko.exe` and `DesktopNeko-previous.exe` (and the earlier `DesktopNeko-1.2.exe`). It
+shares settings, counts and the single-instance lock with them, so quit one before starting
+another.
+
+- **Restless levels.** Company tab → **Restless when ignored**, **Restless after** (1–120 min,
+  default 20) and **More restless every** (1–15 min, default 5). If you're at the computer but
+  haven't petted, played a game with or carried her for the "Restless after" time, she starts
+  at level 1 and climbs a level every "More restless every" minutes:
+  1. *agitated* (2 pets to calm her): tail flicks, ear twitches, glances at you and sighs;
+     now and then she runs off and comes back;
+  2. *pouncy* (3 pets): bursts of running and pouncing to get your attention, with excited
+     bouncing and sometimes a playful laugh;
+  3. *demanding* (4 pets): she comes over to the arrow (never closer than 140 px), stares it
+     down, offers a paw and asks for pets;
+  4. *sad* (5 pets): she comes as close to the arrow as she can without covering it, curls
+     up under her rain cloud and now and then says something small and sad ("i saved you a
+     spot next to me. it's still empty.").
+  **How she moves:** a change of height is always a pounce, left and right is always a run,
+  and she walks only to cool down at the end of a run. Big height changes take several
+  pounces of at most 120 px.
+  **Calming her:** at levels 1–3 each pet calms her a little and she tells you how it's
+  going. Curled up at level 4, she takes **one pet per thing she says**: pet her, wait for
+  her line, pet again. A quick extra pet doesn't count (Journal → Care shows "pet too soon").
+  Her words go from sad to happy, the rain cloud clears after the second pet, and on the
+  fifth she gets up, nuzzles you and goes home. A pet also stops her climbing a level for a
+  minute. Playing a game calms her by a level (from level 1 she forgives you); Play is
+  refused only while she's curled up and sad.
+  The Company tab shows the countdown before she gets restless, then her level, pets so far
+  and time to the next level. The clock only runs while you're using the computer, she's
+  awake and not being played with, petted or carried, and Quiet company is off. She never
+  moves while a mouse button is held or you're typing. Stepping away, Quiet company, the
+  switch, fullscreen, hiding and monitor changes send her home (from a curl she gets up
+  first). Carrying her pauses the mood but isn't a pet; carried while curled up, she stays
+  sad where you put her. Journal → **Mood** shows each level, pet and reason.
+- **Playful laughter.** A new sound, used for excited moments: tail chases and catches,
+  bouncy pets (happy hop, roll, side flop, back arch) instead of the purr some of the time,
+  the chase in Catch, triple-hop wins now and then, restless runs and bounces, and when she
+  cheers up from being sad. Like all her sounds it is soft, follows the **Volume** slider
+  and, when unprompted, waits at least 45 seconds after the last sound.
+- **Smoother.** Words spoken while she runs or pounces no longer pause the animation to
+  sample the screen for the frosted bubble (they use the plain glass), the journal is
+  written at most once a second instead of on every event, and a new volume level is
+  prepared in the background. Measured in scripted runs: a line spoken mid-run used to stall
+  her for up to about 100 ms; now the longest frame gap in a 60-second restless run is about 40 ms.
+
+## New in Neko 1.2
+
+
+Neko 1.2 built to `dist\DesktopNeko-1.2.exe`; everything below is also in 1.3.
 
 - **Bigger Catch area, with hop-downs.** She can now pounce up to 140 px above her ground
   (was 110) and, when the arrow is just below her reach, hop down a little (24 to 80 px) to
@@ -26,31 +73,7 @@ single-instance lock with them, so quit one before starting another.
   finished at her native size in her own palette, with hard edges and crisp, continuous black
   line art like the original drawings (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
   "proud sit" wins are retired.
-- **Restless kitten** (on by default; Company tab → **Restless when ignored** and
-  **Restless after**, 1–120 min, default 20; set 1 minute to try it). If you're at the
-  computer but haven't petted, played a game with or carried her for that long, she gets
-  restless and roams her monitor using only her original drawings (stroll, chase gallop and
-  the Catch crouch-and-pounce):
-  - *restless*: yawns, wanders a little and comes back;
-  - *pouncy*: bursts of bouncy pounce-hops or a gallop, then she stops, says something
-    and relaxes before the next burst;
-  - *jealous*: hops and leaps toward the arrow (never closer than 140 px) and stares it down
-    in her hunting crouch ("what does that arrow have that i don't?");
-  - *demanding*: keeps coming to the arrow with short pauses, offering a paw ("pet. me. now.");
-  - after ten unanswered minutes of demanding she curls up and sulks under her rain cloud
-    until petted.
-
-  The Company tab shows a countdown ("Restless in about 42 sec…"). The clock only runs
-  while you're using the computer, she's awake and not being played with, petted or carried,
-  and Quiet company is off; when it runs out she starts once she's idle and you haven't typed
-  for two seconds. It takes 1, 2, 3, 4 or
-  5 pets (by stage) to calm her; she tells you how it's going, then forgives you with a
-  nuzzle and hearts and goes home. Carrying her pauses the mood but isn't a pet; playing a
-  game calms her by one stage, and between bursts she happily accepts an automatic Catch game too. Big height changes take several kitten-sized leaps (at most
-  120 px each). She never moves while a mouse button is held or you're typing. It never
-  starts while you're away, in fullscreen, in Quiet company or with the switch off; if you
-  step away she goes home quietly and naps. Hiding, fullscreen, quitting and monitor changes
-  put her straight back home. Journal → **Mood** shows each stage, pet and reason.
+- **Restless kitten** (on by default). See *New in Neko 1.3* above for how she behaves now.
 - **Soft kitten sounds** (still off until you enable them): ten cues with four takes each
   (eight purrs), chosen at random and never the same file twice in a row. Every take is
   filtered (140 Hz–4.2 kHz), levelled to a quiet −37 to −40 dBFS and given soft fades.
@@ -236,7 +259,7 @@ prepared by `tools/prepare_sounds.py`.
   while she sulks, a huffy cross mark when she's held too long and sleepy z's once she
   gives up and dozes in your hand. With Gentle motion off they stay still. They live in
   [effects.py](effects.py).
-- **Offline personality.** 472 short lines, including more personal questions and
+- **Offline personality.** 498 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
   context's bag is exhausted. The last 40 built-in lines she said, across every group,
@@ -282,7 +305,7 @@ prepared by `tools/prepare_sounds.py`.
   deliberate pets and naps still work normally.
 
   To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
-  contains all 472 phrases in 59 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  contains all 498 phrases in 65 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
   Edit or add one phrase per line inside the existing triple-quoted groups; keep the
   section names/quotes and aim for at most 110 characters per phrase. Source launches
   use your edits on restart; the packaged executable needs rebuilding. Optional AI

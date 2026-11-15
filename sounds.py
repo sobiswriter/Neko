@@ -12,6 +12,7 @@ import random
 import shutil
 import sys
 import tempfile
+import threading
 import wave
 
 try:
@@ -22,10 +23,11 @@ except ImportError:  # Non-Windows test environments.
 # Volume slider range (percent of the prepared level). The takes peak at -18 dBFS, so even
 # 300 % (+9.5 dB) stays clear of clipping.
 VOLUME_MIN, VOLUME_MAX = 0, 300
-CUES = ("mew", "purr", "chirp", "trill", "question", "yawn", "protest", "sad", "demand", "giggle")
+CUES = ("mew", "purr", "chirp", "trill", "question", "yawn", "protest", "sad", "demand", "giggle", "laugh")
 # Older one-file names, and cues that may stand in when a cue has no takes of its own.
 FALLBACK = {"mew": "mew", "purr": "purr", "chirp": "chirp", "trill": "chirp", "question": "mew",
-            "yawn": "mew", "protest": "mew", "sad": "mew", "demand": "mew", "giggle": "chirp"}
+            "yawn": "mew", "protest": "mew", "sad": "mew", "demand": "mew", "giggle": "chirp",
+            "laugh": "chirp"}
 
 
 class Voice:
@@ -51,23 +53,46 @@ class Voice:
         self.last[cue] = choice
         return choice
 
-    def at_volume(self, path):
-        """The file to play for ``path`` at the current volume (percent of the prepared level).
-        100 % plays the bundled file; other levels play a scaled copy kept in a cache folder, so
-        playback stays asynchronous. Returns None when muted."""
-        if path is None or self.volume <= 0:
+    def set_level(self, volume):
+        """Change the volume and prepare that level's scaled copies in the background, so the
+        first sound at a new level never stalls the animation while its copy is written."""
+        self.volume = volume
+        if volume in (0, 100) or not any(self.takes.values()):
+            return
+        def warm():
+            for takes in list(self.takes.values()):
+                for take in takes:
+                    if self.volume != volume:
+                        return            # The slider moved on; that level's worker takes over.
+                    self.at_volume(take, volume)
+            self.prune()
+        threading.Thread(target=warm, name="neko-volume", daemon=True).start()
+
+    def prune(self):
+        """Keep only the current level's copies."""
+        try:
+            keep = self.cache / f"v{self.volume}"
+            if self.cache.exists():
+                for old in self.cache.iterdir():
+                    if old.is_dir() and old != keep:
+                        shutil.rmtree(old, ignore_errors=True)
+        except OSError:
+            pass
+
+    def at_volume(self, path, volume=None):
+        """The file to play for ``path`` at the volume (percent of the prepared level; default the
+        current one). 100 % plays the bundled file; other levels play a scaled copy kept in a cache
+        folder, so playback stays asynchronous. Returns None when muted."""
+        volume = self.volume if volume is None else volume
+        if path is None or volume <= 0:
             return None
-        if self.volume == 100:
+        if volume == 100:
             return path
-        folder = self.cache / f"v{self.volume}"
+        folder = self.cache / f"v{volume}"
         target = folder / path.name
         if target.exists():
             return target
         try:
-            if self.cache.exists():
-                for old in self.cache.iterdir():   # Keep only the current level's copies.
-                    if old.is_dir() and old != folder:
-                        shutil.rmtree(old, ignore_errors=True)
             folder.mkdir(parents=True, exist_ok=True)
             with wave.open(str(path), "rb") as source:
                 params = source.getparams()
@@ -77,11 +102,11 @@ class Voice:
             samples = array("h", frames)
             if sys.byteorder != "little":
                 samples.byteswap()
-            gain = self.volume / 100
+            gain = volume / 100
             samples = array("h", (max(-32768, min(32767, round(s * gain))) for s in samples))
             if sys.byteorder != "little":
                 samples.byteswap()
-            temporary = target.with_suffix(".tmp")
+            temporary = target.with_suffix(f".{threading.get_ident()}.tmp")
             with wave.open(str(temporary), "wb") as out:
                 out.setparams(params)
                 out.writeframes(samples.tobytes())

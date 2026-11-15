@@ -39,8 +39,20 @@ class VolumeTests(unittest.TestCase):
             self.assertNotEqual(scaled, self.take)
             self.assertAlmostEqual(peak(scaled), original * level / 100, delta=2)
             self.assertLess(peak(scaled), 32767)
-        # Only the current level's copies are kept.
+        self.voice.prune()   # Only the current level's copies are kept.
         self.assertEqual([p.name for p in Path(self.cache.name).iterdir()], [f"v{sounds.VOLUME_MAX}"])
+
+    def test_a_new_level_is_prepared_in_the_background(self):
+        import threading, time
+        self.voice.set_level(150)
+        deadline = time.monotonic() + 20
+        while any(t.name == "neko-volume" for t in threading.enumerate()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+        folder = Path(self.cache.name) / "v150"
+        expected = {p.name for takes in self.voice.takes.values() for p in takes}
+        self.assertEqual({p.name for p in folder.iterdir()}, expected)
+        self.assertFalse(list(folder.glob("*.tmp")))
+        self.assertEqual(self.voice.at_volume(self.take), folder / self.take.name)
 
     def test_every_take_has_headroom_for_the_loudest_setting(self):
         for take in ASSETS.glob("*-*.wav"):

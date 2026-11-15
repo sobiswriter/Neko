@@ -20,6 +20,19 @@ class EventLogTests(unittest.TestCase):
             self.assertEqual(list(loaded.entries), list(journal.entries))
             self.assertNotIn("[Game]", journal.text("Thought"))
 
+    def test_deferred_journal_writes_only_on_flush(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "events.jsonl"
+            journal = EventLog(path, autosave=False)
+            with patch.object(journal, "save", wraps=journal.save) as save:
+                for i in range(30):
+                    journal.add("Game", "phase", str(i))
+                self.assertEqual(save.call_count, 0)     # A burst of events never touches the disk…
+                journal.flush()
+                journal.flush()                          # …one write per flush, none when clean.
+                self.assertEqual(save.call_count, 1)
+            self.assertEqual([json.loads(line) for line in path.read_text().splitlines()], list(journal.entries))
+
     def test_startup_trims_legacy_history_and_deletes_rotated_file(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "events.jsonl"

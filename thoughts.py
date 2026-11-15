@@ -41,6 +41,7 @@ class ThoughtLabel(QLabel):
                           "border-radius: 20px; padding: 8px 10px; font: 600 16px 'Segoe UI';")
         self.ensurePolished()
         self.backdrop = QPixmap()
+        self.plain = False      # Plain glass (no screen sample) for words spoken on the move.
         self.painted_text = None
         palette = self.palette()
         palette.setColor(QPalette.WindowText, QColor("#fffaf0"))
@@ -80,12 +81,13 @@ class ThoughtLabel(QLabel):
             self.painted_text = self.text()
             self.shown.emit(self.painted_text)
 
-    def prepare_backdrop(self):
+    def prepare_backdrop(self, plain=False):
         self.backdrop = QPixmap()
+        self.plain = plain
         palette = self.palette()
         palette.setColor(QPalette.WindowText, QColor("#fffaf0"))
         self.setPalette(palette)
-        if QApplication.platformName() == "windows" and self.screen() is not None:
+        if not plain and QApplication.platformName() == "windows" and self.screen() is not None:
             # A per-thought sample avoids native blur spilling beyond rounded regions.
             try:
                 ctypes.windll.dwmapi.DwmFlush()
@@ -103,7 +105,7 @@ class ThoughtLabel(QLabel):
                 self.setPalette(palette)
 
     def showEvent(self, event):
-        if self.backdrop.isNull():
+        if self.backdrop.isNull() and not self.plain:
             self.prepare_backdrop()
         super().showEvent(event)
 

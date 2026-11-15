@@ -1,6 +1,6 @@
 # Sound credits
 
-Neko 1.2's kitten sounds were hand-picked by the project owner (Sobi) and supplied in
+Neko's kitten sounds (1.2, plus the 1.3 laughter) were hand-picked by the project owner (Sobi) and supplied in
 `assets-incoming/sounds/`. `tools/prepare_sounds.py` trims, levels and (for purrs) loops
 them; it does not otherwise alter the recordings. The earlier synthesized `mew.wav`,
 `purr.wav` and `chirp.wav` (from `tools/make_sounds.py`) remain only as a fallback.
@@ -38,6 +38,10 @@ them; it does not otherwise alter the recordings. The earlier synthesized `mew.w
 | `giggle-1.wav` | `giggle-chatter,_soft_#1-1794643118525.wav` | `8d8c8e42d12f1eb4` | 1.0 |
 | `giggle-2.wav` | `giggle-chatter,_soft_#2-1794643118526.wav` | `77c1c926ef30f3dd` | 1.0 |
 | `giggle-3.wav` | `giggle-chatter,_soft_#4-1794643118526.wav` | `be86aec466cd3c33` | 0.99 |
+| `laugh-1.wav` | `Playful,_kitten_laug_#1-1794724657958.wav` | `ccad2dd566485a7e` | 1.7 |
+| `laugh-2.wav` | `Playful,_kitten_laug_#2-1794724660429.wav` | `2a3272d115f04c4f` | 1.61 |
+| `laugh-3.wav` | `Playful,_kitten_laug_#3-1794724662659.wav` | `148741772a70e2e3` | 1.43 |
+| `laugh-4.wav` | `Playful,_kitten_laug_#4-1794724665150.wav` | `0a2f76d975e4b39e` | 1.46 |
 | `sad-1.wav` | `sad-mew_0.5–1.0_s_a__#1-1794643003972.wav` | `7364b02b9596d337` | 0.91 |
 | `sad-2.wav` | `sad-mew_0.5–1.0_s_a__#2-1794643006102.wav` | `4201047c1481c2d7` | 1.0 |
 | `sad-3.wav` | `sad-mew_0.5–1.0_s_a__#3-1794643007582.wav` | `c6a08fcdf8e6616c` | 0.92 |

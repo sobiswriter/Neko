@@ -14,8 +14,12 @@ STATUS_REPEAT_SECONDS = 60
 
 
 class EventLog:
-    def __init__(self, path):
+    def __init__(self, path, autosave=True):
+        """autosave=False: add() only marks the journal dirty; the owner calls flush() on a timer
+        and at exit, so a burst of events never writes (and fsyncs) the file on the UI thread."""
         self.path = Path(path)
+        self.autosave = autosave
+        self.dirty = False
         self.entries = deque(maxlen=LIMIT)
         self.error, self.statuses = "", {}
         self.status_times = {}
@@ -62,7 +66,15 @@ class EventLog:
         entry = {"time": datetime.now().astimezone().isoformat(timespec="milliseconds"),
                  "category": category, "action": action, "detail": detail}
         self.entries.append(entry)
-        self.save()
+        if self.autosave:
+            self.save()
+        else:
+            self.dirty = True
+
+    def flush(self):
+        if self.dirty:
+            self.dirty = False
+            self.save()
 
     def save(self):
         try:
