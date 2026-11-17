@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-23",
+  "mode": "built-in ImageGen",
+  "prompt": "Use case: precise-object-edit. Asset: three-state blink sprite sheet for the existing white pixel-art desktop kitten Neko. Image 1 is the EXACT canonical seated sprite (edit target); image 2 is the previous expression sheet (expression reference only). The user likes the warm half-lidded and closed-arc eye expressions in image 2 but rejects the shaking silhouette and size drift. Make ONE transparent RGBA sheet, EXACTLY FOUR columns and ONE row, four full kitten drawings, same scale, same baseline, same head/eye positions in every cell. Preserve image 1's physical head width, head crown, ears, torso, chest shading, two planted forepaws, seated haunches, attached curled tail, outline and tiny pink nose and mouth EXACTLY. No breathing, no bob, no tilt, no ear movement, no zoom, no whole-body redraw between states. Only eyelids change. Every cell contains the same seated animal centered in identical cell coordinates.\nCell 0: exact canonical open eyes.\nCell 1: eyelids halfway down over the existing eyes, soft affectionate sleepy look; retain the original eye spacing, the small remaining black eye shapes and white highlights.\nCell 2: both eyes closed into tiny soft happy arcs like the approved closed-eye reference. Same eye centers; small calm mouth remains fixed.\nCell 3: exact same canonical open eyes as cell 0.\nThe runtime will use 0 held for seconds, 1 for 100ms, 2 for 100ms, 1 for 100ms, then 0 again. The closing/reopening transition is drawn, no entire head or body movement. Ears remain relaxed and still, mouth/head remain calmly supported throughout the 300ms blink. Crisp stepped pixel clusters, white fur, charcoal outline, gray under-chin and chest, pink ears/nose. No labels, grid, text, hearts, shadows, background, floor or detached marks. Generous transparent margins. Important: the face's surrounding fur is clean white, do not add new brow lines or move the nose. We will composite ONLY your eye-band drawings onto the unchanged canonical runtime body to guarantee pixel-identical silhouette and scale; the eye band must match the original's eye positions and proportions.",
+  "original": "references/idle-stability/2026-10-23/blink-raw.png",
+  "reference_images": [
+    "references/idle-stability/2026-10-23/canonical.png",
+    "references/idle-stability/2026-10-23/rejected-rest.png"
+  ],
+  "reference_note": "The first reference is the exact shared idle extracted from release c0ab5ad8; the second is the now-superseded 12-cell resting sheet at commit321e628. Historical asset remains in Git and that release.",
+  "assembly": {
+    "source_boxes": [
+      [
+        117,
+        180,
+        368,
+        412
+      ],
+      [
+        116,
+        180,
+        369,
+        412
+      ],
+      [
+        117,
+        180,
+        368,
+        412
+      ],
+      [
+        117,
+        180,
+        368,
+        412
+      ]
+    ],
+    "constant_scale": 0.20064724919093851,
+    "registrations": [
+      {
+        "source": 1,
+        "offset": [
+          59,
+          50
+        ],
+        "nose": [
+          27.5,
+          39.625
+        ]
+      },
+      {
+        "source": 2,
+        "offset": [
+          59,
+          50
+        ],
+        "nose": [
+          27.5,
+          39.625
+        ]
+      }
+    ],
+    "eye_rectangles": [
+      [
+        67,
+        73,
+        84,
+        93
+      ],
+      [
+        94,
+        73,
+        112,
+        93
+      ]
+    ],
+    "canvas": [
+      192,
+      144
+    ],
+    "output": "assets/neko-idle-rest-v2.png",
+    "method": "Crop and register generated eye bands onto the exact canonical body. No facial pixels painted, whole-body refitting or interpolation. All alpha and pixels outside both eyes are identical."
+  },
+  "identities": {
+    "references/idle-stability/2026-10-23/blink-raw.png": {
+      "bytes": 525436,
+      "sha256": "fe477b725929a211dafba1248cf8649de925ed39c5ec60b2973d81f32c10aff3"
+    },
+    "references/idle-stability/2026-10-23/canonical.png": {
+      "bytes": 10179,
+      "sha256": "e1adcdbdce42fd5dc3dbf02f6fdd7e9623010d4eb91f2c232d21f42d27635f04"
+    },
+    "references/idle-stability/2026-10-23/rejected-rest.png": {
+      "bytes": 118996,
+      "sha256": "abcf52f489ec3d5511113e5c1f6c7796c4c2910f81035d4c7468752f98c0dd9a"
+    }
+  }
+}

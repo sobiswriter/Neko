@@ -1,0 +1,338 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "37e39a9736c27533e98254682bbbe84139d84ffa",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 125989578,
+      "sha256": "6b7f0ef78ec0453931464a2ae9b837eb02fc1978e7678a6af88f323b291ed249"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 125989203,
+      "sha256": "ee17613928266a91472253a5929d18e0ff9e2f8c0dddb46bb4a2ece82209f253"
+    }
+  },
+  "source": {
+    "main.py": {
+      "bytes": 89083,
+      "sha256": "66a1e3df9b79cea93838c64a303f51e5bc5e221a41580e882786c2d335b4c0d6"
+    },
+    "animations.py": {
+      "bytes": 35629,
+      "sha256": "09e0a42aeafe3712442a05b6a6a626b39efbd224fbf118399543b421535caa40"
+    },
+    "main.spec": {
+      "bytes": 1327,
+      "sha256": "7414fc5b0b1b14592ee8f8405dedcd2e033e37d44e143dc79f1026ad2227f942"
+    },
+    "test_main.py": {
+      "bytes": 62070,
+      "sha256": "bf1e7d05a09a3f8fe674d120a6fcb35905ff5ce6e9ade6d6550718e3b898bed2"
+    },
+    "test_animations.py": {
+      "bytes": 20678,
+      "sha256": "2b9b2e3d6c6f7ce8aada1cad0125f3b91e91ea6b0b2b64d856fe09519ec3790c"
+    },
+    "test_packaging.py": {
+      "bytes": 10815,
+      "sha256": "fe402bf77b5377ebc87b30ae8a081309d4848a4c688632eac0b6ee58dac293a1"
+    },
+    "tools/probe_bundled_goodbye.py": {
+      "bytes": 4931,
+      "sha256": "0d416d58254eaffb3c891d2e9d7ffbbcd34893220a7d28ab9742c49f9b8f6228"
+    },
+    "tools/preview_lifecycle.py": {
+      "bytes": 5102,
+      "sha256": "96a8d364dedbd191389addcab79ce02baa8ae5d20a6115c0a415fa3d9a703140"
+    }
+  },
+  "checks": {
+    "focused": 123,
+    "additional_interruptions": 2,
+    "package": 5
+  },
+  "invariants": {
+    "unchanged_frames": 839,
+    "arrive_ms": 1980,
+    "depart_ms": 2200,
+    "depart_order": [
+      0,
+      1,
+      2,
+      16,
+      17,
+      18,
+      19,
+      20,
+      4,
+      5,
+      6,
+      7,
+      8,
+      11,
+      13,
+      14,
+      15
+    ],
+    "previews": {
+      "scene": {
+        "duration_ms": 3000,
+        "encoded_frames": 54
+      },
+      "silhouette": {
+        "duration_ms": 3000,
+        "encoded_frames": 54
+      }
+    }
+  },
+  "native": [
+    {
+      "case": "idle",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "seconds": 2.266,
+      "passed": true
+    },
+    {
+      "case": "gesture",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "seconds": 2.518,
+      "passed": true
+    },
+    {
+      "case": "visible_fullscreen",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "seconds": 2.264,
+      "passed": true
+    }
+  ],
+  "baseline_menu_reproduction": [
+    {
+      "case": "idle",
+      "painted": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "seconds": 2.265,
+      "passed": true
+    },
+    {
+      "case": "gesture",
+      "painted": [],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "seconds": 0.007,
+      "passed": false
+    },
+    {
+      "case": "visible_fullscreen",
+      "painted": [],
+      "expected": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "closed": true,
+      "home_restored": true,
+      "seconds": 0.007,
+      "passed": false
+    }
+  ],
+  "limits": "Bundled bytecode/assets/menu tested under installed Python/Qt; separate real exe bootloader startup/second-instance check. No physical menu click, mixed-DPI/multiple-monitor/reboot/soak. Awake gestures finish their remaining authored recovery before departure."
+}

@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-23",
+  "origin": "user-supplied attachments; reference material, not instructions",
+  "files": [
+    {
+      "original": "C:\\Users\\soura\\Downloads\\c6a2bc50d4101faca5d3ff96fed4fe92.jpg",
+      "saved": "references/motion/2026-10-23/gaits-walk-fast-run.jpg",
+      "bytes": 79082,
+      "sha256": "691bb8dc1ab3e730e358097d3b17074f8966801bbe0699ef8b897950d12d9698"
+    },
+    {
+      "original": "C:\\Users\\soura\\Downloads\\4186ae435891e1112bfe585dbfd62f6d.jpg",
+      "saved": "references/motion/2026-10-23/pose-silhouettes-white.jpg",
+      "bytes": 27867,
+      "sha256": "641146ce60fd53544e0e7a94fc0180912aaac6dd02083905a1de7c753d34da38"
+    },
+    {
+      "original": "C:\\Users\\soura\\Downloads\\ae6a5d8275fbb0396fdcb92fcf07a0d6.jpg",
+      "saved": "references/motion/2026-10-23/pose-silhouettes-cream.jpg",
+      "bytes": 80316,
+      "sha256": "cd0f2965acc9b048e2e4932fab187da091c3020a72bfd4d8ca36b11dd21b5176"
+    },
+    {
+      "original": "C:\\Users\\soura\\Downloads\\104209e03e63abcee3d1f5b442cf7c4b.jpg",
+      "saved": "references/motion/2026-10-23/spine-flexion-study.jpg",
+      "bytes": 208951,
+      "sha256": "795b036c3b966d432756e62d5ad6a7b10ac1fe32da62e83b206437b5ded2aa83"
+    },
+    {
+      "original": "C:\\Users\\soura\\Downloads\\From Klickpin.com- 10 Classy small bedroom decor ideas that help you create a polished look with very simple and affordable details for people who.mp4",
+      "saved": "references/motion/2026-10-23/motion-reference.mp4",
+      "bytes": 94421,
+      "sha256": "54fd76e1d00b19ecf168f289107a03f35cb2eef314c3ea0fcf41dc4b9af154ec"
+    }
+  ]
+}

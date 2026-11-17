@@ -2,10 +2,11 @@ DESKTOP NEKO — QUIET COMPANY
 
 Intent
   A curious little presence at the edge of your work. Pleasant to notice,
-  perfectly happy to be ignored. Keep the original pixel cat and a tiny footprint.
+  quiet by default. An opt-out restless mood (1.2) may ask for attention, never while you are away,
+  in fullscreen or in Quiet company. Keep the original pixel cat and a tiny footprint.
 
 Interaction rules
-  Visual reactions before words. No attention debt, chores, streaks, or guilt.
+  Visual reactions before words. No chores, streaks, or guilt; a restless kitten is calmed by a few pets, then forgets it.
   Drawn sequences and connected reactions; optional short cursor walks and soft sounds.
   Petting is deliberate: a click, not a drag or an accidental hover.
   Hover uses an open palm; holding uses a closed hand; a click adds a 630ms palm stroke.
@@ -13,6 +14,7 @@ Interaction rules
   Pet sheets calibrate to idle's 62x50 head and starting height, rather than whole-body fit.
   Window/tab activity, typing, cursor curiosity and following share a configurable 60-second minimum reaction gap (15-600 seconds). Drop events during cooldown instead of queuing a delayed burst.
   Typing bursts earn paw taps and local questions within that shared reaction limit.
+  Six main-window switches within 12 seconds make her dizzy (own 3-minute cooldown, outside the shared gap).
   Never read key values or typed text. Local title hashes help notice app tab changes.
   Idle gestures default to about 14 seconds; configurable from five to 120 seconds.
   Sleep delay defaults to three minutes; configurable from one to 3600 seconds.
@@ -31,7 +33,10 @@ Interaction rules
   Eight-frame startup drop-in finishes landing before greeting. Eight-frame goodbye
   shows mild sadness then the accepted small hop before quitting. Arrival travels from the monitor top; only the landing position is saved.
   Reduced motion skips these jumps; hidden/fullscreen quits remain immediate.
-  346 offline lines in dialogue.py use 33 context shuffle bags, with personal questions and app rituals. One phrase per line inside its named triple-quoted groups; source edits need restart and packaged edits need a rebuild.
+  526 offline lines in dialogue.py use 67 context shuffle bags, with personal questions and app rituals.
+  The last 40 built-in lines said go to the back of fresh bags and persist across launches.
+  A gesture's words wait 150 seconds before returning; gesture thoughts keep a 30-second gap.
+  Activity replies keep their own pause; general idle chatter cannot use it up. One phrase per line inside its named triple-quoted groups; source edits need restart and packaged edits need a rebuild.
   Local foreground app names and media title hints select lines and matching gestures.
   All automatic speech, including idle and optional AI, respects the full Thoughts every minimum. Deliberate pet replies may bypass it. No recording or actual playback detection.
   Ambient thoughts default to 75 seconds; configurable from 15 to 600. Quiet removes them.
@@ -43,7 +48,7 @@ Interaction rules
   Rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS, with precise pet/carry timers; arrival/departure use 30 FPS.
   Tail swishes play one lazy sweep and rest; all tail games return to the shared sitting drawing.
   Standing drawings keep a consistent size; transitions use one fixed character scale.
-  Original soft mews, purrs and chirps are opt-in. Include a Listen button and stop toggle.
+  Hand-picked kitten sounds (10 cues, several takes each, no back-to-back repeats) are opt-in. Include a Listen button and stop toggle.
   Automatic sound has a 45-second pause; quiet/fullscreen/media suppress it.
   Hiding is absolute. Fullscreen hiding is optional; native pinning never steals focus.
   Fullscreen activity always suppresses unsolicited speech and activity reactions.
@@ -52,7 +57,7 @@ Interaction rules
 Small home
   One nook for preferences, startup, AI, lifetime pets and naps.
   Remember position and clamp it into an available monitor.
-  528 atlas entries include twelve pet stories, idle stories, five/two-turn tail games, arrival, departure, sleep and 100 pickup source slots plus idle. Tail games keep triple idle selection weight.
+  908 atlas entries (746 used by clips) include twelve pet stories, idle stories, five/two-turn tail games, arrival, departure, sleep and 100 pickup source slots plus idle. Tail games keep triple idle selection weight.
   Keep visible idle scale and saved visible origin; a fixed 192x144 transparent canvas supplies horizontal gesture room and 32px top padding for lifting. Saved origins add/subtract QPoint(40,32).
   Quick clicks pet; movement past drag distance picks up immediately; a stationary hold picks up after 250ms without pet counts.
   Held expressions progress excited (0-3s), calm (3-10s), mildly unimpressed (10-20s), sleepy (20s+); yawn once, then loop.
@@ -70,7 +75,7 @@ Optional AI
 
 Deliberately excluded
   Voice/chat UI, hunger systems, notifications, task reminders, cloud memory,
-  roaming across windows, new accounts, plugin systems, and new art dependencies.
+  perching on windows (1.2 movement stays on her monitor's work area), new accounts, plugin systems, and new art dependencies.
   Browser extensions and exact background-tab tracking stay out of this pass.
 
 Validation

@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-22",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 119406660,
+      "sha256": "373fb1088e0961ed08452d29eada1409eeaef8c81a792eb8c2eb443dc4256c39"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 112730633,
+      "sha256": "31933e124f5464da4517742772ea7c42194dc181cad4d3ee3191886dbe588797"
+    }
+  },
+  "source_sha256": {
+    "main.py": "ef3574d36e192fa4f897cbf43c20eb14717751b54900353df14073b43f393216",
+    "animations.py": "c14e974ae8a884ec4baaf32df296a7dc3da37f6c40c51f0e12d6119bdd8c0664",
+    "main.spec": "7414fc5b0b1b14592ee8f8405dedcd2e033e37d44e143dc79f1026ad2227f942",
+    "tools/bake_atlas.py": "9f48f79815aebcc8644616fd93e2b555bfaaaca73d2a8f2e6dcfabdd7702b7e7",
+    "test_startup_atlas.py": "52d87b9eb2a898b1208d5e956098b4d28e4c7a087b83fac2a68d2fcc8dea9bf0",
+    "test_packaging.py": "7719e786e5b3845e948a6468349432a6f7b34ce48e06f7d36ec1f8cf2b545831"
+  },
+  "compiled_resource_sha256": {
+    "neko-runtime.png": "70c1b5b2b3a7c33fe2961ee82cf37a716c047702cb779c221d7cc15900913e46",
+    "neko-runtime.json": "834aecca093d8a2cfaaaf41778d49ccea5040074a7be19288475d3f914d139fa"
+  },
+  "baseline_ui_ready": [
+    {
+      "exe": "DesktopNeko.exe",
+      "ui_ready_seconds": 6.965
+    },
+    {
+      "exe": "DesktopNeko-previous.exe",
+      "ui_ready_seconds": 6.884
+    }
+  ],
+  "corrected_ui_ready": [
+    {
+      "exe": "DesktopNeko.exe",
+      "ui_ready_seconds": 2.14
+    }
+  ],
+  "atlas_timing": {
+    "source": {
+      "seconds": 5.4885,
+      "frames": 741
+    },
+    "compiled": {
+      "seconds": 0.2745,
+      "frames": 741
+    }
+  },
+  "verification": {
+    "focused_tests_passed": 2,
+    "package_tests_passed": 4,
+    "pixel_identical_frames": 741,
+    "reboot_cold_timing": "not tested",
+    "full_gameplay_suite": "not run"
+  }
+}

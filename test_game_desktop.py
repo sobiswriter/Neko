@@ -10,7 +10,7 @@ from PySide6.QtCore import QEvent, QPoint, QSettings, Qt
 from PySide6.QtWidgets import QApplication
 from animations import GAME_ROWS, SpriteAtlas, CLIPS, sprite_bounds, pet_landmarks
 from behavior import NekoState
-from games import Runway
+from games import DECLARE_SECONDS, Runway
 from main import NekoWidget
 
 APP = QApplication.instance() or QApplication([])
@@ -18,6 +18,24 @@ APP.setQuitOnLastWindowClosed(False)
 
 
 class DesktopGameTests(unittest.TestCase):
+    def test_automatic_game_can_be_observed_in_the_live_journal(self):
+        with patch("main.autostart_enabled", return_value=False):
+            self.n.open_stats_window()
+        nook = self.n.stats_window
+        self.n.game_timer.due = self.now - 1
+        with patch("main.time.monotonic", return_value=self.now):
+            self.n.poll_game()
+        self.assertIn("Nook controls", self.n.game_timer.reason)
+        nook.tabs.setCurrentWidget(nook.journal_tab)
+        for dt, point in ((0, QPoint(346, 420)), (.2, QPoint(650, 420)), (.5, QPoint(650, 420))):
+            with patch("main.time.monotonic", return_value=self.now + dt), patch("main.QCursor.pos", return_value=point):
+                self.n.poll_game()
+        self.assertIsNotNone(self.n.game)
+        self.assertEqual(self.n.game.source, "automatic")
+        nook.update_journal()
+        self.assertIn("invitation accepted", nook.activity_log.toPlainText())
+        self.assertIn("session created: automatic", nook.activity_log.toPlainText())
+
     @classmethod
     def setUpClass(cls):
         cls.atlas = SpriteAtlas("assets")
@@ -109,8 +127,8 @@ class DesktopGameTests(unittest.TestCase):
 
     def test_loss_survives_hide_carry_and_only_one_pet_comforts(self):
         self.start()
-        self.step(4.2, (650, 400))
-        self.step(9, (2000, -100))
+        self.step(DECLARE_SECONDS + 4.2, (650, 400))
+        self.step(14, (2000, -100))
         self.assertEqual(self.n.game.phase, "curl")
         self.assertEqual(self.n.companion.state, NekoState.DISAPPOINTED)
         self.n.hide_neko()
@@ -229,21 +247,32 @@ class DesktopGameTests(unittest.TestCase):
         self.n.prepare_menu()
         self.assertEqual((self.n.games_played, self.n.games_won), (1, 1))
 
-    def test_outcome_bags_show_all_three_and_never_repeat_at_seam(self):
-        for outcome in ("win", "loss"):
-            selected = []
-            for _ in range(9):
-                self.start()
-                g = self.n.game
-                g.started = True
-                g.result = outcome
-                g.enter(outcome, self.now)
-                self.step(.02, (650, 400))
-                selected.append(g.variant)
-                self.n.end_game(immediate=True, clear_mood=True)
-            for index in range(0, 9, 3):
-                self.assertEqual(set(selected[index:index + 3]), {0, 1, 2})
-            self.assertTrue(all(a != b for a, b in zip(selected, selected[1:])))
+    def outcome(self, outcome):
+        self.start()
+        g = self.n.game
+        g.started = True
+        g.result = outcome
+        g.enter(outcome, self.now)
+        self.step(.02, (650, 400))
+        variant = g.variant
+        self.n.end_game(immediate=True, clear_mood=True)
+        return variant
+
+    def test_loss_bag_shows_all_three_sulks_and_never_repeats_at_seam(self):
+        selected = [self.outcome("loss") for _ in range(9)]
+        for index in range(0, 9, 3):
+            self.assertEqual(set(selected[index:index + 3]), {0, 1, 2})
+        self.assertTrue(all(a != b for a, b in zip(selected, selected[1:])))
+
+    def test_triple_hop_is_most_wins_and_the_new_ones_are_rare(self):
+        self.n.companion.rng.seed(7)
+        wins = [self.outcome("win") for _ in range(200)]
+        hops = wins.count(0) / len(wins)
+        self.assertGreater(hops, 0.7)
+        self.assertLess(hops, 0.9)
+        rare = [v for v in wins if v]
+        self.assertEqual(set(rare), {1, 2, 3})                    # Each still shows up now and then.
+        self.assertTrue(all(a != b for a, b in zip(rare, rare[1:])))   # Never the same rare one twice.
 
     def test_invalid_counters_migrate_without_exceeding_played(self):
         for played, won, expected in (("bad", 4, (0, 0)), (-1, -8, (0, 0)), (3, 99, (3, 3))):
@@ -258,7 +287,7 @@ class DesktopGameTests(unittest.TestCase):
                 n.bubble.deleteLater()
                 n.deleteLater()
 
-    def test_nook_refreshes_timer_preferences_and_sleeping_request_explains_wait(self):
+    def test_nook_refreshes_timer_preferences_and_sleeping_request_wakes_her_to_play(self):
         with patch("main.autostart_enabled", return_value=False):
             self.n.open_stats_window()
         self.n.stats_window.close()
@@ -268,11 +297,11 @@ class DesktopGameTests(unittest.TestCase):
         self.assertFalse(self.n.stats_window.auto_games.isChecked())
         self.assertEqual(self.n.stats_window.game_interval.value(), 120)
         self.n.companion.state = NekoState.SLEEPING
-        with patch.object(self.n.tray_icon, "showMessage") as message:
-            self.n.request_game()
-        message.assert_called_once()
-        self.assertEqual(self.n.companion.state, NekoState.SLEEPING)
+        self.n.request_game()
         self.assertEqual(self.n.game_timer.pending, "manual")
+        self.n.poll_game()
+        self.assertEqual(self.n.companion.state, NekoState.WAKING)   # Woken by the request, not ignored.
+        self.assertEqual(self.n.game_timer.pending, "manual")         # The game follows her wake-up.
 
     def test_gentle_game_has_no_translation_and_can_win(self):
         self.n.motion = False
@@ -327,7 +356,21 @@ class DesktopGameTests(unittest.TestCase):
 
     def test_new_wins_and_walk_recover_to_the_actual_idle_at_retained_scale(self):
         idle = self.atlas.frame("idle", 0).toImage()
-        for name, drawn in (("game_win_0", 22), ("game_win_1", 18), ("game_win_2", 18), ("game_settle", 15)):
+        ib = sprite_bounds(idle)
+        idle_head, idle_center, *_ = pet_landmarks(idle.copy(ib))
+        # 1.2 victories (sproing, roll, sproing second take): their final drawn neutral sits on the
+        # same ground with idle's head width and head position, then hands off to the actual idle.
+        for name in ("game_win_1", "game_win_2", "game_win_3"):
+            clip = CLIPS[name]
+            self.assertEqual(self.atlas.frame(name, 100).toImage(), idle, name)
+            drawn = clip.order[-2]
+            q = self.atlas.frames[clip.bank, drawn // 4, drawn % 4].toImage()
+            bounds = sprite_bounds(q)
+            head, center, *_ = pet_landmarks(q.copy(bounds))
+            self.assertAlmostEqual(head, idle_head, delta=4, msg=name)
+            self.assertAlmostEqual(bounds.left() + center, ib.left() + idle_center, delta=2, msg=name)
+            self.assertAlmostEqual(bounds.bottom(), ib.bottom(), delta=2, msg=name)
+        for name, drawn in (("game_win_0", 22), ("game_settle", 15)):
             clip = CLIPS[name]
             self.assertEqual(self.atlas.frame(name, 100).toImage(), idle)
             q = self.atlas.frames[clip.bank, drawn // 4, drawn % 4].toImage()

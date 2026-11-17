@@ -25,6 +25,31 @@ class DialogueTests(unittest.TestCase):
             picked = [dialogue.pick(kind) for _ in lines]
             self.assertEqual(set(picked), set(lines))
 
+    def test_a_shown_line_waits_out_its_cooldown_and_small_groups_go_quiet(self):
+        from dialogue import LINE_COOLDOWN
+        clock = [0.0]
+        dialogue = OfflineDialogue(random.Random(2), clock=lambda: clock[0])
+        shown = {}
+        for kind in LINES:
+            for _ in range(len(LINES[kind]) + 3):
+                clock[0] += 1
+                line = dialogue.pick(kind)
+                if line is None:
+                    continue
+                self.assertTrue(clock[0] - shown.get(line, -LINE_COOLDOWN) >= LINE_COOLDOWN, (kind, line))
+                dialogue.said(line)
+                shown[line] = clock[0]
+        self.assertIsNone(dialogue.pick("restless_carried"))   # All cooling: silence, not a repeat.
+        clock[0] += LINE_COOLDOWN
+        self.assertIn(dialogue.pick("restless_carried"), LINES["restless_carried"])
+
+    def test_lines_said_before_a_relaunch_are_still_cooling(self):
+        clock = [50.0]
+        line = LINES["restless_away"][0]
+        dialogue = OfflineDialogue(random.Random(1), history=[line], clock=lambda: clock[0])
+        self.assertTrue(dialogue.cooling(line))
+        self.assertTrue(all(dialogue.pick("restless_away") != line for _ in range(len(LINES["restless_away"]) - 1)))
+
     def test_typing_has_real_local_questions(self):
         self.assertIn("whatcha typing?", LINES["typing"])
         self.assertIn(OfflineDialogue().pick("missing-context"), LINES["idle"])

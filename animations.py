@@ -1,10 +1,13 @@
 """Drawn sprite sequences with per-frame timing and a shared ground anchor."""
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtGui import QImage, QPixmap, QPainter
+
+from pixelate import palette_from, pixelate
 
 CANVAS_WIDTH = 192
 CANVAS_PADDING = (CANVAS_WIDTH - 112) // 2
@@ -57,16 +60,20 @@ class Clip:
 
 
 CLIPS = {
-    "idle": Clip("idle", 0, (2500, 120, 160, 2400), loop=True),
+    "idle": Clip("idle-v2-rest", 0, (2100, 200, 200, 300, 100, 100, 100, 300, 2300, 100), tuple(range(10)), loop=True),
     "tail": Clip("tailswish", 0, (300, 220, 220, 350, 220, 220, 280, 450, 700), (0, 1, 2, 3, 4, 5, 6, 8, 7)),
-    "ears": Clip("idleplay-b", 2, (300, 250, 400, 250, 250, 350, 450, 700), tuple(range(8))),
-    "sniff": Clip("idleplay-b", 0, (300, 300, 350, 300, 450, 350, 450, 700), tuple(range(8))),
+    "ears": Clip("idle-v2-ears", 0, (350, 200, 200, 250, 200, 350, 250, 250, 300, 350, 250, 250, 500), tuple(range(13))),
+    "sniff": Clip("idle-v2-sniff", 0, (350, 250, 250, 250, 350, 350, 450, 300, 250, 300, 300, 250, 500), tuple(range(13))),
     "tail_chase": Clip("tailplay", 0, (300, 180, 180, 100) + (50,) * 55 + (100, 180, 300, 600),
                        (16, 17, 18, 19) + tuple(range(11)) * 5 + (20, 21, 22, 23)),
     "tail_catch": Clip("tailplay", 0, (300, 180, 180, 100) + (50,) * 22 + (120, 350, 120, 150, 180, 300, 600),
                        (16, 17, 18, 19) + tuple(range(11)) * 2 + (13, 14, 13, 12, 21, 22, 23)),
-    "arrive": Clip("arrival", 0, (200, 200, 300, 120, 180, 160, 220, 520), tuple(range(8))),
-    "depart": Clip("lifecycle", 2, (650, 350, 200, 150, 200, 200, 200, 200), tuple(range(8))),
+    "arrive": Clip("motion-arrive", 0,
+                   (180, 180, 140, 80, 80, 80, 90, 110) + (70,) * 8 + (160,) * 3,
+                   tuple(range(1, 20))),
+    "depart": Clip("motion-depart", 0,
+                   (100, 100, 140, 220, 140, 100, 100, 100, 100, 100, 90, 90, 100, 120, 140, 200, 260),
+                   (0, 1, 2, 16, 17, 18, 19, 20, 4, 5, 6, 7, 8, 11, 13, 14, 15)),
     "happy": Clip("pet-happy", 0, (100, 100, 100, 150, 150, 200, 250, 150,
                                  200, 200, 150, 150, 200, 200, 150, 350), tuple(range(16))),
     "nuzzle": Clip("pet-nuzzle", 0, (100, 100, 150, 150, 150, 200, 200, 200, 200, 200,
@@ -96,18 +103,30 @@ CLIPS = {
     "ear_rub": Clip("pet-ear_rub", 0, (100, 100, 150, 150, 200, 200, 250, 200,
                                      250, 200, 200, 150, 150, 150, 150, 350), tuple(range(16))),
     "typing": Clip("activity", 0, (330, 330, 330, 330), loop=True),
-    "groom": Clip("idleplay-a", 0, (300, 250, 550, 650, 550, 300, 450, 600), tuple(range(8))),
-    "yawn": Clip("idleplay-c", 0, (300, 350, 350, 650, 350, 350, 450, 650), tuple(range(8))),
+    "groom": Clip("idle-v2-groom", 0, (400, 200, 250, 250, 350, 450, 400, 450, 300, 250, 400, 300, 500), tuple(range(13))),
+    "yawn": Clip("idle-v2-yawn", 0, (400, 250, 200, 200, 250, 450, 450, 250, 250, 250, 300, 250, 300, 500),
+                 (0, 1, 2, 3, 4, 5, 6, 4, 7, 8, 9, 10, 11, 12)),
     "fall_asleep": Clip("transitions", 0, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
     "wake": Clip("transitions", 2, (350, 220, 220, 250, 250, 250, 300, 500), tuple(range(8))),
     "sleep": Clip("transitions", 1, (1400, 1400), (2, 3), loop=True),
     "walk": Clip("game-walk", 0, (120,) * 8, tuple(range(4, 12)), loop=True),
-    "stretch": Clip("idleplay-a", 2, (300, 250, 400, 650, 450, 300, 400, 650), tuple(range(8))),
-    "look_left": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 1, 2, 3, 7)),
-    "look_right": Clip("idleplay-c", 4, (300, 400, 850, 450, 700), (0, 4, 5, 6, 7)),
-    "loaf": Clip("idleplay-a", 4, (300, 300, 350, 1800, 350, 900, 500, 900), tuple(range(8))),
-    "peek": Clip("idleplay-c", 2, (300, 350, 450, 600, 350, 500, 450, 650), tuple(range(8))),
+    "stretch": Clip("idle-v2-stretch", 0, (400, 200, 200, 250, 250, 300, 450, 400, 500, 250, 250, 250, 250, 300, 350, 300, 450), tuple(range(17))),
+    "look_left": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 150, 150, 600, 150, 150, 200, 500),
+                      (0, 1, 2, 3, 4, 3, 2, 1, 7, 16, 17, 18, 17, 16, 19, 24)),
+    "look_right": Clip("idle-v2-look", 0, (350, 250, 300, 350, 650, 300, 250, 250, 300, 150, 150, 600, 150, 150, 200, 500),
+                       (8, 9, 10, 11, 12, 11, 10, 9, 15, 20, 21, 22, 21, 20, 23, 24)),
+    # Interim dizzy reaction until its dedicated sheet exists: the accepted head-turn drawings
+    # follow imaginary windows left/right, faster each sweep, without the look's happy smile.
+    "dizzy": Clip("idle-v2-look", 0,
+                  (200,) * 8 + (150,) * 8 + (110,) * 6 + (90,) * 6 + (900,),
+                  (0, 1, 2, 3, 4, 3, 2, 1, 8, 9, 10, 11, 12, 11, 10, 9,
+                   0, 1, 2, 3, 2, 1, 8, 9, 10, 11, 10, 9, 24)),
+    "loaf": Clip("idle-v2-loaf", 0, (400, 250, 250, 250, 300, 900, 900, 500, 350, 300, 350, 300, 950), tuple(range(13))),
+    "peek": Clip("idle-v2-peek", 0, (400, 250, 250, 250, 450, 450, 450, 300, 250, 250, 300, 300, 600), tuple(range(13))),
 }
+
+IDLE_ROWS = {"rest": 3, "loaf": 3, "stretch": 4, "groom": 3, "yawn": 3,
+             "peek": 3, "ears": 3, "sniff": 3, "look": 6}
 
 
 PET_ROWS = {"happy": 4, "nuzzle": 5, "knead": 6, "chin_scritch": 4, "roll": 6, "paw_offer": 5,
@@ -166,6 +185,51 @@ CLIPS.update({
 })
 
 
+# ---------------------------------------------------------------------------------------------
+# Neko 1.2 victories (user-generated sheets, packed by tools/assemble_v12.py). Each runtime bank is
+# two 12-drawing sheets stacked: rows 0-2 = first sheet, rows 3-5 = its continuation. The other 1.2
+# sheets (dodge, restless, dizzy, leaps) stay in assets but are not played: their smooth style did
+# not sit beside the original pixel kitten. The victories are re-drawn on her pixel grid.
+V12_BANKS = {
+    "sproing": ("win-sproing-a", "win-sproing-b"),
+    "sproing2": ("win-sproing-c", "win-sproing-b"),
+    "roll": ("win-roll-a", "win-roll-b"),
+}
+# Index of each bank's seated neutral, whose head is matched to idle's 62px.
+V12_SEATED = {"sproing": 0, "sproing2": 0, "roll": 0}
+V12_SIDE = set()
+# Engine bounce heights (px) for the airborne Sproing drawings, baked into the frame.
+V12_LIFT = {("sproing", 4): 4, ("sproing", 5): 16, ("sproing", 6): 8, ("sproing", 8): 5,
+            ("sproing", 9): 20, ("sproing", 10): 9, ("sproing", 13): 4, ("sproing", 14): 12,
+            ("sproing2", 4): 4, ("sproing2", 5): 16, ("sproing2", 6): 8, ("sproing2", 8): 5,
+            ("sproing2", 9): 20, ("sproing2", 10): 9, ("sproing2", 13): 4, ("sproing2", 14): 12,
+            ("roll", 2): 6}
+V12_IDLE = 24  # index appended after the final drawing: the actual idle
+
+
+def _v12(bank, timeline, loop=False):
+    """Clip from (index, ms) pairs; index 'idle' means the actual canonical idle drawing."""
+    order = tuple(V12_IDLE if i == "idle" else i for i, _ in timeline)
+    return Clip(f"v12-{bank}", 0, tuple(ms for _, ms in timeline), order, loop)
+
+
+SPROING = ((1, 350), (2, 120), (3, 140), (4, 90), (5, 160), (6, 100), (7, 110), (8, 90), (9, 180),
+           (10, 100), (11, 120), (12, 110), (13, 90), (14, 160), (15, 120), (16, 140), (17, 160),
+           (18, 600), (19, 140), (20, 300), (21, 300), (22, 200), (23, 300), ("idle", 300))
+CLIPS.update({
+    # Catch victories. The triple hop (game_win_0) stays; these replace the prize hug and proud sit.
+    "game_win_1": _v12("sproing", SPROING),
+    "game_win_2": _v12("roll", (
+        (1, 220), (2, 100), (3, 300), (4, 180), (5, 180), (6, 140), (7, 140), (6, 140), (7, 140),
+        (8, 160), (9, 160), (7, 140), (9, 160), (10, 500), (11, 160), (12, 200), (13, 180),
+        (14, 200), (15, 160), (16, 220), (17, 200), (18, 220), (19, 500), (20, 300), (21, 200),
+        (22, 200), (23, 300), ("idle", 300))),
+    "game_win_3": _v12("sproing2", SPROING),
+})
+# Still poses used when Gentle motion is off.
+V12_STILL = {"game_win_1": 18, "game_win_2": 19, "game_win_3": 18}
+
+
 def held_clip(elapsed, sleeping=False):
     if sleeping:
         return "held_sleepy", elapsed
@@ -188,6 +252,19 @@ IDLE_HEADS = {("idleplay-a", 0): (67, 56), ("idleplay-a", 2): (68, 54), ("idlepl
 def drop_progress(elapsed):
     duration = sum(CLIPS["arrive"].durations[:3]) / 1000
     return max(0, min(1, elapsed / duration)) ** 2
+
+
+def departure_progress(elapsed):
+    flight = CLIPS["depart"].order.index(6)
+    launch = sum(CLIPS["depart"].durations[:flight]) / 1000
+    duration = sum(CLIPS["depart"].durations[flight:]) / 1000
+    return max(0, min(1, (elapsed - launch) / duration))
+
+
+def departure_drop(progress, distance):
+    if progress <= 0.25:
+        return -18 * (1 - (1 - progress * 4) ** 2)
+    return -18 + (distance + 18) * ((progress - 0.25) / 0.75) ** 2
 
 
 def pet_landmarks(image):
@@ -224,6 +301,8 @@ def carry_head(image):
 class SpriteAtlas:
     def __init__(self, path):
         self.frames = {}
+        if self.load_runtime(path):
+            return
         cells = {}
         for bank, version, rows in (("idle", 3, 4), ("activity", 3, 4),
                                     ("movement", 3, 4), ("transitions", 1, 4),
@@ -337,6 +416,205 @@ class SpriteAtlas:
             self.frames[key] = frame
         self.load_carry(path)
         self.load_games(path)
+        self.load_lifecycle(path)
+        self.load_motion(path)
+        self.load_idles(path)
+        self.load_v12(path)
+
+    def load_v12(self, path):
+        """All-or-nothing 1.2 import: one shared physical scale, support-registered, idle endpoints."""
+        cell, baseline = 448, 436
+        sheets = {}
+        for name in {sheet for parts in V12_BANKS.values() for sheet in parts}:
+            image = QImage(str(Path(path) / f"neko-v12-{name}.png"))
+            try:
+                sizes = json.loads((Path(path) / f"neko-v12-{name}.json").read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                return
+            if image.width() != 4 * cell or image.height() != 3 * cell or len(sizes) != 12:
+                return
+            crops = []
+            for i, (width, height) in enumerate(sizes):
+                # Packed centred on the cell's shared baseline by tools/assemble_v12.py.
+                crops.append(image.copy(i % 4 * cell + (cell - width) // 2,
+                                        i // 4 * cell + baseline - height, width, height))
+            sheets[name] = crops
+        idle = self.frames["idle", 0, 0]
+        idle_image = idle.toImage()
+        idle_bounds = sprite_bounds(idle_image)
+        idle_landmarks = pet_landmarks(idle_image.copy(idle_bounds))
+        idle_paw = idle_bounds.left() + idle_landmarks[2]
+        idle_head = idle_bounds.left() + idle_landmarks[1]
+        palette = palette_from(idle_image.copy(idle_bounds))
+        imported = {}
+        for bank, parts in V12_BANKS.items():
+            placed = []  # (sprite, horizontal shift) for every drawing of the bank, in order
+            for part_index, part in enumerate(parts):
+                crops = sheets[part]
+                # Each generated sheet has its own pixel size, so each sheet is calibrated once from
+                # its neutral: seated fronts to idle's 62px head, side/standing views to ~56px.
+                # A continuation sheet ("part b") calibrates on its closing neutral (drawing 12).
+                neutral = (V12_SEATED[bank] if part_index == 0 else 11) if bank in V12_SEATED else 0
+                scale = (62 if bank in V12_SEATED else 56) / carry_head(crops[neutral])[0]
+                # Scale to her size, then redraw on her 2px pixel grid in her own palette with a
+                # solid outline, so the victory reads as the same pixel kitten as idle.
+                sprites = [pixelate(crop.scaled(max(1, round(crop.width() * scale)),
+                                                max(1, round(crop.height() * scale)),
+                                                Qt.IgnoreAspectRatio, Qt.SmoothTransformation), palette)
+                           for crop in crops]
+                shift = 0
+                if bank in V12_SEATED:
+                    # Feet stay planted from drawing to drawing (left ground contact); one constant
+                    # shift per sheet puts its neutral's head exactly over idle's, so the hand-off to
+                    # idle doesn't jump sideways.
+                    _, head, paw, _ = pet_landmarks(sprites[neutral])
+                    shift = round(idle_head - (idle_paw - paw + head))
+                placed += [(sprite, shift) for sprite in sprites]
+            for index, (sprite, shift) in enumerate(placed):
+                width, height = sprite.width(), sprite.height()
+                lift = V12_LIFT.get((bank, index), 0)
+                if bank in V12_SIDE:
+                    left = (CANVAS_WIDTH - width) // 2
+                else:
+                    left = round(idle_paw - pet_landmarks(sprite)[2]) + shift
+                left = max(2, min(CANVAS_WIDTH - width - 2, left))
+                top = 130 - lift - height
+                if top < 2 or width > CANVAS_WIDTH - 4:
+                    return
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawImage(left, top, sprite)
+                painter.end()
+                imported[f"v12-{bank}", index // 4, index % 4] = frame
+            imported[f"v12-{bank}", V12_IDLE // 4, V12_IDLE % 4] = idle
+        self.frames.update(imported)
+
+    def load_idles(self, path):
+        imported = {}
+        idle = self.frames["idle", 0, 0]
+        for name, rows in IDLE_ROWS.items():
+            image = QPixmap(str(Path(path) / f"neko-idle-{name}-v2.png"))
+            if image.size().width() != CANVAS_WIDTH * 4 or image.height() != CANVAS_HEIGHT * rows:
+                return
+            bank = f"idle-v2-{name}"
+            for index in range(rows * 4):
+                imported[bank, index // 4, index % 4] = image.copy(index % 4 * CANVAS_WIDTH,
+                    index // 4 * CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT)
+            imported[bank, 0, 0] = idle
+            imported[bank, rows, 0] = idle
+            if name == "look":
+                imported[bank, 2, 0] = idle
+        self.frames = {key: frame for key, frame in self.frames.items()
+                       if key[0] not in ("idleplay-a", "idleplay-b", "idleplay-c")}
+        self.frames.update(imported)
+
+    def load_motion(self, path):
+        imported = {}
+        for name, rows in (("arrive", 5), ("depart", 4), ("bridge", 1), ("sad", 2)):
+            image = QImage(str(Path(path) / f"neko-lifecycle-{name}-v2.png"))
+            if image.isNull() or image.width() % 4 or image.height() % rows:
+                return
+            width, height = image.width() // 4, image.height() // rows
+            poses = []
+            for i in range(rows * 4):
+                cell = image.copy(i % 4 * width, i // 4 * height, width, height).scaledToWidth(128, Qt.FastTransformation)
+                bounds = sprite_bounds(cell)
+                if bounds.isEmpty():
+                    return
+                poses.append(cell.copy(bounds))
+            for i, pose in enumerate(poses):
+                # The recovery group has its own drawn neutral; never fit individual poses.
+                reference = poses[16] if name == "arrive" and i >= 12 else poses[0]
+                sx, sy = 62 / pet_landmarks(reference)[0], 85 / reference.height()
+                sprite = QPixmap.fromImage(pose).scaled(round(pose.width() * sx), round(pose.height() * sy),
+                                                       Qt.IgnoreAspectRatio, Qt.FastTransformation)
+                left = (CANVAS_WIDTH - sprite.width()) // 2
+                if name == "arrive" and i in range(1, 12):
+                    alpha = sprite.toImage().convertToFormat(QImage.Format_Alpha8)
+                    raw, stride = bytes(alpha.constBits()), alpha.bytesPerLine()
+                    # These reviewed poses have raised tails; the leading bottom contact is the foretoe.
+                    toes = [x for x in range(alpha.width()) for y in range(max(0, alpha.height() - 6), alpha.height())
+                            if raw[y * stride + x] >= 128]
+                    if not toes:
+                        return
+                    left = 130 - max(toes)
+                elif name == "arrive":
+                    left += {12: -3, 13: -3, 14: -2, 15: -12, 16: -10, 17: -14, 18: -12}.get(i, 0)
+                else:
+                    # Authored near-hind toe registration through wind-up and the final planted push.
+                    left += {3: -9, 4: 0, 5: 19}.get(i, 0)
+                top = 132 - sprite.height()
+                if min(left, top) < 2 or left + sprite.width() > CANVAS_WIDTH - 2:
+                    return
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawPixmap(left, top, sprite)
+                painter.end()
+                imported[f"motion-{name}", i // 4, i % 4] = frame
+        for key in (("motion-arrive", 4, 3), ("motion-depart", 0, 0)):
+            imported[key] = self.frames["idle", 0, 0]
+        # Whole replacement drawings; reject the source sheet's neighbouring-paw fragments.
+        for target, source in ((8, 1), (11, 2), (12, 3)):
+            imported["motion-depart", target // 4, target % 4] = imported["motion-bridge", 0, source]
+        for target, source in ((1, 1), (2, 2), (16, 3), (17, 4), (18, 5), (19, 6), (20, 7)):
+            imported["motion-depart", target // 4, target % 4] = imported["motion-sad", source // 4, source % 4]
+        self.frames.update(imported)
+
+    def load_lifecycle(self, path):
+        imported = {}
+        for name, rows in (("arrive", 5), ("depart", 4), ("recover", 2)):
+            image = QImage(str(Path(path) / f"neko-visitor-{name}-v1.png"))
+            if image.isNull() or image.width() % 4 or image.height() % rows:
+                return
+            width, height = image.width() // 4, image.height() // rows
+            poses = []
+            for i in range(rows * 4):
+                cell = image.copy(i % 4 * width, i // 4 * height, width, height).scaledToWidth(128, Qt.FastTransformation)
+                bounds = sprite_bounds(cell)
+                if bounds.isEmpty():
+                    return
+                poses.append(cell.copy(bounds))
+            sx, sy = 62 / pet_landmarks(poses[0])[0], 82 / poses[0].height()
+            for i, pose in enumerate(poses):
+                sprite = QPixmap.fromImage(pose).scaled(round(pose.width() * sx), round(pose.height() * sy),
+                                                       Qt.IgnoreAspectRatio, Qt.FastTransformation)
+                if sprite.width() > CANVAS_WIDTH - 4 or sprite.height() > CANVAS_HEIGHT - 4:
+                    return
+                frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+                frame.fill(Qt.transparent)
+                painter = QPainter(frame)
+                painter.drawPixmap((CANVAS_WIDTH - sprite.width()) // 2, 130 - sprite.height(), sprite)
+                painter.end()
+                imported[f"visitor-{name}", i // 4, i % 4] = frame
+        idle = self.frames["idle", 0, 0]
+        for i, source in enumerate(range(1, 7), 14):
+            imported["visitor-arrive", i // 4, i % 4] = imported["visitor-recover", source // 4, source % 4]
+        for key in (("visitor-arrive", 0, 0), ("visitor-arrive", 5, 0), ("visitor-depart", 0, 0)):
+            imported[key] = idle
+        self.frames.update(imported)
+
+    def load_runtime(self, path):
+        """Release builds contain the exact calibrated frames, prepared at build time."""
+        try:
+            keys = json.loads((Path(path) / "neko-runtime.json").read_text(encoding="utf-8"))
+            keys = [tuple(key) for key in keys]
+            if not keys or len(set(keys)) != len(keys):
+                return False
+            required = {(clip.bank, clip.row + i // 4, i % 4)
+                        for clip in CLIPS.values() for i in clip.order}
+            if not required.issubset(keys):
+                return False
+            image = QImage(str(Path(path) / "neko-runtime.png"))
+            if image.size().toTuple() != (16 * CANVAS_WIDTH, ((len(keys) + 15) // 16) * CANVAS_HEIGHT):
+                return False
+            self.frames = {key: QPixmap.fromImage(image.copy(
+                i % 16 * CANVAS_WIDTH, i // 16 * CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT))
+                for i, key in enumerate(keys)}
+            return True
+        except (OSError, ValueError, TypeError):
+            return False
 
     def load_games(self, path):
         """All-or-nothing game art; constant calibration from each bank's neutral."""
@@ -488,15 +766,4 @@ class SpriteAtlas:
         clip = CLIPS[name]
         index = clip.frame_index(elapsed if motion else 0)
         source = self.frames.get((clip.bank, clip.row + index // 4, index % 4), QPixmap())
-        if source.isNull() or name != "depart":
-            return source
-        # Preserve the accepted hop arc after the longer sad pause and crouch.
-        launch = sum(clip.durations[:3]) / 1000
-        progress = max(0, min(1, (elapsed - launch) / 0.75))
-        offset = round(-96 * progress + 208 * progress * progress)
-        frame = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
-        frame.fill(Qt.transparent)
-        painter = QPainter(frame)
-        painter.drawPixmap(0, offset, source)
-        painter.end()
-        return frame
+        return source

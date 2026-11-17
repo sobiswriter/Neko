@@ -1,0 +1,250 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "ce2fa98",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 127823429,
+      "sha256": "eae3555227be966f2e07c4cac2fa88467830423fe31fc76f5b178b090918b62f"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 127823692,
+      "sha256": "7e22b1ac15b404bd9f9e3d1bb20f96195c2463ce479c0d706ffc0de45674e5f0"
+    }
+  },
+  "source": {
+    "animations.py": {
+      "bytes": 37945,
+      "sha256": "c5a279f6612de4a7a7f4f51b85c6c17b8663d1498effc8bdda58015552e83174"
+    },
+    "test_animations.py": {
+      "bytes": 26672,
+      "sha256": "8fff91303c95cd13252564a98d1b782cd0ab21b6912849a1227e7b775152bce4"
+    },
+    "test_main.py": {
+      "bytes": 73102,
+      "sha256": "9d463bdd55e3fc4c166c26e7520cdd144e585d5f31a18928d81762d8f3c5ec3f"
+    },
+    "tools/assemble_rest_smile.py": {
+      "bytes": 2426,
+      "sha256": "df753f4e77f52b1efa359dd06358ee9e0340a0c7a890751c497845a6b2f617b7"
+    },
+    "tools/preview_rest_smile.py": {
+      "bytes": 5636,
+      "sha256": "57d19af1acdd5ba5653dcaf574f50cc7df6227e0b92543ea0e99315ed4b54be1"
+    },
+    "tools/probe_idle_refresh.py": {
+      "bytes": 3854,
+      "sha256": "a507dc7798b49a2527f56418227fc3cf64512f8e35db2189b87a0d81170d07ad"
+    }
+  },
+  "active_refresh_assets": {
+    "assets/neko-idle-rest-v2.png": {
+      "bytes": 53700,
+      "sha256": "0985979c5ac4ac0d694e6c62a8b8be57eea99dc638317b3153acdda6f24e1b8d"
+    },
+    "assets/neko-idle-loaf-v2.png": {
+      "bytes": 112964,
+      "sha256": "b89be0a2c726fc62e09c270b0d14e23bbe1c3c52b320a2db6dee457389ea57aa"
+    },
+    "assets/neko-idle-stretch-v2.png": {
+      "bytes": 177006,
+      "sha256": "d77bce21708e495bd880a49882f54be87994d6bb2f33bb20993c3c82ab079d1a"
+    },
+    "assets/neko-idle-groom-v2.png": {
+      "bytes": 118695,
+      "sha256": "6796317d855ba0bbf677f46bf2c159d1a9b7f94fca44a869be2e177a5cfea6c0"
+    },
+    "assets/neko-idle-yawn-v2.png": {
+      "bytes": 117033,
+      "sha256": "dc5e612dfbddf10f868a101f4b6e915e6aadd26433da81e08df7572c6cc3d619"
+    },
+    "assets/neko-idle-peek-v2.png": {
+      "bytes": 118547,
+      "sha256": "8b91db4304da7a5dd54106f6426fc80b67b13c3aa18a843752897a6e843d3444"
+    },
+    "assets/neko-idle-ears-v2.png": {
+      "bytes": 109041,
+      "sha256": "bfe3b3f78ac7e63c455611418f01d64d92a3937b6fa1a45854df6bf5535441b6"
+    },
+    "assets/neko-idle-sniff-v2.png": {
+      "bytes": 120587,
+      "sha256": "0e9f4bb25468032eaaf559a297827ae9a87addd0ccd8c99f1bd52ddf2b77719d"
+    },
+    "assets/neko-idle-look-v2.png": {
+      "bytes": 237297,
+      "sha256": "91c6ec37d3e3ddc58e9cbebfe18abbd65b073b3d1367a15d10f8378e76ecfcd6"
+    }
+  },
+  "frozen_modules_match_source": {
+    "main": true,
+    "animations": true,
+    "behavior": true,
+    "thoughts": true,
+    "event_log": true,
+    "games": true
+  },
+  "main_and_behavior_bytecode_unchanged": true,
+  "metrics": {
+    "atlas_entries": 908,
+    "unchanged_frames": 895,
+    "unchanged_clips": [
+      "idle",
+      "tail",
+      "ears",
+      "sniff",
+      "tail_chase",
+      "tail_catch",
+      "arrive",
+      "depart",
+      "happy",
+      "nuzzle",
+      "pet_stretch",
+      "back_arch",
+      "happy_hop",
+      "side_flop",
+      "shoulder_peek",
+      "knead",
+      "chin_scritch",
+      "roll",
+      "paw_offer",
+      "ear_rub",
+      "typing",
+      "groom",
+      "yawn",
+      "fall_asleep",
+      "wake",
+      "sleep",
+      "walk",
+      "stretch",
+      "look_left",
+      "look_right",
+      "loaf",
+      "peek",
+      "pickup",
+      "set_down",
+      "carry_to_calm",
+      "carry_to_unimpressed",
+      "carry_open_eyes",
+      "carry_yawn",
+      "held_excited",
+      "held_calm",
+      "held_unimpressed",
+      "held_sleepy",
+      "game_ready",
+      "game_three",
+      "game_two",
+      "game_one",
+      "game_go",
+      "game_ready_cancel",
+      "game_run",
+      "game_turn",
+      "game_prepare",
+      "game_jump",
+      "game_miss",
+      "game_settle",
+      "game_win_0",
+      "game_win_1",
+      "game_win_2",
+      "game_loss_0",
+      "game_loss_1",
+      "game_loss_2",
+      "game_loss_finish",
+      "game_curl",
+      "game_comfort",
+      "game_gentle_rest",
+      "game_gentle_reach"
+    ],
+    "changed_frames": [
+      [
+        "idle-v2-rest",
+        1,
+        2
+      ],
+      [
+        "idle-v2-rest",
+        1,
+        3
+      ],
+      [
+        "idle-v2-rest",
+        2,
+        0
+      ]
+    ],
+    "all_other_frames_identical": 905,
+    "blink_ms": 300,
+    "loop_ms": 5800,
+    "components_alpha128": [
+      [
+        4308
+      ],
+      [
+        4303
+      ],
+      [
+        4366
+      ],
+      [
+        4367
+      ],
+      [
+        4369
+      ],
+      [
+        4359
+      ],
+      [
+        4372
+      ],
+      [
+        4362
+      ],
+      [
+        4308
+      ],
+      [
+        4308
+      ]
+    ],
+    "reused_body_cells": 8,
+    "smile_ms": 2900,
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "durations_ms": [
+      2100,
+      200,
+      200,
+      300,
+      100,
+      100,
+      100,
+      300,
+      2300,
+      100
+    ]
+  },
+  "checks": {
+    "source_cases_passed": 2,
+    "native_timing_not_repeated": "Runtime bytecode and all clip definitions unchanged; prior rest-smile-native.json retained",
+    "final_package_checks_passed": 2,
+    "checks_not_repeated": [
+      "native startup/timing",
+      "full suite",
+      "unchanged icon/manifest",
+      "unrelated bundled goodbye",
+      "physical mixed-DPI/multiple-monitor",
+      "long soak"
+    ]
+  },
+  "scope": "Exact tiny smile selected in user screenshot. Only three frame mouths replaced with prior frame9 mouth; all905 other frames and all65 clips unchanged. Half-loop2.9s smile retained."
+}

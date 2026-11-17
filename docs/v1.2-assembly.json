@@ -1,0 +1,3371 @@
+{
+ "tool": "tools/assemble_v12.py",
+ "cell": 448,
+ "baseline": 436,
+ "method": "main alpha>=128 silhouette per grid cell, +2px soft rim; detached marks dropped; complete original RGBA; bottom-aligned; no anatomy painted",
+ "sheets": {
+  "win-sproing-a": {
+   "prompt": "W1a",
+   "source": "assets-incoming/Bouncy White Cat Pixel Sprite Sheet-1.png",
+   "source_sha256": "97f90494a9caa0bd9264f645808adce79fe0d6354348a21968f9d5b5700771b3",
+   "asset": "assets/neko-v12-win-sproing-a.png",
+   "asset_sha256": "c2f84f2de58134dd461fd12a9982f505a3f0b2b4a8b910c8bf391d823d5fb241",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      48,
+      39,
+      320,
+      322
+     ],
+     "size": [
+      272,
+      283
+     ]
+    },
+    {
+     "index": 1,
+     "label": "realises she won (sparkle eyes)",
+     "source": [
+      462,
+      39,
+      721,
+      321
+     ],
+     "size": [
+      259,
+      282
+     ]
+    },
+    {
+     "index": 2,
+     "label": "pops up, tail rising",
+     "source": [
+      808,
+      26,
+      1113,
+      319
+     ],
+     "size": [
+      305,
+      293
+     ]
+    },
+    {
+     "index": 3,
+     "label": "arch, happy squeeze",
+     "source": [
+      1214,
+      5,
+      1508,
+      324
+     ],
+     "size": [
+      294,
+      319
+     ]
+    },
+    {
+     "index": 4,
+     "label": "bounce 1 launch",
+     "source": [
+      48,
+      344,
+      338,
+      623
+     ],
+     "size": [
+      290,
+      279
+     ]
+    },
+    {
+     "index": 5,
+     "label": "bounce 1 top",
+     "source": [
+      454,
+      348,
+      731,
+      621
+     ],
+     "size": [
+      277,
+      273
+     ]
+    },
+    {
+     "index": 6,
+     "label": "coming down",
+     "source": [
+      833,
+      358,
+      1098,
+      642
+     ],
+     "size": [
+      265,
+      284
+     ]
+    },
+    {
+     "index": 7,
+     "label": "stiff landing",
+     "source": [
+      1223,
+      352,
+      1481,
+      661
+     ],
+     "size": [
+      258,
+      309
+     ]
+    },
+    {
+     "index": 8,
+     "label": "bounce 2 launch",
+     "source": [
+      50,
+      670,
+      325,
+      953
+     ],
+     "size": [
+      275,
+      283
+     ]
+    },
+    {
+     "index": 9,
+     "label": "bounce 2 top (happiest)",
+     "source": [
+      460,
+      656,
+      728,
+      971
+     ],
+     "size": [
+      268,
+      315
+     ]
+    },
+    {
+     "index": 10,
+     "label": "coming down",
+     "source": [
+      840,
+      671,
+      1103,
+      980
+     ],
+     "size": [
+      263,
+      309
+     ]
+    },
+    {
+     "index": 11,
+     "label": "landing crouch",
+     "source": [
+      1234,
+      722,
+      1515,
+      991
+     ],
+     "size": [
+      281,
+      269
+     ]
+    }
+   ]
+  },
+  "win-sproing-c": {
+   "prompt": "W1a (second take)",
+   "source": "assets-incoming/Bouncing White Kitten Pixel Sprite Sheet-2.png",
+   "source_sha256": "9156996b9ae25a04036ee2d471a34f01fd4435ef1698254cac1564c709d78875",
+   "asset": "assets/neko-v12-win-sproing-c.png",
+   "asset_sha256": "42fd0b9d623f495239fcd4f68ffd6fee5a613cbc5b8500039a1fdc3de148b822",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      63,
+      47,
+      344,
+      324
+     ],
+     "size": [
+      281,
+      277
+     ]
+    },
+    {
+     "index": 1,
+     "label": "realises she won",
+     "source": [
+      453,
+      28,
+      728,
+      323
+     ],
+     "size": [
+      275,
+      295
+     ]
+    },
+    {
+     "index": 2,
+     "label": "pops up, tail rising",
+     "source": [
+      824,
+      22,
+      1122,
+      323
+     ],
+     "size": [
+      298,
+      301
+     ]
+    },
+    {
+     "index": 3,
+     "label": "arch, happy squeeze",
+     "source": [
+      1198,
+      7,
+      1488,
+      323
+     ],
+     "size": [
+      290,
+      316
+     ]
+    },
+    {
+     "index": 4,
+     "label": "bounce 1 launch",
+     "source": [
+      42,
+      342,
+      344,
+      616
+     ],
+     "size": [
+      302,
+      274
+     ]
+    },
+    {
+     "index": 5,
+     "label": "bounce 1 top",
+     "source": [
+      442,
+      337,
+      723,
+      613
+     ],
+     "size": [
+      281,
+      276
+     ]
+    },
+    {
+     "index": 6,
+     "label": "coming down",
+     "source": [
+      804,
+      346,
+      1103,
+      629
+     ],
+     "size": [
+      299,
+      283
+     ]
+    },
+    {
+     "index": 7,
+     "label": "landing",
+     "source": [
+      1203,
+      351,
+      1486,
+      648
+     ],
+     "size": [
+      283,
+      297
+     ]
+    },
+    {
+     "index": 8,
+     "label": "bounce 2 launch",
+     "source": [
+      56,
+      694,
+      342,
+      1003
+     ],
+     "size": [
+      286,
+      309
+     ]
+    },
+    {
+     "index": 9,
+     "label": "bounce 2 top",
+     "source": [
+      446,
+      662,
+      724,
+      980
+     ],
+     "size": [
+      278,
+      318
+     ]
+    },
+    {
+     "index": 10,
+     "label": "coming down",
+     "source": [
+      819,
+      689,
+      1107,
+      1005
+     ],
+     "size": [
+      288,
+      316
+     ]
+    },
+    {
+     "index": 11,
+     "label": "landing crouch",
+     "source": [
+      1201,
+      732,
+      1496,
+      1003
+     ],
+     "size": [
+      295,
+      271
+     ]
+    }
+   ]
+  },
+  "win-sproing-b": {
+   "prompt": "W1b",
+   "source": "assets-incoming/Playful White Cat Pixel Sprite Sheet.png",
+   "source_sha256": "3f1439088a0740776e4274b7f7140febbc0e68b7d9d4fe24f6f436bdd3e20869",
+   "asset": "assets/neko-v12-win-sproing-b.png",
+   "asset_sha256": "6aa6347875bbd129b7f33b0de37043e0ee2c1b99ee18009f441153f38f1e5938",
+   "regions": [
+    {
+     "index": 0,
+     "label": "arched bridge",
+     "source": [
+      49,
+      77,
+      324,
+      337
+     ],
+     "size": [
+      275,
+      260
+     ]
+    },
+    {
+     "index": 1,
+     "label": "bounce 3 launch",
+     "source": [
+      466,
+      41,
+      736,
+      322
+     ],
+     "size": [
+      270,
+      281
+     ]
+    },
+    {
+     "index": 2,
+     "label": "bounce 3 top",
+     "source": [
+      836,
+      22,
+      1108,
+      293
+     ],
+     "size": [
+      272,
+      271
+     ]
+    },
+    {
+     "index": 3,
+     "label": "light landing",
+     "source": [
+      1214,
+      45,
+      1484,
+      331
+     ],
+     "size": [
+      270,
+      286
+     ]
+    },
+    {
+     "index": 4,
+     "label": "arch relaxes",
+     "source": [
+      56,
+      387,
+      337,
+      665
+     ],
+     "size": [
+      281,
+      278
+     ]
+    },
+    {
+     "index": 5,
+     "label": "half-sit",
+     "source": [
+      484,
+      364,
+      736,
+      663
+     ],
+     "size": [
+      252,
+      299
+     ]
+    },
+    {
+     "index": 6,
+     "label": "proud squeeze",
+     "source": [
+      868,
+      364,
+      1116,
+      663
+     ],
+     "size": [
+      248,
+      299
+     ]
+    },
+    {
+     "index": 7,
+     "label": "happy head wiggle",
+     "source": [
+      1246,
+      370,
+      1480,
+      664
+     ],
+     "size": [
+      234,
+      294
+     ]
+    },
+    {
+     "index": 8,
+     "label": "smug half-lids",
+     "source": [
+      68,
+      704,
+      335,
+      1001
+     ],
+     "size": [
+      267,
+      297
+     ]
+    },
+    {
+     "index": 9,
+     "label": "contented blink",
+     "source": [
+      467,
+      709,
+      730,
+      1004
+     ],
+     "size": [
+      263,
+      295
+     ]
+    },
+    {
+     "index": 10,
+     "label": "eyes reopen",
+     "source": [
+      848,
+      708,
+      1110,
+      1005
+     ],
+     "size": [
+      262,
+      297
+     ]
+    },
+    {
+     "index": 11,
+     "label": "neutral",
+     "source": [
+      1243,
+      709,
+      1499,
+      1004
+     ],
+     "size": [
+      256,
+      295
+     ]
+    }
+   ]
+  },
+  "win-roll-a": {
+   "prompt": "W2a",
+   "source": "assets-incoming/victory 1.png",
+   "source_sha256": "dd7a9808506a595589b3da4b0889285a92adb67d2c474f846ae18df70f7ce318",
+   "asset": "assets/neko-v12-win-roll-a.png",
+   "asset_sha256": "e8a79f565f9b3d8807337af24eb295e049352aece1e140f7b4cad6f8a740ac63",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      76,
+      26,
+      321,
+      317
+     ],
+     "size": [
+      245,
+      291
+     ]
+    },
+    {
+     "index": 1,
+     "label": "pounce wiggle",
+     "source": [
+      431,
+      48,
+      710,
+      313
+     ],
+     "size": [
+      279,
+      265
+     ]
+    },
+    {
+     "index": 2,
+     "label": "pounce",
+     "source": [
+      801,
+      39,
+      1117,
+      268
+     ],
+     "size": [
+      316,
+      229
+     ]
+    },
+    {
+     "index": 3,
+     "label": "pins the prize",
+     "source": [
+      1197,
+      32,
+      1497,
+      317
+     ],
+     "size": [
+      300,
+      285
+     ]
+    },
+    {
+     "index": 4,
+     "label": "rolls onto side",
+     "source": [
+      14,
+      440,
+      349,
+      642
+     ],
+     "size": [
+      335,
+      202
+     ]
+    },
+    {
+     "index": 5,
+     "label": "belly up",
+     "source": [
+      404,
+      395,
+      710,
+      645
+     ],
+     "size": [
+      306,
+      250
+     ]
+    },
+    {
+     "index": 6,
+     "label": "wiggle A",
+     "source": [
+      788,
+      391,
+      1129,
+      645
+     ],
+     "size": [
+      341,
+      254
+     ]
+    },
+    {
+     "index": 7,
+     "label": "wiggle B",
+     "source": [
+      1182,
+      384,
+      1505,
+      645
+     ],
+     "size": [
+      323,
+      261
+     ]
+    },
+    {
+     "index": 8,
+     "label": "wiggle A, bigger smile",
+     "source": [
+      23,
+      723,
+      346,
+      991
+     ],
+     "size": [
+      323,
+      268
+     ]
+    },
+    {
+     "index": 9,
+     "label": "bicycle kick",
+     "source": [
+      414,
+      732,
+      735,
+      985
+     ],
+     "size": [
+      321,
+      253
+     ]
+    },
+    {
+     "index": 10,
+     "label": "dreamy pause",
+     "source": [
+      789,
+      729,
+      1108,
+      991
+     ],
+     "size": [
+      319,
+      262
+     ]
+    },
+    {
+     "index": 11,
+     "label": "rolling back",
+     "source": [
+      1193,
+      729,
+      1506,
+      971
+     ],
+     "size": [
+      313,
+      242
+     ]
+    }
+   ]
+  },
+  "win-roll-b": {
+   "prompt": "W2b",
+   "source": "assets-incoming/Victory 1 p2.png",
+   "source_sha256": "5ec4150a1429006d05f4aaff4a660a7ba1a0e94e4f06c7c8b08053159c18ddaf",
+   "asset": "assets/neko-v12-win-roll-b.png",
+   "asset_sha256": "b6224cee20cc7a7c9b9ffc3cc141b4eb6cde32ec2c5c2affa360f1145bd686ab",
+   "regions": [
+    {
+     "index": 0,
+     "label": "lying on side",
+     "source": [
+      35,
+      121,
+      355,
+      293
+     ],
+     "size": [
+      320,
+      172
+     ]
+    },
+    {
+     "index": 1,
+     "label": "head lifts",
+     "source": [
+      420,
+      104,
+      719,
+      291
+     ],
+     "size": [
+      299,
+      187
+     ]
+    },
+    {
+     "index": 2,
+     "label": "sphinx",
+     "source": [
+      812,
+      75,
+      1105,
+      294
+     ],
+     "size": [
+      293,
+      219
+     ]
+    },
+    {
+     "index": 3,
+     "label": "four-paw crouch",
+     "source": [
+      1209,
+      64,
+      1484,
+      295
+     ],
+     "size": [
+      275,
+      231
+     ]
+    },
+    {
+     "index": 4,
+     "label": "sits, head shake",
+     "source": [
+      92,
+      374,
+      350,
+      638
+     ],
+     "size": [
+      258,
+      264
+     ]
+    },
+    {
+     "index": 5,
+     "label": "full-body fluff shake",
+     "source": [
+      456,
+      369,
+      739,
+      637
+     ],
+     "size": [
+      283,
+      268
+     ]
+    },
+    {
+     "index": 6,
+     "label": "settles, bright eyes",
+     "source": [
+      847,
+      369,
+      1109,
+      639
+     ],
+     "size": [
+      262,
+      270
+     ]
+    },
+    {
+     "index": 7,
+     "label": "proud paw",
+     "source": [
+      1238,
+      368,
+      1476,
+      643
+     ],
+     "size": [
+      238,
+      275
+     ]
+    },
+    {
+     "index": 8,
+     "label": "smug blink",
+     "source": [
+      87,
+      711,
+      340,
+      976
+     ],
+     "size": [
+      253,
+      265
+     ]
+    },
+    {
+     "index": 9,
+     "label": "eyes reopen",
+     "source": [
+      467,
+      709,
+      724,
+      980
+     ],
+     "size": [
+      257,
+      271
+     ]
+    },
+    {
+     "index": 10,
+     "label": "tail curls",
+     "source": [
+      847,
+      709,
+      1116,
+      981
+     ],
+     "size": [
+      269,
+      272
+     ]
+    },
+    {
+     "index": 11,
+     "label": "neutral",
+     "source": [
+      1247,
+      710,
+      1483,
+      981
+     ],
+     "size": [
+      236,
+      271
+     ]
+    }
+   ]
+  },
+  "dodge-tease": {
+   "prompt": "D1",
+   "source": "assets-incoming/Pixel-Art White Kitten Pose Sheet.png",
+   "source_sha256": "82006d1f29de632680cad8f128e0f12e99efacc98b8edc48cb981d5ab67de4a0",
+   "asset": "assets/neko-v12-dodge-tease.png",
+   "asset_sha256": "d9ee0f16a15d568d0e085a9d456cfb437eb1aeb75c3cc7877b5bf9e958b2cfa1",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      77,
+      29,
+      334,
+      318
+     ],
+     "size": [
+      257,
+      289
+     ]
+    },
+    {
+     "index": 1,
+     "label": "notices, head tilt",
+     "source": [
+      439,
+      19,
+      726,
+      318
+     ],
+     "size": [
+      287,
+      299
+     ]
+    },
+    {
+     "index": 2,
+     "label": "stalking crouch",
+     "source": [
+      814,
+      76,
+      1111,
+      320
+     ],
+     "size": [
+      297,
+      244
+     ]
+    },
+    {
+     "index": 3,
+     "label": "creep step 1",
+     "source": [
+      1201,
+      71,
+      1507,
+      325
+     ],
+     "size": [
+      306,
+      254
+     ]
+    },
+    {
+     "index": 4,
+     "label": "creep step 2",
+     "source": [
+      41,
+      408,
+      335,
+      645
+     ],
+     "size": [
+      294,
+      237
+     ]
+    },
+    {
+     "index": 5,
+     "label": "stops",
+     "source": [
+      438,
+      409,
+      732,
+      647
+     ],
+     "size": [
+      294,
+      238
+     ]
+    },
+    {
+     "index": 6,
+     "label": "rump rises",
+     "source": [
+      823,
+      357,
+      1120,
+      648
+     ],
+     "size": [
+      297,
+      291
+     ]
+    },
+    {
+     "index": 7,
+     "label": "butt wiggle",
+     "source": [
+      1217,
+      366,
+      1513,
+      646
+     ],
+     "size": [
+      296,
+      280
+     ]
+    },
+    {
+     "index": 8,
+     "label": "come-on paw swipe",
+     "source": [
+      55,
+      679,
+      328,
+      999
+     ],
+     "size": [
+      273,
+      320
+     ]
+    },
+    {
+     "index": 9,
+     "label": "play-bow wink",
+     "source": [
+      439,
+      705,
+      734,
+      993
+     ],
+     "size": [
+      295,
+      288
+     ]
+    },
+    {
+     "index": 10,
+     "label": "play-bow",
+     "source": [
+      826,
+      709,
+      1113,
+      998
+     ],
+     "size": [
+      287,
+      289
+     ]
+    },
+    {
+     "index": 11,
+     "label": "ready stance",
+     "source": [
+      1201,
+      726,
+      1517,
+      999
+     ],
+     "size": [
+      316,
+      273
+     ]
+    }
+   ]
+  },
+  "dodge-sidestep": {
+   "prompt": "D2",
+   "source": "assets-incoming/Pixel Kitten Animation Sprite Sheet.png",
+   "source_sha256": "ee89ca2257f10d4e52b2602b5bd20606c75f54966867b03468e6dbea50a20cba",
+   "asset": "assets/neko-v12-dodge-sidestep.png",
+   "asset_sha256": "728d5550bc622135720f84955a119314aee7a6410862b435086c8f92d974399d",
+   "regions": [
+    {
+     "index": 0,
+     "label": "ready stance",
+     "source": [
+      54,
+      33,
+      347,
+      313
+     ],
+     "size": [
+      293,
+      280
+     ]
+    },
+    {
+     "index": 1,
+     "label": "tell: leans away",
+     "source": [
+      440,
+      22,
+      725,
+      303
+     ],
+     "size": [
+      285,
+      281
+     ]
+    },
+    {
+     "index": 2,
+     "label": "gathered crouch",
+     "source": [
+      798,
+      106,
+      1118,
+      298
+     ],
+     "size": [
+      320,
+      192
+     ]
+    },
+    {
+     "index": 3,
+     "label": "launch",
+     "source": [
+      1185,
+      27,
+      1512,
+      271
+     ],
+     "size": [
+      327,
+      244
+     ]
+    },
+    {
+     "index": 4,
+     "label": "mid-air",
+     "source": [
+      30,
+      369,
+      352,
+      576
+     ],
+     "size": [
+      322,
+      207
+     ]
+    },
+    {
+     "index": 5,
+     "label": "forepaws reach",
+     "source": [
+      416,
+      393,
+      735,
+      626
+     ],
+     "size": [
+      319,
+      233
+     ]
+    },
+    {
+     "index": 6,
+     "label": "fore landing",
+     "source": [
+      810,
+      391,
+      1100,
+      635
+     ],
+     "size": [
+      290,
+      244
+     ]
+    },
+    {
+     "index": 7,
+     "label": "safe landing",
+     "source": [
+      1200,
+      393,
+      1503,
+      633
+     ],
+     "size": [
+      303,
+      240
+     ]
+    },
+    {
+     "index": 8,
+     "label": "cheeky wink",
+     "source": [
+      68,
+      701,
+      342,
+      985
+     ],
+     "size": [
+      274,
+      284
+     ]
+    },
+    {
+     "index": 9,
+     "label": "cheeky look",
+     "source": [
+      454,
+      702,
+      726,
+      984
+     ],
+     "size": [
+      272,
+      282
+     ]
+    },
+    {
+     "index": 10,
+     "label": "head forward",
+     "source": [
+      815,
+      698,
+      1100,
+      990
+     ],
+     "size": [
+      285,
+      292
+     ]
+    },
+    {
+     "index": 11,
+     "label": "ready stance",
+     "source": [
+      1200,
+      707,
+      1499,
+      991
+     ],
+     "size": [
+      299,
+      284
+     ]
+    }
+   ]
+  },
+  "dodge-duck": {
+   "prompt": "D3",
+   "source": "assets-incoming/Pixel Cat Duck-and-Recover Sprite Sheet.png",
+   "source_sha256": "c6d37aa067f18b4cb84d830238988ce38e3af8fbdb3b272d3ac0eade11c5696f",
+   "asset": "assets/neko-v12-dodge-duck.png",
+   "asset_sha256": "15a17fb7457b3a21381644095a8e92d6665c0050d1ad598c7b3ff949ad1ff928",
+   "regions": [
+    {
+     "index": 0,
+     "label": "ready stance",
+     "source": [
+      60,
+      38,
+      356,
+      318
+     ],
+     "size": [
+      296,
+      280
+     ]
+    },
+    {
+     "index": 1,
+     "label": "tell: eyes up",
+     "source": [
+      423,
+      84,
+      743,
+      318
+     ],
+     "size": [
+      320,
+      234
+     ]
+    },
+    {
+     "index": 2,
+     "label": "ducks",
+     "source": [
+      786,
+      169,
+      1134,
+      326
+     ],
+     "size": [
+      348,
+      157
+     ]
+    },
+    {
+     "index": 3,
+     "label": "pancake flat",
+     "source": [
+      1169,
+      206,
+      1519,
+      329
+     ],
+     "size": [
+      350,
+      123
+     ]
+    },
+    {
+     "index": 4,
+     "label": "peeks one eye",
+     "source": [
+      20,
+      518,
+      381,
+      643
+     ],
+     "size": [
+      361,
+      125
+     ]
+    },
+    {
+     "index": 5,
+     "label": "eyes open",
+     "source": [
+      418,
+      466,
+      761,
+      645
+     ],
+     "size": [
+      343,
+      179
+     ]
+    },
+    {
+     "index": 6,
+     "label": "pushes up",
+     "source": [
+      803,
+      415,
+      1113,
+      645
+     ],
+     "size": [
+      310,
+      230
+     ]
+    },
+    {
+     "index": 7,
+     "label": "crouch",
+     "source": [
+      1210,
+      394,
+      1503,
+      645
+     ],
+     "size": [
+      293,
+      251
+     ]
+    },
+    {
+     "index": 8,
+     "label": "giggle",
+     "source": [
+      55,
+      697,
+      353,
+      988
+     ],
+     "size": [
+      298,
+      291
+     ]
+    },
+    {
+     "index": 9,
+     "label": "giggle, paw to mouth",
+     "source": [
+      453,
+      700,
+      736,
+      988
+     ],
+     "size": [
+      283,
+      288
+     ]
+    },
+    {
+     "index": 10,
+     "label": "cheeky smile",
+     "source": [
+      817,
+      697,
+      1124,
+      990
+     ],
+     "size": [
+      307,
+      293
+     ]
+    },
+    {
+     "index": 11,
+     "label": "ready stance",
+     "source": [
+      1204,
+      697,
+      1513,
+      990
+     ],
+     "size": [
+      309,
+      293
+     ]
+    }
+   ]
+  },
+  "dodge-tagged": {
+   "prompt": "D4",
+   "source": "assets-incoming/Cute Pixel Cat Sticker Sheet.png",
+   "source_sha256": "d6ffc8841bb4b216dc6e953ba0521728f9cb131d9f9a3c1cd96d2d899ae44b1c",
+   "asset": "assets/neko-v12-dodge-tagged.png",
+   "asset_sha256": "ce2cb45a85645b7c15ce27b586510029a23da204f77240dc2a1ff61691860e27",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      72,
+      20,
+      371,
+      323
+     ],
+     "size": [
+      299,
+      303
+     ]
+    },
+    {
+     "index": 1,
+     "label": "surprise recoil",
+     "source": [
+      459,
+      6,
+      759,
+      334
+     ],
+     "size": [
+      300,
+      328
+     ]
+    },
+    {
+     "index": 2,
+     "label": "hops back",
+     "source": [
+      846,
+      1,
+      1111,
+      325
+     ],
+     "size": [
+      265,
+      324
+     ]
+    },
+    {
+     "index": 3,
+     "label": "lands blinking",
+     "source": [
+      1178,
+      85,
+      1510,
+      323
+     ],
+     "size": [
+      332,
+      238
+     ]
+    },
+    {
+     "index": 4,
+     "label": "mock indignation",
+     "source": [
+      55,
+      395,
+      349,
+      648
+     ],
+     "size": [
+      294,
+      253
+     ]
+    },
+    {
+     "index": 5,
+     "label": "puff and tail lash",
+     "source": [
+      455,
+      392,
+      740,
+      645
+     ],
+     "size": [
+      285,
+      253
+     ]
+    },
+    {
+     "index": 6,
+     "label": "smile wobbles",
+     "source": [
+      841,
+      369,
+      1124,
+      644
+     ],
+     "size": [
+      283,
+      275
+     ]
+    },
+    {
+     "index": 7,
+     "label": "giggle, paw to mouth",
+     "source": [
+      1227,
+      363,
+      1512,
+      646
+     ],
+     "size": [
+      285,
+      283
+     ]
+    },
+    {
+     "index": 8,
+     "label": "giggle tipped",
+     "source": [
+      73,
+      699,
+      365,
+      988
+     ],
+     "size": [
+      292,
+      289
+     ]
+    },
+    {
+     "index": 9,
+     "label": "determined cheeky",
+     "source": [
+      450,
+      699,
+      740,
+      988
+     ],
+     "size": [
+      290,
+      289
+     ]
+    },
+    {
+     "index": 10,
+     "label": "stands",
+     "source": [
+      835,
+      689,
+      1136,
+      993
+     ],
+     "size": [
+      301,
+      304
+     ]
+    },
+    {
+     "index": 11,
+     "label": "ready",
+     "source": [
+      1219,
+      686,
+      1517,
+      995
+     ],
+     "size": [
+      298,
+      309
+     ]
+    }
+   ]
+  },
+  "dodge-caught": {
+   "prompt": "D5",
+   "source": "assets-incoming/Pixel Cat Emote Sticker Sheet.png",
+   "source_sha256": "e6d2b551de1b3537dbbabcc3ba3dd0e078e16882e666e82f5a0c3b2b6b46036a",
+   "asset": "assets/neko-v12-dodge-caught.png",
+   "asset_sha256": "72d7e7ef9f89e86279bbe3df02188bc2042277c5eb2322ca38a5b698fc54859b",
+   "regions": [
+    {
+     "index": 0,
+     "label": "ready",
+     "source": [
+      81,
+      13,
+      382,
+      331
+     ],
+     "size": [
+      301,
+      318
+     ]
+    },
+    {
+     "index": 1,
+     "label": "ah!",
+     "source": [
+      469,
+      6,
+      767,
+      337
+     ],
+     "size": [
+      298,
+      331
+     ]
+    },
+    {
+     "index": 2,
+     "label": "sits laughing",
+     "source": [
+      848,
+      11,
+      1133,
+      337
+     ],
+     "size": [
+      285,
+      326
+     ]
+    },
+    {
+     "index": 3,
+     "label": "tips over",
+     "source": [
+      1180,
+      89,
+      1512,
+      329
+     ],
+     "size": [
+      332,
+      240
+     ]
+    },
+    {
+     "index": 4,
+     "label": "belly up laughing",
+     "source": [
+      14,
+      424,
+      382,
+      643
+     ],
+     "size": [
+      368,
+      219
+     ]
+    },
+    {
+     "index": 5,
+     "label": "paws over face",
+     "source": [
+      427,
+      407,
+      763,
+      651
+     ],
+     "size": [
+      336,
+      244
+     ]
+    },
+    {
+     "index": 6,
+     "label": "peeks",
+     "source": [
+      798,
+      389,
+      1155,
+      651
+     ],
+     "size": [
+      357,
+      262
+     ]
+    },
+    {
+     "index": 7,
+     "label": "open-paw shrug",
+     "source": [
+      1201,
+      361,
+      1516,
+      657
+     ],
+     "size": [
+      315,
+      296
+     ]
+    },
+    {
+     "index": 8,
+     "label": "rolls to side",
+     "source": [
+      14,
+      753,
+      397,
+      981
+     ],
+     "size": [
+      383,
+      228
+     ]
+    },
+    {
+     "index": 9,
+     "label": "sphinx smile",
+     "source": [
+      461,
+      711,
+      777,
+      988
+     ],
+     "size": [
+      316,
+      277
+     ]
+    },
+    {
+     "index": 10,
+     "label": "good-game blink",
+     "source": [
+      843,
+      680,
+      1143,
+      988
+     ],
+     "size": [
+      300,
+      308
+     ]
+    },
+    {
+     "index": 11,
+     "label": "neutral",
+     "source": [
+      1225,
+      684,
+      1522,
+      994
+     ],
+     "size": [
+      297,
+      310
+     ]
+    }
+   ]
+  },
+  "restless-sigh": {
+   "prompt": "R1",
+   "source": "assets-incoming/Pixel Kitten Emotion Sprite Sheet.png",
+   "source_sha256": "a098243ecd23280690efe6aa023211c8f24924f64d3c165790701a3f57ced4f0",
+   "asset": "assets/neko-v12-restless-sigh.png",
+   "asset_sha256": "0d907d1b57a363da7df5230b6896b4f0e1977eb329a6d86bf30e064be8305f43",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      70,
+      13,
+      326,
+      328
+     ],
+     "size": [
+      256,
+      315
+     ]
+    },
+    {
+     "index": 1,
+     "label": "glances at you",
+     "source": [
+      460,
+      6,
+      725,
+      330
+     ],
+     "size": [
+      265,
+      324
+     ]
+    },
+    {
+     "index": 2,
+     "label": "hopeful",
+     "source": [
+      850,
+      6,
+      1098,
+      328
+     ],
+     "size": [
+      248,
+      322
+     ]
+    },
+    {
+     "index": 3,
+     "label": "ears droop",
+     "source": [
+      1208,
+      74,
+      1503,
+      328
+     ],
+     "size": [
+      295,
+      254
+     ]
+    },
+    {
+     "index": 4,
+     "label": "inhale",
+     "source": [
+      72,
+      351,
+      334,
+      644
+     ],
+     "size": [
+      262,
+      293
+     ]
+    },
+    {
+     "index": 5,
+     "label": "sigh out",
+     "source": [
+      425,
+      395,
+      733,
+      648
+     ],
+     "size": [
+      308,
+      253
+     ]
+    },
+    {
+     "index": 6,
+     "label": "slumps",
+     "source": [
+      802,
+      459,
+      1125,
+      644
+     ],
+     "size": [
+      323,
+      185
+     ]
+    },
+    {
+     "index": 7,
+     "label": "chin on paws, looks left",
+     "source": [
+      1192,
+      467,
+      1526,
+      645
+     ],
+     "size": [
+      334,
+      178
+     ]
+    },
+    {
+     "index": 8,
+     "label": "chin on paws, pout",
+     "source": [
+      21,
+      789,
+      374,
+      984
+     ],
+     "size": [
+      353,
+      195
+     ]
+    },
+    {
+     "index": 9,
+     "label": "head lifts",
+     "source": [
+      458,
+      680,
+      756,
+      994
+     ],
+     "size": [
+      298,
+      314
+     ]
+    },
+    {
+     "index": 10,
+     "label": "sits back up",
+     "source": [
+      836,
+      690,
+      1138,
+      998
+     ],
+     "size": [
+      302,
+      308
+     ]
+    },
+    {
+     "index": 11,
+     "label": "neutral",
+     "source": [
+      1229,
+      685,
+      1521,
+      998
+     ],
+     "size": [
+      292,
+      313
+     ]
+    }
+   ]
+  },
+  "restless-jealous": {
+   "prompt": "R2",
+   "source": "assets-incoming/Pixel Cat Animation Sprite Sheet.png",
+   "source_sha256": "25d75b9fce6e3659d341cd3c2a342eeb4f8dc12d65f97af5a9a06f505c6f674b",
+   "asset": "assets/neko-v12-restless-jealous.png",
+   "asset_sha256": "ed2b4bb4ba31a9683275e5028ca6d48979db6069a3188e8088537690dca9810b",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      68,
+      9,
+      351,
+      320
+     ],
+     "size": [
+      283,
+      311
+     ]
+    },
+    {
+     "index": 1,
+     "label": "head snaps left",
+     "source": [
+      452,
+      12,
+      744,
+      320
+     ],
+     "size": [
+      292,
+      308
+     ]
+    },
+    {
+     "index": 2,
+     "label": "glare",
+     "source": [
+      835,
+      47,
+      1129,
+      322
+     ],
+     "size": [
+      294,
+      275
+     ]
+    },
+    {
+     "index": 3,
+     "label": "puffed hmph",
+     "source": [
+      1216,
+      63,
+      1522,
+      325
+     ],
+     "size": [
+      306,
+      262
+     ]
+    },
+    {
+     "index": 4,
+     "label": "nose in the air",
+     "source": [
+      70,
+      383,
+      336,
+      661
+     ],
+     "size": [
+      266,
+      278
+     ]
+    },
+    {
+     "index": 5,
+     "label": "one-eye peek",
+     "source": [
+      463,
+      384,
+      748,
+      660
+     ],
+     "size": [
+      285,
+      276
+     ]
+    },
+    {
+     "index": 6,
+     "label": "glare, tail lash",
+     "source": [
+      840,
+      378,
+      1129,
+      660
+     ],
+     "size": [
+      289,
+      282
+     ]
+    },
+    {
+     "index": 7,
+     "label": "paw stamp up",
+     "source": [
+      1210,
+      373,
+      1504,
+      659
+     ],
+     "size": [
+      294,
+      286
+     ]
+    },
+    {
+     "index": 8,
+     "label": "paw stamp down",
+     "source": [
+      74,
+      722,
+      364,
+      995
+     ],
+     "size": [
+      290,
+      273
+     ]
+    },
+    {
+     "index": 9,
+     "label": "stalking stance",
+     "source": [
+      424,
+      726,
+      744,
+      990
+     ],
+     "size": [
+      320,
+      264
+     ]
+    },
+    {
+     "index": 10,
+     "label": "jealous pounce-hop",
+     "source": [
+      788,
+      703,
+      1134,
+      928
+     ],
+     "size": [
+      346,
+      225
+     ]
+    },
+    {
+     "index": 11,
+     "label": "lands stalking",
+     "source": [
+      1192,
+      758,
+      1527,
+      992
+     ],
+     "size": [
+      335,
+      234
+     ]
+    }
+   ]
+  },
+  "restless-demand": {
+   "prompt": "R3",
+   "source": "assets-incoming/Pixel Cat Emote Sprite Sheet.png",
+   "source_sha256": "515b85a1a9eb3c4e5b2a7317aedafa0eab2185cc08afd3053ccd9b2b28f91c96",
+   "asset": "assets/neko-v12-restless-demand.png",
+   "asset_sha256": "9d2dd7fdcd4718e175c6bc8616ecc212f87e87b183ab320dd2f1c0a7c90d7821",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      77,
+      28,
+      351,
+      331
+     ],
+     "size": [
+      274,
+      303
+     ]
+    },
+    {
+     "index": 1,
+     "label": "pleading eyes",
+     "source": [
+      465,
+      15,
+      744,
+      331
+     ],
+     "size": [
+      279,
+      316
+     ]
+    },
+    {
+     "index": 2,
+     "label": "begging, paws up",
+     "source": [
+      849,
+      8,
+      1106,
+      338
+     ],
+     "size": [
+      257,
+      330
+     ]
+    },
+    {
+     "index": 3,
+     "label": "paw reach",
+     "source": [
+      1215,
+      13,
+      1503,
+      337
+     ],
+     "size": [
+      288,
+      324
+     ]
+    },
+    {
+     "index": 4,
+     "label": "paw tap, mew!",
+     "source": [
+      48,
+      350,
+      344,
+      668
+     ],
+     "size": [
+      296,
+      318
+     ]
+    },
+    {
+     "index": 5,
+     "label": "determined pout",
+     "source": [
+      469,
+      345,
+      735,
+      668
+     ],
+     "size": [
+      266,
+      323
+     ]
+    },
+    {
+     "index": 6,
+     "label": "four paws",
+     "source": [
+      837,
+      359,
+      1119,
+      668
+     ],
+     "size": [
+      282,
+      309
+     ]
+    },
+    {
+     "index": 7,
+     "label": "head-butt",
+     "source": [
+      1210,
+      425,
+      1521,
+      664
+     ],
+     "size": [
+      311,
+      239
+     ]
+    },
+    {
+     "index": 8,
+     "label": "cheek rub",
+     "source": [
+      40,
+      691,
+      384,
+      1005
+     ],
+     "size": [
+      344,
+      314
+     ]
+    },
+    {
+     "index": 9,
+     "label": "pleading again",
+     "source": [
+      475,
+      680,
+      760,
+      1007
+     ],
+     "size": [
+      285,
+      327
+     ]
+    },
+    {
+     "index": 10,
+     "label": "impatient tail flick",
+     "source": [
+      855,
+      694,
+      1143,
+      1007
+     ],
+     "size": [
+      288,
+      313
+     ]
+    },
+    {
+     "index": 11,
+     "label": "neutral",
+     "source": [
+      1228,
+      696,
+      1513,
+      1007
+     ],
+     "size": [
+      285,
+      311
+     ]
+    }
+   ]
+  },
+  "restless-forgive": {
+   "prompt": "R4",
+   "source": "assets-incoming/Pixel Cat Expressions Sticker Sheet.png",
+   "source_sha256": "14c4b217849d471a9bb97ba75c59c78de16c929a386698bc2b9f98fa7877f624",
+   "asset": "assets/neko-v12-restless-forgive.png",
+   "asset_sha256": "7e4dcdb2f2068a7d0ed738c26f807931f533aa113d2d5c4221967e5370c1d00b",
+   "regions": [
+    {
+     "index": 0,
+     "label": "leftover pout",
+     "source": [
+      46,
+      53,
+      343,
+      338
+     ],
+     "size": [
+      297,
+      285
+     ]
+    },
+    {
+     "index": 1,
+     "label": "pout softens",
+     "source": [
+      443,
+      22,
+      736,
+      338
+     ],
+     "size": [
+      293,
+      316
+     ]
+    },
+    {
+     "index": 2,
+     "label": "happy squeeze",
+     "source": [
+      849,
+      20,
+      1121,
+      338
+     ],
+     "size": [
+      272,
+      318
+     ]
+    },
+    {
+     "index": 3,
+     "label": "leans into the hand",
+     "source": [
+      1230,
+      14,
+      1503,
+      336
+     ],
+     "size": [
+      273,
+      322
+     ]
+    },
+    {
+     "index": 4,
+     "label": "melts into loaf",
+     "source": [
+      41,
+      413,
+      368,
+      607
+     ],
+     "size": [
+      327,
+      194
+     ]
+    },
+    {
+     "index": 5,
+     "label": "loaf",
+     "source": [
+      444,
+      418,
+      744,
+      609
+     ],
+     "size": [
+      300,
+      191
+     ]
+    },
+    {
+     "index": 6,
+     "label": "one eye opens warmly",
+     "source": [
+      820,
+      398,
+      1126,
+      609
+     ],
+     "size": [
+      306,
+      211
+     ]
+    },
+    {
+     "index": 7,
+     "label": "warm eyes",
+     "source": [
+      1207,
+      384,
+      1513,
+      607
+     ],
+     "size": [
+      306,
+      223
+     ]
+    },
+    {
+     "index": 8,
+     "label": "rises to sit",
+     "source": [
+      62,
+      664,
+      343,
+      984
+     ],
+     "size": [
+      281,
+      320
+     ]
+    },
+    {
+     "index": 9,
+     "label": "head tilt",
+     "source": [
+      449,
+      642,
+      749,
+      983
+     ],
+     "size": [
+      300,
+      341
+     ]
+    },
+    {
+     "index": 10,
+     "label": "bright eyes",
+     "source": [
+      850,
+      656,
+      1117,
+      984
+     ],
+     "size": [
+      267,
+      328
+     ]
+    },
+    {
+     "index": 11,
+     "label": "neutral",
+     "source": [
+      1238,
+      665,
+      1505,
+      984
+     ],
+     "size": [
+      267,
+      319
+     ]
+    }
+   ]
+  },
+  "move-leap-up": {
+   "prompt": "M1",
+   "source": "assets-incoming/Pixel Cat Leap Animation Sheet.png",
+   "source_sha256": "8d0d92ceab24e931a9de1061f1ceb97438dbc500ebadf330c45563a7c3a1b81f",
+   "asset": "assets/neko-v12-move-leap-up.png",
+   "asset_sha256": "e8521b5389aaccd30d803aadf5d179286bb71c16ce474ebc14573acf0d2630b0",
+   "regions": [
+    {
+     "index": 0,
+     "label": "standing, looks up",
+     "source": [
+      67,
+      11,
+      346,
+      309
+     ],
+     "size": [
+      279,
+      298
+     ]
+    },
+    {
+     "index": 1,
+     "label": "measures the jump",
+     "source": [
+      460,
+      18,
+      738,
+      306
+     ],
+     "size": [
+      278,
+      288
+     ]
+    },
+    {
+     "index": 2,
+     "label": "deep crouch",
+     "source": [
+      780,
+      81,
+      1103,
+      310
+     ],
+     "size": [
+      323,
+      229
+     ]
+    },
+    {
+     "index": 3,
+     "label": "push-off",
+     "source": [
+      1178,
+      22,
+      1510,
+      310
+     ],
+     "size": [
+      332,
+      288
+     ]
+    },
+    {
+     "index": 4,
+     "label": "rising stretch",
+     "source": [
+      19,
+      337,
+      384,
+      636
+     ],
+     "size": [
+      365,
+      299
+     ]
+    },
+    {
+     "index": 5,
+     "label": "peak",
+     "source": [
+      432,
+      366,
+      784,
+      627
+     ],
+     "size": [
+      352,
+      261
+     ]
+    },
+    {
+     "index": 6,
+     "label": "fore-contact",
+     "source": [
+      831,
+      390,
+      1114,
+      659
+     ],
+     "size": [
+      283,
+      269
+     ]
+    },
+    {
+     "index": 7,
+     "label": "hind legs gather",
+     "source": [
+      1192,
+      399,
+      1483,
+      649
+     ],
+     "size": [
+      291,
+      250
+     ]
+    },
+    {
+     "index": 8,
+     "label": "four-paw landing",
+     "source": [
+      52,
+      741,
+      360,
+      981
+     ],
+     "size": [
+      308,
+      240
+     ]
+    },
+    {
+     "index": 9,
+     "label": "standing",
+     "source": [
+      457,
+      688,
+      738,
+      990
+     ],
+     "size": [
+      281,
+      302
+     ]
+    },
+    {
+     "index": 10,
+     "label": "looks back",
+     "source": [
+      813,
+      719,
+      1114,
+      990
+     ],
+     "size": [
+      301,
+      271
+     ]
+    },
+    {
+     "index": 11,
+     "label": "standing",
+     "source": [
+      1214,
+      690,
+      1503,
+      992
+     ],
+     "size": [
+      289,
+      302
+     ]
+    }
+   ]
+  },
+  "move-leap-down": {
+   "prompt": "M2",
+   "source": "assets-incoming/Kawaii Pixel Cat Hop Sprite Sheet.png",
+   "source_sha256": "1ace414eee0f4eb8638d360e3731d55b7748e26d07260ca573fef7f5a7e40477",
+   "asset": "assets/neko-v12-move-leap-down.png",
+   "asset_sha256": "c649fe070cdfa0314461f9c7e16e0481618f7f757a89490296fae576e7ea4a6e",
+   "regions": [
+    {
+     "index": 0,
+     "label": "standing, looks down",
+     "source": [
+      37,
+      45,
+      349,
+      310
+     ],
+     "size": [
+      312,
+      265
+     ]
+    },
+    {
+     "index": 1,
+     "label": "peers down",
+     "source": [
+      415,
+      57,
+      711,
+      310
+     ],
+     "size": [
+      296,
+      253
+     ]
+    },
+    {
+     "index": 2,
+     "label": "small crouch",
+     "source": [
+      803,
+      27,
+      1107,
+      311
+     ],
+     "size": [
+      304,
+      284
+     ]
+    },
+    {
+     "index": 3,
+     "label": "steps off",
+     "source": [
+      1194,
+      10,
+      1505,
+      311
+     ],
+     "size": [
+      311,
+      301
+     ]
+    },
+    {
+     "index": 4,
+     "label": "falling",
+     "source": [
+      40,
+      348,
+      350,
+      629
+     ],
+     "size": [
+      310,
+      281
+     ]
+    },
+    {
+     "index": 5,
+     "label": "forepaws about to touch",
+     "source": [
+      441,
+      348,
+      737,
+      659
+     ],
+     "size": [
+      296,
+      311
+     ]
+    },
+    {
+     "index": 6,
+     "label": "fore-contact",
+     "source": [
+      808,
+      356,
+      1090,
+      670
+     ],
+     "size": [
+      282,
+      314
+     ]
+    },
+    {
+     "index": 7,
+     "label": "hind legs swing down",
+     "source": [
+      1183,
+      348,
+      1501,
+      670
+     ],
+     "size": [
+      318,
+      322
+     ]
+    },
+    {
+     "index": 8,
+     "label": "landing, compressed",
+     "source": [
+      33,
+      710,
+      343,
+      997
+     ],
+     "size": [
+      310,
+      287
+     ]
+    },
+    {
+     "index": 9,
+     "label": "head shake",
+     "source": [
+      425,
+      735,
+      737,
+      994
+     ],
+     "size": [
+      312,
+      259
+     ]
+    },
+    {
+     "index": 10,
+     "label": "looks around",
+     "source": [
+      830,
+      707,
+      1120,
+      997
+     ],
+     "size": [
+      290,
+      290
+     ]
+    },
+    {
+     "index": 11,
+     "label": "standing",
+     "source": [
+      1206,
+      720,
+      1507,
+      998
+     ],
+     "size": [
+      301,
+      278
+     ]
+    }
+   ]
+  },
+  "move-pouncehop": {
+   "prompt": "M3",
+   "source": "assets-incoming/Pixel Cat Bounce Animation Sprite Sheet.png",
+   "source_sha256": "58448daacfaf19af2d167cd527ce2abde54f7d7ff1078cb06fa254ce1114c8c0",
+   "asset": "assets/neko-v12-move-pouncehop.png",
+   "asset_sha256": "0f13519888eeb65bde138f46ea835dcef05f1ad5c65d549fa5a105b8a565d8c7",
+   "regions": [
+    {
+     "index": 0,
+     "label": "standing",
+     "source": [
+      56,
+      32,
+      345,
+      315
+     ],
+     "size": [
+      289,
+      283
+     ]
+    },
+    {
+     "index": 1,
+     "label": "quick crouch",
+     "source": [
+      426,
+      88,
+      730,
+      313
+     ],
+     "size": [
+      304,
+      225
+     ]
+    },
+    {
+     "index": 2,
+     "label": "bouncy launch",
+     "source": [
+      786,
+      32,
+      1121,
+      256
+     ],
+     "size": [
+      335,
+      224
+     ]
+    },
+    {
+     "index": 3,
+     "label": "mid-hop",
+     "source": [
+      1176,
+      51,
+      1509,
+      268
+     ],
+     "size": [
+      333,
+      217
+     ]
+    },
+    {
+     "index": 4,
+     "label": "fore landing",
+     "source": [
+      37,
+      375,
+      339,
+      621
+     ],
+     "size": [
+      302,
+      246
+     ]
+    },
+    {
+     "index": 5,
+     "label": "landing",
+     "source": [
+      437,
+      383,
+      728,
+      626
+     ],
+     "size": [
+      291,
+      243
+     ]
+    },
+    {
+     "index": 6,
+     "label": "skid stop",
+     "source": [
+      811,
+      373,
+      1105,
+      633
+     ],
+     "size": [
+      294,
+      260
+     ]
+    },
+    {
+     "index": 7,
+     "label": "sits, looks around",
+     "source": [
+      1224,
+      364,
+      1509,
+      628
+     ],
+     "size": [
+      285,
+      264
+     ]
+    },
+    {
+     "index": 8,
+     "label": "turn begins",
+     "source": [
+      73,
+      683,
+      373,
+      979
+     ],
+     "size": [
+      300,
+      296
+     ]
+    },
+    {
+     "index": 9,
+     "label": "turn mid",
+     "source": [
+      454,
+      683,
+      725,
+      985
+     ],
+     "size": [
+      271,
+      302
+     ]
+    },
+    {
+     "index": 10,
+     "label": "turn completes (faces right)",
+     "source": [
+      820,
+      679,
+      1087,
+      979
+     ],
+     "size": [
+      267,
+      300
+     ]
+    },
+    {
+     "index": 11,
+     "label": "standing (faces right)",
+     "source": [
+      1188,
+      684,
+      1494,
+      978
+     ],
+     "size": [
+      306,
+      294
+     ]
+    }
+   ]
+  },
+  "dizzy-a": {
+   "prompt": "Z1",
+   "source": "assets-incoming/Dizzy Pixel Cat Sprite Sheet.png",
+   "source_sha256": "7f9d02984b1b5298a05790ded04376c8c92893bc0bca05d993b39d0798d45c04",
+   "asset": "assets/neko-v12-dizzy-a.png",
+   "asset_sha256": "c38b76bde35342b2999d6a104bb8d9f6f1367bc38d17a78e3f43fd6e1efae0a0",
+   "regions": [
+    {
+     "index": 0,
+     "label": "neutral",
+     "source": [
+      56,
+      13,
+      343,
+      324
+     ],
+     "size": [
+      287,
+      311
+     ]
+    },
+    {
+     "index": 1,
+     "label": "looks left",
+     "source": [
+      456,
+      12,
+      733,
+      325
+     ],
+     "size": [
+      277,
+      313
+     ]
+    },
+    {
+     "index": 2,
+     "label": "snaps right",
+     "source": [
+      853,
+      5,
+      1117,
+      324
+     ],
+     "size": [
+      264,
+      319
+     ]
+    },
+    {
+     "index": 3,
+     "label": "snaps left",
+     "source": [
+      1229,
+      11,
+      1505,
+      325
+     ],
+     "size": [
+      276,
+      314
+     ]
+    },
+    {
+     "index": 4,
+     "label": "eyes crossing",
+     "source": [
+      74,
+      352,
+      343,
+      665
+     ],
+     "size": [
+      269,
+      313
+     ]
+    },
+    {
+     "index": 5,
+     "label": "spiral eyes, circle left",
+     "source": [
+      442,
+      356,
+      721,
+      665
+     ],
+     "size": [
+      279,
+      309
+     ]
+    },
+    {
+     "index": 6,
+     "label": "circle forward",
+     "source": [
+      831,
+      386,
+      1123,
+      665
+     ],
+     "size": [
+      292,
+      279
+     ]
+    },
+    {
+     "index": 7,
+     "label": "circle right, tongue",
+     "source": [
+      1231,
+      361,
+      1500,
+      664
+     ],
+     "size": [
+      269,
+      303
+     ]
+    },
+    {
+     "index": 8,
+     "label": "circle up",
+     "source": [
+      57,
+      698,
+      343,
+      1003
+     ],
+     "size": [
+      286,
+      305
+     ]
+    },
+    {
+     "index": 9,
+     "label": "sway left",
+     "source": [
+      452,
+      694,
+      739,
+      1003
+     ],
+     "size": [
+      287,
+      309
+     ]
+    },
+    {
+     "index": 10,
+     "label": "sway right",
+     "source": [
+      821,
+      712,
+      1124,
+      1002
+     ],
+     "size": [
+      303,
+      290
+     ]
+    },
+    {
+     "index": 11,
+     "label": "centred wobble",
+     "source": [
+      1205,
+      719,
+      1507,
+      1003
+     ],
+     "size": [
+      302,
+      284
+     ]
+    }
+   ]
+  },
+  "dizzy-b": {
+   "prompt": "Z2",
+   "source": "assets-incoming/Kawaii Pixel Cat Sprite Sheet.png",
+   "source_sha256": "b63ddd3af0e608fab531b02ea14d8c3228a77d8daaf07c81caf757fa02501646",
+   "asset": "assets/neko-v12-dizzy-b.png",
+   "asset_sha256": "bca5761d4077cf7035dfa68129e10b4f278ac851ce7c6f8eedfa24652d057806",
+   "regions": [
+    {
+     "index": 0,
+     "label": "centred wobble",
+     "source": [
+      57,
+      9,
+      348,
+      324
+     ],
+     "size": [
+      291,
+      315
+     ]
+    },
+    {
+     "index": 1,
+     "label": "steadying paw",
+     "source": [
+      460,
+      5,
+      737,
+      324
+     ],
+     "size": [
+      277,
+      319
+     ]
+    },
+    {
+     "index": 2,
+     "label": "eyes squeezed",
+     "source": [
+      845,
+      9,
+      1117,
+      326
+     ],
+     "size": [
+      272,
+      317
+     ]
+    },
+    {
+     "index": 3,
+     "label": "head shake left",
+     "source": [
+      1212,
+      4,
+      1507,
+      324
+     ],
+     "size": [
+      295,
+      320
+     ]
+    },
+    {
+     "index": 4,
+     "label": "head shake right",
+     "source": [
+      69,
+      344,
+      350,
+      665
+     ],
+     "size": [
+      281,
+      321
+     ]
+    },
+    {
+     "index": 5,
+     "label": "squeezed, centred",
+     "source": [
+      454,
+      358,
+      732,
+      665
+     ],
+     "size": [
+      278,
+      307
+     ]
+    },
+    {
+     "index": 6,
+     "label": "unfocused blink",
+     "source": [
+      839,
+      354,
+      1117,
+      666
+     ],
+     "size": [
+      278,
+      312
+     ]
+    },
+    {
+     "index": 7,
+     "label": "half-lids",
+     "source": [
+      1226,
+      355,
+      1507,
+      665
+     ],
+     "size": [
+      281,
+      310
+     ]
+    },
+    {
+     "index": 8,
+     "label": "focused",
+     "source": [
+      71,
+      689,
+      352,
+      1001
+     ],
+     "size": [
+      281,
+      312
+     ]
+    },
+    {
+     "index": 9,
+     "label": "relieved sigh",
+     "source": [
+      460,
+      690,
+      739,
+      1000
+     ],
+     "size": [
+      279,
+      310
+     ]
+    },
+    {
+     "index": 10,
+     "label": "settles",
+     "source": [
+      842,
+      695,
+      1124,
+      1002
+     ],
+     "size": [
+      282,
+      307
+     ]
+    },
+    {
+     "index": 11,
+     "label": "neutral",
+     "source": [
+      1230,
+      690,
+      1508,
+      1002
+     ],
+     "size": [
+      278,
+      312
+     ]
+    }
+   ]
+  }
+ }
+}

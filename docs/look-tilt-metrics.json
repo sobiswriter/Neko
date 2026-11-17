@@ -1,0 +1,98 @@
+{
+  "atlas_entries": 904,
+  "unchanged_frames": 879,
+  "unchanged_clips": [
+    "idle",
+    "tail",
+    "ears",
+    "sniff",
+    "tail_chase",
+    "tail_catch",
+    "arrive",
+    "depart",
+    "happy",
+    "nuzzle",
+    "pet_stretch",
+    "back_arch",
+    "happy_hop",
+    "side_flop",
+    "shoulder_peek",
+    "knead",
+    "chin_scritch",
+    "roll",
+    "paw_offer",
+    "ear_rub",
+    "typing",
+    "groom",
+    "yawn",
+    "fall_asleep",
+    "wake",
+    "sleep",
+    "walk",
+    "stretch",
+    "loaf",
+    "peek",
+    "pickup",
+    "set_down",
+    "carry_to_calm",
+    "carry_to_unimpressed",
+    "carry_open_eyes",
+    "carry_yawn",
+    "held_excited",
+    "held_calm",
+    "held_unimpressed",
+    "held_sleepy",
+    "game_ready",
+    "game_three",
+    "game_two",
+    "game_one",
+    "game_go",
+    "game_ready_cancel",
+    "game_run",
+    "game_turn",
+    "game_prepare",
+    "game_jump",
+    "game_miss",
+    "game_settle",
+    "game_win_0",
+    "game_win_1",
+    "game_win_2",
+    "game_loss_0",
+    "game_loss_1",
+    "game_loss_2",
+    "game_loss_finish",
+    "game_curl",
+    "game_comfort",
+    "game_gentle_rest",
+    "game_gentle_reach"
+  ],
+  "look_duration_ms": 4900,
+  "happy_hold_ms": 600,
+  "new_source_components": [
+    [
+      4463
+    ],
+    [
+      4396
+    ],
+    [
+      4194
+    ],
+    [
+      4307
+    ],
+    [
+      4537
+    ],
+    [
+      4462
+    ],
+    [
+      4342
+    ],
+    [
+      4375
+    ]
+  ],
+  "updated_glance_source_cells_preserved": 16
+}

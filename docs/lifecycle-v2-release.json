@@ -1,0 +1,596 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "2b812be5474966afe42bea3cc2b5b7a2f5db1e76",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 125989203,
+      "sha256": "ee17613928266a91472253a5929d18e0ff9e2f8c0dddb46bb4a2ece82209f253"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 122370651,
+      "sha256": "659a3f427268879e432edc5533f707060c1c614434a00430a6167d6dc5946d97"
+    }
+  },
+  "source_sha256": {
+    "main.py": "777c9ac1bf40d21e95d4500e5ee2603c2937d98863670602e3b7ef7621632823",
+    "animations.py": "b901c8b9f4e5b369a6be9f87b236fbe82dc5a5931f4e55c8a4eded871cb86a1b",
+    "main.spec": "7414fc5b0b1b14592ee8f8405dedcd2e033e37d44e143dc79f1026ad2227f942",
+    "tools/bake_atlas.py": "9f48f79815aebcc8644616fd93e2b555bfaaaca73d2a8f2e6dcfabdd7702b7e7",
+    "tools/preview_lifecycle.py": "c00392c7af31d21154b1878f2b02e307debe8a038fd880eedc3c3c3c0d42b106",
+    "test_main.py": "6b225dff172b67351e2ab340561bb0ab6ba78c0309874f07f0a463c99c0d4005",
+    "test_animations.py": "6cb8da03c77c4d28a250681ea47f0ca01be30353c83370e969ee2c4ea247baf8",
+    "test_packaging.py": "f34065e1afdfbbd44bd1929e643e216e7a5f718135405f6a172dfed3fea00249"
+  },
+  "assets_sha256": {
+    "assets/neko-lifecycle-arrive-v2.png": "28254eb5932fc05a638b86bb77abca309a4a13411fb18a09ba191a84b3568470",
+    "assets/neko-lifecycle-depart-v2.png": "ea65b585ea8f73a2ab85e5934f2a1c575c0fca1fde375a48c056af1d95cd341c",
+    "assets/neko-lifecycle-bridge-v2.png": "3522ed6c9788c69e58234588b79cad812d61f9565ca4cd2c775f562befed505d",
+    "assets/neko-lifecycle-sad-v2.png": "8c48d1034548b176168e15082d6d1f5b3c6f4c58b6c2a64010bf2290b232c965"
+  },
+  "compiled_sha256": {
+    "neko-runtime.json": "be600943821a762da3e466ac48e04b450b7d35392f273568264ea6372facbfed",
+    "neko-runtime.png": "582815bddcec172340df214f089911c4ddf908b2448fe1817958f05e72a77d8e"
+  },
+  "invariants": {
+    "atlas_entries": 839,
+    "unchanged_prior_frames": 786,
+    "unchanged_other_clips": 63,
+    "components": [
+      {
+        "key": [
+          "motion-arrive",
+          0,
+          0
+        ],
+        "components": [
+          4509
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          0,
+          1
+        ],
+        "components": [
+          4198
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          0,
+          2
+        ],
+        "components": [
+          4199
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          0,
+          3
+        ],
+        "components": [
+          4175
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          1,
+          0
+        ],
+        "components": [
+          4332
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          1,
+          1
+        ],
+        "components": [
+          4564
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          1,
+          2
+        ],
+        "components": [
+          4796
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          1,
+          3
+        ],
+        "components": [
+          4029
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          2,
+          0
+        ],
+        "components": [
+          4289
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          2,
+          1
+        ],
+        "components": [
+          5019
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          2,
+          2
+        ],
+        "components": [
+          4946
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          2,
+          3
+        ],
+        "components": [
+          5052
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          3,
+          0
+        ],
+        "components": [
+          4410
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          3,
+          1
+        ],
+        "components": [
+          4167
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          3,
+          2
+        ],
+        "components": [
+          4383
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          3,
+          3
+        ],
+        "components": [
+          4071
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          4,
+          0
+        ],
+        "components": [
+          4469
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          4,
+          1
+        ],
+        "components": [
+          4219
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          4,
+          2
+        ],
+        "components": [
+          4137
+        ]
+      },
+      {
+        "key": [
+          "motion-arrive",
+          4,
+          3
+        ],
+        "components": [
+          4308
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          0,
+          0
+        ],
+        "components": [
+          4308
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          0,
+          1
+        ],
+        "components": [
+          4167
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          0,
+          2
+        ],
+        "components": [
+          3963
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          0,
+          3
+        ],
+        "components": [
+          4190
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          1,
+          0
+        ],
+        "components": [
+          3479
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          1,
+          1
+        ],
+        "components": [
+          3901
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          1,
+          2
+        ],
+        "components": [
+          3691
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          1,
+          3
+        ],
+        "components": [
+          3979
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          2,
+          0
+        ],
+        "components": [
+          5206
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          2,
+          1
+        ],
+        "components": [
+          3069
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          2,
+          2
+        ],
+        "components": [
+          3272
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          2,
+          3
+        ],
+        "components": [
+          4746
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          3,
+          0
+        ],
+        "components": [
+          4864
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          3,
+          1
+        ],
+        "components": [
+          3487
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          3,
+          2
+        ],
+        "components": [
+          3607
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          3,
+          3
+        ],
+        "components": [
+          3607
+        ]
+      },
+      {
+        "key": [
+          "motion-bridge",
+          0,
+          0
+        ],
+        "components": [
+          4427
+        ]
+      },
+      {
+        "key": [
+          "motion-bridge",
+          0,
+          1
+        ],
+        "components": [
+          5206
+        ]
+      },
+      {
+        "key": [
+          "motion-bridge",
+          0,
+          2
+        ],
+        "components": [
+          4746
+        ]
+      },
+      {
+        "key": [
+          "motion-bridge",
+          0,
+          3
+        ],
+        "components": [
+          4864
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          0,
+          0
+        ],
+        "components": [
+          4307
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          0,
+          1
+        ],
+        "components": [
+          4167
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          0,
+          2
+        ],
+        "components": [
+          3963
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          0,
+          3
+        ],
+        "components": [
+          3889
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          1,
+          0
+        ],
+        "components": [
+          3878
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          1,
+          1
+        ],
+        "components": [
+          3913
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          1,
+          2
+        ],
+        "components": [
+          4104
+        ]
+      },
+      {
+        "key": [
+          "motion-sad",
+          1,
+          3
+        ],
+        "components": [
+          3856
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          4,
+          0
+        ],
+        "components": [
+          3889
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          4,
+          1
+        ],
+        "components": [
+          3878
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          4,
+          2
+        ],
+        "components": [
+          3913
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          4,
+          3
+        ],
+        "components": [
+          4104
+        ]
+      },
+      {
+        "key": [
+          "motion-depart",
+          5,
+          0
+        ],
+        "components": [
+          3856
+        ]
+      }
+    ],
+    "arrive_ms": 1980,
+    "depart_ms": 2200,
+    "previews": {
+      "scene": {
+        "encoded_frames": 54,
+        "duration_ms": 3000
+      },
+      "silhouette": {
+        "encoded_frames": 54,
+        "duration_ms": 3000
+      }
+    }
+  },
+  "checks": {
+    "focused_source": 120,
+    "final_front_mirror_regression": 1,
+    "exact_executable": 4,
+    "native_scenes": 3
+  },
+  "ui_start": [
+    {
+      "exe": "DesktopNeko.exe",
+      "ui_ready_seconds": 2.209
+    }
+  ],
+  "limits": "One local warm UI-readiness run; no physical mixed-DPI/multi-monitor/reboot/long soak. A native run concurrent with the build missed one70ms arrival pose; the subsequent coverage run passes. User judgement of appeal remains open."
+}

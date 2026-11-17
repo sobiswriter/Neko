@@ -15,7 +15,7 @@ from PySide6.QtWidgets import QApplication
 from behavior import NekoState, IDLE_STATES
 from dialogue import LINES
 from animations import CANVAS_PADDING, CANVAS_TOP
-from main import NekoWidget, set_autostart, adjacent_position
+from main import DROP_PIXELS, NekoWidget, set_autostart, adjacent_position
 
 
 APP = QApplication.instance() or QApplication([])
@@ -60,7 +60,10 @@ class DesktopTests(unittest.TestCase):
         with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
             self.neko.animate()
         self.assertEqual(self.neko.companion.state, NekoState.IDLE)
-        self.assertEqual(self.neko.pos(), origin)
+        # Released from a full hold, she drops a little (screen room permitting) onto her feet.
+        self.assertEqual(self.neko.x(), origin.x())
+        self.assertTrue(0 <= self.neko.y() - origin.y() <= DROP_PIXELS)
+        self.assertEqual(self.settings.value("position", type=QPoint), self.neko.pos() + QPoint(40, 32))
 
     def test_release_starts_with_the_actual_visible_pose_in_every_mood(self):
         samples = [i * 0.05 + 0.025 for i in range(8)]
@@ -357,7 +360,8 @@ class DesktopTests(unittest.TestCase):
         target = self.neko.pos()
         self.neko.show_neko(greet=True)
         screen = QApplication.screenAt(target + QPoint(56, 56)) or QApplication.primaryScreen()
-        self.assertLessEqual(self.neko.geometry().bottom(), screen.geometry().top())
+        self.assertLess(self.neko.y(), screen.geometry().top())
+        self.assertGreater(self.neko.geometry().bottom(), screen.geometry().top())
         self.neko.animate()
         start = self.neko.pose_started
         with patch("main.time.monotonic", return_value=start + 0.35):
@@ -365,7 +369,7 @@ class DesktopTests(unittest.TestCase):
         self.assertLess(self.neko.y(), target.y())
         self.neko.save_preferences()
         self.assertEqual(self.settings.value("position", type=QPoint), target + QPoint(CANVAS_PADDING, CANVAS_TOP))
-        with patch("main.time.monotonic", return_value=start + 0.75):
+        with patch("main.time.monotonic", return_value=start + 1.06):
             self.neko.animate()
         self.assertEqual(self.neko.pos(), target)
         self.neko.finish_transition()
@@ -381,11 +385,11 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.y(), top)
         self.assertEqual(self.neko.current_clip, "arrive")
         self.assertGreater(self.neko.companion.pose_until, ready + 1.8)
-        with patch("main.time.monotonic", return_value=ready + 0.35):
+        with patch("main.time.monotonic", return_value=ready + 0.25):
             self.neko.animate()
         self.assertGreater(self.neko.y(), top)
         self.assertLess(self.neko.y(), target.y())
-        with patch("main.time.monotonic", return_value=ready + 0.75):
+        with patch("main.time.monotonic", return_value=ready + 1.06):
             self.neko.animate()
         self.assertEqual(self.neko.pos(), target)
 
@@ -434,7 +438,7 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.companion.state, NekoState.IDLE)
         self.assertIsNone(self.neko.arrival_target)
 
-    def test_quitting_mid_arrival_starts_sad_goodbye_at_the_landing_position(self):
+    def test_quitting_mid_arrival_starts_goodbye_at_the_landing_position(self):
         target = self.neko.pos()
         self.neko.show_neko(greet=True)
         self.neko.quit_neko()
@@ -442,7 +446,7 @@ class DesktopTests(unittest.TestCase):
         self.assertIsNone(self.neko.arrival_target)
         self.assertEqual(self.neko.current_clip, "depart")
         self.assertEqual(self.neko.atlas.frame("depart", 0).toImage(),
-                         self.neko.atlas.frames["farewell", 0, 0].toImage())
+                         self.neko.atlas.frames["idle", 0, 0].toImage())
 
     def test_fullscreen_hiding_interrupts_arrival_without_greeting_or_losing_position(self):
         target = self.neko.pos()
@@ -471,6 +475,178 @@ class DesktopTests(unittest.TestCase):
                             for x in range(self.neko.width()) for y in range(hidden_rows)))
         self.assertTrue(any(image.pixelColor(x, y).alpha() > 0
                             for x in range(self.neko.width()) for y in range(hidden_rows, self.neko.height())))
+
+    def test_goodbye_travels_to_the_monitor_edge_without_saving_flight(self):
+        origin = self.neko.pos()
+        with patch("main.QApplication.quit"):
+            self.neko.quit_neko()
+            self.neko.animate()
+            start = self.neko.pose_started
+            with patch("main.time.monotonic", return_value=start + 1.6):
+                self.neko.animate()
+            self.assertNotEqual(self.neko.pos(), origin)
+            self.neko.save_preferences()
+            self.assertEqual(self.settings.value("position", type=QPoint), origin + QPoint(CANVAS_PADDING, CANVAS_TOP))
+            self.neko.finish_transition()
+            self.assertEqual(self.neko.pos(), origin)
+
+    def test_high_perch_goodbye_uses_a_nearer_side_exit(self):
+        area = QApplication.primaryScreen().geometry()
+        origin = QPoint(area.center().x() - 96, area.top() + 8)
+        self.neko.move(origin)
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        self.assertIsNotNone(self.neko.departure_target)
+        self.assertTrue(self.neko.departure_target.x() < area.left()
+                        or self.neko.departure_target.x() > area.right())
+        self.neko.animate()
+        with patch("main.time.monotonic", return_value=self.neko.pose_started + 1.5):
+            self.neko.animate()
+        self.assertGreater(abs(self.neko.x() - origin.x()), abs(self.neko.y() - origin.y()))
+
+    def test_sleeping_menu_quit_wakes_then_says_goodbye_once(self):
+        from animations import CLIPS
+        self.neko.companion.state = NekoState.SLEEPING
+        self.neko.companion.nap_started = time.monotonic() - 60
+        self.neko.refresh_asset()
+        counts = self.neko.companion.pets, self.neko.companion.naps
+        origin = self.neko.pos()
+        action = next(a for a in self.neko.menu.actions() if a.text() == "Let her go · quit")
+        with patch("main.QApplication.quit") as quit_app:
+            action.trigger()
+            self.assertEqual(self.neko.companion.state, NekoState.WAKING)
+            self.assertEqual(self.neko.current_clip, "wake")
+            self.assertTrue(self.neko.quit_pending)
+            self.assertIsNone(self.neko.companion.nap_started)
+            deadline = self.neko.companion.pose_until
+            self.assertAlmostEqual(deadline - self.neko.pose_started, sum(CLIPS["wake"].durations) / 1000)
+            action.trigger()
+            self.neko.pet_reaction()
+            self.neko.tick()
+            self.assertEqual(self.neko.companion.pose_until, deadline)
+            with patch("main.time.monotonic", return_value=deadline - 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "wake")
+            with patch("main.time.monotonic", return_value=deadline + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.companion.state, NekoState.LEAVING)
+            self.assertEqual(self.neko.current_clip, "depart")
+            self.assertEqual(self.neko.current_frame(self.neko.pose_started).toImage(), self.atlas.frame("depart", 0).toImage())
+            quit_app.assert_not_called()
+            self.neko.finish_transition()
+            quit_app.assert_called_once()
+        self.assertTrue(self.neko.closing)
+        self.assertEqual((self.neko.companion.pets, self.neko.companion.naps), counts)
+        self.assertEqual(self.neko.pos(), origin)
+
+    def test_quitting_during_wake_finishes_it_without_restarting(self):
+        from animations import CLIPS
+        self.neko.companion.wake(time.monotonic())
+        self.neko.pose_started = time.monotonic() - 1
+        self.neko.refresh_asset()
+        started = self.neko.pose_started
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertTrue(self.neko.quit_pending)
+            self.assertEqual(self.neko.pose_started, started)
+            self.assertAlmostEqual(self.neko.companion.pose_until, started + sum(CLIPS["wake"].durations) / 1000)
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "depart")
+            quit_app.assert_not_called()
+
+    def test_quitting_mid_curl_finishes_curl_then_wakes_before_goodbye(self):
+        self.neko.companion.state = NekoState.FALLING_ASLEEP
+        self.neko.pose_started = time.monotonic() - 0.2
+        self.neko.refresh_asset()
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertTrue(self.neko.quit_pending)
+            self.assertEqual(self.neko.current_clip, "fall_asleep")
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+                self.neko.animate()
+            self.assertTrue(self.neko.quit_pending)
+            self.assertEqual(self.neko.current_clip, "wake")
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "depart")
+            quit_app.assert_not_called()
+
+    def test_menu_goodbye_finishes_an_awake_gesture_then_leaves_once(self):
+        self.neko.companion.state = NekoState.TAIL_CHASE
+        self.neko.pose_started = time.monotonic()
+        self.neko.refresh_asset()
+        action = next(action for action in self.neko.menu.actions() if action.text() == "Let her go · quit")
+        with patch("main.QApplication.quit") as quit_app:
+            action.trigger()
+            self.assertTrue(getattr(self.neko, "quit_pending", False))
+            self.assertFalse(self.neko.closing)
+            deadline = self.neko.companion.pose_until
+            self.neko.pet_reaction()
+            self.neko.tick()
+            action.trigger()
+            self.assertEqual(self.neko.companion.pose_until, deadline)
+            with patch("main.time.monotonic", return_value=deadline + 0.01):
+                self.neko.animate()
+            self.assertEqual(self.neko.companion.state, NekoState.LEAVING)
+            quit_app.assert_not_called()
+            self.neko.finish_transition()
+            quit_app.assert_called_once()
+
+    def test_visible_fullscreen_pet_still_plays_menu_goodbye(self):
+        self.neko.fullscreen = True
+        self.neko.hide_fullscreen = False
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertEqual(self.neko.companion.state, NekoState.LEAVING)
+            quit_app.assert_not_called()
+
+    def test_motion_off_can_finish_a_pending_gesture_goodbye(self):
+        self.neko.companion.state = NekoState.TAIL_CHASE
+        self.neko.refresh_asset()
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertTrue(self.neko.quit_pending)
+            self.neko.set_motion(False)
+            quit_app.assert_called_once()
+            self.assertFalse(self.neko.quit_pending)
+
+    def test_fullscreen_hiding_can_finish_a_pending_gesture_goodbye(self):
+        self.neko.companion.state = NekoState.TAIL_CHASE
+        self.neko.refresh_asset()
+        self.neko.fullscreen = True
+        self.neko.hide_fullscreen = False
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.quit_neko()
+            self.assertTrue(self.neko.quit_pending)
+            self.neko.set_hide_fullscreen(True)
+            quit_app.assert_called_once()
+
+    def test_departure_is_clipped_at_its_monitor_not_a_neighbour_below(self):
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        self.neko.lifecycle_area = QRect(0, 0, 800, 800)
+        self.neko.move(100, 715)
+        with patch("main.time.monotonic", return_value=self.neko.pose_started + 1.7):
+            image = self.neko.grab().toImage()
+        self.assertTrue(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(85)))
+        self.assertFalse(any(image.pixelColor(x, y).alpha() for x in range(192) for y in range(85, 144)))
+
+    def test_monitor_change_during_goodbye_restores_home_and_closes(self):
+        origin = self.neko.pos()
+        self.neko.quit_neko()
+        self.neko.move(origin + QPoint(10, 80))
+        with patch("main.QApplication.quit") as quit_app:
+            self.neko.screen_changed()
+            quit_app.assert_called_once()
+        self.assertEqual(self.neko.pos(), origin)
+
+    def test_delayed_first_tick_keeps_the_whole_goodbye(self):
+        with patch("main.QApplication.quit"):
+            self.neko.quit_neko()
+            self.assertFalse(self.neko.transition_timer.isActive())
+            ready = self.neko.pose_started + 2.5
+            with patch("main.time.monotonic", return_value=ready):
+                self.neko.animate()
+            self.assertAlmostEqual(self.neko.companion.pose_until, ready + 2.2)
 
     def test_quit_plays_goodbye_once_then_cleans_up_without_moving_saved_position(self):
         origin = self.neko.pos()
@@ -526,10 +702,10 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.neko.current_clip, "idle")
         self.assertFalse(self.neko.transition_timer.isActive())
 
-    def test_arrival_moves_the_window_and_departure_repaints_its_hop_in_place(self):
+    def test_both_lifecycle_trajectories_move_between_drawn_poses(self):
         origin = self.neko.pos()
-        for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.20, 0.22)),
-                                     (NekoState.LEAVING, "depart", (1.77, 1.79))):
+        for state, clip, samples in ((NekoState.ARRIVING, "arrive", (0.25, 0.27)),
+                                     (NekoState.LEAVING, "depart", (1.8, 1.82))):
             self.neko.start_transition(state, clip)
             self.neko.animate()
             start = self.neko.pose_started
@@ -540,11 +716,59 @@ class DesktopTests(unittest.TestCase):
                     self.neko.animate()
                     frames.append(self.neko.grab().toImage())
                     positions.append(self.neko.pos())
-            if state == NekoState.ARRIVING:
-                self.assertNotEqual(positions[0], positions[1])
+            self.assertNotEqual(positions[0], positions[1], clip)
+
+    def test_arrival_is_diagonal_and_stays_grounded_after_its_single_landing(self):
+        area = QApplication.primaryScreen().geometry()
+        home = QPoint(area.center().x() - 96, area.center().y())
+        self.neko.move(home)
+        self.neko.start_transition(NekoState.ARRIVING, "arrive")
+        entry = self.neko.pos()
+        self.assertGreater(home.x() - entry.x(), (home.y() - entry.y()) * 0.7)
+        self.assertLess(home.x() - entry.x(), home.y() - entry.y())
+        self.neko.animate()
+        start = self.neko.pose_started
+        last = entry
+        for elapsed in (0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1.2, 1.9):
+            with patch("main.time.monotonic", return_value=start + elapsed):
+                self.neko.animate()
+            position = self.neko.pos()
+            self.assertGreaterEqual(position.x(), last.x())
+            self.assertGreaterEqual(position.y(), last.y())
+            if elapsed >= 0.5:
+                self.assertEqual(position, home)
+            last = position
+
+    def test_low_goodbye_has_one_apex_and_a_diagonal_exit(self):
+        area = QApplication.primaryScreen().geometry()
+        home = QPoint(area.center().x() - 96, area.bottom() - 155)
+        self.neko.move(home)
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        self.assertGreaterEqual(abs(self.neko.departure_target.x() - home.x()), 96)
+        self.assertGreater(self.neko.departure_target.y(), home.y())
+        self.neko.animate()
+        start = self.neko.pose_started
+        ys = []
+        for elapsed in (1.2, 1.3, 1.4, 1.45, 1.5, 1.6, 1.8, 2.0, 2.15):
+            with patch("main.time.monotonic", return_value=start + elapsed):
+                self.neko.animate()
+            ys.append(self.neko.y())
+        apex = ys.index(min(ys))
+        self.assertEqual(ys[:apex + 1], sorted(ys[:apex + 1], reverse=True))
+        self.assertEqual(ys[apex:], sorted(ys[apex:]))
+
+    def test_sad_goodbye_does_not_flip_the_front_expression_before_turning(self):
+        self.neko.start_transition(NekoState.LEAVING, "depart")
+        for elapsed in (0, 0.15, 0.25, 0.5, 0.75):
+            frames = []
+            with patch("main.time.monotonic", return_value=self.neko.pose_started + elapsed):
+                for direction in (-1, 1):
+                    self.neko.departure_direction = direction
+                    frames.append(self.neko.grab().toImage())
+            if elapsed < 0.7:
+                self.assertEqual(*frames, elapsed)
             else:
-                self.assertEqual(positions, [origin, origin])
-                self.assertNotEqual(frames[0], frames[1], clip)
+                self.assertNotEqual(*frames, elapsed)
 
     def test_tail_run_uses_the_reference_cadence_without_speeding_up_walking(self):
         for state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):
@@ -571,6 +795,29 @@ class DesktopTests(unittest.TestCase):
                     patch.object(self.neko, "offline_line") as words:
                 self.neko.tick()
                 words.assert_called_once_with(self.neko.current_clip)
+
+    def test_refreshed_idle_deadlines_and_pickup_use_the_complete_drawn_story(self):
+        from animations import CLIPS
+        for state in IDLE_STATES:
+            if state in (NekoState.TAIL_CHASE, NekoState.TAIL_CATCH):
+                continue
+            start = time.monotonic()
+            self.neko.companion.pose(state, start, 6)
+            self.neko.pose_started = start
+            self.neko.refresh_asset()
+            duration = sum(CLIPS[self.neko.current_clip].durations) / 1000
+            deadline = duration if CLIPS[self.neko.current_clip].bank.startswith("idle-v2-") else 6
+            self.assertAlmostEqual(self.neko.companion.pose_until, start + deadline)
+            self.assertEqual(self.neko.animation_timer.interval(), 100)
+            now = start + duration * .45
+            before = self.neko.current_frame(now).toImage()
+            with patch("main.time.monotonic", return_value=now):
+                self.neko.begin_pickup()
+                self.assertEqual(self.neko.current_frame(now).toImage(), before, state)
+                self.neko.release_pickup()
+            with patch("main.time.monotonic", return_value=self.neko.companion.pose_until + .01):
+                self.neko.animate()
+            self.assertEqual(self.neko.current_clip, "idle")
 
     def test_idle_thoughts_still_respect_quiet_and_visible_bubble(self):
         self.neko.companion.state = NekoState.TAIL_CHASE
@@ -647,11 +894,15 @@ class DesktopTests(unittest.TestCase):
         self.assertFalse(self.neko.activity.enabled)
 
     def test_typing_signal_selects_a_real_paw_animation(self):
+        self.neko.journal.entries.clear()
         self.neko.activity.keyboard.extend([time.monotonic()] * 8)
         self.neko.tick()
         self.assertEqual(self.neko.companion.state, NekoState.TYPING)
         self.assertEqual(self.neko.current_clip, "typing")
         self.assertIn(self.neko.bubble.text(), LINES["typing"])
+        self.assertFalse(any(e["category"] == "Activity" for e in self.neko.journal.entries))
+        self.neko.grab()
+        self.assertIn("typing burst · typing", self.neko.journal.text("Activity"))
 
     def test_app_switch_speaks_offline(self):
         self.neko.last_window = 99
@@ -727,7 +978,7 @@ class DesktopTests(unittest.TestCase):
         self.assertTrue(nook.sound_test.isEnabled())
         with patch("main.winsound.PlaySound") as play:
             nook.sound_test.click()
-        self.assertTrue(play.call_args.args[0].endswith("mew.wav"))
+        self.assertRegex(Path(play.call_args.args[0]).name, r"^mew(-\d+)?\.wav$")
         self.assertFalse(self.neko.ai_enabled)
 
     def test_title_fingerprint_catches_a_tab_change_in_the_same_app(self):
@@ -747,18 +998,134 @@ class DesktopTests(unittest.TestCase):
         self.neko.dismiss_bubble()
         self.assertFalse(self.neko.offline_line("cursor"))
 
-    def test_idle_and_activity_words_respect_the_full_thought_interval(self):
+    def test_activity_words_retain_their_shared_pause(self):
         self.neko.companion.chatter_seconds = 75
         with patch("main.time.monotonic", return_value=100):
             self.assertTrue(self.neko.offline_line("typing"))
         self.neko.dismiss_bubble()
         with patch("main.time.monotonic", return_value=174.99):
-            self.assertFalse(self.neko.offline_line("tail_chase"))
+            self.assertFalse(self.neko.offline_line("switch"))
         with patch("main.time.monotonic", return_value=175):
-            self.assertTrue(self.neko.offline_line("tail_chase"))
+            self.assertTrue(self.neko.offline_line("switch"))
         self.neko.dismiss_bubble()
         with patch("main.time.monotonic", return_value=176):
             self.assertTrue(self.neko.offline_line("pet", prompted=True))
+
+    def test_gesture_and_general_idle_thoughts_have_independent_clocks(self):
+        self.neko.companion.chatter_seconds = 75
+        with patch("main.time.monotonic", return_value=100):
+            self.assertTrue(self.neko.offline_line("idle"))
+        deadline = self.neko.companion.next_comment
+        self.neko.dismiss_bubble()
+        with patch("main.time.monotonic", return_value=110):
+            self.neko.companion.state = NekoState.SNIFFING
+            self.neko.companion.pose_until = 114
+            self.neko.refresh_asset()
+            self.assertTrue(self.neko.offline_line("sniff"))
+        self.assertEqual(self.neko.companion.next_comment, deadline)
+        self.neko.dismiss_bubble()
+        with patch("main.time.monotonic", return_value=175):
+            self.assertTrue(self.neko.offline_line("idle"))
+        self.assertEqual(self.neko.companion.next_comment, 250)
+
+    def test_due_general_thought_survives_a_visible_bubble_and_an_idle_gesture(self):
+        self.neko.companion.next_comment = 100
+        self.neko.companion.last_interaction = -1000
+        with patch("main.time.monotonic", return_value=100):
+            self.neko.say("already reading this")
+            self.neko.poll_idle_thought(100)
+        self.assertEqual(self.neko.companion.next_comment, 100)
+        self.neko.dismiss_bubble()
+        self.neko.companion.state = NekoState.SNIFFING
+        self.neko.refresh_asset()
+        with patch("main.time.monotonic", return_value=101):
+            self.neko.poll_idle_thought(101)
+        self.assertTrue(self.neko.bubble.isVisible())
+        self.assertEqual(self.neko.companion.next_comment, 101 + self.neko.companion.chatter_seconds)
+
+    def test_pending_ai_does_not_spend_the_general_deadline_or_show_a_second_line(self):
+        self.neko.ai_enabled = True
+        self.neko.companion.next_comment = 100
+        self.neko.companion.last_interaction = -1000
+        self.neko.brain_worker = object()
+        with patch("main.time.monotonic", return_value=100):
+            self.neko.poll_idle_thought(100)
+        self.assertEqual(self.neko.companion.next_comment, 100)
+        self.assertFalse(self.neko.bubble.isVisible())
+        self.neko.brain_worker = None
+        with patch("main.time.monotonic", return_value=101), patch.object(self.neko, "trigger_ai_brain", return_value=False):
+            self.neko.poll_idle_thought(101)
+        self.assertEqual(self.neko.companion.next_comment, 101 + self.neko.companion.chatter_seconds)
+
+    def test_journal_shows_actual_dialogue_and_state_changes_with_category_filter(self):
+        self.neko.companion.state = NekoState.FALLING_ASLEEP
+        self.neko.refresh_asset()
+        self.neko.grab()
+        self.neko.companion.state = NekoState.IDLE
+        self.neko.refresh_asset()
+        self.neko.grab()
+        self.neko.offline_line("idle")
+        self.neko.bubble.grab()
+        words = self.neko.bubble.text()
+        with patch("main.autostart_enabled", return_value=False):
+            self.neko.open_stats_window()
+        nook = self.neko.stats_window
+        nook.log_filter.setCurrentText("Thought")
+        nook.update_journal()
+        self.assertIn(words, nook.activity_log.toPlainText())
+        self.assertNotIn("[Sleep]", nook.activity_log.toPlainText())
+        nook.log_filter.setCurrentText("Sleep")
+        self.assertIn("falling_asleep", nook.activity_log.toPlainText())
+        self.neko.journal.error = "disk unavailable"
+        nook.update_journal()
+        self.assertIn("unavailable", nook.log_status.text())
+
+    def test_journal_omits_unpainted_states_and_records_the_actual_held_expression(self):
+        self.neko.grab()
+        self.neko.journal.entries.clear()
+        self.neko.companion.state = NekoState.SNIFFING
+        self.neko.refresh_asset()
+        self.neko.companion.state = NekoState.GROOMING
+        self.neko.refresh_asset()
+        self.assertNotIn("[Idle]", self.neko.journal.text())
+        self.neko.grab()
+        self.neko.grab()
+        states = [e["detail"] for e in self.neko.journal.entries if e["action"] == "state"]
+        self.assertEqual(states, ["grooming · groom"])
+        self.neko.begin_pickup()
+        with patch("main.time.monotonic", return_value=self.neko.companion.carry_started + 12):
+            self.neko.grab()
+        self.assertIn("held · held_unimpressed", self.neko.journal.text())
+
+    def test_thought_journal_records_only_painted_words_and_their_dismissal(self):
+        self.neko.dismiss_bubble()
+        self.neko.journal.entries.clear()
+        self.neko.say("unpainted words", kind="idle")
+        self.neko.say("actual words", kind="pet")
+        self.neko.bubble.grab()
+        self.neko.bubble.grab()
+        self.neko.dismiss_bubble()
+        events = [(e["action"], e["detail"]) for e in self.neko.journal.entries if e["category"] == "Thought"]
+        self.assertEqual(events, [("shown", "pet: actual words"), ("hidden", "pet: actual words")])
+
+    def test_ignored_pet_is_not_logged_as_an_accepted_pet(self):
+        self.neko.companion.state = NekoState.ARRIVING
+        self.neko.journal.entries.clear()
+        self.neko.pet_reaction()
+        self.assertFalse(any(e["action"] in ("pet", "pet accepted") for e in self.neko.journal.entries))
+        self.assertEqual(self.neko.companion.pets, 0)
+
+    def test_gesture_thought_cannot_linger_past_its_active_pose(self):
+        self.neko.companion.state = NekoState.SNIFFING
+        self.neko.pose_started = 100
+        self.neko.refresh_asset()
+        with patch("main.time.monotonic", return_value=self.neko.companion.pose_until - 2):
+            self.assertTrue(self.neko.offline_line("sniff"))
+        self.assertLessEqual(self.neko.bubble_timer.interval(), 2000)
+        self.neko.dismiss_bubble()
+        self.neko.companion.state = NekoState.IDLE
+        self.neko.refresh_asset()
+        self.assertFalse(self.neko.offline_line("sniff"))
 
     def test_ai_cannot_bypass_the_thought_cooldown(self):
         self.neko.ai_enabled = True

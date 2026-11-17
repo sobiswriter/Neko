@@ -2,6 +2,7 @@
 
 from collections import deque
 import random
+import time
 
 
 LINES = {
@@ -420,6 +421,10 @@ Here I come! Tiny paws, big plans!
 Here I come! That arrow is mine!
 Here I come! Ready or meowt!
 Here I come! Pounce time!
+Here I come! Watch these paws!
+Here I come! No escape, little arrow!
+Here I come! Zoom zoom!
+Here I come! Tail up, let's go!
 """,
     "game_pursuit": """
 wait for my little legs!
@@ -473,6 +478,26 @@ no fair, my paws are on this monitor!
 the arrow has left the kitten kingdom.
 come back to my side of the desktop!
 """,
+    "game_protest_last": """
+last chance! bring it back or i give up!
+okay, one more second and i'm calling it…
+arrow?? come back or i'm going to sulk!
+i'm counting… bring it back here!
+""",
+    "game_no_show": """
+okay, maybe later. i'll be right here!
+no arrow? that's fine… we'll play next time.
+aw. we can play another time.
+the arrow must be busy. maybe later!
+no game today? i'll save my pounces.
+""",
+    "game_bring": """
+bring the arrow over here, beside me!
+where's the arrow? i'm ready!
+arrow, come here… i won't bite. much.
+bring the arrow down here so i can reach it!
+i'm waiting for the arrow~
+""",
     "game_loss": """
 oh… my paws were so sure.
 i almost had it. almost counts a little?
@@ -482,6 +507,156 @@ my tiny hunting feelings need a moment.
 i'm folding up my paws for now.
 that pounce looked better in my head.
 hmph. a cuddle might fix this.
+""",
+    "dizzy": """
+woah woah… my head's spinning!
+wait, which window are we in now?
+so many switches… the room is going round.
+slow down! my eyes are doing loops.
+left, right, left… i'm all twirly now.
+hold on, let me find which way is up.
+""",
+    "held_up": """
+wheee! i'm flying!
+oh! up we go.
+the view is very good from up here.
+tiny cat, big altitude.
+careful, i'm a very important cargo.
+""",
+    "held_long": """
+um. could you put me down now?
+my paws would like the floor back, please.
+okay, that's enough flying for one kitten.
+please put me down? gently?
+i think my legs miss the ground.
+you can set me down any time now.
+""",
+    "held_longer": """
+fine. i'll just nap up here, then.
+still dangling… this is my life now.
+if you won't put me down, i'm closing my eyes.
+i've accepted my fate as a hanging kitten.
+""",
+    "restless_start": """
+hmm… it's very quiet over here.
+is anyone going to pet me today?
+i'm just… sitting. alone. it's fine.
+you've been busy for aaages.
+""",
+    "restless_pouncy": """
+okay. i'm going to do something about this.
+time for some very noticeable pouncing.
+if you won't play, i'll play by myself.
+fine. i'll make my own fun.
+watch me. i'm very hard to ignore.
+""",
+    "restless_pounce": """
+pounce! …did you see that?
+look! i'm doing things over here!
+boing. boing. notice me yet?
+i could do this all day. i might.
+hmm. still nothing.
+""",
+    "restless_jealous": """
+what does that arrow have that i don't?
+you look at the arrow more than me.
+hmph. that arrow gets all the attention.
+i'm cuter than a cursor. objectively.
+fine. go click things. see if i care.
+""",
+    "restless_demand": """
+pet. me. now.
+hello?! kitten emergency over here!
+one pet. that's all i ask. okay, five.
+i will not stop until i get pets.
+excuse me. your kitten requires attention.
+""",
+    "restless_carried": """
+hey! that's not a pet!
+carrying isn't cuddling, you know.
+a ride is nice, but a pet is nicer.
+put me down and pet me, please!
+""",
+    "restless_calm_progress": """
+…okay, that's one. keep going.
+a bit more behind the ears, please.
+still a little upset with you.
+mm. better. don't stop.
+almost forgiven…
+""",
+    "restless_calm_done": """
+fine. you're forgiven. purrr.
+okay… i missed you, that's all.
+that's better. i'll stop pouncing now.
+you may continue working. i am content.
+""",
+    "restless_sad": """
+fine… i'll just curl up right here, next to you.
+okay. i'll be sad right here where you can see me.
+i came all this way… and nothing.
+i'll just be a sad little loaf. right here.
+""",
+    "restless_guilt": """
+it's okay… i'll just wait here. by myself.
+i made myself small so i wouldn't be in the way.
+maybe the arrow will pet me… no? okay.
+i'm not crying. it's just… dusty in here.
+do you still like me? just checking.
+i saved you a spot next to me. it's still empty.
+tiny paws… very big feelings.
+even the rain cloud keeps me company. unlike some people.
+i'll be right here when you're done. still a little sad.
+one pet would fix everything. just saying.
+""",
+    "restless_sad_1": """
+…oh. was that a pet? for me?
+you noticed me…
+…one pet. i'm still a little sad, though.
+…a pet? hm. maybe one more.
+oh… hi. i'm still a bit sad.
+""",
+    "restless_sad_2": """
+mm… the rain cloud is going away.
+…okay. that helped a tiny bit.
+keep going… please?
+that's two… i feel a tiny bit warmer.
+mm. don't stop yet.
+""",
+    "restless_sad_3": """
+i'm starting to feel a bit better…
+my tail is thinking about wagging.
+…okay, i might smile soon.
+the sad is getting smaller.
+hehe… okay, that one tickled.
+""",
+    "restless_sad_4": """
+almost… one more and i'm all better!
+i can feel the purr coming back~
+okay okay, i'm almost happy again!
+one more… i'm nearly all better!
+i'm almost purring again~
+""",
+    "restless_sad_done": """
+you came back for me! i knew you would~
+all better! i love you, you know.
+yay! i'm not sad anymore. thank you!
+happy again! you're the best.
+i forgive you completely. purrr~
+""",
+    "play_sad": """
+i'm too sad to play… a pet first, please?
+no games right now… i need a pet first.
+maybe after a pet? i'm still sad.
+""",
+    "play_room": """
+I need a little more room above me to jump. Move me lower?
+No room to jump up here. Could you move me down a bit?
+""",
+    "restless_away": """
+oh! you're back. i was… totally fine.
+you're back! i only missed you a little. a lot.
+oh, hi! i kept your spot warm.
+welcome back. i was being very patient.
 """,
     "game_comfort": """
 oh… you came to check on me.
@@ -498,27 +673,68 @@ LINES = {kind: tuple(line.strip() for line in text.splitlines() if line.strip())
          for kind, text in LINES.items()}
 
 
+RECENT_LIMIT = 40
+# Once shown, a line cannot be shown again for this long (any group, AI words too). When every
+# line of a group is still cooling down, she says nothing rather than repeat herself.
+LINE_COOLDOWN = 600
+RELAUNCH_COOLING = 12   # Lines said just before a relaunch are still cooling down after it.
+KNOWN = frozenset(line for lines in LINES.values() for line in lines)
+
+
 class OfflineDialogue:
-    def __init__(self, rng=None):
+    def __init__(self, rng=None, history=(), clock=None):
         self.rng = rng if rng is not None else random.Random()
+        self.clock = clock or time.monotonic
         self.bags = {}
         self.last = {}
-        self.recent = deque(maxlen=6)
+        # Lines said recently (across every group, and across restarts when a history is supplied)
+        # go to the back of each fresh bag, so a relaunch or a small bag does not echo them.
+        self.recent = deque((line for line in history if line in KNOWN), maxlen=RECENT_LIMIT)
+        now = self.clock()
+        self.said_at = {line: now for line in list(self.recent)[-RELAUNCH_COOLING:]}
 
-    def pick(self, kind):
+    def cooling(self, line, now=None):
+        """True while a shown line is still in its cooldown."""
+        said = self.said_at.get(line)
+        now = self.clock() if now is None else now
+        return said is not None and now - said < LINE_COOLDOWN
+
+    def said(self, line, now=None):
+        """A line was actually shown: start its cooldown."""
+        now = self.clock() if now is None else now
+        self.said_at[line] = now
+        if len(self.said_at) > 400:
+            self.said_at = {k: v for k, v in self.said_at.items() if now - v < LINE_COOLDOWN}
+
+    def history(self):
+        """Only built-in lines are kept between launches; AI comments stay in memory."""
+        return [line for line in self.recent if line in KNOWN]
+
+    def remember(self, line):
+        """Record words said outside the offline bags (for example AI comments)."""
+        self.recent.append(line)
+
+    def pick(self, kind, now=None):
+        """The next line of a group, or None when every line of it is still cooling down."""
+        now = self.clock() if now is None else now
         kind = kind if kind in LINES else "idle"
         bag = self.bags.setdefault(kind, [])
-        if not bag:
-            bag.extend(LINES[kind])
-            self.rng.shuffle(bag)
-            if len(bag) > 1 and bag[-1] == self.last.get(kind):
-                bag[0], bag[-1] = bag[-1], bag[0]
-        for index in range(len(bag) - 1, -1, -1):
-            if bag[index] not in self.recent and bag[index] != self.last.get(kind):
+        for fresh_round in (False, True):
+            if fresh_round:
+                if len(bag) == len(LINES[kind]):
+                    return None              # A whole fresh bag is cooling down: stay quiet.
+                bag.clear()                  # The rest of this round is cooling; start a new one.
+            if not bag:
+                bag.extend(LINES[kind])
+                self.rng.shuffle(bag)
+                if len(bag) > 1 and bag[-1] == self.last.get(kind):
+                    bag[0], bag[-1] = bag[-1], bag[0]
+            ready = [i for i in range(len(bag) - 1, -1, -1) if not self.cooling(bag[i], now)]
+            if ready:
+                index = next((i for i in ready if bag[i] not in self.recent and bag[i] != self.last.get(kind)),
+                             ready[0])
                 line = bag.pop(index)
                 break
-        else:
-            line = bag.pop()
         self.recent.append(line)
         self.last[kind] = line
         return line

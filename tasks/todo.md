@@ -1,4 +1,88 @@
+## Updated looks and happy tilted smile · 2026-10-23
+
+- [x] Preserve updated glance cells and append separately authored happy head tilts/neutral recoveries in both directions; save supplied reference and provenance.
+- [x] Correct neutral registration, verify updated selections/support/ear slopes/components, compare879 retained frames/63 other clips and observe both exact native sequences.
+- [x] Pass all three necessary resource/baked-frame/startup checks, preserve the verified predecessor and record release identities. [Evidence](../docs/look-tilt-validation.md).
+
+## Newly authored resting breath · 2026-10-23
+
+- [x] Generate eight new breathing/expression poses, reject global torso drift, assemble reviewed local motion at fixed head/paw/tail anchors.
+- [x] Verify actual chest motion, fixed silhouette/support,300ms blink, all native phases and878 unrelated frames/64 clips; retain prompt/source and comparison.
+- [x] Pass final packed-frame/resource/startup checks, preserve the verified predecessor and record release identities. [Evidence](../docs/rest-breathing-validation.md).
+
+## Resting stability and selective rollback · 2026-10-23
+
+- [x] Restore the original look-left/look-right/quiet-swish pixels, selections and cadence.
+- [x] Replace wobbling resting redraws with authored eye bands on one exact fixed body;300ms blink.
+- [x] Verify fixed pixels/alpha,861 unaffected entries/61 clips,17 original restored frames, desktop recovery/pickup and native pose coverage; retain comparisons/provenance.
+- [x] Pass the three necessary packed-frame/resource/startup checks, preserve the verified immediate predecessor and record release identities. [Evidence and limits](../docs/idle-stability-validation.md).
+
 # Animation rebuild checklist
+
+## Approved idle refresh · 2026-10-23
+
+- [x] Record implementation approval, resting-first priority, permanent expression requirement and synchronized comparison requirement.
+- [x] Author/review resting idle first, then loaf/stretch and remaining unprotected idle gestures with connected acting/support. User's slow-blink feedback corrected to450ms.
+- [x] Import at canonical scale, preserve766 retained frames/54 unrelated clips including protected tails, and wire complete finite durations.
+- [x] Show eleven old/new native-size animation comparisons and ordered expression/transition frames.
+- [x] Run focused anomaly/runtime/package checks, update provenance/Frame Master/README and preserve flat current/previous release. [Evidence and limits](../docs/idle-refresh-validation.md).
+
+## Journal coherence and retention · 2026-10-23
+
+- [x] Reproduce unpainted selection/word and ignored-pet discrepancies; move performed-action evidence to drawing/visibility paths.
+- [x] Keep only50 entries in memory/on disk and internal diagnostic buffers; migrate old rows/rotation automatically and guard disk-failure recovery.
+- [x] Run257 source checks (252 pass/five package skips); independently match native automatic-play poses, phases and words to the journal/file, and verify50 entries after80/reopen.
+- [x] Pass all five final package checks, match frozen runtime modules to source, preserve identical art/clip definitions and rotate the verified predecessor. [Evidence](../docs/journal-coherence-validation.md).
+
+## Sleeping goodbye · 2026-10-23
+
+- [x] Reproduce sleeping, partial wake and partial curl quit failures.
+- [x] Connect existing wake/recovery to sad goodbye and one diagonal leap; preserve interruption, counts and home.
+- [x] Verify source paths and assemble a production-controller preview without changing art/clip definitions.
+- [x] Verify final executable menu/timers and five package checks, then rotate the preserved predecessor. [Report](../docs/sleep-goodbye-validation.md).
+
+## Idle review, thoughts and diagnostics · 2026-10-23
+
+- [x] Review production idle/canonical transitions and saved references; prepare current previews and [animation plan](../docs/idle-refresh-plan.md). Tail chase/catch excluded.
+- [x] Fix general/gesture thought scheduling independently, with visible-bubble/quiet rules, due-display acknowledgment and optional-AI ownership regressions.
+- [x] Reproduce/fix auto-game entry around cooldown; expose gate/zone/invitation reasons and allow live Journal monitoring.
+- [x] Add bounded persistent activity journal in Neko's nook for actual thoughts, gestures, sleep/care, lifecycle and game phases/decisions.
+- [x] Verify source, journal UI/native countdown/file parity and five package checks; retain current/previous executable. [Evidence and limits](../docs/idle-diagnostics-validation.md).
+- [x] After user approval, prototype resting idle/loaf/stretch and implement the approved refresh. [Final comparisons and evidence](../docs/idle-refresh-validation.md).
+
+## Drop-out correction — 2026-10-23
+
+- [x] Reproduce zero goodbye paints in the previous executable's awake-gesture and visible-fullscreen menu paths; retain before records under ignored build storage.
+- [x] Queue finite awake recovery, respect visible-fullscreen preference, preserve pending-close interruptions and suppress competing reactions.
+- [x] Select one continuous reaching flight without midair tuck/re-extension; keep sadness and entrance unchanged.
+- [x] Pass125 source checks across focused runs and five package checks; add a permanent bundled-menu probe and preserve all839 frames. [Report](../docs/dropout-fix-validation.md).
+
+## Reference-led lifecycle v2 — delivered, 2026-10-23
+
+- [x] Preserve all five supplied originals in the project and verify byte-identical hashes; index source identities and motion-use limits.
+- [x] Decode the full 4.18s video and review timestamped scene/pose studies; distinguish observed contact/spine mechanics from proposed Neko acting.
+- [x] Update Frame Master for every future motion: selected references, connected masses, support maps, distinct silhouettes and face-hidden key-pose review.
+- [x] Record the user's rejection of the visitor acting and write [the replacement drop-in/drop-out plan](../docs/lifecycle-motion-v2-plan.md), preserving old validation evidence.
+- [x] Review twelve key poses per action, support maps and rough silhouette movement before full sheet generation; preserve both studies.
+- [x] Resolve contact anchoring, body folding, drawn turns and high-perch exit; author connections/acting and three complete corrective bridge drawings.
+- [x] Implement the user's single diagonal leap direction; 120 focused checks plus one final front-seam regression and native low/high playback pass. [Evidence and limits](../docs/lifecycle-v2-validation.md).
+- [x] Add the user's sad goodbye with drawn ear/eye/head transitions and grounded turn into take-off; preserve front-facing placement before directional mirroring.
+- [x] Pass all four exact-executable checks; record native pose coverage and2.209s UI readiness, preserve verified predecessor, update prompts/previews/README/Frame Master together.
+
+## Entrance and goodbye — delivered, 2026-10-23
+
+- [x] Inspect current lifecycle art, timing, travel, interruption rules and earlier validation; research primary animation and feline references.
+- [x] Record alternatives, recommended paired storyboards, support/scale constraints and acceptance gates in [the research proposal](../docs/arrival-goodbye-research.md).
+- [x] User approved implementation; prototype supported lean, landing compression and high/low exit paths at native size.
+- [x] Author and integrate the complete entrance; reject the undersized seated endpoint and redraw its supported recovery.
+- [x] Author and integrate the complete goodbye with actual window travel and persistent resting origin.
+- [x] Verify lifecycle interruptions, native painting, source/packed equality and startup; 115 focused/four package checks pass. Update provenance/previews/README and preserve the flat release. [Final report](../docs/visitor-validation.md).
+
+## Startup correction — 2026-10-22
+
+- [x] Reproduce startup latency and profile the source atlas bottleneck.
+- [x] Prepare calibrated release frames at build time; preserve all 741 frames exactly and retain source fallback.
+- [x] Verify real executable startup improvement (6.97s → 2.14s), four package checks and flat current/previous release. [Report](../docs/startup-performance-validation.md).
 
 ## Gallop, timer and sleep correction — delivered, 2026-10-22
 
@@ -327,3 +411,24 @@ Description: refine head pats (2.8 seconds), chin scritches (3.0 seconds) and ea
 - [x] Inspect all runtime frames plus native-size/enlarged playback previews; correct defects.
 - [x] Run regression suite, build executable and verify packaging, native Qt rendering and second-instance launch. Cold packaged startup deferred because the user's existing copy is running.
 - [x] Update prompts, animation catalogs and final validation notes.
+
+
+## Seated resting idle without breathing · 2026-10-23
+
+Replace the rejected breathing rest only. Study creator sitting-idle previews; retain generated iterations and exact prompts. Small foreleg/shoulder resettle, ear response and brisk happy blink; planted contacts, fixed head/scale and long quiet holds. Preserve all other art/clip definitions. Scope: rest source, assembly, idle timing, focused assertions, synchronized preview, native pose coverage, provenance/FrameMaster/README, flat current/previous release. Necessary source/native/package checks only; user judges appeal.
+
+Completed: four focused source cases, new-rest component/unchanged-art assertions, corrected native full sequence and three package checks pass. Built flat current/previous executables; prior verified release rotated only after success. Browser local-file playback is blocked; native-size synchronized GIF and keys are supplied for human review.
+
+
+## Accepted resting idle: mouth-only smile · 2026-10-23
+
+User chooses half-loop smile. Reuse existing authored mouth entry/hold/release; preserve accepted body and all synchronized non-mouth pixels. Keep5.8s loop/300ms blink. Scope: mouth composite/rest source count, idle quiet-hold split, focused tests/comparison/provenance/FrameMaster/README and flat current/previous build. No unrelated acting or settings.
+
+Completed: three focused source cases, full-loop synchronized mouth-only comparison, connected components, complete native0..9 sequence and three final package checks pass. Current build and verified immediate predecessor are retained in the flat release folder.
+
+
+## Exact user-selected tiny smile · 2026-10-23
+
+Use the mouth from the supplied release-frame screenshot throughout the existing half-loop smile. Replace only mouths6/7/8 with the already-authored soft mouth; all movement/timing remains unchanged. Two targeted source cases and synchronized mouth-only comparisons; rebuild and package-asset checks, preserve flat current/previous. No repeated native timing or broad tests.
+
+Completed: two source cases, exact three-mouth diff/905 unchanged frames/all65 unchanged clips, complete synchronized outside-mouth comparison, component assertions and both package checks pass. Flat current/verified previous executable retained.

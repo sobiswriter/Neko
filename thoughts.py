@@ -2,7 +2,7 @@
 
 import ctypes
 
-from PySide6.QtCore import QRectF, Qt
+from PySide6.QtCore import QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPalette, QPen, QPixmap, QRegion
 from PySide6.QtWidgets import QApplication, QGraphicsBlurEffect, QGraphicsScene, QLabel
 
@@ -25,6 +25,9 @@ def soften(source):
 
 
 class ThoughtLabel(QLabel):
+    shown = Signal(str)
+    dismissed = Signal(str)
+
     def __init__(self):
         super().__init__(None, Qt.ToolTip | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
                          | Qt.WindowDoesNotAcceptFocus | Qt.WindowTransparentForInput)
@@ -38,6 +41,8 @@ class ThoughtLabel(QLabel):
                           "border-radius: 20px; padding: 8px 10px; font: 600 16px 'Segoe UI';")
         self.ensurePolished()
         self.backdrop = QPixmap()
+        self.plain = False      # Plain glass (no screen sample) for words spoken on the move.
+        self.painted_text = None
         palette = self.palette()
         palette.setColor(QPalette.WindowText, QColor("#fffaf0"))
         self.setPalette(palette)
@@ -57,6 +62,10 @@ class ThoughtLabel(QLabel):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        # Start from a transparent bubble every time, so an earlier thought can never show through.
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(self.rect(), Qt.transparent)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.setRenderHint(QPainter.Antialiasing)
         shape = QPainterPath()
         shape.addRoundedRect(QRectF(self.rect()), 20, 20)
@@ -72,13 +81,17 @@ class ThoughtLabel(QLabel):
         painter.drawRoundedRect(QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5), 20, 20)
         painter.end()
         super().paintEvent(event)
+        if self.isVisible() and self.painted_text != self.text():
+            self.painted_text = self.text()
+            self.shown.emit(self.painted_text)
 
-    def prepare_backdrop(self):
+    def prepare_backdrop(self, plain=False):
         self.backdrop = QPixmap()
+        self.plain = plain
         palette = self.palette()
         palette.setColor(QPalette.WindowText, QColor("#fffaf0"))
         self.setPalette(palette)
-        if QApplication.platformName() == "windows" and self.screen() is not None:
+        if not plain and QApplication.platformName() == "windows" and self.screen() is not None:
             # A per-thought sample avoids native blur spilling beyond rounded regions.
             try:
                 ctypes.windll.dwmapi.DwmFlush()
@@ -96,10 +109,13 @@ class ThoughtLabel(QLabel):
                 self.setPalette(palette)
 
     def showEvent(self, event):
-        if self.backdrop.isNull():
+        if self.backdrop.isNull() and not self.plain:
             self.prepare_backdrop()
         super().showEvent(event)
 
     def hideEvent(self, event):
         self.backdrop = QPixmap()
         super().hideEvent(event)
+        if self.painted_text is not None:
+            text, self.painted_text = self.painted_text, None
+            self.dismissed.emit(text)

@@ -1,0 +1,211 @@
+{
+  "date": "2026-10-23",
+  "mode": "built-in ImageGen",
+  "prompt": "Use case: precise-object-edit. Production resting animation for the EXISTING white pixel-art desktop kitten Neko. Image1 is exact runtime character identity/scale reference; image2 is older expressive motion reference, whose warm eye acting was liked but whose whole-body redraw wobble was REJECTED. Create NEW authored resting poses, not another static-body eye-only sheet.\nONE transparent RGBA sprite sheet. EXACTLY4 columns by2 rows,8 complete chronological kitten drawings. Same physical scale/camera and cell registration throughout. Preserve canonical white fur, charcoal stepped pixel outline, gray under-chin/chest, pink ears/nose and dark eyes with square highlights. No text/labels/grid/floor/shadow/heart/motion marks. Generous transparent padding.\nMotion/support: four-legged seated kitten with both front paws and haunch planted on the SAME baseline in ALL8 cells. Head crown, head center, ear tips, nose position, paws and tail root stay at the SAME pixel positions. NO up/down translation, no bob, no tilting, no zoom, no shifting left/right, no whole-body squash or scaling. Body should feel alive through a small locally drawn breath: upper ribcage/chest contours expand horizontally by about1\u20132 final desktop pixels at the peak, the gray chest contour changes subtly as shoulders soften, then releases. Do NOT merely duplicate the body. Do NOT move planted paws, change leg count or change the head size.\nRow-major storyboard:\n0 calm neutral supported sit, open bright eyes, quiet tiny mouth, relaxed still ears;\n1 inhale begins: chest contour slightly fuller, shoulders softly open while head/paws stay fixed; open attentive eyes;\n2 inhale crest: chest subtly fullest, small gray chest shape lifted within the fixed torso, eyelids soften, tiny content mouth;\n3 eyelids half-close through an actual drawn transition, chest stays softly full, mouth eases into a tiny pleased smile, ears remain relaxed;\n4 both eyes close into warm happy arcs (^_^ feeling DRAWN, no symbols), tiny pleased mouth; same head height and supported chest;\n5 drawn half-open lids returning, smile softens, chest begins releasing;\n6 exhale: chest returns gradually toward narrow resting contour, gray chest settles locally; eyes reopen attentively;\n7 complete drawn neutral recovery matching0, normal open eyes and quiet mouth, same head/paws/tail position.\nPlayback plan:0 hold900ms;1 inhale220ms;2 crest300ms;3/4/5 blink100ms each;6 exhale220ms;7 settle260ms, then quiet canonical hold1800ms. Eye close/reopen should be brisk, not a sleepy long closure. Breathing restrained and alive, NOT frantic whole-body wiggling. Eyes, ears, mouth and head acting are explicitly planned: soft\u2192happy arcs\u2192open, ears quiet/relaxed, tiny smile\u2192neutral, head completely steady. Render crisp pixel clusters, no interpolated mush. Each face/chest should be drawn to join the neighboring phase. We will register/crop your newly authored chest/shoulder and expression regions onto stable character support anchors to eliminate accidental global redraw wobble; please make the actual breathing chest silhouettes distinct but subtle and all contact points fixed.",
+  "original": "references/rest-breathing/2026-10-23/rest-raw.png",
+  "reference_images": [
+    "references/idle-stability/2026-10-23/canonical.png",
+    "references/idle-refresh/2026-10-23/rest-raw.png"
+  ],
+  "intent": "New authored chest/shoulder breathing and warm blink frames. Stable support/physical scale rather than the previous eye-only freeze.",
+  "assembly": {
+    "source_boxes": [
+      [
+        90,
+        57,
+        317,
+        381
+      ],
+      [
+        532,
+        57,
+        319,
+        380
+      ],
+      [
+        975,
+        57,
+        319,
+        381
+      ],
+      [
+        1412,
+        56,
+        319,
+        382
+      ],
+      [
+        90,
+        477,
+        317,
+        380
+      ],
+      [
+        531,
+        478,
+        320,
+        379
+      ],
+      [
+        974,
+        478,
+        320,
+        379
+      ],
+      [
+        1412,
+        478,
+        319,
+        379
+      ]
+    ],
+    "constant_scale": 0.22545454545454546,
+    "registrations": [
+      {
+        "source": 1,
+        "nose": [
+          28.733333333333334,
+          39.13333333333333
+        ],
+        "offset": [
+          58,
+          51
+        ]
+      },
+      {
+        "source": 2,
+        "nose": [
+          29.857142857142858,
+          39.07142857142857
+        ],
+        "offset": [
+          57,
+          51
+        ]
+      },
+      {
+        "source": 3,
+        "nose": [
+          29.0,
+          39.13333333333333
+        ],
+        "offset": [
+          58,
+          51
+        ]
+      },
+      {
+        "source": 4,
+        "nose": [
+          28.894736842105264,
+          38.526315789473685
+        ],
+        "offset": [
+          58,
+          51
+        ]
+      },
+      {
+        "source": 5,
+        "nose": [
+          28.857142857142858,
+          38.07142857142857
+        ],
+        "offset": [
+          58,
+          52
+        ]
+      },
+      {
+        "source": 6,
+        "nose": [
+          28.833333333333332,
+          38.333333333333336
+        ],
+        "offset": [
+          58,
+          52
+        ]
+      },
+      {
+        "source": 7,
+        "nose": [
+          28.833333333333332,
+          38.333333333333336
+        ],
+        "offset": [
+          58,
+          52
+        ]
+      }
+    ],
+    "eyes": [
+      [
+        67,
+        73,
+        84,
+        93
+      ],
+      [
+        94,
+        73,
+        112,
+        93
+      ]
+    ],
+    "mouth": [
+      83,
+      93,
+      95,
+      99
+    ],
+    "chest": [
+      78,
+      104,
+      108,
+      117
+    ],
+    "canvas": [
+      192,
+      144
+    ],
+    "output": "assets/neko-idle-rest-v2.png",
+    "method": "Eight new authored phases; composite expression and internal chest/shoulder drawings only, preserving exact silhouette, head/ear/nose anchors, paws, haunch support and tail. Reject the source's outer-torso variation (up to4px at the proposed larger chest window). Reuse phase1 open eyes at crest2 so breathing does not prolong the300ms blink. No global movement, scaling or anatomy painting."
+  },
+  "runtime": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "durations_ms": [
+      900,
+      220,
+      300,
+      100,
+      100,
+      100,
+      220,
+      260,
+      1800
+    ],
+    "loop_ms": 4000,
+    "blink_ms": 300
+  },
+  "identities": {
+    "references/rest-breathing/2026-10-23/rest-raw.png": {
+      "bytes": 985447,
+      "sha256": "b73099c15a2d62954e0a43b92e03bc3ed284e0b14e72827df46428bf189163a5"
+    },
+    "assets/neko-idle-rest-v2.png": {
+      "bytes": 36565,
+      "sha256": "72d63d58721797644c4924c79c1045c506e21d828320dd1d5763f5ec999d8a9b"
+    }
+  }
+}

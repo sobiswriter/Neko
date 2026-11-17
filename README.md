@@ -6,25 +6,146 @@ Soft sounds are optional and off until you enable them.
 
 ![Neko's petting animations](docs/neko-pet-catalog.gif)
 
+## New in Neko 1.3
+
+Neko 1.3 is the default build, `dist\DesktopNeko.exe`; the release before it (1.1) is kept as
+`dist\DesktopNeko-previous.exe`. Both share settings, counts and the single-instance lock, so
+quit one before starting the other.
+
+- **No more stacked frames.** After a while on the desktop her old frames could pile up on
+  top of each other (a smeared, doubled outline and a dark shadow). Every frame is now drawn
+  on a fully cleared canvas, so that can't happen.
+- **No repeated words.** Once she has said something, those exact words can't come back for
+  10 minutes, whatever triggers them (gestures, pets, games, the restless mood, AI thoughts,
+  across a relaunch too). When every line of a small group is still cooling down she simply
+  stays quiet. The only exception is Catch's "3… 2… 1…" countdown.
+
+- **Restless levels.** Company tab → **Restless when ignored**, **Restless after** (1–120 min,
+  default 20) and **More restless every** (1–15 min, default 5). If you're at the computer but
+  haven't petted, played a game with or carried her for the "Restless after" time, she starts
+  at level 1 and climbs a level every "More restless every" minutes:
+  1. *agitated* (2 pets to calm her): tail flicks, ear twitches, glances at you and sighs;
+     now and then she runs off and comes back;
+  2. *pouncy* (3 pets): bursts of running and pouncing to get your attention, with excited
+     bouncing and sometimes a playful laugh;
+  3. *demanding* (4 pets): she comes over to the arrow (never closer than 140 px), stares it
+     down, offers a paw and asks for pets;
+  4. *sad* (5 pets): she comes as close to the arrow as she can without covering it, curls
+     up under her rain cloud and now and then says something small and sad ("i saved you a
+     spot next to me. it's still empty.").
+  **How she moves:** a change of height is always a pounce, left and right is always a run,
+  and she walks only to cool down at the end of a run. Big height changes take several
+  pounces of at most 120 px.
+  **Calming her:** at levels 1–3 each pet calms her a little and she tells you how it's
+  going. Curled up at level 4, she takes **one pet per thing she says**: pet her, wait for
+  her line, pet again. A quick extra pet doesn't count (Journal → Care shows "pet too soon").
+  Her words go from sad to happy, the rain cloud clears after the second pet, and on the
+  fifth she gets up, nuzzles you and goes home. A pet also stops her climbing a level for a
+  minute. Playing a game you asked for calms her by a level (from level 1 she forgives you);
+  Play is refused only while she's curled up and sad.
+  The Company tab shows the countdown before she gets restless, then her level, pets so far
+  and time to the next level. The countdown only runs while you're using the computer, she's
+  awake and not being played with, petted or carried, and Quiet company is off.
+  **Once she's restless, the mood comes first.** Typing doesn't pause her or her level
+  clock, and no automatic Catch game starts (a game you ask for still does). She only waits
+  where she is while a mouse button is held or her menu is open, and the level clock keeps
+  running then too. Stepping away, fullscreen, hiding her and monitor changes send her home,
+  but she **remembers her level**: about a minute after you're back (she wakes from her nap
+  for it) she carries on where she left off and tells you so. Only a pet, a game you play
+  with her, Quiet company or switching the mood off ends it for good. Carrying her pauses
+  the mood but isn't a pet; carried while curled up, she stays sad where you put her.
+  Journal → **Mood** shows each level, pet, pause and reason.
+- **Playful laughter.** A new sound, used for excited moments: tail chases and catches,
+  bouncy pets (happy hop, roll, side flop, back arch) instead of the purr some of the time,
+  the chase in Catch, triple-hop wins now and then, restless runs and bounces, and when she
+  cheers up from being sad. Like all her sounds it is soft, follows the **Volume** slider
+  and, when unprompted, waits at least 45 seconds after the last sound.
+- **Smoother.** Words spoken while she runs or pounces no longer pause the animation to
+  sample the screen for the frosted bubble (they use the plain glass), the journal is
+  written at most once a second instead of on every event, and a new volume level is
+  prepared in the background. Measured in scripted runs: a line spoken mid-run used to stall
+  her for up to about 100 ms; now the longest frame gap in a 60-second restless run is about 40 ms.
+
+## New in Neko 1.2
+
+
+Neko 1.2 was an experimental build; everything below is also in 1.3.
+
+- **Bigger Catch area, with hop-downs.** She can now pounce up to 140 px above her ground
+  (was 110) and, when the arrow is just below her reach, hop down a little (24 to 80 px) to
+  get at it. After a hop-down a pounce can carry her back up to her home ground, and on the
+  way home she climbs back up first. The area is still bounded: if the arrow stays outside it
+  she warns you three times (the last one is a "last chance!") and forfeits and curls up only
+  after nine seconds outside. Bringing the arrow back resets the warnings. A little **!** over her
+  head shows when a game is ready and she is waiting for the arrow to come by.
+- **Pixel-art victories.** About 80% of Catch wins use the much-loved **triple hop**; the rest
+  are rare treats, never the same one twice in a row:
+  two takes of a **sproing** (stiff-legged, arched-back happy bounces) and a
+  **victory roll** (belly-up wiggles, a fluffy shake and a proud paw). The three new ones are
+  finished at her native size in her own palette, with hard edges and crisp, continuous black
+  line art like the original drawings (comparison: `docs/v1.2-wins-compare.png`). The old "prize hug" and
+  "proud sit" wins are retired.
+- **Restless kitten** (on by default). See *New in Neko 1.3* above for how she behaves now.
+- **Soft kitten sounds** (still off until you enable them): ten cues with four takes each
+  (eight purrs), chosen at random and never the same file twice in a row. Every take is
+  filtered (140 Hz–4.2 kHz), levelled to a quiet −37 to −40 dBFS and given soft fades.
+  Mews, a purr that loops for exactly as long as a pet, chirps when a game is announced,
+  trills on "go", wins and forgiveness, giggles during the chase and tail chase, a curious
+  "mrr?" for sniffs, glances and dizziness, yawns at bedtime and wake-up, protests when the
+  arrow leaves her area, sad mews on losses and goodbyes, and demanding meows when restless.
+  Some idle gestures make a sound about half the time; those, like all unprompted sounds,
+  wait at least 45 seconds after the last one, and Quiet company, fullscreen and media apps
+  silence them. Settings tab → **Volume** sets her voice from 0% (muted) to 300%; 100% is
+  the default soft level, and letting go of the slider plays a sample mew.
+  Sources: [sound credits](docs/sound-credits.md).
+- **Better rain cloud** for sulks: one soft, shaded storybook cloud with slanted rain.
+
+The 1.2 victories came from the user's generated sheets (12 drawings each), labelled, cut
+and calibrated by `tools/assemble_v12.py` and redrawn as pixel art by `pixelate.py`. The
+other generated sheets are not played for now. See the [assembly record](docs/v1.2-assembly.json),
+[prompts](docs/v1.2-art-prompts.md) and [plan](docs/next-updates-plan.md). Sounds were
+prepared by `tools/prepare_sounds.py`.
+
 ## Living with Neko
 
 - **Catch the Cursor.** Right-click Neko or use her tray menu → **Play · Catch the Cursor**.
   The nook's **Play** tab has the same control and **Automatic cursor games**, enabled
   by default, with **90 seconds** between opportunities (adjustable from 30–600 seconds).
-  The cooldown arms play; she waits for a fresh approach into the invisible reachable area
-  beside her, outside her petting space. A stationary cursor cannot trigger it at expiry.
+  The cooldown arms play; then bringing the arrow from a little farther away into the
+  invisible area beside her starts a game after a short hover. That area reaches about 320 px
+  out from either side of her, outside her petting space, at a height she can pounce to;
+  coming from farther to the side, from above or from below all count. An arrow that just
+  stays or wiggles beside her never triggers it.
   Naps, carrying, care, menus, typing and fullscreen take priority; Quiet company pauses it.
   A fresh side approach during an idle gesture waits for that gesture to finish.
-  She notices the arrow, gives a real **3… 2… 1… Here I come!**, then runs and pounces.
+  She spots the arrow (a little **!**), declares the game and holds that thought for
+  1.8 seconds so you can read it, then gives a real **3… 2… 1… Here I come!**, then
+  runs and pounces. In an automatic game, moving the arrow away during the declaration calls
+  it off quietly. A game you ask for (menu, tray or nook **Play**) starts right away: she
+  wakes up if napping, cuts an idle gesture or app reaction short (a pet in progress still
+  finishes), gets up from a post-loss curl for a rematch, and counts down wherever the arrow
+  is. If the arrow never comes over she calls you three times, then says "maybe later" and
+  goes home with no loss or sulk.
   There are no guide lines, game clock or floating buttons. Her forepaw touching the arrow
-  wins one of three celebrations: happy hops, a proud hug or champion paws.
+  wins a celebration: usually the triple hop, now and then a sproing or a victory roll.
   Playful eye squeezes, a new eight-pose walk, sparse chase thoughts and three different
-  sulks give her more life. Each chase lasts up to 45 seconds; four continuous seconds
-  outside her reachable band ends it, with a little protest first.
+  sulks give her more life. Each chase lasts up to 45 seconds; nine continuous seconds
+  outside her reachable band ends it, after three warnings.
   After a loss she curls up, a little disappointed. A pet comforts her through a drawn get-up;
   if left unattended, she can settle for her configured nap instead of sulking forever.
   Moving her preserves that mood and never counts as a nap.
   **End game** lives in her ordinary menu/nook; petting, holding, hide and fullscreen can cancel neutrally.
+  A click during play stops her where she is (after any landing) for her pet. Dragging her
+  ends play on the spot and lifts her from her current pose; while she plays, a drag needs
+  three times the usual distance, so a click with a moving hand still counts as a pet.
+  Moving her or her monitor during a sulk keeps the sulk at the new place.
+  Her right-click menu pauses the chase, so reading it never costs a protest or a loss.
+  The arrow stays an arrow over her while she chases it. Going home, she bounds back in
+  her chase gallop when it's more than 160px away, then switches to her walk for the
+  last 120px and settles (900px takes about 4.5 seconds). A system stall, such as
+  a lock screen, calls off active play but never changes a finished win or loss.
+  While an invitation is armed, cursor-curiosity sniffs and new idle gestures wait,
+  so they cannot swallow your approach.
   Gentle motion off uses a stationary paw target. The real pointer is never moved,
   hidden or captured. **Games played** and **Neko wins** are saved locally in her menu and nook.
   Abandoned countdowns do not count as games.
@@ -47,7 +168,12 @@ Soft sounds are optional and off until you enable them.
 - **Pick her up.** Dragging starts a lift immediately; a stationary click-hold starts
   after 250ms. She dangles with little paw/tail movements, going from excited to
   calm after three seconds, mildly unimpressed after ten, then sleepy after twenty.
-  A little yawn happens once before her sleepy loop. Release at any point—even
+  A little yawn happens once before her sleepy loop. She speaks up too: sometimes a
+  “wheee!” as she's lifted, a polite “could you put me down now?” after ten seconds and
+  a resigned “fine. i'll just nap up here” after twenty (Quiet company silences these;
+  each waits two minutes before returning). The words travel with her while you carry
+  her. Released from a full hold, she drops a short way (up to 22px, room permitting)
+  and lands on her feet; that landing spot is what's saved. Release at any point—even
   mid-lift or mid-yawn—and she settles at the chosen location and returns to idle.
   Re-grabbing follows the visible pose back into the hold and preserves her expression.
   Holding never counts as petting; quick clicks still do. Real naps stay asleep
@@ -60,9 +186,12 @@ Soft sounds are optional and off until you enable them.
 - **Come close.** She can notice a nearby cursor while keeping her place.
   Cursor chasing belongs to Catch the Cursor; ordinary idle following has been removed.
 - **Keep working.** Tail swishes, ear flicks, sniffing, loafing, grooming, stretches,
-  yawns and sleepy peeks share an atlas of 741 entries, including 212 game source slots and a shared walk endpoint, with eight-frame transitions into
-  sleep and back to sitting. Most gestures have 5–6 seconds on screen: one gentle
-  motion followed by a relaxed rest, without repeated head-bobbing or stretching.
+  yawns and sleepy peeks share an atlas of 908 entries, including 212 game source slots and 98 current/historical lifecycle entries, with eight-frame transitions into
+  sleep and back to sitting. Resting idle uses eight seated gesture/expression phases: a small shoulder/foreleg
+  resettle, ear response and quick300ms happy blink in a5.8s loop, without breathing.
+  The exact tiny smile selected in the user reference stays for half the loop (2.9s); other motion stays unchanged.
+  Head height, planted paws, tail and physical scale stay anchored. Refreshed gestures last 3.5–6 seconds with drawn support changes
+  and complete recovery before the next rest. Pet requests wait for that recovery.
   Tail swishes make one lazy sweep and rest; typing uses a gentle repeating cycle.
   Normal rendering runs at 10 FPS; tail running, petting and carrying use 20 FPS; cursor games use a precise 50 FPS timer.
   Petting/carrying use a precise Qt timer so short connecting poses get screen time.
@@ -78,8 +207,13 @@ Soft sounds are optional and off until you enable them.
   Walking, loafing and sleep preserve their natural posture and proportions.
   Grooming, stretching, loafing, sniffing, ear flicks, yawning, sleepy peeks and
   directional looks now have drawn anticipation and recovery: paw lick and ear wipe,
-  a stretch/paw shake, tuck into loaf, tiny nose twitches and contented blinks.
-  The accepted lazy swish gains a blink before sitting still again.
+  a supported front stretch, sequential paw tuck into loaf, nose twitches and contented blinks.
+  Left/right looks use the updated glance/turn drawings, then a happy tilted smile
+  held600ms and a drawn straighten-up; each lasts4.9s. Lazy tail swish keeps its original
+  drawings/cadence, and tail chase/catch remain preserved.
+  [New resting before/after](docs/simple-smile-compare.html) ·
+  [resting smile verification](docs/simple-smile-validation.md) ·
+  [current look/tilted-smile comparisons](docs/look-tilt-compare.html).
 - **A little tail trouble.** She runs low with closed eyes and a trailing tail through five quick
   turns, following the supplied GIF's eleven 50ms poses. The catch game takes two turns, then a small pounce and a
   two-paw catch before the tip slips away. An eager head tilt and crouch lead into play;
@@ -87,17 +221,34 @@ Soft sounds are optional and off until you enable them.
   catch 3.68 seconds. Each gets three times an ordinary idle's selection weight,
   with no consecutive repeats and the same rest between gestures.
   These do not change the twelve pet reactions.
-- **Hello and goodbye.** Starting the app plays a drop-in, landing crouch and
-  sit-up before her greeting. She enters from her monitor's top edge and lands at
-  her saved position. **Let her go · quit** gives her a little sad look and lowered
-  ears, then the existing crouch and graceful hop. These eight-drawing
-  transitions last 1.9 and 2.15 seconds, use continuous travel between poses,
-  and start the arrival clock on Qt's first animation tick so a slow launch
-  cannot spend the fall before it appears. Visible fullscreen launches also
+- **Hello and goodbye.** One graceful diagonal leap brings her into view, with
+  reaching forelegs, planted front paws, a folding spine and gathered hindquarters.
+  She recovers under support into a pleased tilt and smile, with no second bounce.
+  The 1.98s entrance uses 19 selected poses and ends at her actual idle and saved position.
+  **Let her go · quit** gives her lowered ears, soft sad eyes and a dipped head,
+  then a drawn turn into a loaded crouch and one diagonal
+  leap out, extending into a continuous downward reach with her attached tail following.
+  High perches use a nearer side boundary; low departures head diagonally down.
+  This 17-entry goodbye lasts 2.20s and moves the actual window, while preserving
+  her resting position. Both clocks start on Qt's first animation tick so loading
+  cannot spend the performance before it appears. Visible fullscreen launches also
   play the drop-in, silently; the fullscreen hiding preference still applies.
   They keep her saved desktop position, and do not accept pets or
   window reactions midway through. Reduced motion skips the jumps; quitting
-  while hidden or fullscreen is immediate. Hide/Show remains immediate.
+  while hidden is immediate. A visible fullscreen pet still says goodbye when
+  fullscreen hiding is disabled. Awake gestures finish their drawn recovery before
+  goodbye, with new reactions paused. A sleeping kitten wakes and uncurls first,
+  then shows sadness and makes the same single leap. An ongoing curl finishes
+  before waking; an ongoing wake continues without restarting. Held and active
+  game states close immediately. Hide/Show remains immediate.
+  [Sleep goodbye preview and verification](docs/sleep-goodbye-validation.md).
+- **Head spinning.** Switch the main window six times within 12 seconds and her head
+  follows the windows left and right, faster each sweep, with little stars circling
+  above her and a line like “woah woah… my head's spinning!”. The Alt+Tab switcher,
+  taskbar and desktop don't count. It has its own three-minute cooldown, separate from
+  the shared reaction gap, and follows the **Notice typing and window activity**,
+  fullscreen and Quiet company rules. Her dedicated dizzy drawings are planned; until
+  they exist she uses her accepted head-turn drawings without the happy smile.
 - **Type together.** A typing burst gets a few little paw taps and a local thought
   such as “whatcha typing?”, at most once every 30 seconds.
 - **Open, close, or move windows.** Native events earn a look, blink and contextual
@@ -113,14 +264,33 @@ Soft sounds are optional and off until you enable them.
   and timed naps use the same gentle waking transition. After waking she stays
   awake for at least the inactivity delay before another nap.
   Ignoring her never creates chores or penalties.
-- **Offline personality.** 346 short lines, including more personal questions and
+- **Little expression marks.** Painted beside her head (never on her face), with a white
+  outline so they read on light and dark desktops: drifting **Zzz** while she sleeps,
+  rising **hearts** while she's petted, music notes when she swishes to a music app, a
+  **!** when she spots the arrow, twinkling sparkles when she wins, a tiny rain cloud
+  while she sulks, a huffy cross mark when she's held too long and sleepy z's once she
+  gives up and dozes in your hand. With Gentle motion off they stay still. They live in
+  [effects.py](effects.py).
+- **Offline personality.** 526 short lines, including more personal questions and
   company addressed to you, shuffled separately for typing,
   windows, pets, cursor curiosity, waking, and idle thoughts. No repeat until that
-  context's bag is exhausted. Ambient thoughts default to about 75 seconds apart.
-  All automatic words—including idle, activity and optional AI comments—respect
-  the full **Thoughts every** minimum (default 75 seconds) and never replace a visible bubble.
+  context's bag is exhausted. The last 40 built-in lines she said, across every group,
+  go to the back of each fresh bag and are remembered between launches, so a restart
+  or a small bag does not echo them. AI comments she just said are never repeated either.
+  Ambient thoughts default to about 75 seconds apart.
+  General idle thoughts use **Thoughts every** (default 75 seconds), independently
+  of gesture thoughts. A due general thought waits for a visible bubble to finish;
+  its next interval begins when it is shown. Gesture lines use their own action's
+  timing and disappear by the end of that action. Activity replies (typing, apps,
+  windows, the cursor) keep their own shared pause, which general idle chatter does not
+  use up. If a general or gesture thought is still showing, the reply waits for it and
+  speaks while her reaction is still playing. Quiet/fullscreen/sleep/care and readable
+  single-bubble rules apply.
   Every spontaneous idle attempts its own local thought, including “Look at meeee!”
-  and “Round.. around... around...” for tail chasing. Quiet/fullscreen rules still apply.
+  and “Round.. around... around...” for tail chasing. The same gesture's words return
+  after at least 150 seconds, and any two gesture thoughts are at least 30 seconds apart,
+  so frequent gestures stay lively without repeating their small line banks.
+  Quiet/fullscreen rules still apply.
   Thoughts use cream 16px semibold text with a small dark shadow and a compact,
   rounded glass backdrop with a faint rim, a nearly clear tint and gentler frosting.
   The desktop behind it blurs while the lettering stays
@@ -134,6 +304,12 @@ Soft sounds are optional and off until you enable them.
   you're watching; audio file titles and Spotify get listening questions and tail
   swishes. Coding, drawing, writing, chat, games, folders and terminals each have
   their own lines and matching gestures. These are app hints, not content analysis.
+  162 executables and 16 browsers are recognised in [app_context.py](app_context.py), including
+  VS Code, Kiro, Cursor, JetBrains IDEs, Spotify, Windows Media Player, PotPlayer and
+  Windows Terminal. Store apps hosted by `ApplicationFrameHost.exe` resolve to the real
+  app. Browsers count only when a title *segment* names a site (`… - YouTube`,
+  `… | Netflix`, `… - GitHub`), so merely mentioning a site does not. While you stay
+  in a recognised app, about half of her general idle thoughts talk about it.
   Typing, window/tab events, cursor curiosity and following share one minimum
   reaction gap: **60 seconds** by default, adjustable from **15–600 seconds** through
   **Neko's nook → Company → Activity reactions every**. Events during that gap
@@ -141,7 +317,7 @@ Soft sounds are optional and off until you enable them.
   deliberate pets and naps still work normally.
 
   To edit her offline voice, open [dialogue.py](dialogue.py). Its `LINES` dictionary
-  contains all 346 phrases in 33 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
+  contains all 526 phrases in 67 named groups (`typing`, `coding`, `pet`, `tail_chase`, etc.).
   Edit or add one phrase per line inside the existing triple-quoted groups; keep the
   section names/quotes and aim for at most 110 characters per phrase. Source launches
   use your edits on restart; the packaged executable needs rebuilding. Optional AI
@@ -157,13 +333,41 @@ Soft sounds are optional and off until you enable them.
   icon to find her again.
   Menus and the nook open beside her, with no periodic re-pinning over the controls.
 
+- **A local activity journal.** Neko's nook → **Journal** shows actual thoughts,
+  idle/sleep/care state changes, activity reactions, game phases/results and why
+  an automatic invitation is waiting or blocked. Filter by category or copy the
+  visible log. The Journal tab can monitor automatic play live; other Nook controls
+  pause automatic invitations while open. Deliberate Play works from the Nook.
+  State and game-phase entries follow actual painting, including held expressions
+  and reduced-motion poses. Thoughts log the words painted and when they hide;
+  requests, blocked decisions and accepted pets are identified separately.
+  Only the latest **50 entries** remain in memory and the saved JSONL file.
+  So those rows tell the real story, status rows that flip back and forth (waiting,
+  deferred, skipped) repeat at most once a minute, and play blockers such as typing are
+  only journaled once an invitation is actually armed. A damaged row or byte-order mark
+  costs only that row; if the file cannot be read at startup, it is merged back in later
+  instead of being overwritten. Saves are flushed to disk and retried once when Windows
+  briefly locks the file.
+  Older rows and the former rotated file are removed automatically, including
+  on startup. File-write trouble is shown in the Journal; no raw keys,
+  typed text, window titles or cursor trails are logged. [Verification](docs/journal-coherence-validation.md).
+
+The [idle-animation refresh plan](docs/idle-refresh-plan.md) is ready for review.
+Current artwork/playback, including the approved tail chase/catch, is unchanged.
+
 Quiet company stops unprompted words and sounds while keeping deliberate pet reactions.
 Hide really hides her: no surprise appearances, bubbles, or animation. Native
 topmost positioning keeps her above normal windows without stealing focus.
 **Tuck away during fullscreen apps** is a separate, opt-in choice in the nook.
+Fullscreen is detected by comparing the window with its monitor in native pixels, so
+display scaling above 100% no longer mistakes a large window for fullscreen; maximized
+windows with a title bar never count.
 Fullscreen activity always suppresses automatic words and typing/window reactions,
 even when she remains visible. Exclusive-fullscreen games and other topmost overlays
-can still cover desktop windows. Only one copy runs at a time.
+can still cover desktop windows. Only one copy runs at a time. Launching her again
+while she runs (even hidden) brings the running Neko back instead of exiting silently;
+a copy that is still quitting gets a few seconds to finish, and quitting never waits
+more than 1.5 seconds for an optional AI request.
 
 Typing and window reactions work locally and can be switched off. Keyboard
 detection requests only raw-input headers: key identities, text and passwords are
@@ -201,9 +405,17 @@ shared executable, application-window, nook and tray icon. See the
 
 The pet works offline. AI is off by default. To enable it:
 
-1. Set `GEMINI_API_KEY` in the environment **before launching Neko**, or copy
-   `config.example.json` to `config.json` and fill in your own key.
-2. Open the nook and enable **AI observations**.
+1. Open the nook → **Settings**, paste a Gemini API key from Google AI Studio and
+   press **Save key**. It is stored in your account's Windows Credential Manager
+   (`DesktopNeko/GeminiApiKey`), never in Neko's settings, journal or builds, and
+   **Remove key** deletes it. Alternatively set `GEMINI_API_KEY` in the environment
+   before launching (this takes priority), or put it in `config.json` (used last).
+2. Enable **AI observations** in the same tab.
+
+AI thoughts are occasional fill-ins: a general idle thought may ask Gemini only when
+the app in front of her has no lines of its own (VLC, music, code editors and other
+recognised apps always use her offline lines), at most once every ten minutes. With
+AI on but no key, nothing is sent and the nook says a key is missing.
 
 For a packaged executable, `config.json` belongs beside the executable. Keys are
 never included in a build. If a key was committed in an older revision, rotate it:
@@ -236,6 +448,12 @@ deliberately excluded. Build on Windows. A source launch and the executable use
 the same preferences and instance lock. The build isolates its DLL search path
 so unrelated tools cannot supply conflicting Windows libraries.
 
+Packaging prepares all 908 calibrated animation frames once with
+`tools/bake_atlas.py`. The executable loads those finished frames directly,
+avoiding source-sheet silhouette analysis on every launch. Source launches keep
+the original importer; source artwork and custom asset overrides are retained.
+See the [startup measurements and verification](docs/startup-performance-validation.md).
+
 The current build is `dist\DesktopNeko.exe`; its immediate predecessor is
 `dist\DesktopNeko-previous.exe`. Keep these two files directly in `dist`, without
 release subfolders. Quit the existing Neko before launching the new build;
@@ -243,7 +461,8 @@ the single-instance lock prevents two kittens running together.
 The latest build includes Catch the Cursor, pickup, slightly faster petting, frosted thoughts,
 the supplied icon and startup repair; see [Catch verification](docs/catch-validation.md)
 and the [startup/icon record](docs/startup-icon-validation.md). The
-[quieter cursor-play v2 proposal](docs/cursor-play-v2-plan.md) awaits approval and is not implemented.
+[quieter cursor-play v2](docs/cursor-play-v2-validation.md) and the
+[reference-led diagonal entrance/goodbye](docs/lifecycle-v2-validation.md) are implemented.
 Historical build paths
 in older reports describe their original delivery locations.
 
@@ -283,9 +502,12 @@ three rows of four drawings from an earlier petting pass; they too are historica
 `assets/neko-tailplay-v4.png` supplies the eleven-pose running cycle and five preparation/payoff poses.
 `assets/neko-tailsettle-v1.png` adds eight entry/recovery poses, calibrated separately
 and appended to the tail sequence without altering the accepted running artwork.
-`assets/neko-arrival-v1.png` supplies the graceful landing; the first two drawings in
-`assets/neko-farewell-v1.png` introduce sadness before the retained hop in
-`assets/neko-lifecycle-v2.png`. `assets/neko-tailswish-v1.png` supplies the lazy swish.
+`assets/neko-lifecycle-arrive-v2.png`, `assets/neko-lifecycle-depart-v2.png` and
+`assets/neko-lifecycle-bridge-v2.png` supply the current diagonal arrival/departure
+and corrective bridges. `assets/neko-lifecycle-sad-v2.png` adds the sad expression
+and supported turn into take-off. [Exact prompts and assembly](docs/lifecycle-v2-prompts.json).
+Earlier arrival/farewell/lifecycle/visitor sheets remain historical imported banks.
+`assets/neko-tailswish-v1.png` supplies the lazy swish.
 `assets/neko-idleplay-a-v1.png`, `assets/neko-idleplay-b-v1.png` and
 `assets/neko-idleplay-c-v1.png` provide the new idle stories. Replaced idle/activity/
 movement rows and the rejected swish candidates are not imported. New idle stories

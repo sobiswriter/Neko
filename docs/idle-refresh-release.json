@@ -1,0 +1,204 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "40c2c3a",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 127833593,
+      "sha256": "c0ab5ad82710cc7b869c16bcbdf71e58a4c6fe70c428e410352a0894a852eee3"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 125999227,
+      "sha256": "b908c68269366dd9340e76f92ca92aca870e29886f6defd0db1feda8f2770e92"
+    }
+  },
+  "source": {
+    "animations.py": {
+      "bytes": 37216,
+      "sha256": "fae4398a29041042af55f8106ff890f9b2d1a1c57d224b233a2f9ff8a0653416"
+    },
+    "behavior.py": {
+      "bytes": 11573,
+      "sha256": "56777a6404f947494d797fc8183225b6444334b3cb494fab281b0ce62d67ac90"
+    },
+    "main.py": {
+      "bytes": 99174,
+      "sha256": "2fd97246bc143a4a5b8cc29fd9ed1ddc60b22e7c6ae5ce5075a814641d0bbb57"
+    },
+    "test_animations.py": {
+      "bytes": 21889,
+      "sha256": "118fa15f77a1febde709b4ff7e734bfa8fd3d43f4225412ff07c6087dde8c3d2"
+    },
+    "test_behavior.py": {
+      "bytes": 15060,
+      "sha256": "96eef3e745d317af54aea32514ccda99acdc1e8c8db03637523c34634eadbb5c"
+    },
+    "test_main.py": {
+      "bytes": 72993,
+      "sha256": "6293e4b8bec027f63d6fb69ce3d828c005372c03f7028b2230ea706b30ad9f7c"
+    },
+    "test_packaging.py": {
+      "bytes": 11304,
+      "sha256": "b4f13c8712c46094221af4b9d713cdb733485d639605c1620222e6e9130529d4"
+    },
+    "tools/preview_idle_refresh.py": {
+      "bytes": 7765,
+      "sha256": "c49b701a984258491f7f6befbf6aaf59a15677f8115bd46fbbb6e31e112a6656"
+    },
+    "tools/probe_idle_refresh.py": {
+      "bytes": 3691,
+      "sha256": "f05679d0e113e8d8d4ceaabd4f434c756c042b81cb9cd226c9715e32a496c98f"
+    }
+  },
+  "assets": {
+    "assets/neko-idle-ears-v2.png": {
+      "bytes": 109041,
+      "sha256": "bfe3b3f78ac7e63c455611418f01d64d92a3937b6fa1a45854df6bf5535441b6"
+    },
+    "assets/neko-idle-groom-v2.png": {
+      "bytes": 118695,
+      "sha256": "6796317d855ba0bbf677f46bf2c159d1a9b7f94fca44a869be2e177a5cfea6c0"
+    },
+    "assets/neko-idle-loaf-v2.png": {
+      "bytes": 112964,
+      "sha256": "b89be0a2c726fc62e09c270b0d14e23bbe1c3c52b320a2db6dee457389ea57aa"
+    },
+    "assets/neko-idle-look-v2.png": {
+      "bytes": 162619,
+      "sha256": "6decdceecb05de4a55390a2ede66294947bcb3a5ff30732f7d00c4325f26fe05"
+    },
+    "assets/neko-idle-peek-v2.png": {
+      "bytes": 118547,
+      "sha256": "8b91db4304da7a5dd54106f6426fc80b67b13c3aa18a843752897a6e843d3444"
+    },
+    "assets/neko-idle-rest-v2.png": {
+      "bytes": 118996,
+      "sha256": "abcf52f489ec3d5511113e5c1f6c7796c4c2910f81035d4c7468752f98c0dd9a"
+    },
+    "assets/neko-idle-sniff-v2.png": {
+      "bytes": 120587,
+      "sha256": "0e9f4bb25468032eaaf559a297827ae9a87addd0ccd8c99f1bd52ddf2b77719d"
+    },
+    "assets/neko-idle-stretch-v2.png": {
+      "bytes": 177006,
+      "sha256": "d77bce21708e495bd880a49882f54be87994d6bb2f33bb20993c3c82ab079d1a"
+    },
+    "assets/neko-idle-tail-v2.png": {
+      "bytes": 115706,
+      "sha256": "b9265b704c0178c9f15d01958f440501be17d18b6ca706ff62fea3ddfc8545af"
+    },
+    "assets/neko-idle-yawn-v2.png": {
+      "bytes": 117033,
+      "sha256": "dc5e612dfbddf10f868a101f4b6e915e6aadd26433da81e08df7572c6cc3d619"
+    }
+  },
+  "frozen_modules_match_source": {
+    "main": true,
+    "animations": true,
+    "behavior": true,
+    "thoughts": true,
+    "event_log": true,
+    "games": true
+  },
+  "metrics": {
+    "retained_pixel_identical_frames": 766,
+    "retired_idle_frames": 73,
+    "new_frames": 138,
+    "atlas_entries": 904,
+    "unchanged_clips": [
+      "tail_chase",
+      "tail_catch",
+      "arrive",
+      "depart",
+      "happy",
+      "nuzzle",
+      "pet_stretch",
+      "back_arch",
+      "happy_hop",
+      "side_flop",
+      "shoulder_peek",
+      "knead",
+      "chin_scritch",
+      "roll",
+      "paw_offer",
+      "ear_rub",
+      "typing",
+      "fall_asleep",
+      "wake",
+      "sleep",
+      "walk",
+      "pickup",
+      "set_down",
+      "carry_to_calm",
+      "carry_to_unimpressed",
+      "carry_open_eyes",
+      "carry_yawn",
+      "held_excited",
+      "held_calm",
+      "held_unimpressed",
+      "held_sleepy",
+      "game_ready",
+      "game_three",
+      "game_two",
+      "game_one",
+      "game_go",
+      "game_ready_cancel",
+      "game_run",
+      "game_turn",
+      "game_prepare",
+      "game_jump",
+      "game_miss",
+      "game_settle",
+      "game_win_0",
+      "game_win_1",
+      "game_win_2",
+      "game_loss_0",
+      "game_loss_1",
+      "game_loss_2",
+      "game_loss_finish",
+      "game_curl",
+      "game_comfort",
+      "game_gentle_rest",
+      "game_gentle_reach"
+    ],
+    "comparison_clips": [
+      "idle",
+      "loaf",
+      "stretch",
+      "groom",
+      "yawn",
+      "peek",
+      "ears",
+      "sniff",
+      "look_left",
+      "look_right",
+      "tail"
+    ],
+    "durations_ms": {
+      "idle": 6800,
+      "loaf": 6000,
+      "stretch": 5350,
+      "groom": 4500,
+      "yawn": 4300,
+      "peek": 4500,
+      "ears": 3700,
+      "sniff": 4150,
+      "look_left": 3500,
+      "look_right": 3500,
+      "tail": 4200
+    },
+    "protected_tail_clips_identical": true
+  },
+  "checks": {
+    "behavior_passed": 35,
+    "final_blink_and_sleep_delay_passed": 2,
+    "focused_interaction_passed": 7,
+    "all_new_source_components_passed": true,
+    "drawn_neutral_recovery_passed": true,
+    "final_executable_checks_passed": 5,
+    "native_clips_complete": 11,
+    "post_feedback_native_rest_repeated": true,
+    "full_suite_repeated": false
+  },
+  "scope": "Eleven quiet idle clips across ten sheets; supported recovery before queued care/due nap; resting-first expressive brief as permanent rule. Protected tail chase/catch retained.",
+  "limits": "No physical mixed-DPI/multiple-monitor/long-soak trial. Native Qt paint coverage and component checks do not establish unobscured physical visibility, attached anatomy or subjective appeal."
+}

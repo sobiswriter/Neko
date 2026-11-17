@@ -12,6 +12,7 @@ class BrainTests(unittest.TestCase):
 
     def test_bad_config_is_not_a_crash(self):
         with patch.dict(os.environ, {"GEMINI_API_KEY": ""}), \
+                patch("llm_brain.stored_api_key", return_value=""), \
                 patch("pathlib.Path.read_text", return_value='{"GEMINI_API_KEY": 123}'):
             self.assertEqual(load_api_key(), "")
 

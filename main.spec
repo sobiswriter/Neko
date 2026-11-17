@@ -3,6 +3,11 @@
 import os
 from pathlib import Path
 import sys
+import subprocess
+
+runtime_assets = Path(SPECPATH) / 'build' / 'runtime-atlas' / 'assets'
+subprocess.run([sys.executable, str(Path(SPECPATH) / 'tools' / 'bake_atlas.py'),
+                str(runtime_assets)], check=True)
 
 # Keep unrelated tools' ICU and runtime DLLs out of the Windows bundle.
 os.environ['PATH'] = os.pathsep.join([
@@ -15,7 +20,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('assets', 'assets'), ('neko_sleep.ico', '.')],
+    datas=[('assets', 'assets'), (str(runtime_assets), 'assets'), ('neko_sleep.ico', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

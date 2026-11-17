@@ -5,6 +5,7 @@ import hashlib
 from pathlib import Path
 import subprocess
 import time
+import tempfile
 import unittest
 
 
@@ -46,9 +47,25 @@ class PackagingTests(unittest.TestCase):
         self.assertNotIn("assets/neko-tailplay-v3.png", names)
         self.assertIn("assets/neko-arrival-v1.png", names)
         self.assertIn("assets/neko-farewell-v1.png", names)
+        for name in ("arrive", "depart", "recover"):
+            asset = f"assets/neko-visitor-{name}-v1.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest())
+        for name in ("arrive", "depart", "bridge", "sad"):
+            asset = f"assets/neko-lifecycle-{name}-v2.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest())
         self.assertNotIn("assets/neko-tailplay-v2.png", names)
         self.assertIn("assets/neko-lifecycle-v2.png", names)
         self.assertIn("assets/neko-tailswish-v1.png", names)
+        from animations import IDLE_ROWS
+        for bank in IDLE_ROWS:
+            asset = f"assets/neko-idle-{bank}-v2.png"
+            self.assertIn(asset, names)
+            self.assertEqual(hashlib.sha256(archive.extract(names[asset])).hexdigest(),
+                             hashlib.sha256((Path(__file__).parent / asset).read_bytes()).hexdigest(), asset)
         for bank in ("a", "b", "c"):
             self.assertIn(f"assets/neko-idleplay-{bank}-v1.png", names)
         self.assertNotIn("assets/neko-tailplay-v1.png", names)
@@ -69,6 +86,7 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("cursors", modules)
         self.assertIn("thoughts", modules)
         self.assertIn("games", modules)
+        self.assertIn("event_log", modules)
         self.assertNotIn("game_overlay", modules)
         from animations import GAME_ROWS
         for bank in GAME_ROWS:
@@ -103,6 +121,22 @@ class PackagingTests(unittest.TestCase):
             level = manifest.find(".//{urn:schemas-microsoft-com:asm.v3}requestedExecutionLevel")
             self.assertIsNotNone(level)
             self.assertEqual(level.attrib["level"], "asInvoker")
+
+    def test_compiled_atlas_matches_source_frames(self):
+        from PyInstaller.archive.readers import CArchiveReader
+        from PySide6.QtWidgets import QApplication
+        from animations import SpriteAtlas
+        app = QApplication.instance() or QApplication([])
+        archive = CArchiveReader(str(self.exe))
+        names = {name.replace("\\", "/"): name for name in archive.toc}
+        original = SpriteAtlas(Path(__file__).parent / "assets")
+        with tempfile.TemporaryDirectory() as folder:
+            for filename in ("neko-runtime.png", "neko-runtime.json"):
+                Path(folder, filename).write_bytes(archive.extract(names[f"assets/{filename}"]))
+            compiled = SpriteAtlas(folder)
+        self.assertEqual(compiled.frames.keys(), original.frames.keys())
+        for key, frame in original.frames.items():
+            self.assertEqual(compiled.frames[key].toImage(), frame.toImage(), key)
 
     def test_native_startup_and_second_instance_exits(self):
         import win32gui
@@ -155,6 +189,15 @@ class PackagingTests(unittest.TestCase):
                     subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
                     process.wait(timeout=5)
+
+    def test_bundled_menu_plays_goodbye_from_awake_and_sleep_states(self):
+        import sys
+        with tempfile.TemporaryDirectory() as folder:
+            # Five seven-second case limits also need import and retention-I/O time.
+            result = subprocess.run([sys.executable, str(Path(__file__).parent / "tools/probe_bundled_goodbye.py"),
+                                     str(self.exe), str(Path(folder) / "result.json")],
+                                     capture_output=True, text=True, timeout=60)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

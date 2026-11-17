@@ -3,6 +3,23 @@ from games import GameTimer, Runway
 
 
 class InvitationTests(unittest.TestCase):
+    def test_entry_at_expiry_retains_the_observed_outside_approach(self):
+        timer = GameTimer(0)
+        timer.tick(89.5, True, False)
+        timer.tick(89.8, True, False)
+        self.assertIsNone(timer.tick(90.01, True, True))
+        self.assertEqual(timer.tick(90.3, True, True), "automatic")
+
+    def test_diagnostic_wait_reasons_change_without_poll_spam(self):
+        events = []
+        timer = GameTimer(0, record=lambda action, detail: events.append((action, detail)))
+        for now in (90, 91, 92):
+            timer.tick(now, False, blocked_reason="sleeping")
+        self.assertEqual(events.count(("waiting", "sleeping")), 1)
+        self.assertEqual(events.count(("queued", "automatic")), 1)
+        timer.tick(93, True, False)
+        self.assertEqual(timer.reason, "fresh side entry")
+
     def test_fresh_entry_can_wait_for_an_idle_animation_to_finish(self):
         timer = GameTimer(0)
         timer.tick(100, True, False, can_start=False)

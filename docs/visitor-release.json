@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-23",
+  "executables": {
+    "dist/DesktopNeko.exe": {
+      "bytes": 122370651,
+      "sha256": "659a3f427268879e432edc5533f707060c1c614434a00430a6167d6dc5946d97"
+    },
+    "dist/DesktopNeko-previous.exe": {
+      "bytes": 119406660,
+      "sha256": "373fb1088e0961ed08452d29eada1409eeaef8c81a792eb8c2eb443dc4256c39"
+    }
+  },
+  "source_sha256": {
+    "main.py": "e802b18c069fd68822b7af2c92e8a794b1d3128b778ad651a4d9cfce6efcede1",
+    "animations.py": "3f497ab042d838d5329897c74a467466f89704c47f12aac0d2d928fd27f89b5a",
+    "main.spec": "7414fc5b0b1b14592ee8f8405dedcd2e033e37d44e143dc79f1026ad2227f942",
+    "tools/bake_atlas.py": "9f48f79815aebcc8644616fd93e2b555bfaaaca73d2a8f2e6dcfabdd7702b7e7",
+    "tools/preview_lifecycle.py": "0452c12a9176b90b467935ccf1b1adc19c018ad301c09aa5d04851609a2dee40",
+    "test_main.py": "42f3ab06ff89b5445935e1277aa938d9277b1ef8d74ad7c220591647f61a2191",
+    "test_animations.py": "fc3b0da799d0a14234f8c2e71e0522d6a0af8557c2ed6b49a3c5d156a64f4c8c",
+    "test_packaging.py": "3d6d51d53389d9c84d8b1793dc775f7c9936cee54d6eadaa5a048143d1ffbf34"
+  },
+  "assets_sha256": {
+    "assets/neko-visitor-arrive-v1.png": "d7138689db6fd97d8e3d0793ee818c13f8e8948632453a094efcc525d557115a",
+    "assets/neko-visitor-depart-v1.png": "2100c748e5970d4e236f7309b1c43372e5a3ca36ad7042ea540677f1eea20484",
+    "assets/neko-visitor-recover-v1.png": "0288e7a9d195f7d578feeff576b4f9b4eba10920d0fe035ca909c7cafe1b9a1c"
+  },
+  "compiled_sha256": {
+    "neko-runtime.json": "d4533e84b666b1bce9f3451f33d3b369771d3a2687fb2b732cc5e812bdd60211",
+    "neko-runtime.png": "7d9053a9b73ad9b33a8d9ad369b237b6a767e731dece8fb9b07dc1ee45ad7da1"
+  },
+  "invariants": {
+    "atlas_entries": 786,
+    "unchanged_prior_frames": 741,
+    "unchanged_other_clips": 63,
+    "visitor_component_checks": "all45 imported entries pass",
+    "arrive_ms": 2150,
+    "depart_ms": 1800
+  },
+  "ui_start": [
+    {
+      "exe": "DesktopNeko.exe",
+      "ui_ready_seconds": 2.539
+    }
+  ],
+  "checks": {
+    "focused_passed": 115,
+    "packaging_passed": 4,
+    "native_scenes": 3,
+    "physical_mixed_dpi": "not tested",
+    "full_game_behavior_suite": "not run"
+  }
+}

@@ -13,12 +13,12 @@ from PySide6.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from animations import CLIPS, PET_ROWS, CARRY_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
+from animations import CLIPS, PET_ROWS, CARRY_ROWS, GAME_ROWS, IDLE_ROWS, SpriteAtlas, drop_progress, CANVAS_PADDING, CANVAS_TOP
 from cursors import petting_cursors
 
 
-IDLES = [("idle", "Sitting / blink"), ("tail", "Tail swish"), ("ears", "Ear flick"),
-         ("sniff", "Sniffing"), ("stretch", "Seated stretch"), ("groom", "Grooming"),
+IDLES = [("idle", "Resting / breath / blink"), ("tail", "Tail swish"), ("ears", "Ear flick"),
+         ("sniff", "Sniffing"), ("stretch", "Front stretch"), ("groom", "Grooming"),
          ("yawn", "Yawning"), ("loaf", "Loaf"), ("peek", "Sleepy peek"),
          ("look_left", "Looking left"), ("look_right", "Looking right"),
          ("tail_chase", "Tail chase"), ("tail_catch", "Tail catch")]
@@ -51,7 +51,8 @@ def displayed(atlas, name, elapsed):
         else:
             # Keep the 50ms samples exact after subtracting the idle introduction.
             elapsed = round(elapsed - 0.8, 3)
-    slot = 8 if name == "loaf" else 6
+    slot = (sum(CLIPS[name].durations) / 1000 if CLIPS[name].bank.startswith("idle-v2-")
+            and not CLIPS[name].loop else 8 if name == "loaf" else 6)
     if name in {item[0] for item in IDLES} and elapsed >= slot:
         name, elapsed = "idle", elapsed - slot
     if name not in ("arrive", "depart"):
@@ -68,7 +69,7 @@ def frame_sheet(atlas, entries, destination, source=False):
     for row, (name, label) in enumerate(entries):
         draw.text((8, band * 160 + 12), label, fill="#514a43")
         clip = CLIPS[name]
-        indices = sorted(set(clip.order))
+        indices = list(dict.fromkeys(clip.order))
         for col, index in enumerate(indices):
             if source:
                 frame = pixels(atlas.frames[clip.bank, clip.row + index // 4, index % 4])
@@ -84,30 +85,8 @@ def frame_sheet(atlas, entries, destination, source=False):
 
 
 def lifecycle_scene(atlas, destination):
-    frames = []
-    durations = [30, 30, 40] * 60
-    elapsed_ms = 0
-    for duration in durations:
-        canvas = Image.new("RGB", (480, 360), BACKGROUND)
-        draw = ImageDraw.Draw(canvas)
-        draw.text((12, 10), "Monitor top", fill="#514a43")
-        draw.line((0, 30, 240, 30), fill="#bcb4a7")
-        draw.text((252, 10), "Sad pause, then hop", fill="#514a43")
-        draw.line((0, 299, 480, 299), fill="#bcb4a7")
-        elapsed = elapsed_ms / 1000
-        y = round(-82 + 270 * drop_progress(elapsed))
-        arrival = displayed(atlas, "arrive", elapsed).crop((CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
-        # Crop horizontal transparent padding; retain the native top-edge clip/trajectory.
-        canvas.paste(arrival, (64, y), arrival)
-        draw.rectangle((0, 0, 239, 29), fill=BACKGROUND)
-        draw.text((12, 10), "Monitor top", fill="#514a43")
-        departure = pixels(atlas.frame("depart", max(0, elapsed - 0.5))).crop(
-            (CANVAS_PADDING, 0, CANVAS_PADDING + 112, 112))
-        canvas.paste(departure, (304, 188), departure)
-        frames.append(canvas)
-        elapsed_ms += duration
-    frames[0].save(destination, save_all=True, append_images=frames[1:],
-                   duration=durations, loop=0, disposal=2)
+    from tools.preview_lifecycle import scene
+    scene(atlas, destination)
 
 
 def flight_sheet(atlas, destination):
@@ -177,7 +156,7 @@ def cursor_preview(atlas, destination):
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication([])
     atlas = SpriteAtlas(ROOT / "assets")
-    assert len(atlas.frames) == 147 + sum(PET_ROWS.values()) * 4 + len(PET_ROWS) + sum(CARRY_ROWS.values()) * 4 + 1
+    assert len(atlas.frames) == 839 - 64 + sum(IDLE_ROWS.values()) * 4 + len(IDLE_ROWS)
     folder = ROOT / "docs"
     for entries, stem in ((IDLES, "neko-idle-catalog"), (ACTIVITIES, "neko-activity-catalog")):
         catalog(atlas, entries, folder / stem)

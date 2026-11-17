@@ -1,0 +1,280 @@
+{
+  "date": "2026-10-23",
+  "mode": "built-in ImageGen",
+  "prompt": "Use case: precise-object-edit. Asset: eight NEW full-body transition sprites for the EXISTING white pixel-art desktop kitten Neko, to finish her left/right looks with the adorable happy head tilt from the user's screenshot.\nImage1 canonical seated identity; image2 USER'S APPROVED TILTED SMILE target acting; image3 existing updated look sheet for style. Do not replace the existing glance sequence: these are a compatible appended tilted-smile sequence.\nONE transparent RGBA sheet, EXACTLY4 columns by2 rows,8 complete chronological kitten drawings, generous cell margins. Crisp stepped pixel art at consistent physical character size/camera, white fur, charcoal outlines, gray under-chin/chest, pink inner ears/nose, dark eyes with square highlights. No text, grid, scenery, shadows, floor, hearts or marks. Do not import the screenshot's beige background.\nSupport: the seated torso, haunches, both front paws, tail root and curled tail stay at exactly the same positions/scale/baseline in ALL8 cells. Only the head/neck and ears articulate into a DRAWN head tilt; do not rotate the whole kitten bitmap, bob the body, shrink, stretch, levitate, shift paws or add limbs. Head volume stays constant. Both paws and haunch support weight throughout.\nRow1, tilt towards viewer's right matching the screenshot:\n0 actual neutral frontal seated face, level ears, open eyes, tiny quiet mouth; exact canonical identity.\n1 small4-degree head tilt, eyes soften and ears follow the head, mouth begins a tiny pleased smile; neck connects to supported torso.\n2 fuller10-degree tilt (one ear clearly higher), eyelids half-closed, tiny visible happy smile, pink nose maintains facial anatomy.\n3 same full10-degree tilt, both eyes close into soft happy arcs, tiny smiling mouth, relaxed slightly splayed ears. This must read like the user's screenshot: affectionate, playful and satisfied, not sleepy or sad. No literal face glyphs.\nRow2, tilt towards viewer's left:\n4 canonical level/open-eye frontal neutral again, same body/tail orientation.\n5 small4-degree tilt in the opposite direction, soft eyes and tiny smile, ears following.\n6 full10-degree opposite tilt, half-closed happy lids and smile.\n7 full10-degree opposite tilt, closed happy eye arcs and tiny smile like row1's target.\nRuntime will play1\u21922\u21923, hold the delighted tilt600ms, then2\u21921\u21920 before returning to idle. Opposite direction uses5\u21926\u21927\u21926\u21925\u21924. Small connecting poses150ms each and neutral recovery200ms. Eyes/ears/mouth/head acting must therefore work in both directions, with genuine neck/head connections and complete level recovery. Do NOT draw a tilted tail or tilted supporting body. Tail stays on viewer's right in both rows; do not mirror the full animal. Head/neck should remain connected above the chest, without a long thin neck or changing head size. We will keep the exact existing supported lower body and assemble your newly drawn head/neck/upper-shoulder region so no accidental body redraw wobble is introduced. Make the tilt expressive and clearly visible at82px kitten height.",
+  "original": "references/look-tilt/2026-10-23/tilt-raw.png",
+  "reference_images": [
+    "references/idle-stability/2026-10-23/canonical.png",
+    "references/look-tilt/2026-10-23/user-tilt.png",
+    "references/look-tilt/2026-10-23/updated-look-base.png"
+  ],
+  "intent": "Restore updated directional looks; append drawn happy tilted-smile performances in both directions. Preserve resting breath, quiet tail and protected chase/catch.",
+  "assembly": {
+    "source_boxes": [
+      [
+        121,
+        114,
+        255,
+        281
+      ],
+      [
+        562,
+        97,
+        258,
+        299
+      ],
+      [
+        1002,
+        96,
+        262,
+        300
+      ],
+      [
+        1453,
+        107,
+        255,
+        289
+      ],
+      [
+        121,
+        555,
+        256,
+        283
+      ],
+      [
+        532,
+        536,
+        288,
+        304
+      ],
+      [
+        972,
+        535,
+        292,
+        305
+      ],
+      [
+        1413,
+        540,
+        295,
+        300
+      ]
+    ],
+    "batch_scale": [
+      0.2938388625592417,
+      0.2918149466192171
+    ],
+    "registrations": [
+      {
+        "source": 0,
+        "xy": [
+          59,
+          48
+        ],
+        "size": [
+          75,
+          82
+        ]
+      },
+      {
+        "source": 1,
+        "xy": [
+          59,
+          43
+        ],
+        "size": [
+          76,
+          87
+        ]
+      },
+      {
+        "source": 2,
+        "xy": [
+          58,
+          42
+        ],
+        "size": [
+          77,
+          88
+        ]
+      },
+      {
+        "source": 3,
+        "xy": [
+          60,
+          46
+        ],
+        "size": [
+          75,
+          84
+        ]
+      },
+      {
+        "source": 4,
+        "xy": [
+          60,
+          47
+        ],
+        "size": [
+          75,
+          83
+        ]
+      },
+      {
+        "source": 5,
+        "xy": [
+          50,
+          41
+        ],
+        "size": [
+          85,
+          89
+        ]
+      },
+      {
+        "source": 6,
+        "xy": [
+          49,
+          41
+        ],
+        "size": [
+          86,
+          89
+        ]
+      },
+      {
+        "source": 7,
+        "xy": [
+          48,
+          42
+        ],
+        "size": [
+          87,
+          88
+        ]
+      }
+    ],
+    "head_neck_region": [
+      48,
+      34,
+      136,
+      108
+    ],
+    "appended_source_order": [
+      1,
+      2,
+      3,
+      0,
+      5,
+      6,
+      7,
+      4
+    ],
+    "base_cells_preserved": 16,
+    "output": "assets/neko-idle-look-v2.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "method": "Preserve updated glance cells; use one neutral calibration/support registration for drawn head/neck tilts. Lower body/tail remains exact canonical. Opposite head tilts authored separately, no full-body mirroring or rotation.",
+    "source_support_target_on_canonical_head_axis": 95.34834123222748
+  },
+  "runtime": {
+    "look_left": {
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        3,
+        2,
+        1,
+        7,
+        16,
+        17,
+        18,
+        17,
+        16,
+        19,
+        24
+      ],
+      "durations_ms": [
+        350,
+        250,
+        300,
+        350,
+        650,
+        300,
+        250,
+        250,
+        300,
+        150,
+        150,
+        600,
+        150,
+        150,
+        200,
+        500
+      ],
+      "total_ms": 4900
+    },
+    "look_right": {
+      "order": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        11,
+        10,
+        9,
+        15,
+        20,
+        21,
+        22,
+        21,
+        20,
+        23,
+        24
+      ],
+      "durations_ms": [
+        350,
+        250,
+        300,
+        350,
+        650,
+        300,
+        250,
+        250,
+        300,
+        150,
+        150,
+        600,
+        150,
+        150,
+        200,
+        500
+      ],
+      "total_ms": 4900
+    }
+  },
+  "identities": {
+    "references/look-tilt/2026-10-23/tilt-raw.png": {
+      "bytes": 747364,
+      "sha256": "23663ad1f7bb8d1f9cba2b12c5795ac16bc4aebd0ca4e6a7f207f49e5c08fda6"
+    },
+    "references/look-tilt/2026-10-23/updated-look-base.png": {
+      "bytes": 162619,
+      "sha256": "6decdceecb05de4a55390a2ede66294947bcb3a5ff30732f7d00c4325f26fe05"
+    },
+    "references/look-tilt/2026-10-23/user-tilt.png": {
+      "bytes": 9332,
+      "sha256": "a8b8f416f65848421c3c8bfc438fabcb3fa1f8021edc84044194f36bc36ec119"
+    },
+    "assets/neko-idle-look-v2.png": {
+      "bytes": 237297,
+      "sha256": "91c6ec37d3e3ddc58e9cbebfe18abbd65b073b3d1367a15d10f8378e76ecfcd6"
+    }
+  }
+}
